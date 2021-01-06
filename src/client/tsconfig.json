@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "ES2019",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "sourceMap": true,
+        "skipLibCheck": true,
+        "allowSyntheticDefaultImports": true,
+        "isolatedModules": true,
+        "outDir": "../../dist/client",
+        "lib": ["ES2019", "DOM"],
+        "types": [],
+        "composite": true
+    },
+    "include": ["**/*.ts"],
+    "exclude": ["**/*.test.ts"],
+    "references": [{ "path": "../common" }]
+}

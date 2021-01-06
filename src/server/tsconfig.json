@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "sourceMap": true,
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "declaration": true,
+        "resolveJsonModule": true,
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "outDir": "../../dist-server/server",
+        "lib": ["ES2019"],
+        "moduleResolution": "node",
+        "types": ["node"],
+        "incremental": true,
+        "composite": true
+    },
+    "include": ["**/*.ts"],
+    "exclude": ["**/*.test.ts"],
+    "references": [{ "path": "../common" }]
+}
