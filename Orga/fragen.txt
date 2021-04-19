@@ -2,3 +2,4 @@
 - Preisgeld für 1.Platz?
 - Bürolayout
 - Was ist mit dne Kommentaren (Bearbeiterübersicht) gemeint?
+- Sachen im Latex 
