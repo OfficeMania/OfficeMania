@@ -5,3 +5,4 @@
 - Sachen im Latex 
 - unser Spiel nur für PC oder auch für Smartphone (mobile browser)? rönnie?!?!?
 - was heißt das new 0%
+- was machen wir mit tabelle 8? ist zwar Latex-Frage, aber trotzdem
