@@ -1,9 +1,8 @@
-- Muss Video?
-- Preisgeld für 1.Platz?
-- Bürolayout
-- Was ist mit dne Kommentaren (Bearbeiterübersicht) gemeint?
-- Sachen im Latex 
-- unser Spiel nur für PC oder auch für Smartphone (mobile browser)? rönnie?!?!?
-- was heißt das new 0%
-- was machen wir mit tabelle 8 (3.1) ? ist zwar Latex-Frage, aber trotzdem
+- Muss ein Video erstellt werden?
+- Gibt es ein Preisgeld für den 1. Platz?
+- Bürolayout => siehe grundriss.zip
+- Was ist mit den Kommentaren (Bearbeiterübersicht) gemeint?
+- Sachen im Latex?
+- (Soll unser Spiel nur für den PC oder auch für Smartphones (Mobile Browser) sein? rönnie?!?!?) => Da im Browser, denke ich, dass Mobile per se unterstützt wird
+- Was heißt das "new 0%"
 - Zählen die spontanen Tests auch als "Kommunikation"?
