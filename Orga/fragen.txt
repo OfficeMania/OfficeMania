@@ -1,8 +1,8 @@
-- Muss ein Video erstellt werden?
-- Gibt es ein Preisgeld für den 1. Platz?
-- Bürolayout => siehe grundriss.zip
-- Was ist mit den Kommentaren (Bearbeiterübersicht) gemeint?
-- Sachen im Latex?
-- (Soll unser Spiel nur für den PC oder auch für Smartphones (Mobile Browser) sein? rönnie?!?!?) => Da im Browser, denke ich, dass Mobile per se unterstützt wird
-- Was heißt das "new 0%"
-- Zählen die spontanen Tests auch als "Kommunikation"?
+- Muss ein Video erstellt werden? ((nein))
+- Gibt es ein Preisgeld für den 1. Platz? ((nein))
+- Bürolayout => siehe grundriss.zip ((gewünscht))
+- Was ist mit den Kommentaren (Bearbeiterübersicht) gemeint? ((egal))
+- Sachen im Latex? (())
+- (Soll unser Spiel nur für den PC oder auch für Smartphones (Mobile Browser) sein? rönnie?!?!?) => Da im Browser, denke ich, dass Mobile per se unterstützt wird ((kein smartphone, nur chrome und firefox))
+- Was heißt das "new 0%" ((weglassen))
+- Zählen die spontanen Tests auch als "Kommunikation"? ((nein))
