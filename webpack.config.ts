@@ -1,4 +1,4 @@
-import path from 'path';
+import * as path from 'path';
 import { Configuration } from 'webpack';
 
 import { SERVER_PORT, IS_DEV, WEBPACK_PORT } from './src/server/config';
