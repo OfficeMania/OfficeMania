@@ -14,7 +14,11 @@ describe("Player", () => {
         let player: Player = {
             name: "Test",
             positionX: 0,
-            positionY: 0
+            positionY: 0,
+            moveDown: false,
+            moveUp: false,
+            moveLeft: false,
+            moveRight: false
         }
 
         let width = 100;

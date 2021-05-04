@@ -10,6 +10,10 @@ export interface Player {
     name: String;
     positionX: number;
     positionY: number;
+    moveDown: boolean;
+    moveUp: boolean;
+    moveLeft: boolean;
+    moveRight: boolean;
 }
 
 /*
@@ -17,54 +21,52 @@ export interface Player {
  */
 export function updatePosition(player: Player, delta: number, width: number) {
     
-    if(moveDown === true){
-        player.positionY += PLAYER_MOVEMENT_PER_SECOND / 1000 * delta;
+    if(player.moveDown === true){
+        player.positionY += PLAYER_MOVEMENT_PER_SECOND / 100 * delta;
     }
-    if(moveUp === true){
-        player.positionY -= PLAYER_MOVEMENT_PER_SECOND / 1000 * delta;
+    if(player.moveUp === true){
+        player.positionY -= PLAYER_MOVEMENT_PER_SECOND / 100 * delta;
     }
-    if(moveLeft === true){
-        player.positionX -= PLAYER_MOVEMENT_PER_SECOND / 1000 * delta;
+    if(player.moveLeft === true){
+        player.positionX -= PLAYER_MOVEMENT_PER_SECOND / 100 * delta;
     }
-    if(moveRight === true){
-        player.positionX += PLAYER_MOVEMENT_PER_SECOND / 1000 * delta;
+    if(player.moveRight === true){
+        player.positionX += PLAYER_MOVEMENT_PER_SECOND / 100 * delta;
     }
     player.positionX %= width;
     
 }
 
-let moveDown = false;
-let moveUp = false;
-let moveLeft = false;
-let moveRight = false;
+
+
 
 function keyPressed(e: KeyboardEvent){
     if(e.key === "s"){
-        moveDown = true;
+        this.moveDown = true;
     }
     if(e.key === "w"){
-        moveUp = true;
+        this.moveUp = true;
     }
     if(e.key === "a"){
-        moveLeft = true;
+        this.moveLeft = true;
     }
     if(e.key === "d"){
-        moveRight = true;
+        this.moveRight = true;
     }
 }
 
 function keyUp(e: KeyboardEvent){
     if(e.key === "s"){
-        moveDown = false;
+        this.moveDown = false;
     }
     if(e.key === "w"){
-        moveUp = false;
+        this.moveUp = false;
     }
     if(e.key === "a"){
-        moveLeft = false;
+        this.moveLeft = false;
     }
     if(e.key === "d"){
-        moveRight = false;
+        this.moveRight = false;
     }
 }
 

@@ -41,6 +41,39 @@ async function main() {
     let height = canvas.height;
     let ctx = canvas.getContext("2d");
 
+    function keyPressed(e: KeyboardEvent){
+        if(e.key === "s"){
+            ourPlayer.moveDown = true;
+        }
+        if(e.key === "w"){
+            ourPlayer.moveUp = true;
+        }
+        if(e.key === "a"){
+            ourPlayer.moveLeft = true;
+        }
+        if(e.key === "d"){
+            ourPlayer.moveRight = true;
+        }
+    }
+    
+    function keyUp(e: KeyboardEvent){
+        if(e.key === "s"){
+            ourPlayer.moveDown = false;
+        }
+        if(e.key === "w"){
+            ourPlayer.moveUp = false;
+        }
+        if(e.key === "a"){
+            ourPlayer.moveLeft = false;
+        }
+        if(e.key === "d"){
+            ourPlayer.moveRight = false;
+        }
+    }
+    
+    document.addEventListener("keydown", keyPressed);
+    document.addEventListener("keyup", keyUp);
+
     /*
      * Create a gameloop-like function for drawing a simple animation
      *
@@ -50,7 +83,7 @@ async function main() {
 
     let previous = performance.now();
     let lag = 0;
-
+    
     function loop(now: number) {
         lag += now - previous;
         previous = now;
