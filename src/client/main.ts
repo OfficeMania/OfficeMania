@@ -21,7 +21,7 @@ async function main() {
     /*
      * Before we can launch our main functionality, we need to join a room and
      * wait for our player to be available to the server.
-     * 
+     * git
      * room and ourPlayer are currently unused, but are probably of use for later
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
@@ -66,6 +66,8 @@ async function main() {
             lag -= MS_PER_UPDATE;
         }
         
+        
+
         /*
          * Repaint the scene
          */
@@ -80,9 +82,11 @@ async function main() {
         ctx.save();
         Object.values(players).forEach((player: Player, i: number) => {
             ctx.fillStyle = PLAYER_COLORS[i % PLAYER_COLORS.length];
-            ctx.fillRect(player.position, i * 50, 25, 25);
+            ctx.fillRect(player.positionX, player.positionY, 25, 25);
         });
         ctx.restore();
+
+        
 
         // Repeat game loop
         requestAnimationFrame(loop);

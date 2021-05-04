@@ -46,7 +46,8 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
 
                 let player: Player = {
                     name: playerName,
-                    position: 0
+                    positionX: 0,
+                    positionY: 0
                 };
                 players[sessionId] = player;
 

@@ -13,24 +13,25 @@ describe("Player", () => {
     test("Player moves", () => {
         let player: Player = {
             name: "Test",
-            position: 0
+            positionX: 0,
+            positionY: 0
         }
 
         let width = 100;
 
         {
             updatePosition(player, 0, width);
-            expect(player.position).toBe(0);
+            expect(player.positionX).toBe(0);
         }
 
         {
             updatePosition(player, 1000, width);
-            expect(player.position).toBe(PLAYER_MOVEMENT_PER_SECOND);
+            expect(player.positionX).toBe(PLAYER_MOVEMENT_PER_SECOND);
         }
 
         {
             updatePosition(player, 1000, width);
-            expect(player.position).toBe(2 * PLAYER_MOVEMENT_PER_SECOND);
+            expect(player.positionX).toBe(2 * PLAYER_MOVEMENT_PER_SECOND);
         }
     });
 });
