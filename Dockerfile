@@ -8,6 +8,8 @@ COPY package*.json ./
 
 RUN npm ci --production=true
 
+RUN npm install concurrently
+
 COPY . .
 
 EXPOSE 8080
