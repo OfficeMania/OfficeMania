@@ -1,0 +1,9 @@
+kind: pipeline
+name: default
+type: docker
+steps:
+  - name: test
+    image: node:14.13
+    commands:
+      - npm install
+      - npm test
