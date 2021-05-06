@@ -1,14 +1,30 @@
+FROM node:14.13-alpine AS BUILD_IMAGE
+
+ENV PORT 8080
+
+WORKDIR /src
+
+COPY package*.json ./
+
+RUN npm ci
+
+COPY . .
+
+RUN TS_NODE_PROJECT="tsconfig-for-webpack-config.json" && ./node_modules/.bin/webpack --config webpack.config.js
+
+RUN npm prune --production
+
 FROM node:14.13-alpine
 
 ENV PORT 8080
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY package*.json ./
+COPY --from=BUILD_IMAGE /src/ .
 
-RUN npm ci --only=production && npm install ts-node
+RUN ls -lah /app
 
-COPY . .
+RUN npm install --no-package-lock --no-save typescript@^4.1.3 ts-node@^8.1.0 tslib@2.2.0
 
 EXPOSE 8080
 
