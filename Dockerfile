@@ -2,14 +2,14 @@ FROM node:14.13-alpine
 
 ENV PORT 8080
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm ci --production=true
+RUN npm ci --only=production && npm install ts-node
 
 COPY . .
 
 EXPOSE 8080
 
-CMD  [ "npm", "start"]
+CMD  [ "npm", "run", "start-production" ]
