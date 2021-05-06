@@ -1,4 +1,4 @@
-FROM node:14.13
+FROM node:14.13-alpine
 
 ENV PORT 8080
 
@@ -6,7 +6,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci
+RUN npm ci --production=true
 
 COPY . .
 
