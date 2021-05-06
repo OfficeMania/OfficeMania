@@ -27,6 +27,7 @@ steps:
   - name: publish-video
     image: plugins/docker
     settings:
+      dockerfile: Dockerfile.dev
       repo:
         from_secret: docker_repo
       username:
@@ -41,6 +42,7 @@ steps:
   - name: publish-movement
     image: plugins/docker
     settings:
+      dockerfile: Dockerfile.dev
       repo:
         from_secret: docker_repo
       username:
