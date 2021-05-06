@@ -33,7 +33,21 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      tags: video
+      tags: dev-video
     when:
       branch:
         - video
+
+  - name: publish-movement
+    image: plugins/docker
+    settings:
+      repo:
+        from_secret: docker_repo
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      tags: dev-movement
+    when:
+      branch:
+        - movement
