@@ -10,7 +10,7 @@ RUN npm ci
 
 COPY . .
 
-RUN TS_NODE_PROJECT="tsconfig-for-webpack-config.json" && ./node_modules/.bin/webpack --config webpack.config.js
+RUN TS_NODE_PROJECT="tsconfig-for-webpack-config.json" && ./node_modules/.bin/webpack
 
 RUN npm prune --production
 
