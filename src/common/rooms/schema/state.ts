@@ -1,5 +1,20 @@
 import { Schema, type, MapSchema } from "@colyseus/schema";
 
+
+/*
+ * Class to sync the playerdata with the server
+ */
+export class PlayerData extends Schema {
+    @type("string")
+    name: string;
+
+    @type("number")
+    x: number;
+
+    @type("number")
+    y: number;
+}
+
 /*
  * The state of a room. Each variable that is annotated with a @type decorator
  * automatically gets synced with the clients.
@@ -12,7 +27,9 @@ import { Schema, type, MapSchema } from "@colyseus/schema";
  * changed). The solution for this is to add an onAdd, onRemove, onChange listener
  * to every schema.
  */
+
+
 export class State extends Schema {
-    @type({map: "string"})
-    players = new MapSchema<String>();
+    @type({map: PlayerData})
+    players = new MapSchema<PlayerData>();
 }

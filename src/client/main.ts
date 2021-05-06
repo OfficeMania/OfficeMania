@@ -21,7 +21,7 @@ async function main() {
     /*
      * Before we can launch our main functionality, we need to join a room and
      * wait for our player to be available to the server.
-     * 
+     * git
      * room and ourPlayer are currently unused, but are probably of use for later
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
@@ -41,6 +41,54 @@ async function main() {
     let height = canvas.height;
     let ctx = canvas.getContext("2d");
 
+
+    /*
+    * movement of players
+    *
+    * ourPlayer = current Player
+    */
+    function keyPressed(e: KeyboardEvent){
+        if(e.key === "s"){
+            ourPlayer.moveDown = true;
+        }
+        if(e.key === "w"){
+            ourPlayer.moveUp = true;
+        }
+        if(e.key === "a"){
+            ourPlayer.moveLeft = true;
+        }
+        if(e.key === "d"){
+            ourPlayer.moveRight = true;
+        }
+    }
+
+    function keyUp(e: KeyboardEvent){
+        if(e.key === "s"){
+            ourPlayer.moveDown = false;
+        }
+        if(e.key === "w"){
+            ourPlayer.moveUp = false;
+        }
+        if(e.key === "a"){
+            ourPlayer.moveLeft = false;
+        }
+        if(e.key === "d"){
+            ourPlayer.moveRight = false;
+        }
+    }
+
+    document.addEventListener("keydown", keyPressed);
+    document.addEventListener("keyup", keyUp);
+
+
+
+    // message reciev test
+
+    room.onMessage("skill" ,(message) => {console.log("lol")});
+
+
+
+
     /*
      * Create a gameloop-like function for drawing a simple animation
      *
@@ -54,7 +102,7 @@ async function main() {
 
     //ask for available webcam
     const video = document.querySelector('video');
-    
+
     //if webcam works
     function handleSuccess(stream) {
       video.srcObject = stream;
@@ -64,16 +112,16 @@ async function main() {
     function handleError(error) {
       console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
     }
-    
+
     //we want only video for now
     const constraints = {
         audio: false,
         video: true
       };
 
-    //finally get webcam video 
+    //finally get webcam video
     navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess).catch(handleError);
-    
+
     function loop(now: number) {
         lag += now - previous;
         previous = now;
@@ -83,7 +131,7 @@ async function main() {
          */
         while (lag >= MS_PER_UPDATE) {
             Object.values(players).forEach((player: Player) => {
-                updatePosition(player, MS_PER_UPDATE, width);
+                return updatePosition(player, MS_PER_UPDATE, room, client);
             });
 
             lag -= MS_PER_UPDATE;
@@ -103,7 +151,7 @@ async function main() {
         ctx.save();
         Object.values(players).forEach((player: Player, i: number) => {
             ctx.fillStyle = PLAYER_COLORS[i % PLAYER_COLORS.length];
-            ctx.fillRect(player.position, i * 50, 25, 25);
+            ctx.fillRect(player.positionX, player.positionY, 25, 25);
         });
         ctx.restore();
 
