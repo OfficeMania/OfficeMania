@@ -8,7 +8,7 @@ COPY package*.json ./
 
 RUN npm ci --production=true
 
-RUN npm install concurrently
+RUN npm install concurrently --production=true
 
 COPY . .
 
