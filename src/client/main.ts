@@ -40,7 +40,13 @@ async function main() {
     let width = canvas.width;
     let height = canvas.height;
     let ctx = canvas.getContext("2d");
+    
 
+    /*
+    * movement of players
+    * 
+    * ourPlayer = current Player
+    */
     function keyPressed(e: KeyboardEvent){
         if(e.key === "s"){
             ourPlayer.moveDown = true;
@@ -74,6 +80,15 @@ async function main() {
     document.addEventListener("keydown", keyPressed);
     document.addEventListener("keyup", keyUp);
 
+    
+
+    // message reciev test
+
+    room.onMessage("skill" ,(message) => {console.log("lol")});
+
+
+
+
     /*
      * Create a gameloop-like function for drawing a simple animation
      *
@@ -91,9 +106,11 @@ async function main() {
         /*
          * Update each player's position using a fixed delta
          */
+
+        
         while (lag >= MS_PER_UPDATE) {
             Object.values(players).forEach((player: Player) => {
-                updatePosition(player, MS_PER_UPDATE, width);
+                return updatePosition(player, MS_PER_UPDATE, room, client);
             });
 
             lag -= MS_PER_UPDATE;

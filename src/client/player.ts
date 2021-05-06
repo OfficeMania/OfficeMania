@@ -1,3 +1,6 @@
+import { Client, Room } from "colyseus.js";
+import { State } from "../common";
+
 export var PLAYER_MOVEMENT_PER_SECOND = 10;
 export var PLAYER_COLORS = ["red", "blue", "green", "yellow", "black"];
 
@@ -7,7 +10,7 @@ export var PLAYER_COLORS = ["red", "blue", "green", "yellow", "black"];
  * a change from the server is reported (in the onAdd, onRemove, onChange methods).
  */
 export interface Player {
-    name: String;
+    name: string;
     positionX: number;
     positionY: number;
     moveDown: boolean;
@@ -17,61 +20,27 @@ export interface Player {
 }
 
 /*
- * Updating the player's position is currently only done on the client side.
+ * Sending the movement to the Server
  */
-export function updatePosition(player: Player, delta: number, width: number) {
+export function updatePosition(player: Player, delta: number, room: Room, client: Client) {
     
     if(player.moveDown === true){
-        player.positionY += PLAYER_MOVEMENT_PER_SECOND / 100 * delta;
+        room.send("move", "moveDown");
     }
     if(player.moveUp === true){
-        player.positionY -= PLAYER_MOVEMENT_PER_SECOND / 100 * delta;
+        room.send("move", "moveUp");
     }
     if(player.moveLeft === true){
-        player.positionX -= PLAYER_MOVEMENT_PER_SECOND / 100 * delta;
+        room.send("move", "moveLeft");
     }
     if(player.moveRight === true){
-        player.positionX += PLAYER_MOVEMENT_PER_SECOND / 100 * delta;
+        room.send("move", "moveRight");
     }
-    player.positionX %= width;
     
+    //sync down cords
+    player.positionX = room.state.players[player.name].x
+    player.positionY = room.state.players[player.name].y
 }
-
-
-
-
-function keyPressed(e: KeyboardEvent){
-    if(e.key === "s"){
-        this.moveDown = true;
-    }
-    if(e.key === "w"){
-        this.moveUp = true;
-    }
-    if(e.key === "a"){
-        this.moveLeft = true;
-    }
-    if(e.key === "d"){
-        this.moveRight = true;
-    }
-}
-
-function keyUp(e: KeyboardEvent){
-    if(e.key === "s"){
-        this.moveDown = false;
-    }
-    if(e.key === "w"){
-        this.moveUp = false;
-    }
-    if(e.key === "a"){
-        this.moveLeft = false;
-    }
-    if(e.key === "d"){
-        this.moveRight = false;
-    }
-}
-
-document.addEventListener("keydown", keyPressed);
-document.addEventListener("keyup", keyUp);
 
 /*
  * If you run npm test, you will find that no test covers this function.
