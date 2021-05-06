@@ -10,7 +10,7 @@ steps:
       - npm install
       - npm test
 
-  - name: publish
+  - name: publish-master
     image: plugins/docker
     settings:
       repo:
@@ -19,4 +19,21 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      tags: dev
+      tags: latest
+    when:
+      branch:
+        - master
+
+  - name: publish-video
+    image: plugins/docker
+    settings:
+      repo:
+        from_secret: docker_repo
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      tags: video
+    when:
+      branch:
+        - video
