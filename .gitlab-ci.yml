@@ -1,9 +1,6 @@
-javascript:
+test-job:
   stage: test
+  image: node:14.13
   script:
-    - 'jest --ci --reporters=default --reporters=jest-junit'
-  artifacts:
-    when: always
-    reports:
-      junit:
-        - junit.xml
+    - npm install
+    - npm test
