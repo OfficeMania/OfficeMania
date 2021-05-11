@@ -4,3 +4,10 @@ test-job:
   script:
     - npm install
     - npm test
+
+build-job:
+  stage: build
+  image: docker:19.03.12
+  script:
+    - docker build -t test/officemania:test .
+    - docker run --rm test/officemania:test npm test
