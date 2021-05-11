@@ -98,29 +98,27 @@ async function main() {
 
     let previous = performance.now();
     let lag = 0;
+    
+    const domain = 'meet.jit.si';
+    const options = {
+        roomName: 'namedesraums',
+        height: 200,
+        parentNode: document.querySelector('#meet'),
+        configOverwrite: { 
+            startWithAudioMuted: true,
+        },
+        interfaceConfigOverwrite: { 
+            DISABLE_DOMINANT_SPEAKER_INDICATOR: true,
+            DEFAULT_BACKGROUND: '#000000',
+            DEFAULT_LOGO_URL: '#',
+            JITSI_WATERMARK_LINK: '#',
+            SHOW_JITSI_WATERMARK: false
+        },
+    };
+    const api = new JitsiMeetExternalAPI(domain, options);
 
+    //document.getElementById("mute_button").onclick = test;
 
-    //ask for available webcam
-    const video = document.querySelector('video');
-
-    //if webcam works
-    function handleSuccess(stream) {
-      video.srcObject = stream;
-    }
-
-    //if webcam doesn't work
-    function handleError(error) {
-      console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
-    }
-
-    //we want only video for now
-    const constraints = {
-        audio: false,
-        video: true
-      };
-
-    //finally get webcam video
-    navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess).catch(handleError);
 
     function loop(now: number) {
         lag += now - previous;
