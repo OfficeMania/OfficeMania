@@ -99,6 +99,8 @@ async function main() {
     let previous = performance.now();
     let lag = 0;
     
+
+    //configure jitsi room and bind it to div "meet"
     const domain = 'meet.jit.si';
     const options = {
         roomName: 'namedesraums',
@@ -106,20 +108,69 @@ async function main() {
         parentNode: document.querySelector('#meet'),
         configOverwrite: { 
             startWithAudioMuted: true,
+            prejoinPageEnabled: false,
+            toolbarButtons: [],
+            backgroundAlpha: 1,
+            hideConferenceTimer: true,
+            hideConferenceSubject: true,
+            disableJoinLeaveSounds: true,
+            disableResponsiveTiles: true,
         },
         interfaceConfigOverwrite: { 
             DISABLE_DOMINANT_SPEAKER_INDICATOR: true,
-            DEFAULT_BACKGROUND: '#000000',
-            DEFAULT_LOGO_URL: '#',
-            JITSI_WATERMARK_LINK: '#',
-            SHOW_JITSI_WATERMARK: false
+            DEFAULT_BACKGROUND: 'rgba(255,255,255,0)',
+            VIDEO_LAYOUT_FIT: 'height',
+            VIDEO_QUALITY_LABEL_DISABLED: true,
+            TILE_VIEW_MAX_COLUMNS: 5,
         },
     };
+    //start jitsi room
     const api = new JitsiMeetExternalAPI(domain, options);
+    
+    //turn off own webcam preview on the right
+    api.executeCommand('toggleFilmStrip');
 
-    //document.getElementById("mute_button").onclick = test;
+    
+    //tile view as default
+    api.addEventListener(`videoConferenceJoined`, () => {
+        const listener = ({ enabled }) => {
+          api.removeEventListener(`tileViewChanged`, listener);
+    
+          if (!enabled) {
+            api.executeCommand(`toggleTileView`);
+          }
+        };
+    
+        api.addEventListener(`tileViewChanged`, listener);
+        api.executeCommand(`toggleTileView`);
+      });
+    
 
+    //mute/unmute button
+    document.getElementById("mute_button").onclick = toggle_audio;
 
+    //wrapper function for audio mute / unmute button
+    function toggle_audio() {
+        api.executeCommand('toggleAudio');
+    }
+
+    //camera toggle button
+    document.getElementById("cam_button").onclick = toggle_cam;
+
+    //wrapper function for camera toggle button
+    function toggle_cam() {
+        api.executeCommand('toggleVideo');
+    }
+
+    //camera toggle button
+    document.getElementById("tile_button").onclick = toggle_tile;
+
+    //wrapper function for camera toggle button
+    function toggle_tile() {
+        api.executeCommand('setTileView', true);
+    }
+
+    
     function loop(now: number) {
         lag += now - previous;
         previous = now;
