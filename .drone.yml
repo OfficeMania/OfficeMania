@@ -24,7 +24,7 @@ steps:
       branch:
         - master
 
-  - name: publish-video
+  - name: publish-design
     image: plugins/docker
     settings:
       dockerfile: Dockerfile.dev
@@ -34,10 +34,10 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      tags: dev-video
+      tags: dev-design
     when:
       branch:
-        - video
+        - design
 
   - name: publish-movement
     image: plugins/docker
@@ -53,3 +53,18 @@ steps:
     when:
       branch:
         - movement
+
+  - name: publish-video
+    image: plugins/docker
+    settings:
+      dockerfile: Dockerfile.dev
+      repo:
+        from_secret: docker_repo
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      tags: dev-video
+    when:
+      branch:
+        - video
