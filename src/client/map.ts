@@ -18,7 +18,7 @@ class chunk {
 }
 let chunkArray: chunk[];
 
-//resolution of the tiles
+let resolution: number;
 let tileHeight: number;
 let tileWidth: number;
 
@@ -31,7 +31,19 @@ let startPosY: number;
 
 //TODO create canvas with good scale of the map
 
-let path: string[];
+class tileset {
+
+    firstGridId: number;
+    path: string;
+
+    tileset (firstId: number, source: string) {
+
+        this.firstGridId = firstId;
+        this.path = source;
+    }
+}
+
+let tilesetArray: tileset[];
 
 function readMap() {
 
@@ -52,19 +64,22 @@ function drawMapWithChunks () {
 
     var img = new Image;
 
+    //check for the firstGridId to know which texturedata is needed, and then search for number of pixels and divide this with 48 to get the width and height
+
     chunkArray.forEach(function(c) {
 
         for (let y = 0; y < 16; y++) {
 
             for (let x = 0; x < 16; x++) {
 
-                var value = c.element[x][y];
+                var value = c.element[x][y] -1;
+                
+                if (value !== -1) {
+                    var sourceX = (value % tileWidth) * resolution
+                    var sourceY = Math.floor(value / tileHeight) * resolution;
 
-                var sourceX = x * tileWidth;
-                var sourceY = y * tileHeight;
-
-                canvas.drawImage(img, sourceX, sourceY, tileWidth, tileHeight, x, y, tileWidth, tileHeight);
-
+                    canvas.drawImage(img, sourceX, sourceY, resolution, resolution, x, y, resolution, resolution);
+                }
             }
         }
     })
