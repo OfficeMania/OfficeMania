@@ -1,35 +1,71 @@
-function drawMap () {
+export {drawMapWithChunks}
 
-    let chunk:number[];
+//only important for infinit maps
+class chunk {
 
-    var path = "/Users/michaelgoslar/Desktop/Texturepacks/Modern_Interiors/1_Interiors/48x48/Old_Stuff/Tileset_48x48_4.png"
+    element: number[][];
+    posX: number;
+    posY: number;
+
+    chunk (entries: number[], xPos: number, yPos: number) {
+
+        for (let i: number = 0; i < entries.length; i++) {
+            this.element[i % 16][Math.floor(i / 16)] = entries[i];
+        }
+        this.posX = xPos;
+        this.posY = yPos;
+    }
+}
+let chunkArray: chunk[];
+
+//resolution of the tiles
+let tileHeight: number;
+let tileWidth: number;
+
+//important for drawing, infinite maps works with chunks only
+let isInfinity: boolean;
+
+//the spawn for joining
+let startPosX: number;
+let startPosY: number;
+
+//TODO create canvas with good scale of the map
+
+let path: string[];
+
+function readMap() {
+
+    // must be changed to an filereader
+    let rawdata = ("/Users/michaelgoslar/Desktop/Map.json")
+
+    let map = JSON.parse(rawdata);
+}
+
+
+
+//code for infinit maps
+function drawMapWithChunks () {
+
+    let chunkTest:number[];
+
+    let canvas: CanvasDrawImage;
 
     var img = new Image;
 
-    img.src = path;
+    chunkArray.forEach(function(c) {
 
-    for (let i:number = 0; i < 64; i++) {
-        chunk.push(i);
-    }
+        for (let y = 0; y < 16; y++) {
 
-    for (let index = chunk.length - 1; index > -1; index--) {
+            for (let x = 0; x < 16; x++) {
 
-        var value = chunk[index];
+                var value = c.element[x][y];
 
-        var sourceX = (value % 10) * 48
-        var sourceY = Math.floor(value / 10) * 48
+                var sourceX = x * tileWidth;
+                var sourceY = y * tileHeight;
 
-        var destinationX = (index % 16)
-        var destinationY = Math.floor(index / 16)
+                canvas.drawImage(img, sourceX, sourceY, tileWidth, tileHeight, x, y, tileWidth, tileHeight);
 
-        canves.drawImage(img, sourceX, sourceY, 48, 48, destinationX, destinationY, 48, 48);
-    }
+            }
+        }
+    })
 }
-
-const fs = require("fs");
-
-let rawdata = fs.readFileSync("/Users/michaelgoslar/Desktop/Map.json")
-
-let map = JSON.parse(rawdata);
-
-drawMap();
