@@ -70,6 +70,16 @@ function readMap() {
     let map = JSON.parse(rawdata);
 }
 
+function convertXCoordinate(x: number, c:chunk): number {
+
+    return (x + c.posX - (startPosX - Math.floor(mapWidth/2)))
+}
+
+function convertYCoordinate(y: number, c:chunk): number {
+
+    return (y + c.posY - (startPosY - Math.floor(mapHeight/2)))
+}
+
 
 
 //code for infinit maps
@@ -81,39 +91,48 @@ function drawMapWithChunks () {
 
     chunkArray.forEach(function(c) {
 
-        for (let y = 0; y < 16; y++) {
+        let convertedY: number = convertYCoordinate(c.posY, c);
+        let convertedX: number = convertXCoordinate(c.posX, c);
 
-            //checks if the y coordinate would be seen on the screen, only works with an odd mapHeigtht
-            if (!((y + c.posY) < (startPosY - Math.floor(mapHeight/2)) || (y + c.posY) > (startPosY + Math.floor(mapHeight/2)))) {
+        //checks if the full chunk is not on the map on the screen
+        if(!(convertedX + 16 < 0 || convertedY + 16 < 0 || convertedX > mapWidth - 1 || convertedY > mapHeight - 1)) {
 
-                for (let x = 0; x < 16; x++) {
+            for (let y = 0; y < 16; y++) {
 
-                    //if the value is 0 we do not need to draw
-                    if (c.element[x][y] !== 0) {
-                        
-                        //checks if the x coordiante would be seen on the screen, only works with an odd mapWidth
-                        if ((x + c.posX) < (startPosX - Math.floor(mapWidth/2)) || (x + c.posX) > (startPosX + Math.floor(mapWidth/2))) {
+                //checks if the y coordinate would be seen on the screen, only works with an odd mapHeigtht
+                convertedY = convertYCoordinate(y, c);
+                if (!(convertedY < 0 || convertedY > mapHeight - 1)) {
     
-                            //saves a tileset, we need this to find the rigth one
-                            let newTileset:tileset = null;
+                    for (let x = 0; x < 16; x++) {
     
-                            for (let i = 0; 0 < sortedTilesetArray.length; i++) {
-    
-                                if (c.element[x][y] >= sortedTilesetArray[i].firstGridId) {
-    
-                                    newTileset = sortedTilesetArray[i];
-                                }
-    
-                                //if this is true we found the rigth tileset with help of the firstGridId
-                                if (c.element[x][y] < newTileset.firstGridId || i === (sortedTilesetArray.length - 1)) {
-    
-                                    var value = c.element[x][y] - sortedTilesetArray[i].firstGridId;
-                                    
-                                    //calculates the rigth postion from the needed texture
-                                    var sourceX = (value % newTileset.tileWidth) * resolution
-                                    var sourceY = Math.floor(value / newTileset.tileHeight) * resolution;
-    
-                                    canvas.drawImage(img, sourceX, sourceY, resolution, resolution, x + c.posX, y + c.posY, resolution, resolution);
+                        //if the value is 0 we do not need to draw
+                        if (c.element[x][y] !== 0) {
+                            
+                            //checks if the x coordiante would be seen on the screen, only works with an odd mapWidth
+                            convertedX = convertXCoordinate(x, c);
+                            if (!(convertedX < 0 || convertedX > mapWidth - 1)) {
+        
+                                //saves a tileset, we need this to find the rigth one
+                                let newTileset:tileset = null;
+        
+                                for (let i = 0; 0 < sortedTilesetArray.length; i++) {
+        
+                                    if (c.element[x][y] >= sortedTilesetArray[i].firstGridId) {
+        
+                                        newTileset = sortedTilesetArray[i];
+                                    }
+        
+                                    //if this is true we found the rigth tileset with help of the firstGridId
+                                    if (c.element[x][y] < newTileset.firstGridId || i === (sortedTilesetArray.length - 1)) {
+        
+                                        var value = c.element[x][y] - sortedTilesetArray[i].firstGridId;
+                                        
+                                        //calculates the rigth postion from the needed texture
+                                        var sourceX = (value % newTileset.tileWidth) * resolution
+                                        var sourceY = Math.floor(value / newTileset.tileHeight) * resolution;
+        
+                                        canvas.drawImage(img, sourceX, sourceY, resolution, resolution, convertedX, convertedY, resolution, resolution);
+                                    }
                                 }
                             }
                         }
