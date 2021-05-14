@@ -64,7 +64,10 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      tags: dev-video
+      tags:
+       - dev-video
+       - build-${DRONE_BUILD_NUMBER}
+       - commit-${DRONE_COMMIT_SHA:0:8}
     when:
       branch:
         - video
