@@ -25,7 +25,7 @@ resolution = 48;
 //important for drawing, infinite maps work only with chunks
 let isInfinity: boolean;
 
-//the spawn for joining
+//the spawncoordinates
 let startPosX: number;
 let startPosY: number;
 
@@ -78,8 +78,6 @@ function drawMapWithChunks () {
     let canvas: CanvasDrawImage;
 
     var img = new Image;
-
-    //check for the firstGridId to know which texturedata is needed, and then search for number of pixels and divide this with 48 to get the width and height
 
     chunkArray.forEach(function(c) {
 
