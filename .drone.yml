@@ -19,7 +19,10 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      tags: latest
+      target: PRODUCTION_IMAGE
+      tags:
+        - latest
+        - commit-${DRONE_COMMIT_SHA:0:8}
     when:
       branch:
         - master
@@ -27,14 +30,16 @@ steps:
   - name: publish-design
     image: plugins/docker
     settings:
-      dockerfile: Dockerfile.dev
       repo:
         from_secret: docker_repo
       username:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      tags: dev-design
+      target: DEBUG_IMAGE
+      tags:
+        - dev-design
+        - commit-${DRONE_COMMIT_SHA:0:8}
     when:
       branch:
         - design
@@ -42,14 +47,16 @@ steps:
   - name: publish-movement
     image: plugins/docker
     settings:
-      dockerfile: Dockerfile.dev
       repo:
         from_secret: docker_repo
       username:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      tags: dev-movement
+      target: DEBUG_IMAGE
+      tags:
+        - dev-movement
+        - commit-${DRONE_COMMIT_SHA:0:8}
     when:
       branch:
         - movement
@@ -57,14 +64,16 @@ steps:
   - name: publish-video
     image: plugins/docker
     settings:
-      dockerfile: Dockerfile.dev
       repo:
         from_secret: docker_repo
       username:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      tags: dev-video
+      target: DEBUG_IMAGE
+      tags:
+       - dev-video
+       - commit-${DRONE_COMMIT_SHA:0:8}
     when:
       branch:
         - video
