@@ -1,0 +1,6 @@
+test-job:
+  stage: test
+  image: node:14.13
+  script:
+    - npm install
+    - npm test
