@@ -1,6 +1,6 @@
 export {drawMapWithChunks}
 
-//only important for infinit maps
+//only important for infinite maps
 class chunk {
 
     element: number[][];
@@ -18,18 +18,18 @@ class chunk {
 }
 let chunkArray: chunk[];
 
-//the resolution is 48 and shouldnt be changed, would be to complicated to get the rigth resolution
+//the resolution is 48 and shouldn't be changed, would be too complicated to get the right resolution
 let resolution: number;
 resolution = 48;
 
 //important for drawing, infinite maps work only with chunks
 let isInfinity: boolean;
 
-//the spawncoordinates
+//the spawn coordinates
 let startPosX: number;
 let startPosY: number;
 
-//the heigth and width of the map on screen
+//the height and width of the map on screen. Let Height and Width be odd, so player is displayed in middle of the screen
 let mapHeight: number;
 let mapWidth: number;
 
@@ -64,7 +64,7 @@ function fillSortedTilesetArray(tileset: tileset[]) {
 
 function readMap() {
 
-    // must be changed to an filereader
+    // must be changed to a filereader
     let rawdata = ("/Users/michaelgoslar/Desktop/Map.json")
 
     let map = JSON.parse(rawdata);
@@ -82,7 +82,7 @@ function convertYCoordinate(y: number, c:chunk): number {
 
 
 
-//code for infinit maps
+//code for infinite maps
 function drawMapWithChunks () {
 
     let canvas: CanvasDrawImage;
@@ -112,26 +112,27 @@ function drawMapWithChunks () {
                             convertedX = convertXCoordinate(x, c);
                             if (!(convertedX < 0 || convertedX > mapWidth - 1)) {
         
-                                //saves a tileset, we need this to find the rigth one
+                                //saves a tileset, we need this to find the right one
                                 let newTileset:tileset = null;
         
-                                for (let i = 0; 0 < sortedTilesetArray.length; i++) {
+                                for (let i = 0; i < sortedTilesetArray.length; i++) {
         
                                     if (c.element[x][y] >= sortedTilesetArray[i].firstGridId) {
         
                                         newTileset = sortedTilesetArray[i];
                                     }
         
-                                    //if this is true we found the rigth tileset with help of the firstGridId
+                                    //if this is true we found the right tileset with help of the firstGridId
                                     if (c.element[x][y] < newTileset.firstGridId || i === (sortedTilesetArray.length - 1)) {
         
                                         var value = c.element[x][y] - sortedTilesetArray[i].firstGridId;
                                         
-                                        //calculates the rigth postion from the needed texture
+                                        //calculates the right position from the required texture
                                         var sourceX = (value % newTileset.tileWidth) * resolution
                                         var sourceY = Math.floor(value / newTileset.tileHeight) * resolution;
         
                                         canvas.drawImage(img, sourceX, sourceY, resolution, resolution, convertedX, convertedY, resolution, resolution);
+                                        i = sortedTilesetArray.length;
                                     }
                                 }
                             }
