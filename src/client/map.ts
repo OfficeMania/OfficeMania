@@ -68,6 +68,18 @@ function readMap() {
     let rawdata = ("/Users/michaelgoslar/Desktop/Map.json")
 
     let map = JSON.parse(rawdata);
+
+    //TODO map muss gelesen werden
+        //Layer mit id
+            //Ist das Layer solide? (in Namen entahlen, boolean)
+            //chunkarray
+                //chunks
+                    //elements
+                    //x,y koordinaten
+        //Verwendete Tilesets speichern
+            //firstgrid id 
+            //source
+            //welche Auflösung hat es?
 }
 
 function convertXCoordinate(x: number, c:chunk): number {
@@ -85,6 +97,7 @@ function convertYCoordinate(y: number, c:chunk): number {
 //code for infinite maps
 function drawMapWithChunks () {
 
+    //TODO richtiges canvas mit height und width
     let canvas: CanvasDrawImage;
 
     var img = new Image;
