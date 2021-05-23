@@ -66,6 +66,7 @@ function loadMap() {
 
     //creates a XMLhttpRequest to load the json file containing the mapdata
     let xml = new XMLHttpRequest();
+
     let rawdata:string;
 
     window.onload = function(){
