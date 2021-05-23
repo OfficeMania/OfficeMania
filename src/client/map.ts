@@ -1,4 +1,4 @@
-export {drawMapWithChunks}
+export {drawMapWithChunks, loadMap}
 
 //only important for infinite maps
 class chunk {
@@ -62,12 +62,20 @@ function fillSortedTilesetArray(tileset: tileset[]) {
     //fill the sortedTilesetArray with sorted elements from the tilesetArray
 }
 
-function readMap() {
+function loadMap() {
 
-    // must be changed to a filereader
-    let rawdata = ("/Users/michaelgoslar/Desktop/Map.json")
+    //creates a XMLhttpRequest to load the json file containing the mapdata
+    let xml = new XMLHttpRequest();
+    let rawdata:string;
 
-    let map = JSON.parse(rawdata);
+    window.onload = function(){
+        xml.open("GET", "map.json", false);
+        xml.send(null);
+
+        rawdata = xml.responseText;
+    }
+
+    convertMapData(rawdata);
 
     //TODO map muss gelesen werden
         //Layer mit id
@@ -80,6 +88,14 @@ function readMap() {
             //firstgrid id 
             //source
             //welche Auflösung hat es?
+}
+
+function convertMapData(mapdata:string) {
+
+    let map = JSON.parse(mapdata);
+
+    document.write(map);
+
 }
 
 function convertXCoordinate(x: number, c:chunk): number {

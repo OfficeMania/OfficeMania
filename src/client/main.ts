@@ -1,15 +1,18 @@
 import { Client } from "colyseus.js";
 import { Player, PLAYER_COLORS, updatePosition } from "./player";
 import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
+import { loadMap } from "./map";
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
 
 // async is necessary here, because we use 'await' to resolve the promises
 async function main() {
+
+
     /*
      * We communicate to our server via WebSockets (ws-protocol instead of http)
-     */
+    */
     let host = window.document.location.host.replace(/:.*/, '');
     let protocol = location.protocol.replace("http", "ws") + "//";
     let portSuffix = (location.port ? ':' + location.port : '');
@@ -90,6 +93,8 @@ async function main() {
 
     // Start game loop
     requestAnimationFrame(loop);
+
+    loadMap();
 }
 
 main();
