@@ -95,7 +95,7 @@ function convertMapData(mapdata:string) {
 
     let map = JSON.parse(mapdata);
 
-    document.write(map);
+    window.document.write(map);
 
 }
 
