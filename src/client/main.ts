@@ -1,4 +1,5 @@
 import { Client } from "colyseus.js";
+import { PlayerData } from "../common/rooms/schema/state";
 import { Player, PLAYER_COLORS, updatePosition } from "./player";
 import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
 
@@ -82,7 +83,7 @@ async function main() {
 
 
 
-    // message reciev test
+    // message recieve test
 
     room.onMessage("skill" ,(message) => {console.log("lol")});
 
@@ -171,6 +172,9 @@ async function main() {
     }
 
     
+    //log timer
+    let logTimer = 0;
+
     function loop(now: number) {
         lag += now - previous;
         previous = now;
@@ -186,6 +190,28 @@ async function main() {
             lag -= MS_PER_UPDATE;
         }
         
+
+        logTimer++;
+        if (logTimer % 10 === 0) {
+            
+
+            for (const [key, value] of Object.entries(players)) {
+            
+                if (value.name === ourPlayer.name) {
+                    continue;
+                }
+
+                console.log(Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2));
+                
+                if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 5000) {
+                    console.log("Player nearby: " + value.name);
+                }
+            }
+
+
+        }
+
+
         /*
          * Repaint the scene
          */
