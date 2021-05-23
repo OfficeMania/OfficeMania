@@ -9,7 +9,6 @@ function $<T extends HTMLElement>(a: string) { return <T>document.getElementById
 // async is necessary here, because we use 'await' to resolve the promises
 async function main() {
 
-
     /*
      * We communicate to our server via WebSockets (ws-protocol instead of http)
     */

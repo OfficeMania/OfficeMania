@@ -69,7 +69,7 @@ function loadMap() {
     let rawdata:string;
 
     window.onload = function(){
-        xml.open("GET", "map.json", false);
+        xml.open("GET", "/map/map.json", false);
         xml.send(null);
 
         rawdata = xml.responseText;
