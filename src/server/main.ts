@@ -37,6 +37,11 @@ app.use('/', express.static(path.join(process.cwd(), "html")));
 app.use('/img', express.static(path.join(process.cwd(), "assets", "img")));
 
 /*
+ * "Mount" the assets/map directory under "[host]/map"
+ */
+app.use('/map', express.static(path.join(process.cwd(), "assets", "map")));
+
+/*
  * "Mount" the directory where the client JavaScript is generated to (dist/client)
  * under "[host]/img"
  * 

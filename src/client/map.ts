@@ -1,4 +1,4 @@
-export {drawMapWithChunks, loadMap}
+export {drawMapWithChunks, convertMapData}
 
 //only important for infinite maps
 class chunk {
@@ -7,7 +7,7 @@ class chunk {
     posX: number;
     posY: number;
 
-    chunk (entries: number[], xPos: number, yPos: number) {
+    constructor(entries: number[], xPos: number, yPos: number) {
 
         for (let i: number = 0; i < entries.length; i++) {
             this.element[i % 16][Math.floor(i / 16)] = entries[i];
@@ -16,24 +16,36 @@ class chunk {
         this.posY = yPos;
     }
 }
-let chunkArray: chunk[];
 
-//the resolution is 48 and shouldn't be changed, would be too complicated to get the right resolution
-let resolution: number;
-resolution = 48;
+class layer {
 
-//important for drawing, infinite maps work only with chunks
-let isInfinity: boolean;
+    name: string;
+    chunks: chunk[];
+    isSolid: boolean;
 
-//the spawn coordinates
-let startPosX: number;
-let startPosY: number;
+    constructor(x:number[], y:number[], data:number[][], layerName: string) {
 
-//the height and width of the map on screen. Let Height and Width be odd, so player is displayed in middle of the screen
-let mapHeight: number;
-let mapWidth: number;
+        this.name = layerName;
 
-//TODO create canvas with good scale of the map
+        if (layerName.search("solid")) {
+            this.isSolid = true;
+        } else { this.isSolid = false; }
+
+        let tempData: number[];
+
+        for (let i = 0; i < x.length; i++) {
+
+            for (let a = 0; a < 16; a++) {
+
+                tempData.push(data[i][a]);
+            }
+
+            this.chunks.push(new chunk(tempData, x[0], y[i]));
+
+            document.write("" + this.chunks[i].posX);
+        }
+    }
+}
 
 class tileset {
 
@@ -42,7 +54,7 @@ class tileset {
     tileWidth: number;
     tileHeight: number;
 
-    tileset (firstId: number, source: string) {
+    constructor(firstId: number, source: string) {
 
         this.firstGridId = firstId;
         this.path = source;
@@ -54,6 +66,25 @@ class tileset {
     }
 }
 
+let chunkArray: chunk[];
+let layerArray: layer[];
+
+//the resolution is 48 and shouldn't be changed, would be too complicated to get the right resolution
+let resolution: number;
+
+//important for drawing, infinite maps work only with chunks
+let isInfinite: boolean;
+
+//the spawn coordinates
+let startPosX: number;
+let startPosY: number;
+
+//the height and width of the map on screen. Let Height and Width be odd, so player is displayed in middle of the screen
+let mapHeight: number;
+let mapWidth: number;
+
+//TODO create canvas with good scale of the map
+
 let tilesetArray: tileset[];
 let sortedTilesetArray: tileset[];
 
@@ -61,23 +92,6 @@ function fillSortedTilesetArray(tileset: tileset[]) {
 
     //fill the sortedTilesetArray with sorted elements from the tilesetArray
 }
-
-function loadMap() {
-
-    //creates a XMLhttpRequest to load the json file containing the mapdata
-    let xml = new XMLHttpRequest();
-
-    let rawdata:string;
-
-    window.onload = function(){
-        xml.open("GET", "/map/map.json", false);
-        xml.send(null);
-
-        rawdata = xml.responseText;
-    }
-
-    convertMapData(rawdata);
-
     //TODO map muss gelesen werden
         //Layer mit id
             //Ist das Layer solide? (in Namen entahlen, boolean)
@@ -89,14 +103,53 @@ function loadMap() {
             //firstgrid id 
             //source
             //welche Auflösung hat es?
-}
 
 function convertMapData(mapdata:string) {
 
     let map = JSON.parse(mapdata);
 
-    window.document.write(map);
+    if (map.infinite === "true") {
+        isInfinite = true;
+    } else { isInfinite = false; }
+    
+    resolution = parseInt(map.tileheight);
 
+    let xPos: number[];
+    let yPos: number[];
+    let data: number[];
+    let dataArray: number[][];
+
+
+    //TODO herrausfinden wie man mit JSON arbeitet
+    document.writeln(map.layers.chunks);
+
+    for (let l = 0; l < map.layers.length; l++) {
+
+
+        for (let c = 0; c < map.layers[l].chunks.length; c++) {
+
+            document.writeln("" + c);
+
+            xPos.push(parseInt(map.layers[l].chunks[c].x));
+            yPos.push(parseInt(map.layers[l].chunks[c].y));
+
+            
+
+            dataArray.push(data);
+        }
+
+        layerArray.push(new layer(xPos, yPos, dataArray, map.layers[l].name))
+    }
+}
+
+function convertStringArrayToNumbArray(text: string[]) {
+
+    let numbers: number[];
+    text.forEach(function(s){
+
+        numbers.push(parseInt(s))
+    });
+    return numbers;
 }
 
 function convertXCoordinate(x: number, c:chunk): number {

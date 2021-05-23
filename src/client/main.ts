@@ -1,7 +1,7 @@
 import { Client } from "colyseus.js";
 import { Player, PLAYER_COLORS, updatePosition } from "./player";
 import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
-import { loadMap } from "./map";
+import { convertMapData } from "./map";
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
@@ -27,8 +27,11 @@ async function main() {
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
 
-    loadMap();
-    
+    let xml = new XMLHttpRequest();
+    xml.open("GET", "/map/map.json", false);
+    xml.send(null);
+
+    convertMapData(xml.responseText);
 }
 
 main();
