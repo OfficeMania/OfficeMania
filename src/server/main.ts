@@ -1,13 +1,11 @@
 import http from "http";
-import serveIndex from 'serve-index';
 import express from "express";
 import cors from "cors";
 import path from 'path';
-import { Server } from "colyseus";
-import { monitor } from "@colyseus/monitor";
+import {Server} from "colyseus";
 
-import { TURoom } from "../common/rooms/turoom";
-import { SERVER_PORT } from "./config";
+import {TURoom} from "../common/rooms/turoom";
+import {SERVER_PORT} from "./config";
 
 const app = express();
 
@@ -25,7 +23,7 @@ const gameServer = new Server({
 });
 
 // "Mount" the html folder as the root of the website
-app.use('/', serveIndex(path.join(process.cwd(), "html"), {'icons': true}));
+//app.use('/', serveIndex(path.join(process.cwd(), "html"), {'icons': true}));
 app.use('/', express.static(path.join(process.cwd(), "html")));
 
 /*
@@ -54,7 +52,7 @@ gameServer.define("turoom", TURoom)
  *
  * See: https://docs.colyseus.io/tools/monitor/
  */
-// app.use("/colyseus", monitor());
+//app.use("/colyseus", monitor());
 
 // Start the server
 gameServer.listen(SERVER_PORT);
