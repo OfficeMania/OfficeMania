@@ -86,28 +86,51 @@ async function main() {
 
     // message recieve test
 
-    room.onMessage("skill" ,(message) => {console.log("lol")});
+    room.onMessage("skill", (message) => {
+        console.log("lol")
+    });
 
 
-    document.getElementById("mute_button").onclick = toggleMute;
+    // Mute Logic
 
-    function toggleMute() {
-        localTracks.forEach(toggleTrackMute);
+    const muteButton = $<HTMLButtonElement>("mute_button");
+    const camButton = $<HTMLButtonElement>("cam_button");
+
+    muteButton.addEventListener("click", () => toggleMute("audio"));
+    camButton.addEventListener("click", () => toggleMute("video"));
+
+    function setAudioButtonMute(muted: boolean) {
+        muteButton.innerHTML = muted ? "<em class = \"fa fa-microphone-slash\"></em>" : "<em class = \"fa fa-microphone\"></em>";
     }
 
-    function toggleTrackMute(track) {
-        if (track.getType() === 'audio') {
-            if (track.isMuted()) {
-                track.unmute();
-                document.getElementById("isMicrophoneMuted").innerHTML = "unmuted";
-            } else {
-                track.mute();
-                document.getElementById("isMicrophoneMuted").innerHTML = "muted";
+    function setVideoButtonMute(muted: boolean) {
+        camButton.innerHTML = muted ? "<em class = \"fa fa-video-slash\"></em>" : "<em class = \"fa fa-video\"></em>";
+    }
+
+    function toggleMute(type: string) {
+        for (let i = 0; i < localTracks.length; i++) {
+            const track = localTracks[i];
+            if (track.getType() !== type) {
+                continue;
+            }
+            let muted = toggleTrackMute(track);
+            if (type === "audio") {
+                setAudioButtonMute(muted);
+            } else if (type === "video") {
+                setVideoButtonMute(muted);
             }
         }
     }
 
-
+    function toggleTrackMute(track) {
+        if (track.isMuted()) {
+            track.unmute();
+            return false;
+        } else {
+            track.mute();
+            return true;
+        }
+    }
 
     /*
      * Create a gameloop-like function for drawing a simple animation
