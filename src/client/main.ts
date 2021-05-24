@@ -2,7 +2,7 @@ import { Client } from "colyseus.js";
 import { PlayerData } from "../common/rooms/schema/state";
 import { Player, PLAYER_COLORS, updatePosition } from "./player";
 import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
-import "./jitsiconference";
+import {localTracks, remoteTracks} from "./jitsiconference";
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
@@ -89,6 +89,24 @@ async function main() {
     room.onMessage("skill" ,(message) => {console.log("lol")});
 
 
+    document.getElementById("mute_button").onclick = toggleMute;
+
+    function toggleMute() {
+        localTracks.forEach(toggleTrackMute);
+    }
+
+    function toggleTrackMute(track) {
+        if (track.getType() === 'audio') {
+            if (track.isMuted()) {
+                track.unmute();
+                document.getElementById("isMicrophoneMuted").innerHTML = "unmuted";
+            } else {
+                track.mute();
+                document.getElementById("isMicrophoneMuted").innerHTML = "muted";
+            }
+        }
+    }
+
 
 
     /*
@@ -122,7 +140,7 @@ async function main() {
 
         //detection if ourPlayer is nearby other player
         logTimer++;        
-        if (logTimer % 50 === 0) {
+        if (logTimer % 20 === 0) {
             logTimer = 0;
 
             for (const [key, value] of Object.entries(players)) {
@@ -137,7 +155,7 @@ async function main() {
                     //console.log("Player nearby: " + value.name);
                     document.getElementById("playerNearbyIndicator").innerHTML = "player nearby";
                 } else {
-                    document.getElementById("playerNearbyIndicator").innerHTML = "";
+                    document.getElementById("playerNearbyIndicator").innerHTML = "you are lonely :(";
                 }
             }
         }
