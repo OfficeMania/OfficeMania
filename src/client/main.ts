@@ -2,6 +2,7 @@ import { Client } from "colyseus.js";
 import { PlayerData } from "../common/rooms/schema/state";
 import { Player, PLAYER_COLORS, updatePosition } from "./player";
 import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
+import "./jitsi-conference";
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
@@ -125,6 +126,8 @@ async function main() {
             TILE_VIEW_MAX_COLUMNS: 5,
         },
     };
+    
+    /*
     //start jitsi room
     const api = new JitsiMeetExternalAPI(domain, options);
     
@@ -171,7 +174,7 @@ async function main() {
         api.executeCommand('setTileView', true);
     }
 
-    
+    */
     //log timer
     let logTimer = 0;
 
@@ -205,6 +208,7 @@ async function main() {
                 
                 if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 5000) {
                     console.log("Player nearby: " + value.name);
+
                 }
             }
 
