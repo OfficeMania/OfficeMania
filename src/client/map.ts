@@ -9,9 +9,15 @@ class chunk {
 
     constructor(entries: number[], xPos: number, yPos: number) {
 
+        this.element = [];
+        for (let a = 0; a < 16; a++) {
+            this.element[a] = [];
+        }
+
         for (let i: number = 0; i < entries.length; i++) {
             this.element[i % 16][Math.floor(i / 16)] = entries[i];
         }
+
         this.posX = xPos;
         this.posY = yPos;
     }
@@ -23,26 +29,40 @@ class layer {
     chunks: chunk[];
     isSolid: boolean;
 
-    constructor(x:number[], y:number[], data:number[][], layerName: string) {
+    constructor(x:number[], y:number[], data:saveArray[], layerName: string) {
 
+        this.chunks = [];
         this.name = layerName;
 
         if (layerName.search("solid")) {
             this.isSolid = true;
         } else { this.isSolid = false; }
 
-        let tempData: number[];
+        let tempData: number[] = [];
 
         for (let i = 0; i < x.length; i++) {
 
-            for (let a = 0; a < 16; a++) {
+            for (let a = 0; a < 256; a++) {
 
-                tempData.push(data[i][a]);
+                tempData[a] = data[i].array[a];
             }
 
-            this.chunks.push(new chunk(tempData, x[0], y[i]));
+            this.chunks.push(new chunk(tempData, x[i], y[i]));
+        }
+    }
+}
 
-            document.write("" + this.chunks[i].posX);
+class saveArray {
+
+    array: number[];
+
+    constructor(a: number[]) {
+
+        this.array = [];
+
+        for (let i = 0; i < a.length; i++) {
+
+            this.array.push(a[i]);
         }
     }
 }
@@ -57,16 +77,22 @@ class tileset {
     constructor(firstId: number, source: string) {
 
         this.firstGridId = firstId;
-        this.path = source;
+        this.path = this.getPath(source);
     }
 
     calculateHeightAndWidth(path: string) {
 
         //calculate the width and height with the resolution and the number of pixels from the tilesetfile
     }
+
+    getPath(source: string) {
+
+        //gets the rigth path with the given dataname
+
+        return source;
+    }
 }
 
-let chunkArray: chunk[];
 let layerArray: layer[];
 
 //the resolution is 48 and shouldn't be changed, would be too complicated to get the right resolution
@@ -79,6 +105,10 @@ let isInfinite: boolean;
 let startPosX: number;
 let startPosY: number;
 
+//the current Position from the player
+let currentX: number;
+let currentY: number;
+
 //the height and width of the map on screen. Let Height and Width be odd, so player is displayed in middle of the screen
 let mapHeight: number;
 let mapWidth: number;
@@ -86,27 +116,13 @@ let mapWidth: number;
 //TODO create canvas with good scale of the map
 
 let tilesetArray: tileset[];
-let sortedTilesetArray: tileset[];
-
-function fillSortedTilesetArray(tileset: tileset[]) {
-
-    //fill the sortedTilesetArray with sorted elements from the tilesetArray
-}
-    //TODO map muss gelesen werden
-        //Layer mit id
-            //Ist das Layer solide? (in Namen entahlen, boolean)
-            //chunkarray
-                //chunks
-                    //elements
-                    //x,y koordinaten
-        //Verwendete Tilesets speichern
-            //firstgrid id 
-            //source
-            //welche Auflösung hat es?
 
 function convertMapData(mapdata:string) {
 
     let map = JSON.parse(mapdata);
+
+    currentX = startPosX;
+    currentY = startPosY;
 
     if (map.infinite === "true") {
         isInfinite = true;
@@ -114,52 +130,46 @@ function convertMapData(mapdata:string) {
     
     resolution = parseInt(map.tileheight);
 
-    let xPos: number[];
-    let yPos: number[];
-    let data: number[];
-    let dataArray: number[][];
+    layerArray = [];
+    tilesetArray = [];
 
-
-    //TODO herrausfinden wie man mit JSON arbeitet
-    document.writeln(map.layers.chunks);
+    let xPos: number[] = [];
+    let yPos: number[] = [];
+    let dataArray: saveArray[] = [];
+    let x: string;
+    let y: string;
 
     for (let l = 0; l < map.layers.length; l++) {
 
-
         for (let c = 0; c < map.layers[l].chunks.length; c++) {
 
-            document.writeln("" + c);
+            x = map.layers[l].chunks[c].x;
+            y = map.layers[l].chunks[c].y;
 
-            xPos.push(parseInt(map.layers[l].chunks[c].x));
-            yPos.push(parseInt(map.layers[l].chunks[c].y));
+            xPos.push(parseInt(x));
+            yPos.push(parseInt(y));
 
-            
-
-            dataArray.push(data);
+            dataArray.push(new saveArray(map.layers[l].chunks[c].data));
         }
 
         layerArray.push(new layer(xPos, yPos, dataArray, map.layers[l].name))
     }
-}
 
-function convertStringArrayToNumbArray(text: string[]) {
+    for (let t = 0; t < map.tilesets.length; t++) {
 
-    let numbers: number[];
-    text.forEach(function(s){
+        tilesetArray.push(new tileset(parseInt(map.tilesets[t].firstgrid), map.tilesets[t].source));
+    }
 
-        numbers.push(parseInt(s))
-    });
-    return numbers;
 }
 
 function convertXCoordinate(x: number, c:chunk): number {
 
-    return (x + c.posX - (startPosX - Math.floor(mapWidth/2)))
+    return (x + c.posX - (currentX - Math.floor(mapWidth/2)))
 }
 
 function convertYCoordinate(y: number, c:chunk): number {
 
-    return (y + c.posY - (startPosY - Math.floor(mapHeight/2)))
+    return (y + c.posY - (currentY - Math.floor(mapHeight/2)))
 }
 
 
@@ -172,50 +182,56 @@ function drawMapWithChunks () {
 
     var img = new Image;
 
-    chunkArray.forEach(function(c) {
+    layerArray.forEach(function(l: layer) {
 
-        let convertedY: number = convertYCoordinate(c.posY, c);
-        let convertedX: number = convertXCoordinate(c.posX, c);
+        l.chunks.forEach(function(c: chunk) {
 
-        //checks if the full chunk is not on the map on the screen
-        if(!(convertedX + 16 < 0 || convertedY + 16 < 0 || convertedX > mapWidth - 1 || convertedY > mapHeight - 1)) {
+            let convertedY: number = convertYCoordinate(c.posY, c);
+            let convertedX: number = convertXCoordinate(c.posX, c);
 
-            for (let y = 0; y < 16; y++) {
+            //checks if the full chunk is not on the map on the screen
+            if(!(convertedX + 16 < 0 || convertedY + 16 < 0 || convertedX > mapWidth - 1 || convertedY > mapHeight - 1)) {
 
-                //checks if the y coordinate would be seen on the screen, only works with an odd mapHeigtht
-                convertedY = convertYCoordinate(y, c);
-                if (!(convertedY < 0 || convertedY > mapHeight - 1)) {
+                for (let y = 0; y < 16; y++) {
+
+                    //checks if the y coordinate would be seen on the screen, only works with an odd mapHeigtht
+                    convertedY = convertYCoordinate(y, c);
+                    if (!(convertedY < 0 || convertedY > mapHeight - 1)) {
     
-                    for (let x = 0; x < 16; x++) {
+                        for (let x = 0; x < 16; x++) {
     
-                        //if the value is 0 we do not need to draw
-                        if (c.element[x][y] !== 0) {
+                            //if the value is 0 we do not need to draw
+                            if (c.element[x][y] !== 0) {
                             
-                            //checks if the x coordiante would be seen on the screen, only works with an odd mapWidth
-                            convertedX = convertXCoordinate(x, c);
-                            if (!(convertedX < 0 || convertedX > mapWidth - 1)) {
+                                //checks if the x coordiante would be seen on the screen, only works with an odd mapWidth
+                                convertedX = convertXCoordinate(x, c);
+                                if (!(convertedX < 0 || convertedX > mapWidth - 1)) {
         
-                                //saves a tileset, we need this to find the right one
-                                let newTileset:tileset = null;
+                                    //saves a tileset, we need this to find the right one
+                                    let newTileset:tileset = null;
         
-                                for (let i = 0; i < sortedTilesetArray.length; i++) {
+                                    for (let i = 0; i < tilesetArray.length; i++) {
         
-                                    if (c.element[x][y] >= sortedTilesetArray[i].firstGridId) {
+                                        if (c.element[x][y] >= tilesetArray[i].firstGridId) {
         
-                                        newTileset = sortedTilesetArray[i];
-                                    }
-        
-                                    //if this is true we found the right tileset with help of the firstGridId
-                                    if (c.element[x][y] < newTileset.firstGridId || i === (sortedTilesetArray.length - 1)) {
-        
-                                        var value = c.element[x][y] - sortedTilesetArray[i].firstGridId;
+                                            newTileset = tilesetArray[i];
+                                        }
                                         
-                                        //calculates the right position from the required texture
-                                        var sourceX = (value % newTileset.tileWidth) * resolution
-                                        var sourceY = Math.floor(value / newTileset.tileHeight) * resolution;
+                                        let value: number;
+                                        let sourceX: number;
+                                        let sourceY: number;
+                                        //if this is true we found the right tileset with help of the firstGridId
+                                        if (c.element[x][y] < newTileset.firstGridId || i === (tilesetArray.length - 1)) {
         
-                                        canvas.drawImage(img, sourceX, sourceY, resolution, resolution, convertedX, convertedY, resolution, resolution);
-                                        i = sortedTilesetArray.length;
+                                            value = c.element[x][y] - tilesetArray[i].firstGridId;
+                                        
+                                            //calculates the right position from the required texture
+                                            sourceX = (value % newTileset.tileWidth) * resolution
+                                            sourceY = Math.floor(value / newTileset.tileHeight) * resolution;
+        
+                                            canvas.drawImage(img, sourceX, sourceY, resolution, resolution, convertedX, convertedY, resolution, resolution);
+                                            i = tilesetArray.length;
+                                        }
                                     }
                                 }
                             }
@@ -223,6 +239,6 @@ function drawMapWithChunks () {
                     }
                 }
             }
-        }
+        })
     })
 }
