@@ -1,11 +1,12 @@
-import { Client } from "colyseus.js";
-import { PlayerData } from "../common/rooms/schema/state";
-import { Player, PLAYER_COLORS, updatePosition } from "./player";
-import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
-import {localTracks, remoteTracks} from "./jitsiconference";
+import {Client} from "colyseus.js";
+import {Player, PLAYER_COLORS, updatePosition} from "./player";
+import {InitState, joinAndSync, loadImage, PlayerRecord} from "./util";
+import {localTracks} from "./jitsiconference";
 
 // A simple helper function
-function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
+function $<T extends HTMLElement>(a: string) {
+    return <T>document.getElementById(a);
+}
 
 // async is necessary here, because we use 'await' to resolve the promises
 async function main() {
@@ -37,7 +38,7 @@ async function main() {
      * Get the canvas element and its 2D-context
      *
      * See: https://developer.mozilla.org/de/docs/Web/HTML/Canvas
-     */ 
+     */
     let canvas = $<HTMLCanvasElement>("canvas");
     let width = canvas.width;
     let height = canvas.height;
@@ -49,39 +50,38 @@ async function main() {
     *
     * ourPlayer = current Player
     */
-    function keyPressed(e: KeyboardEvent){
-        if(e.key === "s"){
+    function keyPressed(e: KeyboardEvent) {
+        if (e.key === "s") {
             ourPlayer.moveDown = true;
         }
-        if(e.key === "w"){
+        if (e.key === "w") {
             ourPlayer.moveUp = true;
         }
-        if(e.key === "a"){
+        if (e.key === "a") {
             ourPlayer.moveLeft = true;
         }
-        if(e.key === "d"){
+        if (e.key === "d") {
             ourPlayer.moveRight = true;
         }
     }
 
-    function keyUp(e: KeyboardEvent){
-        if(e.key === "s"){
+    function keyUp(e: KeyboardEvent) {
+        if (e.key === "s") {
             ourPlayer.moveDown = false;
         }
-        if(e.key === "w"){
+        if (e.key === "w") {
             ourPlayer.moveUp = false;
         }
-        if(e.key === "a"){
+        if (e.key === "a") {
             ourPlayer.moveLeft = false;
         }
-        if(e.key === "d"){
+        if (e.key === "d") {
             ourPlayer.moveRight = false;
         }
     }
 
     document.addEventListener("keydown", keyPressed);
     document.addEventListener("keyup", keyUp);
-
 
 
     // message recieve test
@@ -159,21 +159,21 @@ async function main() {
 
             lag -= MS_PER_UPDATE;
         }
-        
+
 
         //detection if ourPlayer is nearby other player
-        logTimer++;        
+        logTimer++;
         if (logTimer % 20 === 0) {
             logTimer = 0;
 
             for (const [key, value] of Object.entries(players)) {
-            
+
                 if (value.name === ourPlayer.name) {
                     continue;
                 }
 
                 //console.log(Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2));
-                
+
                 if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 5000) {
                     //console.log("Player nearby: " + value.name);
                     document.getElementById("playerNearbyIndicator").innerHTML = "player nearby";
@@ -193,7 +193,7 @@ async function main() {
 
         // Draw background
         ctx.drawImage(startImage, 0, 0);
-        
+
         // Draw each player
         ctx.save();
         Object.values(players).forEach((player: Player, i: number) => {
