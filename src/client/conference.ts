@@ -1,4 +1,4 @@
-export{toggleMuteByType}
+export {toggleMuteByType}
 
 const options = {
     connection: {
@@ -213,7 +213,7 @@ function switchVideo() { // eslint-disable-line no-unused-vars
         localTracks.pop();
     }
     JitsiMeetJS.createLocalTracks({
-        devices: [ isVideo ? 'video' : 'desktop' ]
+        devices: [isVideo ? 'video' : 'desktop']
     })
         .then(tracks => {
             localTracks.push(tracks[0]);
@@ -265,7 +265,7 @@ JitsiMeetJS.mediaDevices.addEventListener(
 
 connection.connect();
 
-JitsiMeetJS.createLocalTracks({ devices: [ 'audio', 'video' ] })
+JitsiMeetJS.createLocalTracks({devices: ['audio', 'video']})
     .then(onLocalTracks)
     .catch(error => {
         throw error;
