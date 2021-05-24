@@ -1,6 +1,5 @@
 export{toggleMuteByType}
 
-
 const options = {
     connection: {
         hosts: {

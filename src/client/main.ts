@@ -1,7 +1,7 @@
 import {Client} from "colyseus.js";
 import {Player, PLAYER_COLORS, updatePosition} from "./player";
 import {InitState, joinAndSync, loadImage, PlayerRecord} from "./util";
-import {toggleMuteByType} from "./jitsiconference";
+import {toggleMuteByType} from "./conference";
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) {
