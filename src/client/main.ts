@@ -2,7 +2,7 @@ import { Client } from "colyseus.js";
 import { PlayerData } from "../common/rooms/schema/state";
 import { Player, PLAYER_COLORS, updatePosition } from "./player";
 import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
-import "./jitsi-conference";
+import "./jitsiconference";
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
@@ -100,81 +100,7 @@ async function main() {
 
     let previous = performance.now();
     let lag = 0;
-    
 
-    //configure jitsi room and bind it to div "meet"
-    const domain = 'meet.jit.si';
-    const options = {
-        roomName: 'namedesraums',
-        height: 200,
-        parentNode: document.querySelector('#meet'),
-        configOverwrite: { 
-            startWithAudioMuted: true,
-            prejoinPageEnabled: false,
-            toolbarButtons: [],
-            backgroundAlpha: 1,
-            hideConferenceTimer: true,
-            hideConferenceSubject: true,
-            disableJoinLeaveSounds: true,
-            disableResponsiveTiles: true,
-        },
-        interfaceConfigOverwrite: { 
-            DISABLE_DOMINANT_SPEAKER_INDICATOR: true,
-            DEFAULT_BACKGROUND: 'rgba(255,255,255,0)',
-            VIDEO_LAYOUT_FIT: 'height',
-            VIDEO_QUALITY_LABEL_DISABLED: true,
-            TILE_VIEW_MAX_COLUMNS: 5,
-        },
-    };
-    
-    /*
-    //start jitsi room
-    const api = new JitsiMeetExternalAPI(domain, options);
-    
-    //turn off own webcam preview on the right
-    api.executeCommand('toggleFilmStrip');
-
-    
-    //tile view as default
-    api.addEventListener(`videoConferenceJoined`, () => {
-        const listener = ({ enabled }) => {
-          api.removeEventListener(`tileViewChanged`, listener);
-    
-          if (!enabled) {
-            api.executeCommand(`toggleTileView`);
-          }
-        };
-    
-        api.addEventListener(`tileViewChanged`, listener);
-        api.executeCommand(`toggleTileView`);
-      });
-    
-
-    //mute/unmute button
-    document.getElementById("mute_button").onclick = toggle_audio;
-
-    //wrapper function for audio mute / unmute button
-    function toggle_audio() {
-        api.executeCommand('toggleAudio');
-    }
-
-    //camera toggle button
-    document.getElementById("cam_button").onclick = toggle_cam;
-
-    //wrapper function for camera toggle button
-    function toggle_cam() {
-        api.executeCommand('toggleVideo');
-    }
-
-    //camera toggle button
-    document.getElementById("tile_button").onclick = toggle_tile;
-
-    //wrapper function for camera toggle button
-    function toggle_tile() {
-        api.executeCommand('setTileView', true);
-    }
-
-    */
     //log timer
     let logTimer = 0;
 
@@ -194,9 +120,10 @@ async function main() {
         }
         
 
-        logTimer++;
-        if (logTimer % 10 === 0) {
-            
+        //detection if ourPlayer is nearby other player
+        logTimer++;        
+        if (logTimer % 50 === 0) {
+            logTimer = 0;
 
             for (const [key, value] of Object.entries(players)) {
             
@@ -204,15 +131,15 @@ async function main() {
                     continue;
                 }
 
-                console.log(Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2));
+                //console.log(Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2));
                 
                 if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 5000) {
-                    console.log("Player nearby: " + value.name);
-
+                    //console.log("Player nearby: " + value.name);
+                    document.getElementById("playerNearbyIndicator").innerHTML = "player nearby";
+                } else {
+                    document.getElementById("playerNearbyIndicator").innerHTML = "";
                 }
             }
-
-
         }
 
 
