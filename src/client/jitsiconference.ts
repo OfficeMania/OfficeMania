@@ -1,4 +1,4 @@
-export{localTracks, remoteTracks}
+export{toggleMuteByType}
 
 
 const options = {
@@ -288,4 +288,29 @@ if (JitsiMeetJS.mediaDevices.isDeviceChangeAvailable('output')) {
             $('#audioOutputSelectWrapper').show();
         }
     });
+}
+
+
+// Custom Functions
+
+function toggleMuteByType(type: string) {
+    let muted: boolean = null;
+    for (let i = 0; i < localTracks.length; i++) {
+        const track = localTracks[i];
+        if (track.getType() !== type) {
+            continue;
+        }
+        muted = toggleTrackMute(track);
+    }
+    return muted;
+}
+
+function toggleTrackMute(track) {
+    if (track.isMuted()) {
+        track.unmute();
+        return false;
+    } else {
+        track.mute();
+        return true;
+    }
 }

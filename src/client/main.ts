@@ -1,7 +1,7 @@
 import {Client} from "colyseus.js";
 import {Player, PLAYER_COLORS, updatePosition} from "./player";
 import {InitState, joinAndSync, loadImage, PlayerRecord} from "./util";
-import {localTracks} from "./jitsiconference";
+import {toggleMuteByType} from "./jitsiconference";
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) {
@@ -108,27 +108,11 @@ async function main() {
     }
 
     function toggleMute(type: string) {
-        for (let i = 0; i < localTracks.length; i++) {
-            const track = localTracks[i];
-            if (track.getType() !== type) {
-                continue;
-            }
-            let muted = toggleTrackMute(track);
-            if (type === "audio") {
-                setAudioButtonMute(muted);
-            } else if (type === "video") {
-                setVideoButtonMute(muted);
-            }
-        }
-    }
-
-    function toggleTrackMute(track) {
-        if (track.isMuted()) {
-            track.unmute();
-            return false;
-        } else {
-            track.mute();
-            return true;
+        const muted = toggleMuteByType(type);
+        if (type === "audio") {
+            setAudioButtonMute(muted);
+        } else if (type === "video") {
+            setVideoButtonMute(muted);
         }
     }
 
