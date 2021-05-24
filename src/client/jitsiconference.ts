@@ -295,8 +295,7 @@ if (JitsiMeetJS.mediaDevices.isDeviceChangeAvailable('output')) {
 
 function toggleMuteByType(type: string) {
     let muted: boolean = null;
-    for (let i = 0; i < localTracks.length; i++) {
-        const track = localTracks[i];
+    for (const track of localTracks) {
         if (track.getType() !== type) {
             continue;
         }
