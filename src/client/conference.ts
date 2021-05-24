@@ -267,7 +267,7 @@ function toggleMuteByType(type: string) {
 
 /*
 let isVideo = true;
-function switchVideo() { //TODO Is this even used anymore?
+function switchVideo() { //TODO Is this even used anymore? //yes, for screen sharing 
     isVideo = !isVideo;
     if (localTracks[1]) {
         localTracks[1].dispose();
