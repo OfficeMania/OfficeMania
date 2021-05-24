@@ -1,5 +1,3 @@
-import JitsiMeetJS from "./external_api.min";
-
 export{}
 
 
