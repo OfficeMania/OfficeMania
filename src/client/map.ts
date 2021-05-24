@@ -228,7 +228,8 @@ function drawMapWithChunks () {
                                             //calculates the right position from the required texture
                                             sourceX = (value % newTileset.tileWidth) * resolution
                                             sourceY = Math.floor(value / newTileset.tileHeight) * resolution;
-        
+
+                                            //Create an array with used templates to boost performance
                                             canvas.drawImage(img, sourceX, sourceY, resolution, resolution, convertedX, convertedY, resolution, resolution);
                                             i = tilesetArray.length;
                                         }
