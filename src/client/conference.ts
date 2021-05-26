@@ -210,9 +210,11 @@ function onUserJoined(id) {
  */
 function onUserLeft(id) {
     console.debug('User left: ' + id); //DEBUG
-    
-    //remove video
+
+    //remove video and audio
+    document.getElementById(id + "audio" + "1").remove(); 
     document.getElementById(id + "video" + "2").remove(); 
+
     if (!remoteTracks[id]) {
         return;
     }
