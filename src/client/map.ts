@@ -74,17 +74,12 @@ class tileset {
     firstGridId: number;
     path: string;
     tileWidth: number;
-    tileHeight: number;
 
     constructor(firstId: number, source: string) {
 
         this.firstGridId = firstId;
         this.path = source;
-    }
-
-    calculateHeightAndWidth(path: string) {
-
-        //calculate the width and height with the resolution and the number of pixels from the tilesetfile
+        this.tileWidth = 0;
     }
 }
 
@@ -159,6 +154,8 @@ async function convertMapData(mapdata:string) {
         tilesetArray.push(new tileset(parseInt(map.tilesets[t].firstgrid), map.tilesets[t].source));
 
         image = await loadImage("templates/" + tilesetArray[t].path);
+
+        tilesetArray[t].tileWidth = image.naturalWidth;
         textures.set(tilesetArray[t].path, image);
 
         document.writeln("Hi");
@@ -228,7 +225,7 @@ function drawMapWithChunks () {
                                         
                                             //calculates the right position from the required texture
                                             sourceX = (value % newTileset.tileWidth) * resolution
-                                            sourceY = Math.floor(value / newTileset.tileHeight) * resolution;
+                                            sourceY = Math.floor(value / newTileset.tileWidth) * resolution;
 
                                             //Create an array with used templates to boost performance
                                             canvas.drawImage(textures.get(newTileset.path), sourceX, sourceY, resolution, resolution, convertedX, convertedY, resolution, resolution);
