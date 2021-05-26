@@ -1,3 +1,5 @@
+import { loadImage } from "./util";
+
 export {drawMapWithChunks, convertMapData}
 
 //only important for infinite maps
@@ -77,19 +79,12 @@ class tileset {
     constructor(firstId: number, source: string) {
 
         this.firstGridId = firstId;
-        this.path = this.getPath(source);
+        this.path = source;
     }
 
     calculateHeightAndWidth(path: string) {
 
         //calculate the width and height with the resolution and the number of pixels from the tilesetfile
-    }
-
-    getPath(source: string) {
-
-        //gets the rigth path with the given dataname
-
-        return source;
     }
 }
 
@@ -113,11 +108,15 @@ let currentY: number;
 let mapHeight: number;
 let mapWidth: number;
 
+let textures: Map<string, HTMLImageElement>;
 //TODO create canvas with good scale of the map
 
 let tilesetArray: tileset[];
 
-function convertMapData(mapdata:string) {
+async function convertMapData(mapdata:string) {
+
+    textures = new Map<string, HTMLImageElement>();
+    let image: HTMLImageElement;
 
     let map = JSON.parse(mapdata);
 
@@ -158,8 +157,12 @@ function convertMapData(mapdata:string) {
     for (let t = 0; t < map.tilesets.length; t++) {
 
         tilesetArray.push(new tileset(parseInt(map.tilesets[t].firstgrid), map.tilesets[t].source));
-    }
 
+        image = await loadImage("templates/" + tilesetArray[t].path);
+        textures.set(tilesetArray[t].path, image);
+
+        document.writeln("Hi");
+    }
 }
 
 function convertXCoordinate(x: number, c:chunk): number {
@@ -179,8 +182,6 @@ function drawMapWithChunks () {
 
     //TODO richtiges canvas mit height und width
     let canvas: CanvasDrawImage;
-
-    var img = new Image;
 
     layerArray.forEach(function(l: layer) {
 
@@ -208,7 +209,7 @@ function drawMapWithChunks () {
                                 if (!(convertedX < 0 || convertedX > mapWidth - 1)) {
         
                                     //saves a tileset, we need this to find the right one
-                                    let newTileset:tileset = null;
+                                    let newTileset: tileset = null;
         
                                     for (let i = 0; i < tilesetArray.length; i++) {
         
@@ -230,7 +231,7 @@ function drawMapWithChunks () {
                                             sourceY = Math.floor(value / newTileset.tileHeight) * resolution;
 
                                             //Create an array with used templates to boost performance
-                                            canvas.drawImage(img, sourceX, sourceY, resolution, resolution, convertedX, convertedY, resolution, resolution);
+                                            canvas.drawImage(textures.get(newTileset.path), sourceX, sourceY, resolution, resolution, convertedX, convertedY, resolution, resolution);
                                             i = tilesetArray.length;
                                         }
                                     }
