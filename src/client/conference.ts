@@ -141,10 +141,10 @@ function onLocalTrackAdded(track, pos: number) {
     track.addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Local Track stopped')); //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Local Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     if (track.getType() === trackTypeVideo) {
-        $('body').append(`<video autoplay='1' id='localVideo${pos}' />`);
+        $('videobar').append(`<video autoplay='1' height="200" id='localVideo${pos}' />`);
         track.attach($(`#localVideo${pos}`)[0]);
     } else {
-        $('body').append(
+        $('videobar').append(
             `<audio autoplay='1' muted='true' id='localAudio${pos}' />`);
         track.attach($(`#localAudio${pos}`)[0]);
     }
@@ -171,10 +171,9 @@ function onRemoteTrackAdded(track) {
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Remote Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     const id = participant + track.getType() + idx;
     if (track.getType() === trackTypeVideo) {
-        $('body').append(
-            `<video autoplay='1' id='${participant}video${idx}' />`);
+        $('videobar').append(`<video autoplay='1' height="200" id='${participant}video${idx}' />`);
     } else {
-        $('body').append(
+        $('videobar').append(
             `<audio autoplay='1' id='${participant}audio${idx}' />`);
     }
     track.attach($(`#${id}`)[0]);
@@ -211,6 +210,9 @@ function onUserJoined(id) {
  */
 function onUserLeft(id) {
     console.debug('User left: ' + id); //DEBUG
+    
+    //remove video
+    document.getElementById(id + "video" + "2").remove(); 
     if (!remoteTracks[id]) {
         return;
     }
