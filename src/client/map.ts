@@ -80,6 +80,8 @@ class tileset {
 
         this.firstGridId = firstId;
         source = source.replace(".tsx", ".png");
+        source = source.replace("Map/", "");
+
         this.path = this.getPath(source);
         this.tileWidth = 0;
     }
