@@ -1,4 +1,5 @@
 import { loadImage } from "./util";
+import { getPath } from "../server/main";
 
 export {drawMapWithChunks, convertMapData}
 

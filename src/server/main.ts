@@ -3,6 +3,7 @@ import serveIndex from 'serve-index';
 import express from "express";
 import cors from "cors";
 import path from 'path';
+import fs from 'fs';
 import { Server } from "colyseus";
 import { monitor } from "@colyseus/monitor";
 
@@ -54,6 +55,28 @@ app.use('/templates', express.static(path.join(process.cwd(), "assets", "templat
  *   <script src="/js/[script-name]"></script>
  */
 app.use('/js', express.static(path.join(process.cwd(), "dist", "client")));
+
+export function getPath(startPath: string, filter: string) {
+
+    if (!fs.existsSync(startPath)) {
+
+        return;
+    }
+
+    var files = fs.readdirSync(startPath);
+    for (let i = 0; i < files.length; i++) {
+
+        let fileName = path.join(startPath, files[i]);
+        let stat = fs.lstatSync(fileName);
+
+        if (stat.isDirectory()) {
+            getPath(fileName, filter);
+        }
+        else if (fileName.includes(filter)) {
+            return fileName;
+        }
+    }
+}
 
 // Register the TURoom (defined in src/common/rooms/turoom.ts)
 gameServer.define("turoom", TURoom)
