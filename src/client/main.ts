@@ -27,11 +27,13 @@ async function main() {
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
 
+    let canvas = $<HTMLCanvasElement>("canvas");
+
     let xml = new XMLHttpRequest();
     xml.open("GET", "/map/map.json", false);
     xml.send(null);
 
-    convertMapData(xml.responseText);
+    convertMapData(xml.responseText, room, canvas);
 }
 
 main();

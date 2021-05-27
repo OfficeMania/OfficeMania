@@ -48,6 +48,11 @@ app.use('/map', express.static(path.join(process.cwd(), "assets", "map")));
 app.use('/templates', express.static(path.join(process.cwd(), "assets", "templates")));
 
 /*
+ * "Mount" the assets directory under "[host]/assets"
+ */
+app.use('/assets', express.static(path.join(process.cwd(), "assets")));
+
+/*
  * "Mount" the directory where the client JavaScript is generated to (dist/client)
  * under "[host]/img"
  * 
@@ -55,28 +60,6 @@ app.use('/templates', express.static(path.join(process.cwd(), "assets", "templat
  *   <script src="/js/[script-name]"></script>
  */
 app.use('/js', express.static(path.join(process.cwd(), "dist", "client")));
-
-export function getPath(startPath: string, filter: string) {
-
-    if (!fs.existsSync(startPath)) {
-
-        return;
-    }
-
-    var files = fs.readdirSync(startPath);
-    for (let i = 0; i < files.length; i++) {
-
-        let fileName = path.join(startPath, files[i]);
-        let stat = fs.lstatSync(fileName);
-
-        if (stat.isDirectory()) {
-            getPath(fileName, filter);
-        }
-        else if (fileName.includes(filter)) {
-            return fileName;
-        }
-    }
-}
 
 // Register the TURoom (defined in src/common/rooms/turoom.ts)
 gameServer.define("turoom", TURoom)

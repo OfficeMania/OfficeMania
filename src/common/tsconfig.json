@@ -16,4 +16,5 @@
     },
     "include": ["./**/*.ts"],
     "exclude": ["./**/*.test.ts"],
+    "references": [{ "path": "../client" }]
 }

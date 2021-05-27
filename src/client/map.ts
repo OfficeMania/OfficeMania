@@ -1,5 +1,5 @@
 import { loadImage } from "./util";
-import { getPath } from "../server/main";
+import { Room } from "colyseus.js";
 
 export {drawMapWithChunks, convertMapData}
 
@@ -79,12 +79,25 @@ class tileset {
     constructor(firstId: number, source: string) {
 
         this.firstGridId = firstId;
-        this.path = source;
+        source = source.replace(".tsx", ".png");
+        this.path = this.getPath(source);
         this.tileWidth = 0;
+    }
+
+    getPath(source: string) {
+
+        for (let i = 0; i < paths.length; i++) {
+            
+            if (paths[i].includes(source)) {
+
+                return paths[i];
+            }
+        }
     }
 }
 
 let layerArray: layer[];
+let paths: string[];
 
 //the resolution is 48 and shouldn't be changed, would be too complicated to get the right resolution
 let resolution: number;
@@ -103,18 +116,35 @@ let currentY: number;
 //the height and width of the map on screen. Let Height and Width be odd, so player is displayed in middle of the screen
 let mapHeight: number;
 let mapWidth: number;
+let ctx: CanvasRenderingContext2D;
 
 let textures: Map<string, HTMLImageElement>;
 //TODO create canvas with good scale of the map
 
 let tilesetArray: tileset[];
 
-async function convertMapData(mapdata:string) {
+async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElement) {
+
+    canvas.height = 1008;
+    canvas.width = 1008;
+    
+    ctx = canvas.getContext("2d");
+
+    paths = [];
+
+    for (let i = 0; i < room.state.templatePaths.length; i++) {
+
+        paths.push(room.state.templatePaths[i]);
+    }
 
     textures = new Map<string, HTMLImageElement>();
     let image: HTMLImageElement;
 
     let map = JSON.parse(mapdata);
+
+
+    startPosX = 0;
+    startPosY = 0;
 
     currentX = startPosX;
     currentY = startPosY;
@@ -124,6 +154,9 @@ async function convertMapData(mapdata:string) {
     } else { isInfinite = false; }
     
     resolution = parseInt(map.tileheight);
+
+    mapWidth = canvas.width / resolution;
+    mapHeight = canvas.height / resolution;
 
     layerArray = [];
     tilesetArray = [];
@@ -152,15 +185,15 @@ async function convertMapData(mapdata:string) {
 
     for (let t = 0; t < map.tilesets.length; t++) {
 
-        tilesetArray.push(new tileset(parseInt(map.tilesets[t].firstgrid), map.tilesets[t].source));
+        tilesetArray.push(new tileset(parseInt(map.tilesets[t].firstgid), map.tilesets[t].source));
 
-        image = await loadImage("templates/" + tilesetArray[t].path);
+        image = await loadImage(tilesetArray[t].path);
 
         tilesetArray[t].tileWidth = image.naturalWidth;
         textures.set(tilesetArray[t].path, image);
-
-        document.writeln("Hi");
     }
+
+    drawMapWithChunks();
 }
 
 function convertXCoordinate(x: number, c:chunk): number {
@@ -177,9 +210,6 @@ function convertYCoordinate(y: number, c:chunk): number {
 
 //code for infinite maps
 function drawMapWithChunks () {
-
-    //TODO richtiges canvas mit height und width
-    let canvas: CanvasDrawImage;
 
     layerArray.forEach(function(l: layer) {
 
@@ -211,11 +241,11 @@ function drawMapWithChunks () {
         
                                     for (let i = 0; i < tilesetArray.length; i++) {
         
-                                        if (c.element[x][y] >= tilesetArray[i].firstGridId) {
+                                        if (c.element[x][y] >= tilesetArray[i].firstGridId || tilesetArray.length === 1) {
         
                                             newTileset = tilesetArray[i];
                                         }
-                                        
+
                                         let value: number;
                                         let sourceX: number;
                                         let sourceY: number;
@@ -225,11 +255,11 @@ function drawMapWithChunks () {
                                             value = c.element[x][y] - tilesetArray[i].firstGridId;
                                         
                                             //calculates the right position from the required texture
-                                            sourceX = (value % newTileset.tileWidth) * resolution
-                                            sourceY = Math.floor(value / newTileset.tileWidth) * resolution;
+                                            sourceX = (value % (newTileset.tileWidth / resolution)) * resolution
+                                            sourceY = Math.floor(value / (newTileset.tileWidth / resolution)) * resolution;
 
                                             //Create an array with used templates to boost performance
-                                            canvas.drawImage(textures.get(newTileset.path), sourceX, sourceY, resolution, resolution, convertedX, convertedY, resolution, resolution);
+                                            ctx.drawImage(textures.get(newTileset.path), sourceX, sourceY, resolution, resolution, convertedX * resolution, convertedY * resolution, resolution, resolution);
                                             i = tilesetArray.length;
                                         }
                                     }

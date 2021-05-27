@@ -2,6 +2,7 @@ import { Room, Client } from "colyseus";
 import { State, PlayerData } from "./schema/state";
 import { TILE_SIZE } from "../../client/player"
 import { cli } from "webpack";
+import fs from 'fs';
 
 
 let i = 0
@@ -17,11 +18,37 @@ export class TURoom extends Room<State> {
         this.setSimulationInterval((deltaTime) => this.update(deltaTime));
 
         //loads paths from assets
-        var fs = require('fs');
-        var files: string[] = fs.readdirSync('./assets/img/characters');
+
+        /*
+        var files: string[] = fs.readdirSync('/templates');
         for (let path of files){
             this.state.playerSpritePaths.push(path) 
         }
+        */
+
+        var path = require('path');
+        getPaths("./assets/templates", this.state);
+
+        function getPaths(startParth, newState: State) {
+
+            if (!fs.existsSync(startParth)) {
+                return;
+            }
+
+            var files = fs.readdirSync(startParth);
+            for (let i = 0; i < files.length; i++) {
+
+                let filename: string = path.join(startParth, files[i]);
+                var stat = fs.lstatSync(filename);
+                if(stat.isDirectory()) {
+                    getPaths(filename, newState);
+                }
+                else if (filename.indexOf("png") >= 0) {
+                    newState.templatePaths.push(filename);
+                }
+            }
+        }
+
 
         //recieves movement from all the clients
         this.onMessage("move", (client, message) => {

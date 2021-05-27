@@ -38,4 +38,7 @@ export class State extends Schema {
 
     @type({array: "string"})
     playerSpritePaths = new ArraySchema<string>();
+
+    @type({array: "string"})
+    templatePaths = new ArraySchema<string>();
 }
