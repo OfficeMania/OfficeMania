@@ -135,6 +135,12 @@ function onTrackAdded(track) {
 }
 
 function onLocalTrackAdded(track, pos: number) {
+
+    //filter out local stream duplicate
+    if(typeof pos === "undefined") {
+        return;
+    }
+
     console.debug(`Local Track added: ${track}`); //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel => console.debug(`Audio Level Local: ${audioLevel}`)); //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, () => console.debug('Local Track Mute changed')); //DEBUG
