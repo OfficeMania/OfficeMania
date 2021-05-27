@@ -14,7 +14,7 @@ const deviceKindVideo = "videooutput";
 
 // Options
 
-const roomName = "conference"; //TODO
+const roomName = "conference-with-safe-name-djlsöncaöeif38723"; //TODO
 
 const optionsHosts = {
     domain: "8x8.vc",
@@ -147,7 +147,7 @@ function onLocalTrackAdded(track, pos: number) {
     track.addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Local Track stopped')); //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Local Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     if (track.getType() === trackTypeVideo) {
-        $('videobar').append(`<video autoplay='1' height="200" id='localVideo${pos}' />`);
+        $('videobar').append(`<video autoplay='1' height="200" style="margin-right:5px;" id='localVideo${pos}' />`);
         track.attach($(`#localVideo${pos}`)[0]);
     } else {
         $('videobar').append(
@@ -177,7 +177,7 @@ function onRemoteTrackAdded(track) {
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Remote Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     const id = participant + track.getType() + idx;
     if (track.getType() === trackTypeVideo) {
-        $('videobar').append(`<video autoplay='1' height="200" id='${participant}video${idx}' />`);
+        $('videobar').append(`<video autoplay='1' height="200" style="margin-right:5px;" id='${participant}video${idx}' />`);
     } else {
         $('videobar').append(
             `<audio autoplay='1' id='${participant}audio${idx}' />`);

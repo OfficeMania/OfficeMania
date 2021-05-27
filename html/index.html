@@ -11,11 +11,17 @@
 
         <script src="/js/vendors-bundle.js"></script>
     </head>
-    <body style="background-color:rgb(255, 255, 255);">
+    <body style="background-color:rgb(255, 255, 255);margin: 0px;">
+        
+        <div id="buttonpanel" style="background-color: gray; padding: 10px;">
+            <button id="mute_button"><em class="fa fa-microphone"></em></button>
+            <button id="cam_button"><em class="fa fa-video"></em></button>
+        </div>
+        
 
-        <button id="mute_button"><em class = "fa fa-microphone"></em></button>
-        <button id="cam_button"><em class = "fa fa-video"></em></button>
-        <p id="playerNearbyIndicator"></p>
+        <videobar></videobar>
+
+        <p id="playerNearbyIndicator">Waiting for someone else to join...</p>
              
         <canvas id="canvas" width="600" height="600" style="float: inline-start;"></canvas>
         
