@@ -128,7 +128,7 @@ let tilesetArray: tileset[];
 async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElement) {
 
     canvas.height = 1008;
-    canvas.width = 1008;
+    canvas.width = 1776;
     
     ctx = canvas.getContext("2d");
 
@@ -145,8 +145,8 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
     let map = JSON.parse(mapdata);
 
 
-    startPosX = 0;
-    startPosY = 0;
+    startPosX = 10;
+    startPosY = -15;
 
     currentX = startPosX;
     currentY = startPosY;
@@ -217,8 +217,8 @@ function drawMapWithChunks () {
 
         l.chunks.forEach(function(c: chunk) {
 
-            let convertedY: number = convertYCoordinate(c.posY, c);
-            let convertedX: number = convertXCoordinate(c.posX, c);
+            let convertedY: number = convertYCoordinate(0, c);
+            let convertedX: number = convertXCoordinate(0, c);
 
             //checks if the full chunk is not on the map on the screen
             if(!(convertedX + 16 < 0 || convertedY + 16 < 0 || convertedX > mapWidth - 1 || convertedY > mapHeight - 1)) {
@@ -239,22 +239,25 @@ function drawMapWithChunks () {
                                 if (!(convertedX < 0 || convertedX > mapWidth - 1)) {
         
                                     //saves a tileset, we need this to find the right one
-                                    let newTileset: tileset = null;
+                                    let newFirstGridId: number;
+                                    let newTileset: tileset;
+                                    let entry = c.element[x][y];
         
                                     for (let i = 0; i < tilesetArray.length; i++) {
         
-                                        if (c.element[x][y] >= tilesetArray[i].firstGridId || tilesetArray.length === 1) {
+                                        if (entry >= tilesetArray[i].firstGridId || tilesetArray.length === 1) {
         
-                                            newTileset = tilesetArray[i];
+                                            newFirstGridId = tilesetArray[i].firstGridId;
+                                            newTileset = tilesetArray[i]
                                         }
-
+                                        
                                         let value: number;
                                         let sourceX: number;
                                         let sourceY: number;
                                         //if this is true we found the right tileset with help of the firstGridId
-                                        if (c.element[x][y] < newTileset.firstGridId || i === (tilesetArray.length - 1)) {
+                                        if (newFirstGridId < tilesetArray[i].firstGridId || i === (tilesetArray.length - 1)) {
         
-                                            value = c.element[x][y] - tilesetArray[i].firstGridId;
+                                            value = c.element[x][y] - newTileset.firstGridId;
                                         
                                             //calculates the right position from the required texture
                                             sourceX = (value % (newTileset.tileWidth / resolution)) * resolution
