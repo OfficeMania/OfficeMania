@@ -1,7 +1,7 @@
 import { loadImage } from "./util";
 import { Room } from "colyseus.js";
 
-export {drawMapWithChunks, convertMapData}
+export {drawMapWithChunks, convertMapData, mapInfo}
 
 //only important for infinite maps
 class chunk {
@@ -23,6 +23,47 @@ class chunk {
 
         this.posX = xPos;
         this.posY = yPos;
+    }
+}
+
+class mapInfo {
+
+    layers: layer[];
+    tilesets: tileset[];
+    heightOfMap: number;
+    widthOfMap: number;
+    ctx: CanvasRenderingContext2D;
+    currentX: number;
+    currentY: number;
+    textures: Map<string, HTMLImageElement>;
+    resolution: number;
+    canvas: HTMLCanvasElement;
+
+    constructor(layers: layer[], tilesets: tileset[], canvas: HTMLCanvasElement, resolution: number, textures: Map<string, HTMLImageElement>) {
+
+        this.layers = layers;
+        this.tilesets = tilesets;
+        this.heightOfMap = canvas.height / (resolution);
+        this.widthOfMap = canvas.width / (resolution);
+        this.ctx = canvas.getContext("2d");
+        this.currentX = 0;
+        this.currentY = 15;
+        this.textures = textures;
+        this.resolution = resolution;
+        this.canvas = canvas;
+    }
+
+    updateScaling(scaling: number) {
+
+        this.heightOfMap = this.heightOfMap / scaling;
+        this.widthOfMap = this.widthOfMap / scaling;
+        this.ctx.scale(scaling, scaling);
+    }
+
+    updatePos(posX: number, posY: number) {
+
+        this.currentX = posX;
+        this.currentY = posY;
     }
 }
 
@@ -98,39 +139,35 @@ class tileset {
     }
 }
 
-let layerArray: layer[];
+//saves the paths from the templates
 let paths: string[];
-
-//the resolution is 48 and shouldn't be changed, would be too complicated to get the right resolution
-let resolution: number;
-
-//important for drawing, infinite maps work only with chunks
-let isInfinite: boolean;
-
-//the spawn coordinates
-let startPosX: number;
-let startPosY: number;
-
-//the current Position from the player
-let currentX: number;
-let currentY: number;
-
-//the height and width of the map on screen. Let Height and Width be odd, so player is displayed in middle of the screen
-let mapHeight: number;
-let mapWidth: number;
-let ctx: CanvasRenderingContext2D;
-
-let textures: Map<string, HTMLImageElement>;
-//TODO create canvas with good scale of the map
-
-let tilesetArray: tileset[];
 
 async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElement) {
 
-    canvas.height = 1008;
+    //saves the layers from the map
+    let layerArray: layer[];
+
+    //the resolution is 48 and shouldn't be changed, would be too complicated to get the right resolution
+    let resolution: number;
+
+    //important for drawing, infinite maps work only with chunks
+    let isInfinite: boolean;
+
+    //the height and width of the map on screen. Let Height and Width be odd, so player is displayed in middle of the screen
+    let mapHeight: number;
+    let mapWidth: number;
+
+    //maps a HTMLImageElement with the name of the sourcefile
+    let textures: Map<string, HTMLImageElement>;
+
+    //zoom in and out on the map, 1 is the standart
+    let scaling: number;
+
+    //saves the tilesets from the map
+    let tilesetArray: tileset[];
+
+    canvas.height = 1020;
     canvas.width = 1776;
-    
-    ctx = canvas.getContext("2d");
 
     paths = [];
 
@@ -144,21 +181,14 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
 
     let map = JSON.parse(mapdata);
 
-
-    startPosX = 10;
-    startPosY = -15;
-
-    currentX = startPosX;
-    currentY = startPosY;
-
     if (map.infinite === "true") {
         isInfinite = true;
     } else { isInfinite = false; }
     
     resolution = parseInt(map.tileheight);
 
-    mapWidth = canvas.width / resolution;
-    mapHeight = canvas.height / resolution;
+    mapWidth = canvas.width / (resolution * scaling);
+    mapHeight = canvas.height / (resolution * scaling);
 
     layerArray = [];
     tilesetArray = [];
@@ -195,15 +225,15 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
         textures.set(tilesetArray[t].path, image);
     }
 
-    drawMapWithChunks();
+    return new mapInfo(layerArray, tilesetArray, canvas, resolution, textures);
 }
 
-function convertXCoordinate(x: number, c:chunk): number {
+function convertXCoordinate(x: number, c:chunk, currentX: number, mapWidth: number): number {
 
     return (x + c.posX - (currentX - Math.floor(mapWidth/2)))
 }
 
-function convertYCoordinate(y: number, c:chunk): number {
+function convertYCoordinate(y: number, c:chunk, currentY: number, mapHeight: number): number {
 
     return (y + c.posY - (currentY - Math.floor(mapHeight/2)))
 }
@@ -211,23 +241,23 @@ function convertYCoordinate(y: number, c:chunk): number {
 
 
 //code for infinite maps
-function drawMapWithChunks () {
+function drawMapWithChunks (mapData: mapInfo) {
 
-    layerArray.forEach(function(l: layer) {
+    mapData.layers.forEach(function(l: layer) {
 
         l.chunks.forEach(function(c: chunk) {
 
-            let convertedY: number = convertYCoordinate(0, c);
-            let convertedX: number = convertXCoordinate(0, c);
+            let convertedY: number = convertYCoordinate(0, c, mapData.currentX, mapData.widthOfMap);
+            let convertedX: number = convertXCoordinate(0, c, mapData.currentY, mapData.heightOfMap);
 
             //checks if the full chunk is not on the map on the screen
-            if(!(convertedX + 16 < 0 || convertedY + 16 < 0 || convertedX > mapWidth - 1 || convertedY > mapHeight - 1)) {
+            if(!(convertedX + 16 < 0 || convertedY + 16 < 0 || convertedX > mapData.widthOfMap || convertedY > mapData.heightOfMap)) {
 
                 for (let y = 0; y < 16; y++) {
 
                     //checks if the y coordinate would be seen on the screen, only works with an odd mapHeigtht
-                    convertedY = convertYCoordinate(y, c);
-                    if (!(convertedY < 0 || convertedY > mapHeight - 1)) {
+                    convertedY = convertYCoordinate(y, c, mapData.currentY, mapData.heightOfMap);
+                    if (!(convertedY < 0 || convertedY > mapData.heightOfMap)) {
     
                         for (let x = 0; x < 16; x++) {
     
@@ -235,37 +265,37 @@ function drawMapWithChunks () {
                             if (c.element[x][y] !== 0) {
                             
                                 //checks if the x coordiante would be seen on the screen, only works with an odd mapWidth
-                                convertedX = convertXCoordinate(x, c);
-                                if (!(convertedX < 0 || convertedX > mapWidth - 1)) {
+                                convertedX = convertXCoordinate(x, c, mapData.currentX, mapData.widthOfMap);
+                                if (!(convertedX < 0 || convertedX > mapData.widthOfMap)) {
         
                                     //saves a tileset, we need this to find the right one
                                     let newFirstGridId: number;
                                     let newTileset: tileset;
                                     let entry = c.element[x][y];
         
-                                    for (let i = 0; i < tilesetArray.length; i++) {
+                                    for (let i = 0; i < mapData.tilesets.length; i++) {
         
-                                        if (entry >= tilesetArray[i].firstGridId || tilesetArray.length === 1) {
+                                        if (entry >= mapData.tilesets[i].firstGridId || mapData.tilesets.length === 1) {
         
-                                            newFirstGridId = tilesetArray[i].firstGridId;
-                                            newTileset = tilesetArray[i]
+                                            newFirstGridId = mapData.tilesets[i].firstGridId;
+                                            newTileset = mapData.tilesets[i];
                                         }
                                         
                                         let value: number;
                                         let sourceX: number;
                                         let sourceY: number;
                                         //if this is true we found the right tileset with help of the firstGridId
-                                        if (newFirstGridId < tilesetArray[i].firstGridId || i === (tilesetArray.length - 1)) {
+                                        if (newFirstGridId < mapData.tilesets[i].firstGridId || i === (mapData.tilesets.length - 1)) {
         
                                             value = c.element[x][y] - newTileset.firstGridId;
                                         
                                             //calculates the right position from the required texture
-                                            sourceX = (value % (newTileset.tileWidth / resolution)) * resolution
-                                            sourceY = Math.floor(value / (newTileset.tileWidth / resolution)) * resolution;
+                                            sourceX = (value % (newTileset.tileWidth / mapData.resolution)) * mapData.resolution
+                                            sourceY = Math.floor(value / (newTileset.tileWidth / mapData.resolution)) * mapData.resolution;
 
                                             //Create an array with used templates to boost performance
-                                            ctx.drawImage(textures.get(newTileset.path), sourceX, sourceY, resolution, resolution, convertedX * resolution, convertedY * resolution, resolution, resolution);
-                                            i = tilesetArray.length;
+                                            mapData.ctx.drawImage(mapData.textures.get(newTileset.path), sourceX, sourceY, mapData.resolution, mapData.resolution, convertedX * mapData.resolution, convertedY * mapData.resolution, mapData.resolution, mapData.resolution);
+                                            i = mapData.tilesets.length;
                                         }
                                     }
                                 }

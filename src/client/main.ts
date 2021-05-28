@@ -1,7 +1,7 @@
 import { Client } from "colyseus.js";
 import { Player, PLAYER_COLORS, updatePosition } from "./player";
 import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
-import { convertMapData } from "./map";
+import { convertMapData, drawMapWithChunks, mapInfo } from "./map";
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
@@ -30,10 +30,20 @@ async function main() {
     let canvas = $<HTMLCanvasElement>("canvas");
 
     let xml = new XMLHttpRequest();
-    xml.open("GET", "/map/map.json", false);
+    xml.open("GET", "/map/Map.json", false);
     xml.send(null);
 
-    convertMapData(xml.responseText, room, canvas);
+    let map: Promise<mapInfo> = convertMapData(xml.responseText, room, canvas);
+
+    let currentMap = new mapInfo((await map).layers, (await map).tilesets, (await map).canvas, (await map).resolution, (await map).textures);
+
+    let posX: number = -11;
+    let posY: number = -8;
+
+    currentMap.updatePos(posX, posY);
+    currentMap.updateScaling(1);
+
+    drawMapWithChunks(currentMap);
 }
 
 main();
