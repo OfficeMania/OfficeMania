@@ -81,23 +81,15 @@ async function main() {
     function keyPressed(e: KeyboardEvent){
         if(e.key === "s" && !ourPlayer.prioDirection.includes("moveDown")){
             ourPlayer.prioDirection.unshift("moveDown")
-            currentMap.updatePos(posX, posY - 1);
-            currentMap.updateScaling(1);
         }
         if(e.key === "w" && !ourPlayer.prioDirection.includes("moveUp")){
             ourPlayer.prioDirection.unshift("moveUp")
-            currentMap.updatePos(posX, posY + 1);
-            currentMap.updateScaling(1);
         }
         if(e.key === "a" && !ourPlayer.prioDirection.includes("moveLeft")){
             ourPlayer.prioDirection.unshift("moveLeft")
-            currentMap.updatePos(posX - 1, posY);
-            currentMap.updateScaling(1);
         }
         if(e.key === "d" && !ourPlayer.prioDirection.includes("moveRight")){
             ourPlayer.prioDirection.unshift("moveRight")
-            currentMap.updatePos(posX+ 1, posY);
-            currentMap.updateScaling(1);
         }
         //iterate through characters
         if(e.key === "c"){
@@ -165,6 +157,10 @@ async function main() {
         });
 
         updateOwnPosition(ourPlayer, room);
+        
+        //testing Playerpositioning
+        ourPlayer.positionX = Math.round(width/2);
+        ourPlayer.positionY = Math.round(height/2);
 
         /*
         code from beginning
@@ -189,9 +185,6 @@ async function main() {
         //ctx.drawImage(startImage, 0, 0); 
 
         //draw map
-        let posX: number = -11;
-        let posY: number = -8;
-
         currentMap.updatePos(posX, posY);
         currentMap.updateScaling(1);
 
