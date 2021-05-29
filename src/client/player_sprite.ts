@@ -1,5 +1,5 @@
 import { Room } from "colyseus.js";
-import { Player } from "./player";
+import { Player, TILE_SIZE } from "./player";
 
 /*
  * Chooses the Player sprite dependend on walking direction and duration of walking/standing
@@ -97,21 +97,21 @@ export function choosePlayerSprites(room: Room, player: Player, playerWidth: num
         }
     } else {
         //sets facing direction to choose sprites
-        if(Math.abs(player.positionX - room.state.players[player.name].x) > Math.abs(player.positionY - room.state.players[player.name].y)){
-            if(player.positionX < room.state.players[player.name].x){
+        if(Math.abs(player.positionX - room.state.players[player.name].x * TILE_SIZE) > Math.abs(player.positionY - room.state.players[player.name].y * TILE_SIZE)){
+            if(player.positionX < room.state.players[player.name].x * TILE_SIZE){
                 player.facing = "right"
-            }else if(player.positionX > room.state.players[player.name].x){
+            }else if(player.positionX > room.state.players[player.name].x * TILE_SIZE){
                 player.facing = "left"
             }
-        } else if (Math.abs(player.positionX - room.state.players[player.name].x) < Math.abs(player.positionY - room.state.players[player.name].y)){
-            if(player.positionY < room.state.players[player.name].y){
+        } else if (Math.abs(player.positionX - room.state.players[player.name].x * TILE_SIZE) < Math.abs(player.positionY - room.state.players[player.name].y * TILE_SIZE)){
+            if(player.positionY < room.state.players[player.name].y * TILE_SIZE){
                 player.facing = "down"
-            }else if(player.positionY > room.state.players[player.name].y){
+            }else if(player.positionY > room.state.players[player.name].y * TILE_SIZE){
                 player.facing = "up"
             }
         }
         // player is standing
-        if(player.positionX === room.state.players[player.name].x && player.positionY === room.state.players[player.name].y){
+        if(player.positionX === room.state.players[player.name].x * TILE_SIZE && player.positionY === room.state.players[player.name].y * TILE_SIZE){
             player.standing++
             if (player.standing >= 10){
                 player.moving = 0

@@ -20,6 +20,8 @@ export interface Player {
     character: string;          //the name of the character sprite               
     positionX: number;          //posX on the Map
     positionY: number;          //posY on the Map
+    scaledX: number;            //one tilestep changes this by 1
+    scaledY: number;            //one tilestep changes this by 1
     moveDirection: string;      //currently moving in this or none direction
     moveTime: number;           //time moving in current move
     prioDirection: string[];    //current and last direction button pressed
@@ -36,30 +38,30 @@ export interface Player {
 export function updatePosition(player: Player, room: Room, client: Client) {
     
     //if server and client data differ to much tp player to server postion.
-    if(Math.abs(player.positionX-room.state.players[player.name].x)>=100 || Math.abs(player.positionY-room.state.players[player.name].y)>=100){
-        player.positionX = room.state.players[player.name].x
-        player.positionY = room.state.players[player.name].y
+    if(Math.abs(player.positionX - room.state.players[player.name].x * TILE_SIZE)>=100 || Math.abs(player.positionY - room.state.players[player.name].y * TILE_SIZE)>=100){
+        player.positionX = room.state.players[player.name].x * TILE_SIZE;
+        player.positionY = room.state.players[player.name].y * TILE_SIZE;
     }
 
     //if close enough just set client pos = server pos
-    if(Math.abs(player.positionX - room.state.players[player.name].x) <= PLAYER_MOVEMENT_PER_TICK){
-        player.positionX = room.state.players[player.name].x
+    if(Math.abs(player.positionX - room.state.players[player.name].x * TILE_SIZE) <= PLAYER_MOVEMENT_PER_TICK){
+        player.positionX = room.state.players[player.name].x * TILE_SIZE;
     } else {
         //smooth animation to new x coord
-        if(player.positionX < room.state.players[player.name].x){
+        if(player.positionX < room.state.players[player.name].x * TILE_SIZE){
             player.positionX += PLAYER_MOVEMENT_PER_TICK;
-        }else if(player.positionX > room.state.players[player.name].x){
+        }else if(player.positionX > room.state.players[player.name].x * TILE_SIZE){
             player.positionX -= PLAYER_MOVEMENT_PER_TICK;
         }
     }
     //if close enough just set client pos = server pos
-    if(Math.abs(player.positionY - room.state.players[player.name].y) <= PLAYER_MOVEMENT_PER_TICK){
-        player.positionY = room.state.players[player.name].y
+    if(Math.abs(player.positionY - room.state.players[player.name].y * TILE_SIZE) <= PLAYER_MOVEMENT_PER_TICK){
+        player.positionY = room.state.players[player.name].y * TILE_SIZE
     } else {
         //smooth animation to new y coord
-        if(player.positionY < room.state.players[player.name].y){
+        if(player.positionY < room.state.players[player.name].y * TILE_SIZE){
             player.positionY += PLAYER_MOVEMENT_PER_TICK;
-        }else if(player.positionY > room.state.players[player.name].y){
+        }else if(player.positionY > room.state.players[player.name].y * TILE_SIZE){
             player.positionY -= PLAYER_MOVEMENT_PER_TICK;
         }
     }
@@ -69,9 +71,9 @@ export function updatePosition(player: Player, room: Room, client: Client) {
 export function updateOwnPosition(player: Player, room: Room) {
 
     //if server and client data differ to much tp player to server postion.
-    if(Math.abs(player.positionX-room.state.players[player.name].x)>=47 || Math.abs(player.positionY-room.state.players[player.name].y)>=47){
-        player.positionX = room.state.players[player.name].x
-        player.positionY = room.state.players[player.name].y
+    if(Math.abs(player.positionX - room.state.players[player.name].x  * TILE_SIZE)>=72 || Math.abs(player.positionY-room.state.players[player.name].y  * TILE_SIZE)>=72){
+        player.positionX = room.state.players[player.name].x * TILE_SIZE;
+        player.positionY = room.state.players[player.name].y * TILE_SIZE;
     }
     
     //initiates movement in one direction and blocks the other directions till the next tile
@@ -79,21 +81,25 @@ export function updateOwnPosition(player: Player, room: Room) {
         if(player.prioDirection[0] === "moveDown" && player.moveDirection === null){
             player.moveDirection = "down"
             player.facing = "down"
+            player.scaledY++;
             room.send("move", "moveDown");
         }
         if(player.prioDirection[0] === "moveUp" && player.moveDirection === null){
             player.moveDirection = "up"
             player.facing = "up"
+            player.scaledY--;
             room.send("move", "moveUp");
         }
         if(player.prioDirection[0] === "moveLeft" && player.moveDirection === null){
             player.moveDirection = "left"
             player.facing = "left"
+            player.scaledX--;
             room.send("move", "moveLeft");
         }
         if(player.prioDirection[0] === "moveRight" && player.moveDirection === null){
             player.moveDirection = "right"
             player.facing = "right"
+            player.scaledX++;
             room.send("move", "moveRight");
         }
     }
@@ -110,11 +116,14 @@ export function updateOwnPosition(player: Player, room: Room) {
             player.positionX += PLAYER_MOVEMENT_PER_TICK;
         }
         if(player.moveTime === FRAMES_PER_MOVE){
+            player.scaledX = room.state.players[player.name].x
+            player.scaledY = room.state.players[player.name].y
             player.moveTime = 0;
             player.moveDirection = null;
-            if(player.positionX%48 != 0 || player.positionX%48 != 0){
-                player.positionX = room.state.players[player.name].x
-                player.positionY = room.state.players[player.name].y
+            //corrects centers the player every whole step
+            if(player.positionX % TILE_SIZE != 0 || player.positionY % TILE_SIZE != 0){
+                player.positionX = player.scaledX * TILE_SIZE
+                player.positionY = player.scaledY * TILE_SIZE
             }
         }
     }

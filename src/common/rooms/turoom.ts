@@ -18,58 +18,40 @@ export class TURoom extends Room<State> {
         this.setSimulationInterval((deltaTime) => this.update(deltaTime));
 
         //loads paths from assets
-
-        /*
-        var files: string[] = fs.readdirSync('/templates');
+        var files: string[] = fs.readdirSync('./assets/img/characters');
         for (let path of files){
-            this.state.playerSpritePaths.push(path) 
-        }
-        */
-
-        var path = require('path');
-        getPaths("./assets/templates", this.state);
-
-        function getPaths(startParth, newState: State) {
-
-            if (!fs.existsSync(startParth)) {
-                return;
-            }
-
-            var files = fs.readdirSync(startParth);
-            for (let i = 0; i < files.length; i++) {
-
-                let filename: string = path.join(startParth, files[i]);
-                var stat = fs.lstatSync(filename);
-                if(stat.isDirectory()) {
-                    getPaths(filename, newState);
-                }
-                else if (filename.indexOf("png") >= 0) {
-                    newState.templatePaths.push(filename);
-                }
-            }
+            if (path.includes(".png")){
+                this.state.playerSpritePaths.push(path)
+            } 
         }
 
 
         //recieves movement from all the clients
         this.onMessage("move", (client, message) => {
-            switch(message){
-                case "moveDown":{
-                    this.state.players[client.sessionId].y += TILE_SIZE;
-                    break;
+            console.log(this.state.players[client.sessionId].cooldown);
+            if (this.state.players[client.sessionId].cooldown <= 0){
+                switch(message){
+                    case "moveDown":{
+                        this.state.players[client.sessionId].cooldown = 6;
+                        this.state.players[client.sessionId].y++;
+                        break;
+                    }
+                    case "moveUp":{
+                        this.state.players[client.sessionId].cooldown = 6;
+                        this.state.players[client.sessionId].y--;
+                        break;
+                    }
+                    case "moveLeft":{
+                        this.state.players[client.sessionId].cooldown = 6;
+                        this.state.players[client.sessionId].x--;
+                        break;
+                    }
+                    case "moveRight":{
+                        this.state.players[client.sessionId].cooldown = 6;
+                        this.state.players[client.sessionId].x++;
+                        break;
+                    }
                 }
-                case "moveUp":{
-                    this.state.players[client.sessionId].y -= TILE_SIZE;
-                    break;
-                }
-                case "moveLeft":{
-                    this.state.players[client.sessionId].x -= TILE_SIZE;
-                    break;
-                }
-                case "moveRight":{
-                    this.state.players[client.sessionId].x += TILE_SIZE;
-                    break;
-                }
-
             }
              
 
@@ -92,6 +74,7 @@ export class TURoom extends Room<State> {
         this.state.players[client.sessionId].character = "Adam_48x48.png";
         this.state.players[client.sessionId].x = 0;
         this.state.players[client.sessionId].y = 0;
+        this.state.players[client.sessionId].cooldown = 0;
     }
 
     onLeave (client: Client, consented: boolean) {
@@ -103,6 +86,11 @@ export class TURoom extends Room<State> {
     
     //gameloop for server
     update (deltaTime) {
+        for (let [id, player] of this.state.players){
+            if (player.cooldown > 0){
+                player.cooldown--;
+            }
 
+        }
     }
 }

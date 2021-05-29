@@ -5,6 +5,7 @@ import { Player } from "./player";
 export type InitState = [Room<State>, Player];
 export type PlayerRecord = {[key: string]: Player}
 
+
 /*
  * This function returns a promise that is resolve when the image is loaded
  * from the url. Note that this function currently does no error handling.
@@ -41,15 +42,29 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
             *
             * See: https://docs.colyseus.io/state/schema/#onadd-instance-key
             */
-            room.state.players.onAdd = function (playerName, sessionId) {
-                console.log("Add", sessionId);
+            room.state.players.onAdd = function (playerData, sessionId) {
+                console.log("Add", sessionId, playerData);
 
                 let player: Player = {
-                    name: playerName,
-                    position: 0
+                    name: sessionId,
+                    character: "Adam_48x48.png",
+                    positionX: 0,
+                    positionY: 0,
+                    scaledX: 0,
+                    scaledY: 0,
+                    moveDirection: null,
+                    moveTime: 0,
+                    prioDirection: [],
+                    facing: "down",
+                    standing: 0,
+                    moving: 0,
+                    spriteX: 144,
+                    spriteY: 0
                 };
                 players[sessionId] = player;
 
+                
+                
                 /*
                  * If the sessionId of the added player and the room's session id
                  * are equal, the server added our player. Now, the room and our
@@ -58,7 +73,10 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 if (sessionId === room.sessionId) {
                     resolve([room, player]);
                 }
+
+                
             };
+
 
             /*
             * ... but once a player becomes inactive (according to the server) we
@@ -71,12 +89,16 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 delete players[sessionId];
             };
 
+
             /*
              * If the room has any other state that needs to be observed, the
              * code needs to be placed here:
              * 
              * ...
              */
+            
+
         });
     });
 }
+
