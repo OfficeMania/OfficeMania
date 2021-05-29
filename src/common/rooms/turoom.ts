@@ -98,8 +98,8 @@ export class TURoom extends Room<State> {
         this.state.players[client.sessionId] = playerdata;
         this.state.players[client.sessionId].name = "";
         this.state.players[client.sessionId].character = "Adam_48x48.png";
-        this.state.players[client.sessionId].x = 0;
-        this.state.players[client.sessionId].y = 0;
+        this.state.players[client.sessionId].x = 10;
+        this.state.players[client.sessionId].y = 10;
         this.state.players[client.sessionId].cooldown = 0;
     }
 
