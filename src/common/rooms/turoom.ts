@@ -17,6 +17,7 @@ export class TURoom extends Room<State> {
         //sets the interval in which update gets called
         this.setSimulationInterval((deltaTime) => this.update(deltaTime));
 
+
         //loads paths from assets
         var files: string[] = fs.readdirSync('./assets/img/characters');
         for (let path of files){
@@ -24,6 +25,31 @@ export class TURoom extends Room<State> {
                 this.state.playerSpritePaths.push(path)
             } 
         }
+
+        //loads paths from templates
+        var path = require('path');
+        getPaths("./assets/templates", this.state);
+        
+        function getPaths(startParth, newState: State) {
+        
+            if (!fs.existsSync(startParth)) {
+                return;
+            }
+        
+            var files = fs.readdirSync(startParth);
+            for (let i = 0; i < files.length; i++) {
+        
+                let filename: string = path.join(startParth, files[i]);
+                var stat = fs.lstatSync(filename);
+                if(stat.isDirectory()) {
+                    getPaths(filename, newState);
+                }
+                else if (filename.indexOf("png") >= 0) {
+                    newState.templatePaths.push(filename);
+                }
+            }
+        }
+        
 
 
         //recieves movement from all the clients
