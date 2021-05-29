@@ -136,6 +136,8 @@ async function main() {
 
     function loop(now: number) {
 
+        ctx.clearRect(0, 0, width, height);
+
         /*lag += now - previous;
         previous = now;*/
 
@@ -178,8 +180,8 @@ async function main() {
          * Repaint the scene
          */
         //Draw white plane
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, width, height);
+        //ctx.fillStyle = "white";
+        //ctx.fillRect(0, 0, width, height);
 
         // Draw background
         //ctx.drawImage(startImage, 0, 0); 
@@ -188,7 +190,7 @@ async function main() {
         currentMap.updatePos(posX, posY);
         currentMap.updateScaling(1);*/
 
-        drawMapWithChunks(currentMap);
+        //drawMapWithChunks(currentMap);
         
         // Draw each player
         ctx.save();
