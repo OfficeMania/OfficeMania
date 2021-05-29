@@ -152,7 +152,7 @@ async function main() {
             if(player !== ourPlayer){
                 updatePosition(player, room, client);
                 player.character = room.state.players[player.name].character
-                console.log(player.character)
+                //console.log(player.character)
             } 
         });
 
@@ -186,9 +186,9 @@ async function main() {
 
         /*draw map
         currentMap.updatePos(posX, posY);
-        currentMap.updateScaling(1);
+        currentMap.updateScaling(1);*/
 
-        drawMapWithChunks(currentMap);*/
+        drawMapWithChunks(currentMap);
         
         // Draw each player
         ctx.save();
