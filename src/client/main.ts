@@ -138,6 +138,7 @@ async function main() {
 
         lag += now - previous;
         previous = now;
+        console.log(lag);
 
         /*update width and height
         canvas.width = window.innerWidth
