@@ -7,6 +7,9 @@ export {drawMapWithChunks, convertMapData, mapInfo}
 class chunk {
 
     element: number[][];
+    tilesetForElement: tileset[][];
+    tilesetX: number[][];
+    tilesteY: number[][];
     posX: number;
     posY: number;
 
@@ -267,37 +270,51 @@ function drawMapWithChunks (mapData: mapInfo) {
                                 //checks if the x coordiante would be seen on the screen, only works with an odd mapWidth
                                 convertedX = convertXCoordinate(x, c, mapData.currentX, mapData.widthOfMap);
                                 if (!(convertedX < 0 || convertedX > mapData.widthOfMap)) {
-        
-                                    //saves a tileset, we need this to find the right one
-                                    let newFirstGridId: number;
-                                    let newTileset: tileset;
-                                    let entry = c.element[x][y];
-        
-                                    for (let i = 0; i < mapData.tilesets.length; i++) {
-        
-                                        if (entry >= mapData.tilesets[i].firstGridId || mapData.tilesets.length === 1) {
-        
-                                            newFirstGridId = mapData.tilesets[i].firstGridId;
-                                            newTileset = mapData.tilesets[i];
-                                        }
-                                        
-                                        let value: number;
-                                        let sourceX: number;
-                                        let sourceY: number;
-                                        //if this is true we found the right tileset with help of the firstGridId
-                                        if (newFirstGridId < mapData.tilesets[i].firstGridId || i === (mapData.tilesets.length - 1)) {
-        
-                                            value = c.element[x][y] - newTileset.firstGridId;
-                                        
-                                            //calculates the right position from the required texture
-                                            sourceX = (value % (newTileset.tileWidth / mapData.resolution)) * mapData.resolution
-                                            sourceY = Math.floor(value / (newTileset.tileWidth / mapData.resolution)) * mapData.resolution;
 
-                                            //Create an array with used templates to boost performance
-                                            mapData.ctx.drawImage(mapData.textures.get(newTileset.path), sourceX, sourceY, mapData.resolution, mapData.resolution, convertedX * mapData.resolution, convertedY * mapData.resolution, mapData.resolution, mapData.resolution);
-                                            i = mapData.tilesets.length;
+                                    if(c.tilesetForElement[x][y] === null){
+
+                                        //saves a tileset, we need this to find the right one
+                                        let newFirstGridId: number;
+                                        let newTileset: tileset;
+                                        let entry = c.element[x][y];
+        
+                                        for (let i = 0; i < mapData.tilesets.length; i++) {
+        
+                                            if (entry >= mapData.tilesets[i].firstGridId || mapData.tilesets.length === 1) {
+        
+                                                newFirstGridId = mapData.tilesets[i].firstGridId;
+                                                newTileset = mapData.tilesets[i];
+                                            }
+                                        
+                                            let value: number;
+                                            let sourceX: number;
+                                            let sourceY: number;
+                                            //if this is true we found the right tileset with help of the firstGridId
+                                            if (newFirstGridId < mapData.tilesets[i].firstGridId || i === (mapData.tilesets.length - 1)) {
+        
+                                                c.tilesetForElement[x][y] = newTileset;
+                                                value = c.element[x][y] - newTileset.firstGridId;
+                                        
+                                                //calculates the right position from the required texture
+                                                sourceX = (value % (newTileset.tileWidth / mapData.resolution)) * mapData.resolution
+                                                c.tilesetX[x][y] = sourceX;
+                                                sourceY = Math.floor(value / (newTileset.tileWidth / mapData.resolution)) * mapData.resolution;
+                                                c.tilesteY[x][y] = sourceY;
+
+                                                //Create an array with used templates to boost performance
+                                                mapData.ctx.drawImage(mapData.textures.get(newTileset.path), sourceX, sourceY, mapData.resolution, mapData.resolution, convertedX * mapData.resolution, convertedY * mapData.resolution, mapData.resolution, mapData.resolution);
+                                                i = mapData.tilesets.length;
+                                            }
                                         }
+
+                                    } else{
+                                        //draw the image withaout searching
+                                        mapData.ctx.drawImage(mapData.textures.get(c.tilesetForElement[x][y].path), c.tilesetX[x][y], c.tilesteY[x][y], mapData.resolution, mapData.resolution, convertedX * mapData.resolution, convertedY * mapData.resolution, mapData.resolution, mapData.resolution);
                                     }
+
+
+
+
                                 }
                             }
                         }
