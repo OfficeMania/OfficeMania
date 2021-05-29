@@ -53,6 +53,7 @@ async function main() {
     let currentMap = new mapInfo((await map).layers, (await map).tilesets, (await map).canvas, (await map).resolution, (await map).textures);
 
     //start position
+    //TODO nicht hard coden?
     let posX: number = -11;
     let posY: number = -8;
 
@@ -70,6 +71,11 @@ async function main() {
     let playerWidth: number = 48;
     let playerHeight: number = 96;
 
+    let up: boolean = false;
+    let down: boolean = false;
+    let left: boolean = false;
+    let right: boolean = false;
+
     /* (from movement)
      * movement inputs
      *
@@ -80,16 +86,20 @@ async function main() {
      */
     function keyPressed(e: KeyboardEvent){
         if(e.key === "s" && !ourPlayer.prioDirection.includes("moveDown")){
-            ourPlayer.prioDirection.unshift("moveDown")
+            ourPlayer.prioDirection.unshift("moveDown");
+            down = true;
         }
         if(e.key === "w" && !ourPlayer.prioDirection.includes("moveUp")){
-            ourPlayer.prioDirection.unshift("moveUp")
+            ourPlayer.prioDirection.unshift("moveUp");
+            up = true;
         }
         if(e.key === "a" && !ourPlayer.prioDirection.includes("moveLeft")){
-            ourPlayer.prioDirection.unshift("moveLeft")
+            ourPlayer.prioDirection.unshift("moveLeft");
+            left = true;
         }
         if(e.key === "d" && !ourPlayer.prioDirection.includes("moveRight")){
-            ourPlayer.prioDirection.unshift("moveRight")
+            ourPlayer.prioDirection.unshift("moveRight");
+            right = true;
         }
         //iterate through characters
         if(e.key === "c"){
@@ -106,15 +116,19 @@ async function main() {
     function keyUp(e: KeyboardEvent){
         if(e.key === "s"){
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveDown"), 1);
+            down = false;
         }
         if(e.key === "w"){
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveUp"), 1);
+            up = false;
         }
         if(e.key === "a"){
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveLeft"), 1);
+            left = false;
         }
         if(e.key === "d"){
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveRight"), 1);
+            right = false;
         }
     }
     
@@ -133,6 +147,7 @@ async function main() {
     let lag = 0;
     
     let j = 0;*/
+
 
     function loop(now: number) {
 
@@ -176,9 +191,18 @@ async function main() {
          * Repaint the scene
          */
 
-        /*draw map
+        //draw map
+        if(up){
+            posY -= 1;
+        }else if(down){
+            posY += 1;
+        } else if(left) {
+            posX -= 1;
+        } else if(right) {
+            posX += 1;
+        }
         currentMap.updatePos(posX, posY);
-        currentMap.updateScaling(1);*/
+        currentMap.updateScaling(1);
 
         drawMapWithChunks(currentMap);
         
@@ -188,14 +212,21 @@ async function main() {
             //choose the correct sprite
             if (ourPlayer.name === player.name){
                 choosePlayerSprites(room, player, playerWidth, playerHeight, true);
+                //draw yourself always at the same position
+                ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round(width / 2), Math.round(height / 2), playerWidth, playerHeight);
             } else {
+                //if the other player ist next to you. you have to paint him where he is and not in dependency of you 
                 choosePlayerSprites(room, player, playerWidth, playerHeight, false);
+                //draw everyone else on theire position
+                ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round(player.positionX), Math.round(player.positionY), playerWidth, playerHeight);
+                
             }
             
             //draw each character
-            ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round(player.positionX), Math.round(player.positionY), playerWidth, playerHeight);
+            //ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round(player.positionX), Math.round(player.positionY), playerWidth, playerHeight);
 
         });
+
         ctx.restore();
 
         // Repeat game loop

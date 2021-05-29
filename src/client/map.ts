@@ -9,11 +9,34 @@ class chunk {
     element: number[][];
     tilesetForElement: tileset[][];
     tilesetX: number[][];
-    tilesteY: number[][];
+    tilesetY: number[][];
     posX: number;
     posY: number;
 
     constructor(entries: number[], xPos: number, yPos: number) {
+
+        this.tilesetForElement = [];
+        for (let a = 0; a < 16; a++) {
+            this.tilesetForElement[a] = [];
+        }
+
+        this.tilesetX = [];
+        for (let a = 0; a < 16; a++) {
+            this.tilesetX[a] = [];
+        }
+
+        this.tilesetY = [];
+        for (let a = 0; a < 16; a++) {
+            this.tilesetY[a] = [];
+        }
+
+        for (let i = 0; i < 16; i++) {
+            for (let j = 0; j < 16; j++) {
+                this.tilesetForElement[i][j] = null;
+                this.tilesetX[i][j] = null;
+                this.tilesetY[i][j] = null;
+            }
+        }
 
         this.element = [];
         for (let a = 0; a < 16; a++) {
@@ -299,7 +322,7 @@ function drawMapWithChunks (mapData: mapInfo) {
                                                 sourceX = (value % (newTileset.tileWidth / mapData.resolution)) * mapData.resolution
                                                 c.tilesetX[x][y] = sourceX;
                                                 sourceY = Math.floor(value / (newTileset.tileWidth / mapData.resolution)) * mapData.resolution;
-                                                c.tilesteY[x][y] = sourceY;
+                                                c.tilesetY[x][y] = sourceY;
 
                                                 //Create an array with used templates to boost performance
                                                 mapData.ctx.drawImage(mapData.textures.get(newTileset.path), sourceX, sourceY, mapData.resolution, mapData.resolution, convertedX * mapData.resolution, convertedY * mapData.resolution, mapData.resolution, mapData.resolution);
@@ -309,7 +332,7 @@ function drawMapWithChunks (mapData: mapInfo) {
 
                                     } else{
                                         //draw the image withaout searching
-                                        mapData.ctx.drawImage(mapData.textures.get(c.tilesetForElement[x][y].path), c.tilesetX[x][y], c.tilesteY[x][y], mapData.resolution, mapData.resolution, convertedX * mapData.resolution, convertedY * mapData.resolution, mapData.resolution, mapData.resolution);
+                                        mapData.ctx.drawImage(mapData.textures.get(c.tilesetForElement[x][y].path), c.tilesetX[x][y], c.tilesetY[x][y], mapData.resolution, mapData.resolution, convertedX * mapData.resolution, convertedY * mapData.resolution, mapData.resolution, mapData.resolution);
                                     }
 
 
