@@ -184,11 +184,11 @@ async function main() {
         // Draw background
         //ctx.drawImage(startImage, 0, 0); 
 
-        //draw map
+        /*draw map
         currentMap.updatePos(posX, posY);
         currentMap.updateScaling(1);
 
-        drawMapWithChunks(currentMap);
+        drawMapWithChunks(currentMap);*/
         
         // Draw each player
         ctx.save();
