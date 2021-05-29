@@ -9,7 +9,7 @@ import { Player, PLAYER_MOVEMENT_PER_TICK, updatePosition } from "./player";
  * Currently, the testEnvironment is set to node (in jest.config.js) so you
  * probably can not access browser-related- / DOM- functions (e.g. getElementById)
  */
-describe("Player", () => {
+/*describe("Player", () => {
     test("Player moves", () => {
         let player: Player = {
             name: "test",
@@ -28,7 +28,7 @@ describe("Player", () => {
             spriteY: 0
         }
 
-        let width = 100;
+        let width = 100; */
 
         /*{
             updatePosition(player, 0, width);
@@ -44,5 +44,5 @@ describe("Player", () => {
             updatePosition(player, 1000, width);
             expect(player.positionX).toBe(2 * PLAYER_MOVEMENT_PER_SECOND);
         }*/
-    });
-});
+/*    });
+});*/
