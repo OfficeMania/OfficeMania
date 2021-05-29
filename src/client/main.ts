@@ -81,15 +81,23 @@ async function main() {
     function keyPressed(e: KeyboardEvent){
         if(e.key === "s" && !ourPlayer.prioDirection.includes("moveDown")){
             ourPlayer.prioDirection.unshift("moveDown")
+            currentMap.updatePos(posX, posY - 1);
+            currentMap.updateScaling(1);
         }
         if(e.key === "w" && !ourPlayer.prioDirection.includes("moveUp")){
             ourPlayer.prioDirection.unshift("moveUp")
+            currentMap.updatePos(posX, posY + 1);
+            currentMap.updateScaling(1);
         }
         if(e.key === "a" && !ourPlayer.prioDirection.includes("moveLeft")){
             ourPlayer.prioDirection.unshift("moveLeft")
+            currentMap.updatePos(posX - 1, posY);
+            currentMap.updateScaling(1);
         }
         if(e.key === "d" && !ourPlayer.prioDirection.includes("moveRight")){
             ourPlayer.prioDirection.unshift("moveRight")
+            currentMap.updatePos(posX+ 1, posY);
+            currentMap.updateScaling(1);
         }
         //iterate through characters
         if(e.key === "c"){
@@ -129,16 +137,15 @@ async function main() {
 
     //const MS_PER_UPDATE = 10;
 
-    let previous = performance.now();
+    /*let previous = performance.now();
     let lag = 0;
     
-    let j = 0;
+    let j = 0;*/
 
     function loop(now: number) {
 
-        lag += now - previous;
-        previous = now;
-        console.log(lag);
+        /*lag += now - previous;
+        previous = now;*/
 
         /*update width and height
         canvas.width = window.innerWidth
