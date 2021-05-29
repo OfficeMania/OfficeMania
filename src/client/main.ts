@@ -158,9 +158,9 @@ async function main() {
 
         updateOwnPosition(ourPlayer, room);
         
-        //testing Playerpositioning
+        /*testing Playerpositioning
         ourPlayer.positionX = Math.round(width/2);
-        ourPlayer.positionY = Math.round(height/2);
+        ourPlayer.positionY = Math.round(height/2);*/
 
         /*
         code from beginning
