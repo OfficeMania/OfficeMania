@@ -150,6 +150,9 @@ async function main() {
         if (logTimer % 20 === 0) {
             logTimer = 0;
 
+            //array with nearby players. use this vor videochat.
+            let playersNearby = [];
+
             for (const [key, value] of Object.entries(players)) {
 
                 if (value.name === ourPlayer.name) {
@@ -160,10 +163,13 @@ async function main() {
 
                 if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 5000) {
                     //console.log("Player nearby: " + value.name);
-                    document.getElementById("playerNearbyIndicator").innerHTML = "player nearby";
-                } else {
-                    document.getElementById("playerNearbyIndicator").innerHTML = "you are lonely :(";
+                    playersNearby.push(value);
                 }
+            }
+            if (playersNearby.length === 0) {
+                document.getElementById("playerNearbyIndicator").innerHTML = "you are lonely :(";
+            } else {
+                document.getElementById("playerNearbyIndicator").innerHTML = "player nearby";
             }
         }
 
