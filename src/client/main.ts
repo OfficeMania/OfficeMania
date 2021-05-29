@@ -159,10 +159,6 @@ async function main() {
         });
 
         updateOwnPosition(ourPlayer, room);
-        
-        /*testing Playerpositioning
-        ourPlayer.positionX = Math.round(width/2);
-        ourPlayer.positionY = Math.round(height/2);*/
 
         /*
         code from beginning
@@ -179,18 +175,12 @@ async function main() {
         /*
          * Repaint the scene
          */
-        //Draw white plane
-        //ctx.fillStyle = "white";
-        //ctx.fillRect(0, 0, width, height);
-
-        // Draw background
-        //ctx.drawImage(startImage, 0, 0); 
 
         /*draw map
         currentMap.updatePos(posX, posY);
         currentMap.updateScaling(1);*/
 
-        //drawMapWithChunks(currentMap);
+        drawMapWithChunks(currentMap);
         
         // Draw each player
         ctx.save();
