@@ -36,11 +36,11 @@ async function main() {
      */
     let canvas = $<HTMLCanvasElement>("canvas");
 
-    /*from movement or rather original
+    //from movement or rather original
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
     let width = canvas.width;
-    let height = canvas. height; */
+    let height = canvas. height;
     let ctx = canvas.getContext("2d");
 
     //load map from server
@@ -174,12 +174,12 @@ async function main() {
         /*
          * Repaint the scene
          */
-        /* Draw white plane
+        //Draw white plane
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, width, height);
 
         // Draw background
-        ctx.drawImage(startImage, 0, 0); */
+        //ctx.drawImage(startImage, 0, 0); 
 
         //draw map
         let posX: number = -11;
