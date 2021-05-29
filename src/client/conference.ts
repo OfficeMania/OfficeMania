@@ -39,6 +39,15 @@ const optionsInit = {
     disableAudioLevels: true
 };
 
+const optionsLocalTracks = {
+    devices: [trackTypeAudio, trackTypeVideo],
+    resolution: 720,
+    desktopSharingFrameRate: {
+        max: 15
+    }
+    
+}
+
 // Variables
 
 let connection = null;
@@ -309,7 +318,7 @@ connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED
 connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
 connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, onDisconnected);
 connection.connect();
-JitsiMeetJS.createLocalTracks({devices: [trackTypeAudio, trackTypeVideo]}).then(onLocalTracksAdded);
+JitsiMeetJS.createLocalTracks(optionsLocalTracks).then(onLocalTracksAdded);
 if (JitsiMeetJS.mediaDevices.isDeviceChangeAvailable(deviceOutput)) {
     JitsiMeetJS.mediaDevices.enumerateDevices(devices => {
         const audioOutputDevices = devices.filter(d => d.kind === deviceKindAudio);

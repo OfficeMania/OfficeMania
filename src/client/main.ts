@@ -116,20 +116,6 @@ async function main() {
         }
     }
 
-    function isPlayerNearby() {
-        for (const [key, value] of Object.entries(players)) {
-            if (value.name === ourPlayer.name) {
-                continue;
-            }
-            //console.debug(Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2)); //DEBUG
-            if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 5000) {
-                //TODO Make the distance configurable
-                return true;
-            }
-        }
-        return false;
-    }
-
     /*
      * Create a gameloop-like function for drawing a simple animation
      *
@@ -160,15 +146,25 @@ async function main() {
 
 
         //detection if ourPlayer is nearby other player
-        if (isPlayerNearby()) {
-            logTimer++;
-            if (logTimer % 20 === 0) {
-                logTimer = 0;
-                console.log("Player nearby: " + value.name);
+        logTimer++;
+        if (logTimer % 20 === 0) {
+            logTimer = 0;
+
+            for (const [key, value] of Object.entries(players)) {
+
+                if (value.name === ourPlayer.name) {
+                    continue;
+                }
+
+                //console.log(Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2));
+
+                if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 5000) {
+                    //console.log("Player nearby: " + value.name);
+                    document.getElementById("playerNearbyIndicator").innerHTML = "player nearby";
+                } else {
+                    document.getElementById("playerNearbyIndicator").innerHTML = "you are lonely :(";
+                }
             }
-            document.getElementById("playerNearbyIndicator").innerHTML = "player nearby";
-        } else {
-            document.getElementById("playerNearbyIndicator").innerHTML = "you are lonely :(";
         }
 
 
