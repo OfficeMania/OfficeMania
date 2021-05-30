@@ -42,14 +42,21 @@ const optionsInit = {
 
 const optionsLocalTracks = {
     devices: [trackTypeAudio, trackTypeVideo],
-    resolution: 720,
+    resolution: 180,
     desktopSharingFrameRate: {
         max: 15
     },
     maxFps: 15,
     /*constraints: {
-        height: 1080,
-        width: 1920,
+        video: {
+            aspectRatio: 16/9,
+            height: {
+                ideal: 720,
+                max: 720,
+                min: 720,
+            },
+        },
+        
     },*/
 }
 
@@ -62,6 +69,7 @@ let room = null;
 
 let localTracks = [];
 const remoteTracks = {};
+let muted = [];
 
 // Callbacks
 
@@ -187,9 +195,14 @@ function onRemoteTrackAdded(track) {
     if (!remoteTracks[participant]) {
         remoteTracks[participant] = []; //TODO
     }
+    if(remoteTracks[participant].length == 2){
+        console.log(`video and desktop swapping in progress`);
+        remoteTracks[participant].pop();
+        document.getElementById(participant + "video2").remove();
+    }
     const idx = remoteTracks[participant].push(track);
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel => console.debug(`Audio Level Remote: ${audioLevel}`)); //DEBUG
-    track.addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, () => console.debug('Remote Track Mute changed'));  //DEBUG
+    track.addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, () => {console.debug('Remote Track Mute changed'); onMute(track);});  //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Remote Track stopped')); //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Remote Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     const id = participant + track.getType() + idx;
@@ -272,6 +285,27 @@ function toggleTrackMute(track) {
         track.mute();
         return true;
     }
+}
+
+function onMute(track){
+    for (const i in remoteTracks){
+        if (i === track){
+            muted.push(i);
+            //document.getElementById()
+        }
+    }
+    let a = document.getElementById(track.getParticipantId());
+    let name: string = track.getParticipantId();
+    let index = 0;
+    index = parseInt(name.charAt(name.length - 1));
+    //console.log(`the index of ${name}do be something like ` + index);
+    console.log(track);
+    console.log(`the index of ${name}do be something like ` + index);
+    if (track.getType() === "audio") console.debug(`henlo this is audio`);
+    if (track.getType() === "video") console.debug(`henlo this is video`);
+    if (track.getType() === "desktop") console.debug(`henlo this is desktop`);
+    
+    
 }
 
 /**

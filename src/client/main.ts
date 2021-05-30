@@ -19,7 +19,7 @@ async function main() {
     let client = new Client(protocol + host + portSuffix);
 
     // Keep track of all (active) players
-    let players: PlayerRecord = {};
+    let players: PlayerRecord = {}; 
 
     /*
      * Before we can launch our main functionality, we need to join a room and
