@@ -1,7 +1,7 @@
 import { loadImage } from "./util";
 import { Room } from "colyseus.js";
 
-export {drawMapWithChunks, convertMapData, mapInfo}
+export {drawMapWithChunks, convertMapData, mapInfo, drawMap}
 
 //only important for infinite maps
 class chunk {
@@ -193,9 +193,6 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
     //saves the tilesets from the map
     let tilesetArray: tileset[];
 
-    canvas.height = 1020;
-    canvas.width = 1776;
-
     paths = [];
 
     for (let i = 0; i < room.state.templatePaths.length; i++) {
@@ -213,6 +210,9 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
     } else { isInfinite = false; }
     
     resolution = parseInt(map.tileheight);
+
+    canvas.height = map.height * resolution;
+    canvas.width = map.width * resolution;
 
     mapWidth = canvas.width / (resolution * scaling);
     mapHeight = canvas.height / (resolution * scaling);
@@ -269,6 +269,7 @@ function convertYCoordinate(y: number, c:chunk, currentY: number, mapHeight: num
 
 
 //code for infinite maps
+//we have to do it all again because performance sucks
 function drawMapWithChunks (mapData: mapInfo) {
 
     mapData.layers.forEach(function(l: layer) {
@@ -285,7 +286,7 @@ function drawMapWithChunks (mapData: mapInfo) {
 
                     //checks if the y coordinate would be seen on the screen, only works with an odd mapHeigtht
                     convertedY = convertYCoordinate(y, c, mapData.currentY, mapData.heightOfMap);
-                    if (!(convertedY < 0 || convertedY > mapData.heightOfMap)) {
+                    //if (!(convertedY < 0 || convertedY > mapData.heightOfMap)) {
     
                         for (let x = 0; x < 16; x++) {
     
@@ -294,7 +295,7 @@ function drawMapWithChunks (mapData: mapInfo) {
                             
                                 //checks if the x coordiante would be seen on the screen, only works with an odd mapWidth
                                 convertedX = convertXCoordinate(x, c, mapData.currentX, mapData.widthOfMap);
-                                if (!(convertedX < 0 || convertedX > mapData.widthOfMap)) {
+                                //if (!(convertedX < 0 || convertedX > mapData.widthOfMap)) {
 
                                     if(c.tilesetForElement[x][y] === null){
                                         //saves a tileset, we need this to find the right one
@@ -336,12 +337,69 @@ function drawMapWithChunks (mapData: mapInfo) {
                                         mapData.ctx.drawImage(mapData.textures.get(c.tilesetForElement[x][y].path), c.tilesetX[x][y], c.tilesetY[x][y], mapData.resolution, mapData.resolution, convertedX * mapData.resolution, convertedY * mapData.resolution, mapData.resolution, mapData.resolution);
                                     }
 
+                                //}
+                            }
+                        }
+                    //}
+                }
+            //}
+        })
+    })
+}
+
+function drawMap(mapData: mapInfo){
+    mapData.layers.forEach(function (l: layer){
+        l.chunks.forEach(function (c: chunk){
+            for(let x = 0; x < 16; x++){
+                for(let y = 0; y < 16; y++){
+                    if(c.element[x][y] !== 0){
+                        let positionX: number;
+                        let positionY: number;
+                        //calculates the position on the canvas
+                        positionX = x + c.posX + Math.floor(mapData.widthOfMap / 2);
+                        positionY = y + c.posY + Math.floor(mapData.heightOfMap / 2);
+                        //if this Element was never painted before
+                        if(c.tilesetForElement[x][y] === null){
+                            //saves a tileset, we need this to find the right one
+                            let newFirstGridId: number;
+                            let newTileset: tileset;
+                            let entry = c.element[x][y];
+
+                            for (let i = 0; i < mapData.tilesets.length; i++) {
+
+                                if (entry >= mapData.tilesets[i].firstGridId || mapData.tilesets.length === 1) {
+
+                                    newFirstGridId = mapData.tilesets[i].firstGridId;
+                                    newTileset = mapData.tilesets[i];
+                                }
+                            
+                                let value: number;
+                                let sourceX: number;
+                                let sourceY: number;
+                                //if this is true we found the right tileset with help of the firstGridId
+                                if (newFirstGridId < mapData.tilesets[i].firstGridId || i === (mapData.tilesets.length - 1)) {
+
+                                    c.tilesetForElement[x][y] = newTileset;
+                                    value = c.element[x][y] - newTileset.firstGridId;
+                            
+                                    //calculates the right position from the required texture
+                                    sourceX = (value % (newTileset.tileWidth / mapData.resolution)) * mapData.resolution
+                                    c.tilesetX[x][y] = sourceX;
+                                    sourceY = Math.floor(value / (newTileset.tileWidth / mapData.resolution)) * mapData.resolution;
+                                    c.tilesetY[x][y] = sourceY;
+
+                                    //Create an array with used templates to boost performance
+                                    mapData.ctx.drawImage(mapData.textures.get(newTileset.path), sourceX, sourceY, mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
+                                    i = mapData.tilesets.length;
                                 }
                             }
+                        } else{
+                            //draw the image withaout searching
+                            mapData.ctx.drawImage(mapData.textures.get(c.tilesetForElement[x][y].path), c.tilesetX[x][y], c.tilesetY[x][y], mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
                         }
                     }
                 }
-            //}
+            }
         })
     })
 }

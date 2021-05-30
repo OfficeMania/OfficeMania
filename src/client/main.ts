@@ -1,12 +1,12 @@
 import { Client, Room } from "colyseus.js";
 import { Player, PLAYER_COLORS, TILE_SIZE, updatePosition, updateOwnPosition } from "./player";
 import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
-import { convertMapData, drawMapWithChunks, mapInfo } from "./map";
+import { convertMapData, drawMapWithChunks, mapInfo, drawMap } from "./map";
 import { choosePlayerSprites } from "./player_sprite";
 
 export var characters: {[key: string]: HTMLImageElement} = {} //from movement
-export var START_POSITION_X = -13;
-export var START_POSITION_Y = -10;
+var START_POSITION_X = -13;
+var START_POSITION_Y = -8;
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
@@ -37,8 +37,8 @@ async function main() {
      * Then, we wait for our map to load
      */
     let canvas = $<HTMLCanvasElement>("canvas");
+    let background = $<HTMLCanvasElement>("background");
 
-    //from movement or rather original
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
     let width = canvas.width;
@@ -50,18 +50,16 @@ async function main() {
     xml.open("GET", "/map/Map.json", false);
     xml.send(null);
 
-    let map: Promise<mapInfo> = convertMapData(xml.responseText, room, canvas);
+    let map: Promise<mapInfo> = convertMapData(xml.responseText, room, background);
 
     let currentMap = new mapInfo((await map).layers, (await map).tilesets, (await map).canvas, (await map).resolution, (await map).textures);
 
     //start position
-    let posX: number = START_POSITION_X;
-    let posY: number = START_POSITION_Y;
+    let posX: number = (START_POSITION_X + Math.floor(currentMap.widthOfMap / 2)) * currentMap.resolution;
+    let posY: number = (START_POSITION_Y + Math.floor(currentMap.heightOfMap / 2)) * currentMap.resolution;
 
-    currentMap.updatePos(posX, posY);
-    currentMap.updateScaling(1);
-
-    drawMapWithChunks(currentMap);
+    drawMap(currentMap);
+    ctx.drawImage(background, posX, posY, width, height, Math.floor(width / 2), Math.floor(height / 2), width, height);
 
     //loads character sprite paths from the server (from movement)
     for (let path of room.state.playerSpritePaths){
@@ -134,7 +132,7 @@ async function main() {
     /*let previous = performance.now();
     let lag = 0;*/
     
-    let j = 0;
+    //let j = 0;
 
 
     function loop(now: number) {
@@ -178,13 +176,16 @@ async function main() {
         /*
          * Repaint the scene
          */
-        posX = (ourPlayer.positionX / TILE_SIZE) + START_POSITION_X;
-        posY = (ourPlayer.positionY / TILE_SIZE) + START_POSITION_Y;
 
-        currentMap.updatePos(posX, posY);
-        currentMap.updateScaling(1);
+        //when this change you want to paint different
+        posX = ((ourPlayer.positionX / TILE_SIZE) + START_POSITION_X + Math.floor(currentMap.widthOfMap / 2)) * currentMap.resolution;
+        posY = ((ourPlayer.positionY / TILE_SIZE) + START_POSITION_Y + Math.floor(currentMap.heightOfMap / 2)) * currentMap.resolution;
 
-        drawMapWithChunks(currentMap);
+        //when somethin on the map changes: drawMap
+
+        //draw background on canvas - need to make movestuff here
+        ctx.drawImage(background, posX - Math.floor(width / 2), posY - Math.floor(height / 2), width, height, 0, 0, width, height);
+
         
         // Draw each player
         ctx.save();

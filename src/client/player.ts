@@ -3,7 +3,7 @@ import { State } from "../common";
 import { convertMapData, drawMapWithChunks, mapInfo } from "./map";
 
 //all variables needed to adjust movement speed and length.
-export var MOVEMENT_SPEED = 64;
+export var MOVEMENT_SPEED = 8;
 export var TILE_SIZE = 48;
 export var FRAMES_PER_MOVE = Math.round(100 / MOVEMENT_SPEED)
 export var PLAYER_MOVEMENT_PER_TICK = TILE_SIZE * (1 / FRAMES_PER_MOVE);
