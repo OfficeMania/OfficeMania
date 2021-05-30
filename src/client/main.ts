@@ -178,8 +178,8 @@ async function main() {
         /*
          * Repaint the scene
          */
-        posX = Math.round(ourPlayer.positionX - START_POSITION_X);
-        posY = Math.round(ourPlayer.positionY - START_POSITION_Y);
+        posX = Math.round(ourPlayer.scaledX - START_POSITION_X);
+        posY = Math.round(ourPlayer.scaledY - START_POSITION_Y);
 
         currentMap.updatePos(posX, posY);
         currentMap.updateScaling(1);
