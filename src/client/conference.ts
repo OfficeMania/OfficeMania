@@ -41,7 +41,7 @@ const optionsInit = {
 };
 
 const optionsLocalTracks = {
-    devices: [trackTypeAudio, trackTypeVideo],
+    devices: [trackTypeAudio, trackTypeVideo,/* trackTypeDesktop*/],
     resolution: 180,
     desktopSharingFrameRate: {
         max: 15
@@ -198,7 +198,7 @@ function onRemoteTrackAdded(track) {
     if(remoteTracks[participant].length == 2){
         console.log(`video and desktop swapping in progress`);
         remoteTracks[participant].pop();
-        document.getElementById(participant + "video2").remove();
+        document.getElementById(participant + "video2").remove(); //wenn ich das aufrufe, wie rufe ich das zurück? -- also beim mute das aufrufen, und beim entmuten wieder hinmachen
     }
     const idx = remoteTracks[participant].push(track);
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel => console.debug(`Audio Level Remote: ${audioLevel}`)); //DEBUG
@@ -207,7 +207,7 @@ function onRemoteTrackAdded(track) {
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Remote Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     const id = participant + track.getType() + idx;
     if (track.getType() === trackTypeVideo) {
-        $('videobar').append(`<video autoplay='1' height="200" style="margin-right:5px;" id='${participant}video${idx}' />`);
+        addVideoTrack(participant, idx);
     } else {
         $('videobar').append(
             `<audio autoplay='1' id='${participant}audio${idx}' />`);
@@ -277,6 +277,10 @@ function setAudioOutputDevice(selected) {
     JitsiMeetJS.mediaDevices.setAudioOutputDevice(selected.value);
 }
 
+function addVideoTrack(participant: string, idx: number){
+    $('videobar').append(`<video autoplay='1' height="200" style="margin-right:5px;" id='${participant}video${idx}' />`);
+}
+
 function toggleTrackMute(track) {
     if (track.isMuted()) {
         track.unmute();
@@ -286,24 +290,30 @@ function toggleTrackMute(track) {
         return true;
     }
 }
-
 function onMute(track){
+    onHidden(track);
+}
+function onHidden(track){
+    let participant = track.getParticipantId();
+    let type = track.getType();
+    console.debug(`WTF IS THAT DAMAGE MY GUY ` + type);
+    if (type === "audio"){
+        console.log(`is audio, exiting`);
+        return;
+    }
     for (const i in remoteTracks){
+        console.log(`hello there, general kenobi:`)
         if (i === track){
+            console.log(`track is: ${track} `);
             muted.push(i);
-            //document.getElementById()
+            console.log(`document.getElementById` + participant + type + "2");
+            //document.getElementById(participant + type + "2").remove();
         }
     }
-    let a = document.getElementById(track.getParticipantId());
+    
+    document.getElementById(track.getParticipantId() + "video2");
     let name: string = track.getParticipantId();
-    let index = 0;
-    index = parseInt(name.charAt(name.length - 1));
-    //console.log(`the index of ${name}do be something like ` + index);
-    console.log(track);
-    console.log(`the index of ${name}do be something like ` + index);
-    if (track.getType() === "audio") console.debug(`henlo this is audio`);
-    if (track.getType() === "video") console.debug(`henlo this is video`);
-    if (track.getType() === "desktop") console.debug(`henlo this is desktop`);
+    
     
     
 }
