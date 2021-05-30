@@ -1,7 +1,7 @@
 import {Client} from "colyseus.js";
 import {Player, PLAYER_COLORS, updatePosition} from "./player";
 import {InitState, joinAndSync, loadImage, PlayerRecord} from "./util";
-import {toggleMuteByType} from "./conference";
+import {toggleMuteByType, switchVideo} from "./conference";
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) {
@@ -95,9 +95,11 @@ async function main() {
 
     const muteButton = $<HTMLButtonElement>("mute_button");
     const camButton = $<HTMLButtonElement>("cam_button");
+    const switchButton = $<HTMLButtonElement>("switch_button");
 
     muteButton.addEventListener("click", () => toggleMute("audio"));
     camButton.addEventListener("click", () => toggleMute("video"));
+    switchButton.addEventListener("click", () => toggleMute("desktop"));
 
     function setAudioButtonMute(muted: boolean) {
         muteButton.innerHTML = muted ? "<em class = \"fa fa-microphone-slash\"></em>" : "<em class = \"fa fa-microphone\"></em>";
@@ -107,13 +109,23 @@ async function main() {
         camButton.innerHTML = muted ? "<em class = \"fa fa-video-slash\"></em>" : "<em class = \"fa fa-video\"></em>";
     }
 
-    function toggleMute(type: string) {
-        const muted = toggleMuteByType(type);
-        if (type === "audio") {
-            setAudioButtonMute(muted);
-        } else if (type === "video") {
-            setVideoButtonMute(muted);
+    function setSwitchToDesktop(muted: boolean){
+        switchButton.innerHTML = muted ? "<em class = \"fa fa-camera\"></em>" : "<em class = \"fa fa-video\"></em>";
         }
+
+    function toggleMute(type: string) {
+        if (type === "desktop"){
+            switchVideo();
+        }
+        else {
+            const muted = toggleMuteByType(type);
+            if (type === "audio") {
+                setAudioButtonMute(muted);
+            } else if (type === "video") {
+                setVideoButtonMute(muted);
+            }
+        }
+        
     }
 
     /*

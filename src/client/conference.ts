@@ -1,10 +1,10 @@
-export {roomName, trackTypeAudio, trackTypeVideo, toggleMuteByType};
+export {roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, switchVideo};
 
 // Constants
 
 const trackTypeAudio = "audio";
 const trackTypeVideo = "video";
-//const trackTypeDesktop = "desktop";
+const trackTypeDesktop = "desktop";
 
 const deviceOutput = "output";
 const deviceInput = "input";
@@ -36,7 +36,8 @@ const optionsConference = {
 };
 
 const optionsInit = {
-    disableAudioLevels: true
+    disableAudioLevels: true,
+    startAudioMuted: true,
 };
 
 const optionsLocalTracks = {
@@ -44,9 +45,14 @@ const optionsLocalTracks = {
     resolution: 720,
     desktopSharingFrameRate: {
         max: 15
-    }
-    
+    },
+    maxFps: 15,
+    /*constraints: {
+        height: 1080,
+        width: 1920,
+    },*/
 }
+
 
 // Variables
 
@@ -78,6 +84,7 @@ function onConnectionFailed() {
  */
 function onConnectionSuccess() {
     room = connection.initJitsiConference(roomName, optionsConference);
+    //room.setStartMutedPolicy({audio: true});
     room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onTrackAdded);
     room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onTrackRemoved);
     room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
@@ -176,6 +183,7 @@ function onLocalTrackAdded(track, pos: number) {
 function onRemoteTrackAdded(track) {
     console.debug(`Remote Track added: ${track}`); //DEBUG
     const participant = track.getParticipantId();
+    console.debug(`Participant id is: ${participant}`); //DEBUG
     if (!remoteTracks[participant]) {
         remoteTracks[participant] = []; //TODO
     }
@@ -205,6 +213,11 @@ function onLocalTrackRemoved(track) {
 
 function onRemoteTrackRemoved(track) {
     console.debug(`Remote Track removed: ${track}`); //DEBUG
+    console.debug(`document.getElementById: ${document.getElementById(track + "audio1")}`); //DEBUG
+    //document.getElementById(track + "audio1").remove(); 
+    //document.getElementById(track + "video2").remove();
+    
+
     //TODO
 }
 
@@ -225,7 +238,8 @@ function onUserJoined(id) {
  */
 function onUserLeft(id) {
     console.debug('User left: ' + id); //DEBUG
-
+    console.debug(`abcdefg ` + document.getElementById("canvas")=== null);
+    console.debug(); //DEBUG
     //remove video and audio
     document.getElementById(id + "audio" + "1").remove(); 
     document.getElementById(id + "video" + "2").remove(); 
@@ -284,7 +298,7 @@ function toggleMuteByType(type: string) {
 
 // Code
 
-/*
+
 let isVideo = true;
 function switchVideo() { //TODO Is this even used anymore? //yes, for screen sharing 
     isVideo = !isVideo;
@@ -302,13 +316,13 @@ function switchVideo() { //TODO Is this even used anymore? //yes, for screen sha
                 () => console.log('local track muted'));
             localTracks[1].addEventListener(
                 JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED,
-                () => console.log('local track stoped'));
+                () => console.log('local track stopped'));
             localTracks[1].attach($('#localVideo1')[0]);
             room.addTrack(localTracks[1]);
         })
         .catch(error => console.log(error));
 }
-*/
+
 $(window).on("beforeunload", unload);
 $(window).on("unload", unload);
 JitsiMeetJS.init(optionsInit);
