@@ -91,6 +91,7 @@ class mapInfo {
         this.currentX = posX;
         this.currentY = posY;
     }
+
 }
 
 class layer {
@@ -104,7 +105,7 @@ class layer {
         this.chunks = [];
         this.name = layerName;
 
-        if (layerName.search("solid")) {
+        if (layerName.search("solid") !== -1) {
             this.isSolid = true;
         } else { this.isSolid = false; }
 
@@ -236,6 +237,7 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
             yPos.push(parseInt(y));
 
             dataArray.push(new saveArray(map.layers[l].chunks[c].data));
+
         }
 
         layerArray.push(new layer(xPos, yPos, dataArray, map.layers[l].name))
@@ -277,7 +279,7 @@ function drawMapWithChunks (mapData: mapInfo) {
             let convertedX: number = convertXCoordinate(0, c, mapData.currentY, mapData.heightOfMap);
 
             //checks if the full chunk is not on the map on the screen
-            if(!(convertedX + 16 < 0 || convertedY + 16 < 0 || convertedX > mapData.widthOfMap || convertedY > mapData.heightOfMap)) {
+            //if(!(convertedX + 16 < 0 || convertedY + 16 < 0 || convertedX > mapData.widthOfMap || convertedY > mapData.heightOfMap)) {
 
                 for (let y = 0; y < 16; y++) {
 
@@ -334,15 +336,12 @@ function drawMapWithChunks (mapData: mapInfo) {
                                         mapData.ctx.drawImage(mapData.textures.get(c.tilesetForElement[x][y].path), c.tilesetX[x][y], c.tilesetY[x][y], mapData.resolution, mapData.resolution, convertedX * mapData.resolution, convertedY * mapData.resolution, mapData.resolution, mapData.resolution);
                                     }
 
-
-
-
                                 }
                             }
                         }
                     }
                 }
-            }
+            //}
         })
     })
 }

@@ -1,12 +1,12 @@
 import { Client, Room } from "colyseus.js";
-import { Player, PLAYER_COLORS, updatePosition, updateOwnPosition } from "./player";
+import { Player, PLAYER_COLORS, TILE_SIZE, updatePosition, updateOwnPosition } from "./player";
 import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
 import { convertMapData, drawMapWithChunks, mapInfo } from "./map";
 import { choosePlayerSprites } from "./player_sprite";
 
 export var characters: {[key: string]: HTMLImageElement} = {} //from movement
-export var START_POSITION_X = -11;
-export var START_POSITION_Y = -8;
+export var START_POSITION_X = -13;
+export var START_POSITION_Y = -10;
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
@@ -84,13 +84,13 @@ async function main() {
         if(e.key === "s" && !ourPlayer.prioDirection.includes("moveDown")){
             ourPlayer.prioDirection.unshift("moveDown");
         }
-        if(e.key === "w" && !ourPlayer.prioDirection.includes("moveUp")){
+        if(e.key === "w" && !ourPlayer.prioDirection.includes("moveUp")){            
             ourPlayer.prioDirection.unshift("moveUp");
         }
-        if(e.key === "a" && !ourPlayer.prioDirection.includes("moveLeft")){
+        if(e.key === "a" && !ourPlayer.prioDirection.includes("moveLeft")){            
             ourPlayer.prioDirection.unshift("moveLeft");
         }
-        if(e.key === "d" && !ourPlayer.prioDirection.includes("moveRight")){
+        if(e.key === "d" && !ourPlayer.prioDirection.includes("moveRight")){            
             ourPlayer.prioDirection.unshift("moveRight");
         }
         //iterate through characters
@@ -178,8 +178,8 @@ async function main() {
         /*
          * Repaint the scene
          */
-        posX = Math.round(ourPlayer.scaledX - START_POSITION_X);
-        posY = Math.round(ourPlayer.scaledY - START_POSITION_Y);
+        posX = (ourPlayer.positionX / TILE_SIZE) + START_POSITION_X;
+        posY = (ourPlayer.positionY / TILE_SIZE) + START_POSITION_Y;
 
         currentMap.updatePos(posX, posY);
         currentMap.updateScaling(1);
