@@ -4,7 +4,7 @@ import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
 import { convertMapData, drawMapWithChunks, mapInfo, drawMap } from "./map";
 import { choosePlayerSprites } from "./player_sprite";
 
-export var characters: {[key: string]: HTMLImageElement} = {} //from movement
+export var characters: {[key: string]: HTMLImageElement} = {}
 var START_POSITION_X = -13;
 var START_POSITION_Y = -8;
 
@@ -142,11 +142,11 @@ async function main() {
         /*lag += now - previous;
         previous = now;*/
 
-        /*update width and height
+        //update width and height
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         width = canvas.width;
-        height = canvas.height;*/
+        height = canvas.height;
 
         /*
          * Update each player's data
@@ -177,9 +177,9 @@ async function main() {
          * Repaint the scene
          */
 
-        //when this change you want to paint different
-        posX = ((ourPlayer.positionX / TILE_SIZE) + START_POSITION_X + Math.floor(currentMap.widthOfMap / 2)) * currentMap.resolution;
-        posY = ((ourPlayer.positionY / TILE_SIZE) + START_POSITION_Y + Math.floor(currentMap.heightOfMap / 2)) * currentMap.resolution;
+        //the new Position from yourself
+        posX = ((ourPlayer.positionX / TILE_SIZE) + START_POSITION_X + Math.floor(currentMap.widthOfMap / 2)) * TILE_SIZE;
+        posY = ((ourPlayer.positionY / TILE_SIZE) + START_POSITION_Y + Math.floor(currentMap.heightOfMap / 2)) * TILE_SIZE;
 
         //when somethin on the map changes: drawMap
 
@@ -193,7 +193,7 @@ async function main() {
             //choose the correct sprite
             if (ourPlayer.name !== player.name){
                 choosePlayerSprites(room, player, playerWidth, playerHeight, false);
-                //draw everyone else on theire position
+                //draw everyone else on theire position relatiely to you
                 ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round((width / 2) + player.positionX - ourPlayer.positionX), Math.round((height / 2) + player.positionY - ourPlayer.positionY), playerWidth, playerHeight);
             } else {
                 choosePlayerSprites(room, player, playerWidth, playerHeight, true);
