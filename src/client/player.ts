@@ -1,5 +1,6 @@
 import { Client, Room } from "colyseus.js";
 import { State } from "../common";
+import { convertMapData, drawMapWithChunks, mapInfo } from "./map";
 
 //all variables needed to adjust movement speed and length.
 export var MOVEMENT_SPEED = 8;
@@ -68,7 +69,7 @@ export function updatePosition(player: Player, room: Room, client: Client) {
     
 }
 
-export function updateOwnPosition(player: Player, room: Room) {
+export function updateOwnPosition(player: Player, room: Room, currentMap: mapInfo) {
 
     //if server and client data differ to much tp player to server postion.
     if(Math.abs(player.positionX - room.state.players[player.name].x  * TILE_SIZE)>=72 || Math.abs(player.positionY-room.state.players[player.name].y  * TILE_SIZE)>=72){

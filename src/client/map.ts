@@ -295,7 +295,6 @@ function drawMapWithChunks (mapData: mapInfo) {
                                 if (!(convertedX < 0 || convertedX > mapData.widthOfMap)) {
 
                                     if(c.tilesetForElement[x][y] === null){
-
                                         //saves a tileset, we need this to find the right one
                                         let newFirstGridId: number;
                                         let newTileset: tileset;
