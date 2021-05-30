@@ -59,7 +59,6 @@ async function main() {
     let posY: number = (START_POSITION_Y + Math.floor(currentMap.heightOfMap / 2)) * currentMap.resolution;
 
     drawMap(currentMap);
-    ctx.drawImage(background, posX, posY, width, height, Math.floor(width / 2), Math.floor(height / 2), width, height);
 
     //loads character sprite paths from the server (from movement)
     for (let path of room.state.playerSpritePaths){
@@ -100,6 +99,10 @@ async function main() {
             }
             ourPlayer.character = names[nextIndex]
             room.send("character", names[nextIndex]);
+        }
+        if(e.key === " "){
+            //player interacts with object in front of him
+            //(ttriggert with space)
         }
     }
 

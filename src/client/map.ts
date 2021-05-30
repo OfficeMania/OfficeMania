@@ -350,55 +350,67 @@ function drawMapWithChunks (mapData: mapInfo) {
 function drawMap(mapData: mapInfo){
     mapData.layers.forEach(function (l: layer){
         l.chunks.forEach(function (c: chunk){
-            for(let x = 0; x < 16; x++){
-                for(let y = 0; y < 16; y++){
-                    if(c.element[x][y] !== 0){
-                        let positionX: number;
-                        let positionY: number;
-                        //calculates the position on the canvas
-                        positionX = x + c.posX + Math.floor(mapData.widthOfMap / 2);
-                        positionY = y + c.posY + Math.floor(mapData.heightOfMap / 2);
-                        //if this Element was never painted before
-                        if(c.tilesetForElement[x][y] === null){
-                            //saves a tileset, we need this to find the right one
-                            let newFirstGridId: number;
-                            let newTileset: tileset;
-                            let entry = c.element[x][y];
 
-                            for (let i = 0; i < mapData.tilesets.length; i++) {
+            //if the chunk is not animated
+            if(l.name.search("animated") === -1){
 
-                                if (entry >= mapData.tilesets[i].firstGridId || mapData.tilesets.length === 1) {
+                for(let x = 0; x < 16; x++){
+                    for(let y = 0; y < 16; y++){
 
-                                    newFirstGridId = mapData.tilesets[i].firstGridId;
-                                    newTileset = mapData.tilesets[i];
+                        //dont paint if there is nothing
+                        if(c.element[x][y] !== 0){
+                            let positionX: number;
+                            let positionY: number;
+
+                            //calculates the position on the canvas
+                            positionX = x + c.posX + Math.floor(mapData.widthOfMap / 2);
+                            positionY = y + c.posY + Math.floor(mapData.heightOfMap / 2);
+
+                            //if this Element was never painted before
+                            if(c.tilesetForElement[x][y] === null){
+                                //saves a tileset, we need this to find the right one
+                                let newFirstGridId: number;
+                                let newTileset: tileset;
+                                let entry = c.element[x][y];
+    
+                                for (let i = 0; i < mapData.tilesets.length; i++) {
+    
+                                    if (entry >= mapData.tilesets[i].firstGridId || mapData.tilesets.length === 1) {
+    
+                                        newFirstGridId = mapData.tilesets[i].firstGridId;
+                                        newTileset = mapData.tilesets[i];
+                                    }
+                                
+                                    let value: number;
+                                    let sourceX: number;
+                                    let sourceY: number;
+                                    //if this is true we found the right tileset with help of the firstGridId
+                                    if (newFirstGridId < mapData.tilesets[i].firstGridId || i === (mapData.tilesets.length - 1)) {
+    
+                                        c.tilesetForElement[x][y] = newTileset;
+                                        value = c.element[x][y] - newTileset.firstGridId;
+                                
+                                        //calculates the right position from the required texture
+                                        sourceX = (value % (newTileset.tileWidth / mapData.resolution)) * mapData.resolution
+                                        c.tilesetX[x][y] = sourceX;
+                                        sourceY = Math.floor(value / (newTileset.tileWidth / mapData.resolution)) * mapData.resolution;
+                                        c.tilesetY[x][y] = sourceY;
+    
+                                        //Create an array with used templates to boost performance
+                                        mapData.ctx.drawImage(mapData.textures.get(newTileset.path), sourceX, sourceY, mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
+                                        i = mapData.tilesets.length;
+                                    }
                                 }
-                            
-                                let value: number;
-                                let sourceX: number;
-                                let sourceY: number;
-                                //if this is true we found the right tileset with help of the firstGridId
-                                if (newFirstGridId < mapData.tilesets[i].firstGridId || i === (mapData.tilesets.length - 1)) {
-
-                                    c.tilesetForElement[x][y] = newTileset;
-                                    value = c.element[x][y] - newTileset.firstGridId;
-                            
-                                    //calculates the right position from the required texture
-                                    sourceX = (value % (newTileset.tileWidth / mapData.resolution)) * mapData.resolution
-                                    c.tilesetX[x][y] = sourceX;
-                                    sourceY = Math.floor(value / (newTileset.tileWidth / mapData.resolution)) * mapData.resolution;
-                                    c.tilesetY[x][y] = sourceY;
-
-                                    //Create an array with used templates to boost performance
-                                    mapData.ctx.drawImage(mapData.textures.get(newTileset.path), sourceX, sourceY, mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
-                                    i = mapData.tilesets.length;
-                                }
+                            } else{
+                                //draw the image withaout searching
+                                mapData.ctx.drawImage(mapData.textures.get(c.tilesetForElement[x][y].path), c.tilesetX[x][y], c.tilesetY[x][y], mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
                             }
-                        } else{
-                            //draw the image withaout searching
-                            mapData.ctx.drawImage(mapData.textures.get(c.tilesetForElement[x][y].path), c.tilesetX[x][y], c.tilesetY[x][y], mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
                         }
                     }
                 }
+            }else{
+                //draw gif
+                //https://stackoverflow.com/questions/48234696/how-to-put-a-gif-with-canvas
             }
         })
     })
