@@ -5,6 +5,8 @@ import { convertMapData, drawMapWithChunks, mapInfo } from "./map";
 import { choosePlayerSprites } from "./player_sprite";
 
 export var characters: {[key: string]: HTMLImageElement} = {} //from movement
+export var START_POSITION_X = -11;
+export var START_POSITION_Y = -8;
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
@@ -53,9 +55,8 @@ async function main() {
     let currentMap = new mapInfo((await map).layers, (await map).tilesets, (await map).canvas, (await map).resolution, (await map).textures);
 
     //start position
-    //TODO nicht hard coden?
-    let posX: number = -11;
-    let posY: number = -8;
+    let posX: number = START_POSITION_X;
+    let posY: number = START_POSITION_Y;
 
     currentMap.updatePos(posX, posY);
     currentMap.updateScaling(1);
@@ -177,8 +178,9 @@ async function main() {
         /*
          * Repaint the scene
          */
+        posX = Math.round(ourPlayer.positionX - START_POSITION_X);
+        posY = Math.round(ourPlayer.positionY - START_POSITION_Y);
 
-        //draw map
         currentMap.updatePos(posX, posY);
         currentMap.updateScaling(1);
 
