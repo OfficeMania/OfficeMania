@@ -1,3 +1,5 @@
+import { remoteRoomCall } from "colyseus/lib/MatchMaker";
+
 export {roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, switchVideo};
 
 // Constants
@@ -296,28 +298,53 @@ function onMute(track){
 function onHidden(track){
     let participant = track.getParticipantId();
     let type = track.getType();
-    console.debug(`WTF IS THAT DAMAGE MY GUY ` + type);
+    console.log(`WTF IS THAT DAMAGE MY GUY ` + type);
     if (type === "audio"){
         console.log(`is audio, exiting`);
         return;
     }
-    for (const i in remoteTracks){
-        console.log(`hello there, general kenobi:`)
-        if (i === track){
-            console.log(`track is: ${track} `);
-            muted.push(i);
-            console.log(`document.getElementById` + participant + type + "2");
-            //document.getElementById(participant + type + "2").remove();
-        }
-    }
+    console.log(`abcdefghijkl`);
     
-    document.getElementById(track.getParticipantId() + "video2");
-    let name: string = track.getParticipantId();
+    checkRemoteTracks(track);
+    //document.getElementById(track.getParticipantId() + "video2");
+    //let name: string = track.getParticipantId();
     
     
     
 }
+function checkRemoteTracks(track){
+    let participant = track.getParticipantId();
+    let type = track.getType();
+    const id = participant + track.getType() + 2;
+    const i = {};
+    for (let i = 0; i < remoteTracks[participant].length; i++){
+        console.log(`hello there, general kenobi:`)
+        if (remoteTracks[participant][i].getType() === "audio"){
 
+            console.log(`track is: audio:  ${remoteTracks[participant][i]}`);
+            
+        }
+        if (remoteTracks[participant][i].getType() === "video"){
+            console.log(`track is: video:  ${remoteTracks[participant][i]}`);
+            let isMuted: number = -1;
+            isMuted = muted.indexOf(remoteTracks[participant][i]);
+            if (isMuted != -1){
+                muted.splice(isMuted, 1);
+                addVideoTrack(participant, 2);
+                track.attach($(`#${id}`)[0]);
+                console.log(`muted is: when unmuting` + muted);
+            }
+            else {
+                muted.push(remoteTracks[participant][i]);
+                console.log(`document.getElementById` + participant + type + "2");
+                document.getElementById(participant + type + "2").remove();
+                console.log(`muted is: ` + muted);
+            }
+            //muted.push(i);
+            
+        }
+    }
+}
 /**
  *
  */
