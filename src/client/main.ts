@@ -11,7 +11,7 @@ export var characters: {[key: string]: HTMLImageElement} = {}
 var START_POSITION_X = -13;
 var START_POSITION_Y = -8;
 const MS_PER_UPDATE = 10;
-const MS_PER_UPDATE2 = 20;
+const MS_PER_UPDATE2 = 15;
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
@@ -104,20 +104,20 @@ async function main() {
      * needing to let go of the first button pressed
      */
     function keyPressed(e: KeyboardEvent){
-        if(e.key === "s" && !ourPlayer.prioDirection.includes("moveDown")){
+        if(e.key.toLowerCase() === "s" && !ourPlayer.prioDirection.includes("moveDown")){
             ourPlayer.prioDirection.unshift("moveDown");
         }
-        if(e.key === "w" && !ourPlayer.prioDirection.includes("moveUp")){            
+        if(e.key.toLowerCase() === "w" && !ourPlayer.prioDirection.includes("moveUp")){            
             ourPlayer.prioDirection.unshift("moveUp");
         }
-        if(e.key === "a" && !ourPlayer.prioDirection.includes("moveLeft")){            
+        if(e.key.toLowerCase() === "a" && !ourPlayer.prioDirection.includes("moveLeft")){            
             ourPlayer.prioDirection.unshift("moveLeft");
         }
-        if(e.key === "d" && !ourPlayer.prioDirection.includes("moveRight")){            
+        if(e.key.toLowerCase() === "d" && !ourPlayer.prioDirection.includes("moveRight")){            
             ourPlayer.prioDirection.unshift("moveRight");
         }
         //iterate through characters
-        if(e.key === "c"){
+        if(e.key.toLowerCase() === "c"){
             let filenames = Object.keys(characters);
             let nextIndex = filenames.indexOf(ourPlayer.character) + 1;
             if (filenames.length <= nextIndex){
@@ -128,7 +128,7 @@ async function main() {
             room.send("character", filenames[nextIndex]);
         }
         //rename players name
-        if(e.key === "r"){
+        if(e.key.toLowerCase() === "r"){
             let name = window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy");
             name = name.slice(0, 20)
             if (name !== null){
@@ -137,23 +137,23 @@ async function main() {
                 room.send("name", ourPlayer.name);
             }
         }
-        if(e.key === " "){
+        if(e.key.toLowerCase() === " "){
             //player interacts with object in front of him
             //(ttriggert with space)
         }
     }
 
     function keyUp(e: KeyboardEvent){
-        if(e.key === "s"){
+        if(e.key.toLowerCase() === "s"){
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveDown"), 1);
         }
-        if(e.key === "w"){
+        if(e.key.toLowerCase() === "w"){
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveUp"), 1);
         }
-        if(e.key === "a"){
+        if(e.key.toLowerCase() === "a"){
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveLeft"), 1);
         }
-        if(e.key === "d"){
+        if(e.key.toLowerCase() === "d"){
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveRight"), 1);
         }
     }
