@@ -3,6 +3,7 @@ import { Player, PLAYER_COLORS, TILE_SIZE, updatePosition, updateOwnPosition, sy
 import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
 import { convertMapData, drawMapWithChunks, mapInfo, drawMap } from "./map";
 import { choosePlayerSprites } from "./player_sprite";
+import {toggleMuteByType, switchVideo} from "./conference";
 
 export var characters: {[key: string]: HTMLImageElement} = {}
 var START_POSITION_X = -13;
@@ -128,10 +129,49 @@ async function main() {
         ourPlayer.prioDirection = [];
     }
 
+
+    //mute button logic
     document.addEventListener("keydown", keyPressed);
     document.addEventListener("keyup", keyUp);
     window.addEventListener("blur", onBlur);
-    
+
+    const muteButton = $<HTMLButtonElement>("mute_button");
+    const camButton = $<HTMLButtonElement>("cam_button");
+    const switchButton = $<HTMLButtonElement>("switch_button");
+
+    muteButton.addEventListener("click", () => toggleMute("audio"));
+    camButton.addEventListener("click", () => toggleMute("video"));
+    switchButton.addEventListener("click", () => toggleMute("desktop"));
+
+    function setAudioButtonMute(muted: boolean) {
+        muteButton.innerHTML = muted ? "<em class = \"fa fa-microphone-slash\"></em>" : "<em class = \"fa fa-microphone\"></em>";
+    }
+
+    function setVideoButtonMute(muted: boolean) {
+        camButton.innerHTML = muted ? "<em class = \"fa fa-video-slash\"></em>" : "<em class = \"fa fa-video\"></em>";
+    }
+
+    function setSwitchToDesktop(muted: boolean){
+        switchButton.innerHTML = muted ? "<em class = \"fa fa-camera\"></em>" : "<em class = \"fa fa-video\"></em>";
+        }
+
+    //toggle mute of tracks by type
+    function toggleMute(type: string) {
+        if (type === "desktop"){
+            switchVideo();
+        }
+        else {
+            const muted = toggleMuteByType(type);
+            if (type === "audio") {
+                setAudioButtonMute(muted);
+            } else if (type === "video") {
+                setVideoButtonMute(muted);
+            }
+        }
+        
+    }
+
+
 
     /* (from movement)
      * Create a gameLoop-like function for drawing a simple animation
@@ -149,18 +189,15 @@ async function main() {
     let previous = performance.now();
     let lastSecond = performance.now();
     let lag = 0;
+    let playerNearbyTimer = 0;
 
     function loop(now: number) {
 
         lag += now - previous;
         previous = now;
-        
-        
 
         ctx.clearRect(0, 0, width, height);
-
         
-
         //update width and height
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
@@ -192,13 +229,39 @@ async function main() {
          * Repaint the scene
          */
 
-        //the new Position from yourself
+        //the new Position of yourself in relation to the map
         posX = ((ourPlayer.positionX / TILE_SIZE) + START_POSITION_X + Math.floor(currentMap.widthOfMap / 2)) * TILE_SIZE;
         posY = ((ourPlayer.positionY / TILE_SIZE) + START_POSITION_Y + Math.floor(currentMap.heightOfMap / 2)) * TILE_SIZE;
 
-        //when somethin on the map changes: drawMap
+        //detection if someone is nearby, executed only every 20th time
+        playerNearbyTimer++;
+        if (playerNearbyTimer % 20 === 0) {
+            playerNearbyTimer = 0;
 
-        //draw background on canvas - need to make movestuff here
+            //array with nearby players. use this vor videochat.
+            let playersNearby = [];
+
+            for (const [key, value] of Object.entries(players)) {
+                if (value.name === ourPlayer.name) {
+                    continue;
+                }
+                //console.log(Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2));
+
+                if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 5000) {
+                    //console.log("Player nearby: " + value.name);
+                    playersNearby.push(value);
+                }
+            }
+            if (playersNearby.length === 0) {
+                document.getElementById("playerNearbyIndicator").innerHTML = "you are lonely :(";
+            } else {
+                document.getElementById("playerNearbyIndicator").innerHTML = "player nearby";
+            }
+        }
+
+        //DESIGN TODO: when something on the map changes: drawMap
+
+        //TODO: draw background on canvas - need to make movestuff here
         ctx.drawImage(background, posX - Math.floor(width / 2), posY - Math.floor(height / 2), width, height, 0, 0, width, height);
 
         
@@ -208,7 +271,7 @@ async function main() {
             //choose the correct sprite
             if (ourPlayer.name !== player.name){
                 choosePlayerSprites(room, player, playerWidth, playerHeight, false);
-                //draw everyone else on theire position relatiely to you
+                //draw everyone else on theire position relatively to you
                 ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round((width / 2) + player.positionX - ourPlayer.positionX), Math.round((height / 2) + player.positionY - ourPlayer.positionY), playerWidth, playerHeight);
             } else {
                 choosePlayerSprites(room, player, playerWidth, playerHeight, true);
