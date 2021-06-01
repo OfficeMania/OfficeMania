@@ -1,5 +1,5 @@
 import { Client, Room } from "colyseus.js";
-import { Player, PLAYER_COLORS, TILE_SIZE, updatePosition, updateOwnPosition } from "./player";
+import { Player, PLAYER_COLORS, TILE_SIZE, updatePosition, updateOwnPosition, syncOwnPosition } from "./player";
 import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
 import { convertMapData, drawMapWithChunks, mapInfo, drawMap } from "./map";
 import { choosePlayerSprites } from "./player_sprite";
@@ -187,6 +187,7 @@ async function main() {
 
 
     let previous = performance.now();
+    let lastSecond = performance.now();
     let lag = 0;
     let playerNearbyTimer = 0;
 
@@ -217,6 +218,12 @@ async function main() {
 
             lag -= MS_PER_UPDATE;
         }
+
+        if(!lastSecond || now - lastSecond >= 100) {
+            lastSecond = now;
+            syncOwnPosition(ourPlayer, room);
+        }
+    
 
         /*
          * Repaint the scene
