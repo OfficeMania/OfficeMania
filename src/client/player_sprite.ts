@@ -4,8 +4,8 @@ import { Player, TILE_SIZE , STEP_SIZE} from "./player";
 /*
  * Chooses the Player sprite dependend on walking direction and duration of walking/standing
  */
-export function choosePlayerSprites(room: Room, player: Player, playerWidth: number, playerHeight: number, ownPlayer: boolean){
-    if (ownPlayer === true){
+export function choosePlayerSprites(room: Room, player: Player, playerWidth: number, playerHeight: number, ownPlayer: Player){
+    if (ownPlayer === player){
         if (player.moveDirection === null){
             player.standing++;
 

@@ -4,7 +4,7 @@ import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
 import { convertMapData, drawMapWithChunks, mapInfo, drawMap } from "./map";
 import { choosePlayerSprites } from "./player_sprite";
 import {toggleMuteByType, switchVideo} from "./conference";
-import { getCookieName, setCookieName} from "./cookie"
+import { getCookie, setCookie} from "./cookie"
 
 
 export var characters: {[key: string]: HTMLImageElement} = {}
@@ -36,14 +36,27 @@ async function main() {
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
 
-    let cookieName = getCookieName();
+    //load or set name
+    let cookieName = getCookie("username");
     if(cookieName === ""){
-        ourPlayer.name = window.prompt("Gib dir einen Namen", "Jimmy");
-        setCookieName(ourPlayer.name, 100);
+        let name = window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy");
+        name = name.slice(0, 20)
+        if(name === null){
+            name = "Jimmy";
+        }
+        ourPlayer.name = name;
+        setCookie("username", ourPlayer.name, 100);
     } else {
         ourPlayer.name = cookieName;
     }
     room.send("name", ourPlayer.name);
+
+    //load character
+    let cookieCharacter = getCookie("character");
+    if(cookieCharacter !== ""){
+        ourPlayer.character = cookieCharacter;
+        room.send("character", ourPlayer.character)
+    }
     
     /*
      * Then, we wait for our map to load
@@ -110,12 +123,18 @@ async function main() {
                 nextIndex = 0;
             }
             ourPlayer.character = filenames[nextIndex]
+            setCookie("character", filenames[nextIndex], 100);
             room.send("character", filenames[nextIndex]);
         }
+        //rename players name
         if(e.key === "r"){
-            ourPlayer.name = window.prompt("Gib dir einen Namen", "Jimmy");
-            setCookieName(ourPlayer.name, 100);
-            room.send("name", ourPlayer.name);
+            let name = window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy");
+            name = name.slice(0, 20)
+            if (name !== null){
+                ourPlayer.name = name;
+                setCookie("username", ourPlayer.name, 100);
+                room.send("name", ourPlayer.name);
+            }
         }
         if(e.key === " "){
             //player interacts with object in front of him
@@ -228,6 +247,7 @@ async function main() {
                     player.character = room.state.players[player.id].character;
                     player.name = room.state.players[player.id].name;
                 } 
+                choosePlayerSprites(room, player, playerWidth, playerHeight, ourPlayer);
             });
             //Update own player
             updateOwnPosition(ourPlayer, room, currentMap);
@@ -286,7 +306,6 @@ async function main() {
         Object.values(players).forEach((player: Player, i: number) => {
             //choose the correct sprite
             if (ourPlayer.id !== player.id){
-                choosePlayerSprites(room, player, playerWidth, playerHeight, false);
                 //draw everyone else on theire position relatively to you
                 ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round((width / 2) + player.positionX - ourPlayer.positionX), Math.round((height / 2) + player.positionY - ourPlayer.positionY), playerWidth, playerHeight);
 
@@ -301,7 +320,6 @@ async function main() {
                 ctx.fillStyle = "rgba(255, 255, 255, 1)";
                 ctx.fillText(player.name, Math.round((width / 2) + player.positionX - ourPlayer.positionX) + 24, Math.round((height / 2) + player.positionY - ourPlayer.positionY) + 12)
             } else {
-                choosePlayerSprites(room, player, playerWidth, playerHeight, true);
                 //draw yourself always at the same position
                 ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round(width / 2), Math.round(height / 2), playerWidth, playerHeight);
 

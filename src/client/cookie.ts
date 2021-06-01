@@ -1,15 +1,15 @@
 
 
 
-export function setCookieName(cvalue, exdays: number) {
+export function setCookie(cname: string, cvalue: string, exdays: number) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
     var expires = "expires="+ d.toUTCString();
-    document.cookie = "name" + "=" + cvalue + ";" + expires + ";path=/";
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
-export function getCookieName() {
-    var name = "name=";
+export function getCookie(cname: string) {
+    var name = cname + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
     var ca = decodedCookie.split(';');
     for(var i = 0; i <ca.length; i++) {
