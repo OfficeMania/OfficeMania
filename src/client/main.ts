@@ -11,6 +11,7 @@ export var characters: {[key: string]: HTMLImageElement} = {}
 var START_POSITION_X = -13;
 var START_POSITION_Y = -8;
 const MS_PER_UPDATE = 10;
+const MS_PER_UPDATE2 = 20;
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
@@ -221,13 +222,15 @@ async function main() {
 
 
     let previous = performance.now();
-    let lastSecond = performance.now();
     let lag = 0;
+    let lag2 = 0;
+    let lastSecond = performance.now();
     let playerNearbyTimer = 0;
 
     function loop(now: number) {
 
         lag += now - previous;
+        lag2 += now - previous;
         previous = now;
 
         ctx.clearRect(0, 0, width, height);
@@ -238,21 +241,28 @@ async function main() {
         width = canvas.width;
         height = canvas.height;
 
-        
+        //calculates players movement
         while (lag >= MS_PER_UPDATE) {
             //Update each player's data
             Object.values(players).forEach((player: Player) => {
                 if(player !== ourPlayer){
-                    updatePosition(player, room, client, now - previous);
+                    updatePosition(player, room);
                     player.character = room.state.players[player.id].character;
                     player.name = room.state.players[player.id].name;
                 } 
-                choosePlayerSprites(room, player, playerWidth, playerHeight, ourPlayer);
             });
             //Update own player
             updateOwnPosition(ourPlayer, room, currentMap);
 
             lag -= MS_PER_UPDATE;
+        }
+
+        //animates/chooses character sprite
+        while (lag2 >= MS_PER_UPDATE2) {
+            Object.values(players).forEach((player: Player) => {
+                choosePlayerSprites(room, player, playerWidth, playerHeight, ourPlayer);
+            });
+            lag2 -= MS_PER_UPDATE2;
         }
 
         if(!lastSecond || now - lastSecond >= 100) {

@@ -40,7 +40,7 @@ export interface Player {
 /*
  * Syncing data from server and using it
  */
-export function updatePosition(player: Player, room: Room, client: Client, delay: number) {
+export function updatePosition(player: Player, room: Room) {
     
     //if server and client data differ to much tp player to server postion.
     if(Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE)>=100 || Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)>=100){
