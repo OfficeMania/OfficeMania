@@ -12,7 +12,8 @@ import { Player, PLAYER_MOVEMENT_PER_TICK, updatePosition } from "./player";
 describe("Player", () => {
     /*test("Player moves", () => {
         let player: Player = {
-            name: "test",
+            id: "test",
+            name: "",
             character: "Adam_48x48.png",
             positionX: 0,
             positionY: 0,

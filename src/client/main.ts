@@ -4,6 +4,8 @@ import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
 import { convertMapData, drawMapWithChunks, mapInfo, drawMap } from "./map";
 import { choosePlayerSprites } from "./player_sprite";
 import {toggleMuteByType, switchVideo} from "./conference";
+import { getCookieName, setCookieName} from "./cookie"
+
 
 export var characters: {[key: string]: HTMLImageElement} = {}
 var START_POSITION_X = -13;
@@ -34,7 +36,14 @@ async function main() {
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
 
-    let name = window.prompt("sometext","defaultText");
+    let cookieName = getCookieName();
+    if(cookieName === ""){
+        ourPlayer.name = window.prompt("Gib dir einen Namen", "Jimmy");
+        setCookieName(ourPlayer.name, 100);
+    } else {
+        ourPlayer.name = cookieName;
+    }
+    room.send("name", ourPlayer.name);
     
     /*
      * Then, we wait for our map to load
@@ -95,13 +104,13 @@ async function main() {
         }
         //iterate through characters
         if(e.key === "c"){
-            let names = Object.keys(characters);
-            let nextIndex = names.indexOf(ourPlayer.character) + 1;
-            if (names.length <= nextIndex){
+            let filenames = Object.keys(characters);
+            let nextIndex = filenames.indexOf(ourPlayer.character) + 1;
+            if (filenames.length <= nextIndex){
                 nextIndex = 0;
             }
-            ourPlayer.character = names[nextIndex]
-            room.send("character", names[nextIndex]);
+            ourPlayer.character = filenames[nextIndex]
+            room.send("character", filenames[nextIndex]);
         }
         if(e.key === " "){
             //player interacts with object in front of him
@@ -211,7 +220,8 @@ async function main() {
             Object.values(players).forEach((player: Player) => {
                 if(player !== ourPlayer){
                     updatePosition(player, room, client, now - previous);
-                    player.character = room.state.players[player.id].character
+                    player.character = room.state.players[player.id].character;
+                    player.name = room.state.players[player.id].name;
                 } 
             });
             //Update own player
@@ -274,10 +284,32 @@ async function main() {
                 choosePlayerSprites(room, player, playerWidth, playerHeight, false);
                 //draw everyone else on theire position relatively to you
                 ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round((width / 2) + player.positionX - ourPlayer.positionX), Math.round((height / 2) + player.positionY - ourPlayer.positionY), playerWidth, playerHeight);
+
+                //draw name
+                ctx.font = '18px Hevitica';
+                ctx.textAlign = "center";
+
+                var text = ctx.measureText(player.name);
+                ctx.fillStyle = "rgba(100, 100, 100, 0.5)";
+                ctx.fillRect(Math.round((width / 2) + player.positionX - ourPlayer.positionX) - text.width/2 + 20, Math.round((height / 2) + player.positionY - ourPlayer.positionY) - 4, text.width + 8, 24);
+
+                ctx.fillStyle = "rgba(255, 255, 255, 1)";
+                ctx.fillText(player.name, Math.round((width / 2) + player.positionX - ourPlayer.positionX) + 24, Math.round((height / 2) + player.positionY - ourPlayer.positionY) + 12)
             } else {
                 choosePlayerSprites(room, player, playerWidth, playerHeight, true);
                 //draw yourself always at the same position
                 ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round(width / 2), Math.round(height / 2), playerWidth, playerHeight);
+
+                //draw name
+                ctx.font = '18px Hevitica';
+                ctx.textAlign = "center";
+
+                var text = ctx.measureText(player.name);
+                ctx.fillStyle = "rgba(100, 100, 100, 0.5)";
+                ctx.fillRect(Math.round(width / 2) - text.width/2 + 20, Math.round(height / 2) - 4, text.width + 8, 24);
+
+                ctx.fillStyle = "rgba(255, 255, 255, 1)";
+                ctx.fillText(player.name,Math.round(width / 2) + 24, Math.round(height / 2) + 12)
                 
             }
             //draw each character

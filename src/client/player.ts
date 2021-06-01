@@ -18,7 +18,8 @@ export var PLAYER_COLORS = ["red", "blue", "green", "yellow", "black"];
  * a change from the server is reported (in the onAdd, onRemove, onChange methods).
  */
 export interface Player {
-    id: string;
+    id: string;                 //players id in the room
+    name: string;               //players name
     character: string;          //the name of the character sprite               
     positionX: number;          //posX on the Map
     positionY: number;          //posY on the Map
@@ -146,16 +147,11 @@ export function syncOwnPosition(player: Player, room: Room){
     //checks if current position differs from servers data
     if ((player.scaledY !== room.state.players[player.id].y && !player.lastScaledY.includes(room.state.players[player.id].y)) ||
         (!player.lastScaledX.includes(room.state.players[player.id].x) && player.scaledX !== room.state.players[player.id].x)){
-        
-            console.log(player.scaledX + " : " + player.lastScaledX + " : " + room.state.players[player.id].x)
-            console.log(player.scaledY + " : " + player.lastScaledY + " : " + room.state.players[player.id].y)
-        
+                
         //if it differs for to long the positions get synced
         if (posDiffers < 10){
             posDiffers++;
         } else {
-            
-
             player.scaledX = room.state.players[player.id].x;
             player.scaledY = room.state.players[player.id].y;
             player.positionX = player.scaledX * STEP_SIZE

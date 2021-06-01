@@ -4,8 +4,6 @@ import { TILE_SIZE } from "../../client/player"
 import { cli } from "webpack";
 import fs from 'fs';
 
-
-let i = 0
 /*
  * See: https://docs.colyseus.io/server/room/
  */
@@ -86,6 +84,14 @@ export class TURoom extends Room<State> {
         this.onMessage("character", (client, message) => {
             this.state.players[client.sessionId].character = message;
         });
+
+        //recieves name changes
+        this.onMessage("name", (client, message) => {
+            this.state.players[client.sessionId].name = message;
+        });
+
+
+
     }
 
     onAuth(client: Client, options: any, req: any) {
