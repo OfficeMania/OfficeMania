@@ -34,7 +34,8 @@ async function main() {
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
 
-
+    let name = window.prompt("sometext","defaultText");
+    
     /*
      * Then, we wait for our map to load
      */
@@ -210,7 +211,7 @@ async function main() {
             Object.values(players).forEach((player: Player) => {
                 if(player !== ourPlayer){
                     updatePosition(player, room, client, now - previous);
-                    player.character = room.state.players[player.name].character
+                    player.character = room.state.players[player.id].character
                 } 
             });
             //Update own player
@@ -242,7 +243,7 @@ async function main() {
             let playersNearby = [];
 
             for (const [key, value] of Object.entries(players)) {
-                if (value.name === ourPlayer.name) {
+                if (value.id === ourPlayer.id) {
                     continue;
                 }
                 //console.log(Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2));
@@ -269,7 +270,7 @@ async function main() {
         ctx.save();
         Object.values(players).forEach((player: Player, i: number) => {
             //choose the correct sprite
-            if (ourPlayer.name !== player.name){
+            if (ourPlayer.id !== player.id){
                 choosePlayerSprites(room, player, playerWidth, playerHeight, false);
                 //draw everyone else on theire position relatively to you
                 ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round((width / 2) + player.positionX - ourPlayer.positionX), Math.round((height / 2) + player.positionY - ourPlayer.positionY), playerWidth, playerHeight);

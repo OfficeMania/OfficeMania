@@ -46,7 +46,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 console.log("Add", sessionId, playerData);
 
                 let player: Player = {
-                    name: sessionId,
+                    id: sessionId,
                     character: "Adam_48x48.png",
                     positionX: 0,
                     positionY: 0,

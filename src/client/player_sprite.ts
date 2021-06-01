@@ -97,21 +97,21 @@ export function choosePlayerSprites(room: Room, player: Player, playerWidth: num
         }
     } else { //all other players
         //sets facing direction to choose sprites
-        if(Math.abs(player.positionX - room.state.players[player.name].x * STEP_SIZE) > Math.abs(player.positionY - room.state.players[player.name].y * STEP_SIZE)){
-            if(player.positionX < room.state.players[player.name].x * STEP_SIZE){
+        if(Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE) > Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)){
+            if(player.positionX < room.state.players[player.id].x * STEP_SIZE){
                 player.facing = "right"
-            }else if(player.positionX > room.state.players[player.name].x * STEP_SIZE){
+            }else if(player.positionX > room.state.players[player.id].x * STEP_SIZE){
                 player.facing = "left"
             }
-        } else if (Math.abs(player.positionX - room.state.players[player.name].x * STEP_SIZE) < Math.abs(player.positionY - room.state.players[player.name].y * STEP_SIZE)){
-            if(player.positionY < room.state.players[player.name].y * STEP_SIZE){
+        } else if (Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE) < Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)){
+            if(player.positionY < room.state.players[player.id].y * STEP_SIZE){
                 player.facing = "down"
-            }else if(player.positionY > room.state.players[player.name].y * STEP_SIZE){
+            }else if(player.positionY > room.state.players[player.id].y * STEP_SIZE){
                 player.facing = "up"
             }
         }
         // player is standing
-        if(player.positionX === room.state.players[player.name].x * STEP_SIZE && player.positionY === room.state.players[player.name].y * STEP_SIZE){
+        if(player.positionX === room.state.players[player.id].x * STEP_SIZE && player.positionY === room.state.players[player.id].y * STEP_SIZE){
             player.standing++
             if (player.standing >= 10){
                 player.moving = 0
