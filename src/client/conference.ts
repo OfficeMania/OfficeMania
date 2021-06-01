@@ -44,7 +44,7 @@ const optionsInit = {
 
 const optionsLocalTracks = {
     devices: [trackTypeAudio, trackTypeVideo,/* trackTypeDesktop*/],
-    resolution: 180,
+    //resolution: 180,
     desktopSharingFrameRate: {
         max: 15
     },
