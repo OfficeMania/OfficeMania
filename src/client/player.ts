@@ -86,7 +86,7 @@ export function updateOwnPosition(player: Player, room: Room, currentMap: mapInf
             player.moveDirection = "down"
             player.facing = "down"
             player.lastScaledY.pop()
-            player.lastScaledY.unshift[player.scaledY] //stores the previous position
+            player.lastScaledY.unshift(player.scaledY) //stores the previous position
             player.scaledY++;
             room.send("move", "moveDown");
         }
@@ -94,23 +94,23 @@ export function updateOwnPosition(player: Player, room: Room, currentMap: mapInf
             player.moveDirection = "up"
             player.facing = "up"
             player.lastScaledY.pop()
-            player.lastScaledY.unshift[player.scaledY] //stores the previous position
+            player.lastScaledY.unshift(player.scaledY) //stores the previous position
             player.scaledY--;
             room.send("move", "moveUp");
         }
         if(player.prioDirection[0] === "moveLeft" && player.moveDirection === null){
             player.moveDirection = "left"
             player.facing = "left"
-            player.lastScaledY.pop()
-            player.lastScaledX.unshift[player.scaledX] //stores the previous position
+            player.lastScaledX.pop()
+            player.lastScaledX.unshift(player.scaledX) //stores the previous position
             player.scaledX--;
             room.send("move", "moveLeft");
         }
         if(player.prioDirection[0] === "moveRight" && player.moveDirection === null){
             player.moveDirection = "right"
             player.facing = "right"
-            player.lastScaledY.pop()
-            player.lastScaledX.unshift[player.scaledX] //stores the previous position
+            player.lastScaledX.pop()
+            player.lastScaledX.unshift(player.scaledX) //stores the previous position
             player.scaledX++;
             room.send("move", "moveRight");
         }
@@ -151,8 +151,6 @@ export function syncOwnPosition(player: Player, room: Room){
         if (posDiffers < 10){
             posDiffers++;
         } else {
-            console.log(player.scaledX + " : " + player.lastScaledX + " : " + room.state.players[player.name].x)
-            console.log(player.scaledY + " : " + player.lastScaledY + " : " + room.state.players[player.name].y)
             player.scaledX = room.state.players[player.name].x;
             player.scaledY = room.state.players[player.name].y;
             player.positionX = player.scaledX * STEP_SIZE
