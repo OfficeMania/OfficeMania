@@ -7,7 +7,7 @@ import { choosePlayerSprites } from "./player_sprite";
 export var characters: {[key: string]: HTMLImageElement} = {}
 var START_POSITION_X = -13;
 var START_POSITION_Y = -8;
-const MS_PER_UPDATE = 20;
+const MS_PER_UPDATE = 10;
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
@@ -158,38 +158,20 @@ async function main() {
         width = canvas.width;
         height = canvas.height;
 
-        /*
-         * Update each player's data
-         */
+        
         while (lag >= MS_PER_UPDATE) {
+            //Update each player's data
             Object.values(players).forEach((player: Player) => {
                 if(player !== ourPlayer){
                     updatePosition(player, room, client, now - previous);
                     player.character = room.state.players[player.name].character
-                    //console.log(player.character)
                 } 
             });
-
+            //Update own player
             updateOwnPosition(ourPlayer, room, currentMap);
 
             lag -= MS_PER_UPDATE;
         }
-
-        
-
-         /*
-        code from beginning
-        
-        
-
-        while (lag >= MS_PER_UPDATE) {
-            Object.values(players).forEach((player: Player) => {
-                return updatePosition(player, MS_PER_UPDATE, room, client, MS_PER_UPDATE);
-            });
-
-            lag -= MS_PER_UPDATE;
-        }/*
-        
 
         /*
          * Repaint the scene

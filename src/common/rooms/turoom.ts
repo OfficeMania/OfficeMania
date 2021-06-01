@@ -57,22 +57,22 @@ export class TURoom extends Room<State> {
             if (this.state.players[client.sessionId].cooldown <= 0){
                 switch(message){
                     case "moveDown":{
-                        this.state.players[client.sessionId].cooldown = 6;
+                        this.state.players[client.sessionId].cooldown = 3;
                         this.state.players[client.sessionId].y++;
                         break;
                     }
                     case "moveUp":{
-                        this.state.players[client.sessionId].cooldown = 6;
+                        this.state.players[client.sessionId].cooldown = 3;
                         this.state.players[client.sessionId].y--;
                         break;
                     }
                     case "moveLeft":{
-                        this.state.players[client.sessionId].cooldown = 6;
+                        this.state.players[client.sessionId].cooldown = 3;
                         this.state.players[client.sessionId].x--;
                         break;
                     }
                     case "moveRight":{
-                        this.state.players[client.sessionId].cooldown = 6;
+                        this.state.players[client.sessionId].cooldown = 3;
                         this.state.players[client.sessionId].x++;
                         break;
                     }
