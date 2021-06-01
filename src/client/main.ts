@@ -112,6 +112,11 @@ async function main() {
             ourPlayer.character = filenames[nextIndex]
             room.send("character", filenames[nextIndex]);
         }
+        if(e.key === "r"){
+            ourPlayer.name = window.prompt("Gib dir einen Namen", "Jimmy");
+            setCookieName(ourPlayer.name, 100);
+            room.send("name", ourPlayer.name);
+        }
         if(e.key === " "){
             //player interacts with object in front of him
             //(ttriggert with space)
