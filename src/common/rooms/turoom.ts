@@ -54,7 +54,6 @@ export class TURoom extends Room<State> {
 
         //recieves movement from all the clients
         this.onMessage("move", (client, message) => {
-            console.log(this.state.players[client.sessionId].cooldown);
             if (this.state.players[client.sessionId].cooldown <= 0){
                 switch(message){
                     case "moveDown":{

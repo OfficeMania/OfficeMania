@@ -7,6 +7,7 @@ import { choosePlayerSprites } from "./player_sprite";
 export var characters: {[key: string]: HTMLImageElement} = {}
 var START_POSITION_X = -13;
 var START_POSITION_Y = -8;
+const MS_PER_UPDATE = 20;
 
 // A simple helper function
 function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
@@ -132,18 +133,24 @@ async function main() {
 
     //const MS_PER_UPDATE = 10;
 
-    /*let previous = performance.now();
-    let lag = 0;*/
+    
     
     //let j = 0;
 
 
+    let previous = performance.now();
+    let lag = 0;
+
     function loop(now: number) {
+
+        lag += now - previous;
+        previous = now;
+        
+        
 
         ctx.clearRect(0, 0, width, height);
 
-        /*lag += now - previous;
-        previous = now;*/
+        
 
         //update width and height
         canvas.width = window.innerWidth
@@ -154,19 +161,27 @@ async function main() {
         /*
          * Update each player's data
          */
-        Object.values(players).forEach((player: Player) => {
-            if(player !== ourPlayer){
-                updatePosition(player, room, client);
-                player.character = room.state.players[player.name].character
-                //console.log(player.character)
-            } 
-        });
+        while (lag >= MS_PER_UPDATE) {
+            Object.values(players).forEach((player: Player) => {
+                if(player !== ourPlayer){
+                    updatePosition(player, room, client, now - previous);
+                    player.character = room.state.players[player.name].character
+                    //console.log(player.character)
+                } 
+            });
 
-        updateOwnPosition(ourPlayer, room, currentMap);
+            updateOwnPosition(ourPlayer, room, currentMap);
 
-        /*
+            lag -= MS_PER_UPDATE;
+        }
+
+        
+
+         /*
         code from beginning
         
+        
+
         while (lag >= MS_PER_UPDATE) {
             Object.values(players).forEach((player: Player) => {
                 return updatePosition(player, MS_PER_UPDATE, room, client, MS_PER_UPDATE);

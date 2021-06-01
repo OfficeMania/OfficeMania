@@ -3,7 +3,7 @@ import { State } from "../common";
 import { convertMapData, drawMapWithChunks, mapInfo } from "./map";
 
 //all variables needed to adjust movement speed and length.
-export var MOVEMENT_SPEED = 8;
+export var MOVEMENT_SPEED = 10;
 export var TILE_SIZE = 48;
 export var FRAMES_PER_MOVE = Math.round(100 / MOVEMENT_SPEED)
 export var PLAYER_MOVEMENT_PER_TICK = TILE_SIZE * (1 / FRAMES_PER_MOVE);
@@ -36,7 +36,7 @@ export interface Player {
 /*
  * Syncing data from server and using it
  */
-export function updatePosition(player: Player, room: Room, client: Client) {
+export function updatePosition(player: Player, room: Room, client: Client, delay: number) {
     
     //if server and client data differ to much tp player to server postion.
     if(Math.abs(player.positionX - room.state.players[player.name].x * TILE_SIZE)>=100 || Math.abs(player.positionY - room.state.players[player.name].y * TILE_SIZE)>=100){
