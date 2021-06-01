@@ -122,8 +122,16 @@ async function main() {
         }
     }
     
+    //gets called when window is out auf focus
+    function onBlur(){
+        //stops player
+        ourPlayer.prioDirection = [];
+    }
+
     document.addEventListener("keydown", keyPressed);
     document.addEventListener("keyup", keyUp);
+    window.addEventListener("blur", onBlur);
+    
 
     /* (from movement)
      * Create a gameLoop-like function for drawing a simple animation
