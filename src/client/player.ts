@@ -22,8 +22,10 @@ export interface Player {
     character: string;          //the name of the character sprite               
     positionX: number;          //posX on the Map
     positionY: number;          //posY on the Map
-    scaledX: number;            //one tilestep changes this by 1
-    scaledY: number;            //one tilestep changes this by 1
+    scaledX: number;            //one step changes this by 1
+    scaledY: number;            //one step changes this by 1
+    lastScaledX: number;        //last postion from scaledX
+    lastScaledY: number;        //last postion from scaledY
     moveDirection: string;      //currently moving in this or none direction
     moveTime: number;           //time moving in current move
     prioDirection: string[];    //current and last direction button pressed
@@ -83,24 +85,28 @@ export function updateOwnPosition(player: Player, room: Room, currentMap: mapInf
         if(player.prioDirection[0] === "moveDown" && player.moveDirection === null){
             player.moveDirection = "down"
             player.facing = "down"
+            player.lastScaledY = player.scaledY //stores the previous position
             player.scaledY++;
             room.send("move", "moveDown");
         }
         if(player.prioDirection[0] === "moveUp" && player.moveDirection === null){
             player.moveDirection = "up"
             player.facing = "up"
+            player.lastScaledY = player.scaledY //stores the previous position
             player.scaledY--;
             room.send("move", "moveUp");
         }
         if(player.prioDirection[0] === "moveLeft" && player.moveDirection === null){
             player.moveDirection = "left"
             player.facing = "left"
+            player.lastScaledX = player.scaledX //stores the previous position
             player.scaledX--;
             room.send("move", "moveLeft");
         }
         if(player.prioDirection[0] === "moveRight" && player.moveDirection === null){
             player.moveDirection = "right"
             player.facing = "right"
+            player.lastScaledX = player.scaledX //stores the previous position
             player.scaledX++;
             room.send("move", "moveRight");
         }
@@ -118,17 +124,40 @@ export function updateOwnPosition(player: Player, room: Room, currentMap: mapInf
             player.positionX += PLAYER_MOVEMENT_PER_TICK;
         }
         if(player.moveTime === FRAMES_PER_MOVE){
-            player.scaledX = room.state.players[player.name].x
-            player.scaledY = room.state.players[player.name].y
+            //centers the player every whole step 
+            player.positionX = player.scaledX * STEP_SIZE
+            player.positionY = player.scaledY * STEP_SIZE
+
+            //resets movement counter and blocker
             player.moveTime = 0;
             player.moveDirection = null;
-            //corrects centers the player every whole step
-            if(player.positionX % STEP_SIZE != 0 || player.positionY % STEP_SIZE != 0){
-                player.positionX = player.scaledX * STEP_SIZE
-                player.positionY = player.scaledY * STEP_SIZE
-            }
         }
     }
+}
+
+//syncs the own position from the server
+let posDiffers = 0;
+export function syncOwnPosition(player: Player, room: Room){
+    
+    //checks if current position differs from servers data
+    if ((player.scaledX !== room.state.players[player.name].x || player.scaledY !== room.state.players[player.name].y) &&
+        (player.lastScaledX !== room.state.players[player.name].x || player.lastScaledY !== room.state.players[player.name].y)){
+
+        //if it differs for to long the positions get synced
+        if (posDiffers < 10){
+            posDiffers++;
+        } else {
+            console.log(player.scaledX + " : " + player.lastScaledX + " : " + room.state.players[player.name].x)
+            console.log(player.scaledY + " : " + player.lastScaledY + " : " + room.state.players[player.name].y)
+            player.scaledX = room.state.players[player.name].x;
+            player.scaledY = room.state.players[player.name].y;
+            player.positionX = player.scaledX * STEP_SIZE
+            player.positionY = player.scaledY * STEP_SIZE
+        }
+    } else {
+        posDiffers = 0;
+    }
+    
 }
 
 /*
