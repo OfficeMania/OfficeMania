@@ -173,7 +173,7 @@ function onLocalTrackAdded(track, pos: number) {
     track.addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Local Track stopped')); //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Local Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     if (track.getType() === trackTypeVideo) {
-        $('videobar').append(`<video autoplay='1' height="200" style="margin-right:5px;" id='localVideo${pos}' />`);
+        $('videobar').append(`<video autoplay='1' style="width:15%; margin-right:5px;" id='localVideo${pos}' />`);
         track.attach($(`#localVideo${pos}`)[0]);
     } else {
         $('videobar').append(
@@ -280,7 +280,8 @@ function setAudioOutputDevice(selected) {
 }
 
 function addVideoTrack(participant: string, idx: number){
-    $('videobar').append(`<video autoplay='1' height="200" style="margin-right:5px;" id='${participant}video${idx}' />`);
+    $('videobar').append(`<video autoplay='1' style="width: 10%; margin-right:5px;" id='${participant}video${idx}' />`);
+    //document.getElementById(participant + "video2").style.width = "50%";
 }
 
 function toggleTrackMute(track) {
