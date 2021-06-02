@@ -380,7 +380,7 @@ function nearbyPlayerCheck(players: PlayerRecord, ourPlayer){
         isEmpty = false;
         //console.log(Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2));
 
-        if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 5000) {
+        if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 50000) {
             //console.log("Player nearby: " + value.name);
             playersNearby.push(value);
         }
