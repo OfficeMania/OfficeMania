@@ -293,7 +293,7 @@ function setAudioOutputDevice(selected) {
 }
 
 function addRemoteVideoTrack(participant: string, idx: number){
-    $('videobar').append(`<video autoplay='1' style="width: 10%; margin-right:5px;" id='${participant}video${idx}' />`);
+    $('videobar').append(`<video autoplay='1' style="width: 15%; margin-right:5px;" id='${participant}video${idx}' />`);
     //document.getElementById(participant + "video2").style.width = "50%";
 }
 
