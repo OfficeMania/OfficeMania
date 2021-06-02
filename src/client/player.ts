@@ -25,8 +25,8 @@ export interface Player {
     positionY: number;          //posY on the Map
     scaledX: number;            //one step changes this by 1
     scaledY: number;            //one step changes this by 1
-    lastScaledX: number[];        //last postion from scaledX
-    lastScaledY: number[];        //last postion from scaledY
+    lastScaledX: number[];      //last 5 postion from scaledX
+    lastScaledY: number[];      //last 5 postion from scaledY
     moveDirection: string;      //currently moving in this or none direction
     moveTime: number;           //time moving in current move
     prioDirection: string[];    //current and last direction button pressed
@@ -74,12 +74,6 @@ export function updatePosition(player: Player, room: Room) {
 }
 
 export function updateOwnPosition(player: Player, room: Room, currentMap: mapInfo) {
-
-    //if server and client data differ to much tp player to server postion.
-    if(Math.abs(player.positionX - room.state.players[player.id].x  * STEP_SIZE)>=72 || Math.abs(player.positionY-room.state.players[player.id].y  * STEP_SIZE)>=72){
-        player.positionX = room.state.players[player.id].x * STEP_SIZE;
-        player.positionY = room.state.players[player.id].y * STEP_SIZE;
-    }
     
     //initiates movement in one direction and blocks the other directions till the next tile
     if(player.prioDirection.length > 0){
