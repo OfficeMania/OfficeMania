@@ -319,7 +319,7 @@ function checkRemoteTracks(track){
         
         if (remoteTracks[participant][i].getType() === "video"){//could just be "if (i===2)"
             if (track.isMuted()){
-                addVideoTrack(participant, 2);
+                addRemoteVideoTrack(participant, 2);
                 track.attach($(`#${id}`)[0]);
             }
         }
