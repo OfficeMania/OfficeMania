@@ -3,7 +3,7 @@ import { Player, PLAYER_COLORS, TILE_SIZE, updatePosition, updateOwnPosition, sy
 import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
 import { convertMapData, drawMapWithChunks, mapInfo, drawMap } from "./map";
 import { choosePlayerSprites } from "./player_sprite";
-import {toggleMuteByType, switchVideo} from "./conference";
+import {toggleMuteByType, switchVideo, nearbyPlayerCheck} from "./conference";
 import { getCookie, setCookie} from "./cookie"
 
 
@@ -284,25 +284,7 @@ async function main() {
         if (playerNearbyTimer % 20 === 0) {
             playerNearbyTimer = 0;
 
-            //array with nearby players. use this vor videochat.
-            let playersNearby = [];
-
-            for (const [key, value] of Object.entries(players)) {
-                if (value.id === ourPlayer.id) {
-                    continue;
-                }
-                //console.log(Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2));
-
-                if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 5000) {
-                    //console.log("Player nearby: " + value.name);
-                    playersNearby.push(value);
-                }
-            }
-            if (playersNearby.length === 0) {
-                document.getElementById("playerNearbyIndicator").innerHTML = "you are lonely :(";
-            } else {
-                document.getElementById("playerNearbyIndicator").innerHTML = "player nearby";
-            }
+            nearbyPlayerCheck(players, ourPlayer);
         }
 
         //DESIGN TODO: when something on the map changes: drawMap

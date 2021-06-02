@@ -1,6 +1,8 @@
 import { remoteRoomCall } from "colyseus/lib/MatchMaker";
+//import { Player } from "./player";
+import { PlayerRecord } from "./util";
 
-export {roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, switchVideo};
+export {roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, switchVideo, nearbyPlayerCheck};
 
 // Constants
 
@@ -190,7 +192,7 @@ function onLocalTrackAdded(track, pos: number) {
  *
  * @param track JitsiTrack object
  */
-function onRemoteTrackAdded(track) {
+function onRemoteTrackAdded(track): void {
     console.debug(`Remote Track added: ${track}`); //DEBUG
     const participant = track.getParticipantId();
     console.debug(`Participant id is: ${participant}`); //DEBUG
@@ -209,7 +211,7 @@ function onRemoteTrackAdded(track) {
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Remote Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     const id = participant + track.getType() + idx;
     if (track.getType() === trackTypeVideo) {
-        addVideoTrack(participant, idx);
+        addRemoteVideoTrack(participant, idx);
     } else {
         $('videobar').append(
             `<audio autoplay='1' id='${participant}audio${idx}' />`);
@@ -235,7 +237,18 @@ function onRemoteTrackRemoved(track) {
 
     //TODO
 }
+/*  
+ *  Checks if muted button was audio or other
+ */
+function onMute(track){
 
+    if (track.getType() === "audio"){
+        console.log(`is audio, exiting`);
+        return;
+    }
+    
+    checkRemoteTracks(track);
+}
 /**
  * This is called when a user has joined.
  *
@@ -279,7 +292,7 @@ function setAudioOutputDevice(selected) {
     JitsiMeetJS.mediaDevices.setAudioOutputDevice(selected.value);
 }
 
-function addVideoTrack(participant: string, idx: number){
+function addRemoteVideoTrack(participant: string, idx: number){
     $('videobar').append(`<video autoplay='1' style="width: 10%; margin-right:5px;" id='${participant}video${idx}' />`);
     //document.getElementById(participant + "video2").style.width = "50%";
 }
@@ -293,58 +306,46 @@ function toggleTrackMute(track) {
         return true;
     }
 }
-function onMute(track){
-    onHidden(track);
-}
-function onHidden(track){
-    let participant = track.getParticipantId();
-    let type = track.getType();
-    console.log(`WTF IS THAT DAMAGE MY GUY ` + type);
-    if (type === "audio"){
-        console.log(`is audio, exiting`);
-        return;
-    }
-    console.log(`abcdefghijkl`);
-    
-    checkRemoteTracks(track);
-    //document.getElementById(track.getParticipantId() + "video2");
-    //let name: string = track.getParticipantId();
-    
-    
-    
-}
+
+/*
+ *checks the remote tracks, and removes the video track to be muted
+ */
 function checkRemoteTracks(track){
     let participant = track.getParticipantId();
     let type = track.getType();
     const id = participant + track.getType() + 2;
     const i = {};
     for (let i = 0; i < remoteTracks[participant].length; i++){
-        console.log(`hello there, general kenobi:`)
-        if (remoteTracks[participant][i].getType() === "audio"){
-
-            console.log(`track is: audio:  ${remoteTracks[participant][i]}`);
-            
-        }
-        if (remoteTracks[participant][i].getType() === "video"){
-            console.log(`track is: video:  ${remoteTracks[participant][i]}`);
-            let isMuted: number = -1;
-            isMuted = muted.indexOf(remoteTracks[participant][i]);
-            if (isMuted != -1){
-                muted.splice(isMuted, 1);
+        
+        if (remoteTracks[participant][i].getType() === "video"){//could just be "if (i===2)"
+            if (track.isMuted()){
                 addVideoTrack(participant, 2);
                 track.attach($(`#${id}`)[0]);
-                console.log(`muted is: when unmuting` + muted);
             }
-            else {
-                muted.push(remoteTracks[participant][i]);
-                console.log(`document.getElementById` + participant + type + "2");
-                document.getElementById(participant + type + "2").remove();
-                console.log(`muted is: ` + muted);
-            }
-            //muted.push(i);
-            
         }
     }
+}
+/*
+ *switches local videotrack
+ */
+let isVideo = true;
+function switchVideo() { 
+    isVideo = !isVideo;
+    if (localTracks[1]) {
+        localTracks[1].dispose();
+        localTracks.pop();
+    }
+    JitsiMeetJS.createLocalTracks({
+        devices: [isVideo ? trackTypeVideo : trackTypeDesktop]
+    })
+        .then(tracks => {
+            localTracks.push(tracks[0]);
+            localTracks[1].addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED,() => console.log('local track muted'));
+            localTracks[1].addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED,() => console.log('local track stopped'));
+            localTracks[1].attach($('#localVideo1')[0]);
+            room.addTrack(localTracks[1]);
+        })
+        .catch(error => console.log(error));
 }
 /**
  *
@@ -368,32 +369,36 @@ function toggleMuteByType(type: string) {
     return muted;
 }
 
+function nearbyPlayerCheck(players: PlayerRecord, ourPlayer){
+    //array with nearby players. use this vor videochat.
+    let playersNearby = [];
+    let isEmpty: boolean = true;
+    for (const [key, value] of Object.entries(players)) {
+        if (value.id === ourPlayer.id) {
+            continue;
+        }
+        isEmpty = false;
+        //console.log(Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2));
+
+        if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 5000) {
+            //console.log("Player nearby: " + value.name);
+            playersNearby.push(value);
+        }
+    }
+    console.log("Players consists of : " + players);
+    if (isEmpty) {
+        document.getElementById("playerNearbyIndicator").innerHTML = "Waiting for someone else to join...";
+    } else if (playersNearby.length === 0) {
+        document.getElementById("playerNearbyIndicator").innerHTML = "you are lonely :(";
+    } else {
+        document.getElementById("playerNearbyIndicator").innerHTML = "player nearby";
+    }
+}
+
 // Code
 
 
-let isVideo = true;
-function switchVideo() { //TODO Is this even used anymore? //yes, for screen sharing 
-    isVideo = !isVideo;
-    if (localTracks[1]) {
-        localTracks[1].dispose();
-        localTracks.pop();
-    }
-    JitsiMeetJS.createLocalTracks({
-        devices: [isVideo ? trackTypeVideo : trackTypeDesktop]
-    })
-        .then(tracks => {
-            localTracks.push(tracks[0]);
-            localTracks[1].addEventListener(
-                JitsiMeetJS.events.track.TRACK_MUTE_CHANGED,
-                () => console.log('local track muted'));
-            localTracks[1].addEventListener(
-                JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED,
-                () => console.log('local track stopped'));
-            localTracks[1].attach($('#localVideo1')[0]);
-            room.addTrack(localTracks[1]);
-        })
-        .catch(error => console.log(error));
-}
+
 
 $(window).on("beforeunload", unload);
 $(window).on("unload", unload);
