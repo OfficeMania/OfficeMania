@@ -165,11 +165,12 @@ async function main() {
     }
 
 
-    //mute button logic
+    
     document.addEventListener("keydown", keyPressed);
     document.addEventListener("keyup", keyUp);
     window.addEventListener("blur", onBlur);
 
+    //mute button logic
     const muteButton = $<HTMLButtonElement>("mute_button");
     const camButton = $<HTMLButtonElement>("cam_button");
     const switchButton = $<HTMLButtonElement>("switch_button");
@@ -265,6 +266,7 @@ async function main() {
             lag2 -= MS_PER_UPDATE2;
         }
 
+        //synchronize own position with the server
         if(!lastSecond || now - lastSecond >= 100) {
             lastSecond = now;
             syncOwnPosition(ourPlayer, room);
