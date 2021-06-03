@@ -3,6 +3,7 @@ import serveIndex from 'serve-index';
 import express from "express";
 import cors from "cors";
 import path from 'path';
+import fs from 'fs';
 import { Server } from "colyseus";
 import { monitor } from "@colyseus/monitor";
 
@@ -35,6 +36,21 @@ app.use('/', express.static(path.join(process.cwd(), "html")));
  *   <img src="/img/[image-name]" />
  */
 app.use('/img', express.static(path.join(process.cwd(), "assets", "img")));
+
+/*
+ * "Mount" the assets/map directory under "[host]/map"
+ */
+app.use('/map', express.static(path.join(process.cwd(), "assets", "map")));
+
+/*
+ * "Mount" the assets/templates directory under "[host]/templates"
+ */
+app.use('/templates', express.static(path.join(process.cwd(), "assets", "templates")));
+
+/*
+ * "Mount" the assets directory under "[host]/assets"
+ */
+app.use('/assets', express.static(path.join(process.cwd(), "assets")));
 
 /*
  * "Mount" the directory where the client JavaScript is generated to (dist/client)

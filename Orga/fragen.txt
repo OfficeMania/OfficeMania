@@ -8,4 +8,3 @@
 - Zählen die spontanen Tests auch als "Kommunikation"? ((nein))
 - wie "vernünftig" muss das Innendesign sein? Dürfen wir da themes machen oder muss alles nach Büro aussehen ((Büros sollten Büros sein, aber wir können auch zusätzliche Räume gestalten))
 -Wie lang muss die Einleitung von Abschnitt 1 sein? Soll die Einleitung 1/2 - 2 Seiten sein, oder der ganze Abschnitt? (wir dürfen gerne mehr machen)
-- Technischer Entwurf 3.1: was soll da hin? wir haben ja keine Klassen (er fragt mal nach)

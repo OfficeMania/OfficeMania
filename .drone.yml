@@ -10,17 +10,6 @@ steps:
       - npm install
       - npm test
 
-  - name: code-analysis
-    image: mailbyms/drone-sonar-plugin
-    settings:
-      sonar_host:
-        from_secret: sonar_host
-      sonar_token:
-        from_secret: sonar_token
-    when:
-      branch:
-        - master
-
   - name: publish-master
     image: plugins/docker
     settings:

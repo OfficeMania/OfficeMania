@@ -1,13 +1,34 @@
 <!DOCTYPE html>
-<html lang="de">
+<html>
     <head>
         <meta name="viewport" content="width=device-width" />
         <title>OfficeQuest</title>
 
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" crossorigin="anonymous">
+
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://8x8.vc/libs/lib-jitsi-meet.min.js"></script>
+
+
         <script src="/js/vendors-bundle.js"></script>
     </head>
-    <body>
-        <canvas id="canvas" width="600" height="600"></canvas>
+    <body style="background-color:rgb(255, 255, 255);margin: 0px;">
+
+        <div id="buttonpanel" style="width: 100%; background-color: gray; padding: 10px; position: fixed; top: 0;">
+            <button id="mute_button"><em class="fa fa-microphone"></em></button>
+            <button id="cam_button"><em class="fa fa-video"></em></button>
+            <button id="switch_button"><em class="fa fa-desktop"></em></button>
+        </div>
+        
+
+        <videobar style="width: 100%; position: fixed; top: 48px;"></videobar>
+
+        <p id="playerNearbyIndicator" style="position: fixed; bottom: 0">Waiting for someone else to join...</p>
+
+
+        <canvas id="canvas" width="600" height="600">
+            <canvas id="background"></canvas>
+        </canvas>
 
         <script src="/js/main-bundle.js"></script>
     </body>

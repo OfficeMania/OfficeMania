@@ -1,4 +1,25 @@
-import { Schema, type, MapSchema } from "@colyseus/schema";
+import { Schema, type, MapSchema, ArraySchema} from "@colyseus/schema";
+
+
+/*
+ * Class to sync the playerdata with the server
+ */
+export class PlayerData extends Schema {
+    @type("string")
+    name: string;
+
+    @type("string")
+    character: string;
+
+    @type("number")
+    x: number;
+
+    @type("number")
+    y: number;
+
+    @type("number")
+    cooldown: number;
+}
 
 /*
  * The state of a room. Each variable that is annotated with a @type decorator
@@ -12,7 +33,15 @@ import { Schema, type, MapSchema } from "@colyseus/schema";
  * changed). The solution for this is to add an onAdd, onRemove, onChange listener
  * to every schema.
  */
+
+
 export class State extends Schema {
-    @type({map: "string"})
-    players = new MapSchema<String>();
+    @type({map: PlayerData})
+    players = new MapSchema<PlayerData>();
+
+    @type({array: "string"})
+    playerSpritePaths = new ArraySchema<string>();
+
+    @type({array: "string"})
+    templatePaths = new ArraySchema<string>();
 }
