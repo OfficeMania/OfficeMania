@@ -11,10 +11,9 @@
         "allowSyntheticDefaultImports": true,
         "isolatedModules": true,
         "outDir": "../../dist/common",
-        "lib": ["ES2019", "DOM"],
+        "lib": ["ES2019"],
         "composite": true
     },
     "include": ["./**/*.ts"],
     "exclude": ["./**/*.test.ts"],
-    "references": [{ "path": "../client" }],
 }

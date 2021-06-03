@@ -9,10 +9,14 @@
     "start-win": "concurrently \"set TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" && webpack -w\" \"ts-node-dev --project ./src/server/tsconfig.json src/server/main.ts\"",
     "start-production": "ts-node --transpile-only --project ./src/server/tsconfig.json src/server/main.ts",
     "start": "concurrently \"TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack -w\" \"ts-node-dev --project ./src/server/tsconfig.json src/server/main.ts\"",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "author": "",
   "license": "UNLICENSED",
+  "jest": {
+    "collectCoverage": true,
+    "testResultsProcessor": "jest-sonar-reporter"
+  },
   "bugs": {
     "url": "https://github.com/colyseus/create-colyseus/issues"
   },
