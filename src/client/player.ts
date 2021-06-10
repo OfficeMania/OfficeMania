@@ -11,7 +11,6 @@ export var PLAYER_MOVEMENT_PER_TICK = STEP_SIZE * (1 / FRAMES_PER_MOVE);
 
 export var PLAYER_COLORS = ["red", "blue", "green", "yellow", "black"];
 
-
 /*
  * This is a client-side Player-class. This means that the name and position
  * attributes are not synced with the server, but need to be updated when
@@ -20,7 +19,7 @@ export var PLAYER_COLORS = ["red", "blue", "green", "yellow", "black"];
 export interface Player {
     id: string;                 //players id in the room
     name: string;               //players name
-    character: string;          //the name of the character sprite               
+    character: string;          //the name of the character sprite
     positionX: number;          //posX on the Map
     positionY: number;          //posY on the Map
     scaledX: number;            //one step changes this by 1
@@ -41,7 +40,7 @@ export interface Player {
  * Syncing data from server and using it
  */
 export function updatePosition(player: Player, room: Room) {
-    
+
     //if server and client data differ to much tp player to server postion.
     if(Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE)>=100 || Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)>=100){
         player.positionX = room.state.players[player.id].x * STEP_SIZE;
@@ -70,11 +69,11 @@ export function updatePosition(player: Player, room: Room) {
             player.positionY -= PLAYER_MOVEMENT_PER_TICK;
         }
     }
-    
+
 }
 
 export function updateOwnPosition(player: Player, room: Room, currentMap: mapInfo) {
-    
+
     //initiates movement in one direction and blocks the other directions till the next tile
     if(player.prioDirection.length > 0){
         if(player.prioDirection[0] === "moveDown" && player.moveDirection === null){
@@ -123,7 +122,7 @@ export function updateOwnPosition(player: Player, room: Room, currentMap: mapInf
             player.positionX += PLAYER_MOVEMENT_PER_TICK;
         }
         if(player.moveTime === FRAMES_PER_MOVE){
-            //centers the player every whole step 
+            //centers the player every whole step
             player.positionX = player.scaledX * STEP_SIZE
             player.positionY = player.scaledY * STEP_SIZE
 
@@ -141,7 +140,7 @@ export function syncOwnPosition(player: Player, room: Room){
     //checks if current position differs from servers data
     if ((player.scaledY !== room.state.players[player.id].y && !player.lastScaledY.includes(room.state.players[player.id].y)) ||
         (!player.lastScaledX.includes(room.state.players[player.id].x) && player.scaledX !== room.state.players[player.id].x)){
-                
+
         //if it differs for to long the positions get synced
         if (posDiffers < 10){
             posDiffers++;
@@ -154,7 +153,7 @@ export function syncOwnPosition(player: Player, room: Room){
     } else {
         posDiffers = 0;
     }
-    
+
 }
 
 /*

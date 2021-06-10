@@ -10,7 +10,7 @@
         "isolatedModules": true,
         "outDir": "../../dist/client",
         "lib": ["ES2019", "DOM"],
-        "types": [],
+        "types": ["jquery"],
         "composite": true
     },
     "include": ["**/*.ts"],

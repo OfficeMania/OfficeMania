@@ -33,8 +33,6 @@ export class PlayerData extends Schema {
  * changed). The solution for this is to add an onAdd, onRemove, onChange listener
  * to every schema.
  */
-
-
 export class State extends Schema {
     @type({map: PlayerData})
     players = new MapSchema<PlayerData>();

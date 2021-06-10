@@ -14,7 +14,9 @@ const MS_PER_UPDATE = 10;
 const MS_PER_UPDATE2 = 15;
 
 // A simple helper function
-function $<T extends HTMLElement>(a: string) { return <T>document.getElementById(a); }
+function $<T extends HTMLElement>(a: string) {
+    return <T>document.getElementById(a);
+}
 
 // async is necessary here, because we use 'await' to resolve the promises
 async function main() {
@@ -58,7 +60,7 @@ async function main() {
         ourPlayer.character = cookieCharacter;
         room.send("character", ourPlayer.character)
     }
-    
+
     /*
      * Then, we wait for our map to load
      */
@@ -99,7 +101,7 @@ async function main() {
      * movement inputs
      *
      * ourPlayer is the currentPlayer
-     * 
+     *
      * prioDirection is used, so that you can press another direction without
      * needing to let go of the first button pressed
      */
@@ -107,13 +109,13 @@ async function main() {
         if(e.key.toLowerCase() === "s" && !ourPlayer.prioDirection.includes("moveDown")){
             ourPlayer.prioDirection.unshift("moveDown");
         }
-        if(e.key.toLowerCase() === "w" && !ourPlayer.prioDirection.includes("moveUp")){            
+        if(e.key.toLowerCase() === "w" && !ourPlayer.prioDirection.includes("moveUp")){
             ourPlayer.prioDirection.unshift("moveUp");
         }
-        if(e.key.toLowerCase() === "a" && !ourPlayer.prioDirection.includes("moveLeft")){            
+        if(e.key.toLowerCase() === "a" && !ourPlayer.prioDirection.includes("moveLeft")){
             ourPlayer.prioDirection.unshift("moveLeft");
         }
-        if(e.key.toLowerCase() === "d" && !ourPlayer.prioDirection.includes("moveRight")){            
+        if(e.key.toLowerCase() === "d" && !ourPlayer.prioDirection.includes("moveRight")){
             ourPlayer.prioDirection.unshift("moveRight");
         }
         //iterate through characters
@@ -157,7 +159,7 @@ async function main() {
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveRight"), 1);
         }
     }
-    
+
     //gets called when window is out auf focus
     function onBlur(){
         //stops player
@@ -165,12 +167,20 @@ async function main() {
     }
 
 
-    
+
     document.addEventListener("keydown", keyPressed);
     document.addEventListener("keyup", keyUp);
     window.addEventListener("blur", onBlur);
 
-    //mute button logic
+
+    // message recieve test
+
+    room.onMessage("skill", (message) => {
+        console.log("lol")
+    });
+
+
+    // Mute Logic
     const muteButton = $<HTMLButtonElement>("mute_button");
     const camButton = $<HTMLButtonElement>("cam_button");
     const switchButton = $<HTMLButtonElement>("switch_button");
@@ -204,7 +214,7 @@ async function main() {
                 setVideoButtonMute(muted);
             }
         }
-        
+
     }
 
 
@@ -217,8 +227,8 @@ async function main() {
 
     //const MS_PER_UPDATE = 10;
 
-    
-    
+
+
     //let j = 0;
 
 
@@ -229,13 +239,12 @@ async function main() {
     let playerNearbyTimer = 0;
 
     function loop(now: number) {
-
         lag += now - previous;
         lag2 += now - previous;
         previous = now;
 
         ctx.clearRect(0, 0, width, height);
-        
+
         //update width and height
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
@@ -250,7 +259,7 @@ async function main() {
                     updatePosition(player, room);
                     player.character = room.state.players[player.id].character;
                     player.name = room.state.players[player.id].name;
-                } 
+                }
             });
             //Update own player
             updateOwnPosition(ourPlayer, room, currentMap);
@@ -271,7 +280,7 @@ async function main() {
             lastSecond = now;
             syncOwnPosition(ourPlayer, room);
         }
-    
+
 
         /*
          * Repaint the scene
@@ -327,13 +336,12 @@ async function main() {
 
                 ctx.fillStyle = "rgba(255, 255, 255, 1)";
                 ctx.fillText(player.name,Math.round(width / 2) + 24, Math.round(height / 2) + 12)
-                
+
             }
             //draw each character
             //ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round(player.positionX), Math.round(player.positionY), playerWidth, playerHeight);
 
         });
-
         ctx.restore();
 
         // Repeat game loop
@@ -342,7 +350,6 @@ async function main() {
 
     // Start game loop
     requestAnimationFrame(loop);
-
 }
 
 main();

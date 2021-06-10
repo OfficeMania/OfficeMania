@@ -21,22 +21,22 @@ export class TURoom extends Room<State> {
         for (let path of files){
             if (path.includes(".png")){
                 this.state.playerSpritePaths.push(path)
-            } 
+            }
         }
 
         //loads paths from templates
         var path = require('path');
         getPaths("./assets/templates", this.state);
-        
+
         function getPaths(startParth, newState: State) {
-        
+
             if (!fs.existsSync(startParth)) {
                 return;
             }
-        
+
             var files = fs.readdirSync(startParth);
             for (let i = 0; i < files.length; i++) {
-        
+
                 let filename: string = path.join(startParth, files[i]);
                 var stat = fs.lstatSync(filename);
                 if(stat.isDirectory()) {
@@ -47,7 +47,7 @@ export class TURoom extends Room<State> {
                 }
             }
         }
-        
+
 
 
         //recieves movement from all the clients
@@ -76,7 +76,7 @@ export class TURoom extends Room<State> {
                     }
                 }
             }
-             
+
 
         });
 
@@ -111,10 +111,9 @@ export class TURoom extends Room<State> {
     onLeave (client: Client, consented: boolean) {
         delete this.state.players[client.sessionId];
     }
-    
 
     onDispose () { }
-    
+
     //gameloop for server
     update (deltaTime) {
         for (let [id, player] of this.state.players){
