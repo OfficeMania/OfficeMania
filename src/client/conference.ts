@@ -322,6 +322,9 @@ function checkRemoteTracks(track){
                 addRemoteVideoTrack(participant, 2);
                 track.attach($(`#${id}`)[0]);
             }
+            else {
+                document.getElementById(participant + type + "2").remove();
+            }
         }
     }
 }
