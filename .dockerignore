@@ -1,4 +1,6 @@
 dist-server/
+Abgaben/
+.git/
 
 # Logs
 logs

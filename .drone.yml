@@ -30,7 +30,7 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      target: PRODUCTION_IMAGE
+      target: PRODUCTION
       tags:
         - latest
         - commit-${DRONE_COMMIT_SHA:0:8}
@@ -47,7 +47,7 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      target: DEBUG_IMAGE
+      target: DEV
       tags:
         - dev-design
         - commit-${DRONE_COMMIT_SHA:0:8}
@@ -64,7 +64,7 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      target: DEBUG_IMAGE
+      target: DEV
       tags:
         - dev-movement
         - commit-${DRONE_COMMIT_SHA:0:8}
@@ -81,7 +81,7 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      target: DEBUG_IMAGE
+      target: DEV
       tags:
        - dev-video
        - commit-${DRONE_COMMIT_SHA:0:8}
