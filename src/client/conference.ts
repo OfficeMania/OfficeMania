@@ -388,7 +388,7 @@ function nearbyPlayerCheck(players: PlayerRecord, ourPlayer){
             playersNearby.push(value);
         }
     }
-    console.log("Players consists of : " + players);
+    //console.log("Players consists of : " + players);
     if (isEmpty) {
         document.getElementById("playerNearbyIndicator").innerHTML = "Waiting for someone else to join...";
     } else if (playersNearby.length === 0) {
@@ -405,6 +405,7 @@ function nearbyPlayerCheck(players: PlayerRecord, ourPlayer){
 
 $(window).on("beforeunload", unload);
 $(window).on("unload", unload);
+JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);          //mutes logger
 JitsiMeetJS.init(optionsInit);
 connection = new JitsiMeetJS.JitsiConnection(null, null, optionsConnection);
 JitsiMeetJS.mediaDevices.addEventListener(JitsiMeetJS.events.mediaDevices.DEVICE_LIST_CHANGED, onDeviceListChanged);

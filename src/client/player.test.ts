@@ -1,4 +1,4 @@
-import { Player, PLAYER_MOVEMENT_PER_TICK, updatePosition } from "./player";
+import { Player, PLAYER_MOVEMENT_PER_TICK } from "./player";
 
 /*
  * This file tests player.ts. Simply run "npm test" to get the test results.
