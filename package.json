@@ -7,7 +7,7 @@
     "start-webpack": "set TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" && webpack -w --config webpack.config.js",
     "start-ts-node-dev": "ts-node-dev --project ./src/server/tsconfig.json src/server/main.ts",
     "start-win": "concurrently \"set TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" && webpack -w\" \"ts-node-dev --project ./src/server/tsconfig.json src/server/main.ts\"",
-    "build-webpack": "TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" && webpack --config webpack.config.js",
+    "build-webpack": "TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" && webpack --config webpack.config.ts",
     "start-production": "ts-node --transpile-only --project ./src/server/tsconfig.json src/server/main.ts",
     "start": "concurrently \"TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack -w\" \"ts-node-dev --project ./src/server/tsconfig.json src/server/main.ts\"",
     "test": "jest --coverage"
