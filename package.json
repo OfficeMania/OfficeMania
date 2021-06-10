@@ -7,6 +7,7 @@
     "start-webpack": "set TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" && webpack -w --config webpack.config.js",
     "start-ts-node-dev": "ts-node-dev --project ./src/server/tsconfig.json src/server/main.ts",
     "start-win": "concurrently \"set TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" && webpack -w\" \"ts-node-dev --project ./src/server/tsconfig.json src/server/main.ts\"",
+    "build-webpack": "TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" && webpack --config webpack.config.js",
     "start-production": "ts-node --transpile-only --project ./src/server/tsconfig.json src/server/main.ts",
     "start": "concurrently \"TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack -w\" \"ts-node-dev --project ./src/server/tsconfig.json src/server/main.ts\"",
     "test": "jest --coverage"
@@ -58,6 +59,9 @@
     "colyseus": "^0.14.0",
     "cors": "^2.8.5",
     "express": "^4.16.4",
-    "serve-index": "^1.9.1"
+    "serve-index": "^1.9.1",
+    "ts-node": "^8.1.0",
+    "tslib": "2.2.0",
+    "typescript": "^4.1.3"
   }
 }
