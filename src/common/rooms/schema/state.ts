@@ -1,4 +1,4 @@
-import { Schema, type, MapSchema, ArraySchema} from "@colyseus/schema";
+import {ArraySchema, MapSchema, Schema, type} from "@colyseus/schema";
 
 
 /*
@@ -19,6 +19,9 @@ export class PlayerData extends Schema {
 
     @type("number")
     cooldown: number;
+
+    @type("string")
+    participantId: string;
 }
 
 /*

@@ -2,8 +2,9 @@
 
 import {PlayerRecord} from "../util";
 import {User} from "./entities";
+import {Room} from "colyseus.js";
 
-export {roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, switchVideo, nearbyPlayerCheck};
+export {init as initConference, roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, switchVideo, nearbyPlayerCheck};
 
 function $<T extends HTMLElement>(a: string) {
     return <T>document.getElementById(a);
@@ -86,6 +87,8 @@ function getUser(participantId: string): User {
     }
     return user;
 }
+
+let serverRoom: Room = null;
 
 let connection = null;
 let isJoined = false;
@@ -493,24 +496,26 @@ function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
 
 // Code
 
-
-window.addEventListener("beforeunload", unload);
-window.addEventListener("unload", unload); // TODO Why Twice?
-JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);          //mutes logger
-JitsiMeetJS.init(optionsInit);
-connection = new JitsiMeetJS.JitsiConnection(null, null, optionsConnection);
-JitsiMeetJS.mediaDevices.addEventListener(JitsiMeetJS.events.mediaDevices.DEVICE_LIST_CHANGED, onDeviceListChanged);
-connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
-connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
-connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, onDisconnected);
-connection.connect();
-JitsiMeetJS.createLocalTracks(optionsLocalTracks).then(onLocalTracksAdded);
-if (JitsiMeetJS.mediaDevices.isDeviceChangeAvailable(deviceOutput)) {
-    JitsiMeetJS.mediaDevices.enumerateDevices(devices => {
-        const audioOutputDevices = devices.filter(d => d.kind === deviceKindAudio);
-        if (audioOutputDevices.length > 1) {
-            //$('#audioOutputSelect').html(audioOutputDevices.map(d => `<option value="${d.deviceId}">${d.label}</option>`).join('\n'));
-            //$('#audioOutputSelectWrapper').show();
-        }
-    });
+function init(room: Room) {
+    serverRoom = room;
+    window.addEventListener("beforeunload", unload);
+    window.addEventListener("unload", unload); // TODO Why Twice?
+    JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);          //mutes logger
+    JitsiMeetJS.init(optionsInit);
+    connection = new JitsiMeetJS.JitsiConnection(null, null, optionsConnection);
+    JitsiMeetJS.mediaDevices.addEventListener(JitsiMeetJS.events.mediaDevices.DEVICE_LIST_CHANGED, onDeviceListChanged);
+    connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
+    connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
+    connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, onDisconnected);
+    connection.connect();
+    JitsiMeetJS.createLocalTracks(optionsLocalTracks).then(onLocalTracksAdded);
+    if (JitsiMeetJS.mediaDevices.isDeviceChangeAvailable(deviceOutput)) {
+        JitsiMeetJS.mediaDevices.enumerateDevices(devices => {
+            const audioOutputDevices = devices.filter(d => d.kind === deviceKindAudio);
+            if (audioOutputDevices.length > 1) {
+                //$('#audioOutputSelect').html(audioOutputDevices.map(d => `<option value="${d.deviceId}">${d.label}</option>`).join('\n'));
+                //$('#audioOutputSelectWrapper').show();
+            }
+        });
+    }
 }

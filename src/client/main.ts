@@ -3,7 +3,7 @@ import {Player, syncOwnPosition, TILE_SIZE, updateOwnPosition, updatePosition} f
 import {InitState, joinAndSync, loadImage, PlayerRecord} from "./util";
 import {convertMapData, drawMap, mapInfo} from "./map";
 import {choosePlayerSprites} from "./player_sprite";
-import {nearbyPlayerCheck, switchVideo, toggleMuteByType} from "./conference/conference";
+import {initConference, nearbyPlayerCheck, switchVideo, toggleMuteByType} from "./conference/conference";
 import {getCookie, setCookie} from "./cookie"
 
 
@@ -178,6 +178,7 @@ async function main() {
         console.log("lol")
     });
 
+    initConference(room);
 
     // Mute Logic
     const muteButton = $<HTMLButtonElement>("button-mute-audio");
