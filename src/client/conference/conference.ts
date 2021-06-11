@@ -202,7 +202,7 @@ function onLocalTrackAdded(track, pos: number) {
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Local Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     if (track.getType() === trackTypeVideo) {
         selfUser.setVideoTrack(track);
-        selfUser.setVideoEnabled(true);
+        selfUser.setVideoMuted(false);
     } else {
         selfUser.setAudioTrack(track); //Keep this for muting ourself
         //selfUser.setAudioEnabled(true); //TODO Wait wouldn't that cause you to hear yourself?
@@ -242,11 +242,11 @@ function onRemoteTrackAdded(track): void {
     const id = participantId + track.getType() + idx;
     if (track.getType() === trackTypeVideo) {
         user.setVideoTrack(track);
-        user.setVideoEnabled(true);
+        user.setVideoMuted(false);
         //addRemoteVideoTrack(participantId);
     } else {
         user.setAudioTrack(track);
-        user.setAudioEnabled(true);
+        user.setAudioMuted(false);
         //videoBar.append(`<audio autoplay='1' id='${participantId}audio${idx}' />`);
     }
     //track.attach($(`#${id}`)[0]);
@@ -316,8 +316,8 @@ function processTrackType<R>(trackType: string, onTrackTypeAudio: () => R, onTra
  */
 function onRemoteMute(track) {
     const user = getUser(track.getParticipantId());
-    const enabled = !track.isMuted();
-    useTrackType(track.getType(), () => user.setAudioEnabled(enabled), () => user.setVideoEnabled(enabled), () => user.setShareEnabled(enabled));
+    const mute = track.isMuted();
+    useTrackType(track.getType(), () => user.setAudioMuted(mute), () => user.setVideoMuted(mute), () => user.setShareMuted(mute));
 
     /*
     if (track.getType() === trackTypeAudio){
@@ -462,15 +462,16 @@ function toggleMuteByType(type: string) {
     */
     console.debug(`type: ${type}, selfUser: ${selfUser}`)
     return processTrackType(type, () => selfUser.toggleAudioTrack(), () => {
-        const enabled = !selfUser.toggleVideoTrack();
-        selfUser.setVideoEnabled(enabled);
-        return !enabled;
+        const mute = selfUser.toggleVideoTrack();
+        selfUser.setVideoMuted(mute);
+        return mute;
     });
 }
 
 function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
     //array with nearby players. use this vor videochat.
-    let playersNearby = [];
+    const playersNearby: string[] = [];
+    const playersAway: string[] = [];
     let isEmpty: boolean = true;
     for (const [key, value] of Object.entries(players)) {
         if (value.id === ourPlayer.id) {
@@ -480,10 +481,28 @@ function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
         //console.log(Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2));
 
         if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 50000) {
-            //console.log("Player nearby: " + value.name);
-            playersNearby.push(value);
+            //console.debug("Player nearby: " + value.participantId);
+            playersNearby.push(value.participantId);
+        } else {
+            //console.debug("Player away: " + value.participantId);
+            playersAway.push(value.participantId);
         }
     }
+    //console.debug(serverRoom.state.players);
+    playersAway.forEach((participantId) => {
+        const user = getUser(participantId);
+        user.setAudioDisabled(true);
+        user.setVideoDisabled(true);
+        user.setShareDisabled(true);
+        //console.debug(`far away: ${user.participantId}`);
+    });
+    playersNearby.forEach((participantId) => {
+        const user = getUser(participantId);
+        user.setAudioDisabled(false);
+        user.setVideoDisabled(false);
+        user.setShareDisabled(false);
+        //console.debug(`nearby  : ${user.participantId}`);
+    });
     //console.log("Players consists of : " + players);
     if (isEmpty) {
         playerNearbyIndicator.innerHTML = "Waiting for someone else to join...";
