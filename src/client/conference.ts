@@ -4,6 +4,10 @@ import { PlayerRecord } from "./util";
 
 export {roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, switchVideo, nearbyPlayerCheck};
 
+function $<T extends HTMLElement>(a: string) {
+    return <T>document.getElementById(a);
+}
+
 // Constants
 
 const trackTypeAudio = "audio";
@@ -15,6 +19,9 @@ const deviceInput = "input";
 
 const deviceKindAudio = "audiooutput";
 const deviceKindVideo = "videooutput";
+
+const videoBar = $<HTMLDivElement>("video-bar");
+const playerNearbyIndicator = $<HTMLDivElement>("player-nearby-indicator");
 
 // Options
 
@@ -65,7 +72,165 @@ const optionsLocalTracks = {
 }
 
 
+class User {
+
+    // Constants
+    userId: string;
+    participantId: string;
+    // Variables
+    audio = {
+        track: null,
+        element: HTMLAudioElement
+    }
+    video = {
+        track: null,
+        element: HTMLVideoElement
+    }
+    share = {
+        track: null,
+        element: HTMLVideoElement
+    }
+
+    constructor(userId: string, participantId: string) {
+        this.userId = userId;
+        this.participantId = participantId;
+    }
+
+    setAudioTrack(track) {
+        if (!track) {
+            this.audio.element?.remove();
+            this.audio.track?.detach(this.audio.element);
+            this.audio.element = null;
+            this.audio.track = null;
+            return;
+        }
+        this.audio.track = track;
+        const element = document.createElement("audio");
+        element.setAttribute("autoplay", "1");
+        //element.setAttribute("muted", "true"); //TODO Why was that added anyway?
+        element.setAttribute("id", `track-audio-${track.getParticipantId()}`);
+        this.audio.element = element;
+        track.attach(element);
+    }
+
+    setVideoTrack(track) {
+        if (!track) {
+            this.video.element?.remove();
+            this.video.track?.detach(this.video.element);
+            this.video.element = null;
+            this.video.track = null;
+            return;
+        }
+        this.video.track = track;
+        const element = document.createElement("video");
+        element.setAttribute("autoplay", "1");
+        element.setAttribute("style", "width:15%; margin-right:5px;");
+        element.setAttribute("id", `track-video-${track.getParticipantId()}`);
+        this.video.element = element;
+        track.attach(element);
+    }
+
+    setShareTrack(track) {
+        if (!track) {
+            this.share.element?.remove();
+            this.share.track?.detach(this.share.element);
+            this.share.element = null;
+            this.share.track = null;
+            return;
+        }
+        this.share.track = track;
+        const element = document.createElement("video");
+        element.setAttribute("autoplay", "1");
+        element.setAttribute("style", "width:15%; margin-right:5px;");
+        element.setAttribute("id", `track-share-${track.getParticipantId()}`);
+        this.share.element = element;
+        track.attach(element);
+    }
+
+    toggleAudioTrack(): boolean {
+        return this.toggleTrack(this.audio.track);
+    }
+
+    toggleVideoTrack(): boolean {
+        return this.toggleTrack(this.video.track);
+    }
+
+    toggleShareTrack(): boolean {
+        return this.toggleTrack(this.share.track);
+    }
+
+    toggleTrack(track): boolean {
+        if (!track) {
+            console.warn("toggling undefined or null track?")
+            return undefined;
+        }
+        if (track.isMuted()) {
+            track.unmute();
+            return false;
+        } else {
+            track.mute();
+            return true;
+        }
+    }
+
+    toggleElement(element: HTMLElement, enabled: boolean) {
+        if (!element) {
+            return;
+        }
+        if (videoBar.contains(element) !== enabled) {
+            if (enabled) {
+                videoBar.append(element);
+            } else {
+                element.remove();
+            }
+        }
+    }
+
+    setAudioEnabled(enabled: boolean) {
+        this.toggleElement(this.audio.element, enabled);
+    }
+
+    setVideoEnabled(enabled: boolean) {
+        this.toggleElement(this.video.element, enabled);
+    }
+
+    setShareEnabled(enabled: boolean) {
+        this.toggleElement(this.share.element, enabled);
+    }
+
+    remove() {
+        this.removeElements();
+        this.detachTracks();
+    }
+
+    removeElements() {
+        this.audio.element?.remove();
+        this.video.element?.remove();
+        this.share.element?.remove();
+    }
+
+    detachTracks() {
+        this.audio.track?.detach(this.audio.element);
+        this.video.track?.detach(this.video.element);
+        this.share.track?.detach(this.share.element);
+    }
+
+}
+
 // Variables
+
+const selfUser = new User(null, null);
+
+const users: User[] = [];
+
+function getUser(participantId: string): User {
+    let user = users.find(value => value.participantId === participantId);
+    if (!user) {
+        user = new User(null, participantId);
+        users.push(user);
+    }
+    return user;
+}
 
 let connection = null;
 let isJoined = false;
@@ -94,7 +259,8 @@ function onConnectionFailed() {
 /**
  * This is called after successfully establishing a connection
  */
-function onConnectionSuccess() {
+function onConnectionSuccess(id: string) {
+    selfUser.participantId = id;
     room = connection.initJitsiConference(roomName, optionsConference);
     //room.setStartMutedPolicy({audio: true});
     room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onTrackAdded);
@@ -108,6 +274,7 @@ function onConnectionSuccess() {
     room.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
     room.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${room.getPhoneNumber()} - ${room.getPhonePin()}`)); //DEBUG //REMOVE
     room.join();
+
 }
 
 /**
@@ -149,7 +316,7 @@ function onTrack(track, onLocal, onRemote) {
 /**
  * Handles local tracks.
  *
- * @param tracks Array with JitsiTrack objects
+ * @param tracks Array with tracks
  */
 function onLocalTracksAdded(tracks) {
     localTracks = tracks; //TODO should this stay that way?
@@ -175,13 +342,13 @@ function onLocalTrackAdded(track, pos: number) {
     track.addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Local Track stopped')); //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Local Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     if (track.getType() === trackTypeVideo) {
-        $('videobar').append(`<video autoplay='1' style="width:15%; margin-right:5px;" id='localVideo${pos}' />`);
-        track.attach($(`#localVideo${pos}`)[0]);
+        selfUser.setVideoTrack(track);
+        selfUser.setVideoEnabled(true);
     } else {
-        $('videobar').append(
-            `<audio autoplay='1' muted='true' id='localAudio${pos}' />`);
-        track.attach($(`#localAudio${pos}`)[0]);
+        selfUser.setAudioTrack(track); //Keep this for muting ourself
+        //selfUser.setAudioEnabled(true); //TODO Wait wouldn't that cause you to hear yourself?
     }
+    //TODO What is when you're sharing your Screen? Should you see it yourself?
     if (isJoined) {
         room.addTrack(track);
     }
@@ -194,29 +361,35 @@ function onLocalTrackAdded(track, pos: number) {
  */
 function onRemoteTrackAdded(track): void {
     console.debug(`Remote Track added: ${track}`); //DEBUG
-    const participant = track.getParticipantId();
-    console.debug(`Participant id is: ${participant}`); //DEBUG
-    if (!remoteTracks[participant]) {
-        remoteTracks[participant] = []; //TODO
+    const participantId = track.getParticipantId();
+    const user = getUser(participantId);
+    console.debug(`Participant id is: ${participantId}`); //DEBUG
+    console.debug(`User is: ${user}`); //DEBUG
+    if (!remoteTracks[participantId]) {
+        remoteTracks[participantId] = [];
     }
-    if(remoteTracks[participant].length == 2){
-        console.log(`video and desktop swapping in progress`);
-        remoteTracks[participant].pop();
-        document.getElementById(participant + "video2").remove(); //wenn ich das aufrufe, wie rufe ich das zurück? -- also beim mute das aufrufen, und beim entmuten wieder hinmachen
+    if(remoteTracks[participantId].length == 2){
+        console.debug(`video and desktop swapping in progress`);
+        remoteTracks[participantId].pop();
+        //document.getElementById(participantId + "video2").remove(); //wenn ich das aufrufe, wie rufe ich das zurück? -- also beim mute das aufrufen, und beim entmuten wieder hinmachen
     }
-    const idx = remoteTracks[participant].push(track);
+    const idx = remoteTracks[participantId].push(track);
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel => console.debug(`Audio Level Remote: ${audioLevel}`)); //DEBUG
-    track.addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, () => {console.debug('Remote Track Mute changed'); onMute(track);});  //DEBUG
+    track.addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, () => {console.debug('Remote Track Mute changed'); onRemoteMute(track);});  //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Remote Track stopped')); //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Remote Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
-    const id = participant + track.getType() + idx;
+    const id = participantId + track.getType() + idx;
     if (track.getType() === trackTypeVideo) {
-        addRemoteVideoTrack(participant, idx);
+        user.setVideoTrack(track);
+        user.setVideoEnabled(true);
+        //addRemoteVideoTrack(participantId);
     } else {
-        $('videobar').append(
-            `<audio autoplay='1' id='${participant}audio${idx}' />`);
+        user.setAudioTrack(track);
+        user.setAudioEnabled(true);
+        //videoBar.append(`<audio autoplay='1' id='${participantId}audio${idx}' />`);
     }
-    track.attach($(`#${id}`)[0]);
+    //track.attach($(`#${id}`)[0]);
+    console.debug(`User is: ${user}`); //DEBUG
 }
 
 function onTrackRemoved(track) {
@@ -226,58 +399,108 @@ function onTrackRemoved(track) {
 function onLocalTrackRemoved(track) {
     console.debug(`Remote Track added: ${track}`); //DEBUG
     //TODO
+    removeTrack(selfUser, track.getType());
 }
 
 function onRemoteTrackRemoved(track) {
     console.debug(`Remote Track removed: ${track}`); //DEBUG
-    console.debug(`document.getElementById: ${document.getElementById(track + "audio1")}`); //DEBUG
+    //console.debug(`document.getElementById: ${document.getElementById(track + "audio1")}`); //DEBUG
     //document.getElementById(track + "audio1").remove(); 
     //document.getElementById(track + "video2").remove();
-    
+    const user = getUser(track.getParticipantId());
 
+    removeTrack(user, track.getType());
     //TODO
 }
+
+function removeTrack(user: User, trackType: string) {
+    useTrackType(trackType, () => user.setAudioTrack(null), () => user.setVideoTrack(null), () => user.setShareTrack(null));
+}
+
+function useTrackType(trackType: string, onTrackTypeAudio: () => void, onTrackTypeVideo: () => void, onTrackTypeDesktop?: () => void, onTrackTypeElse?: () => void) {
+    switch (trackType) {
+        case trackTypeAudio:
+            onTrackTypeAudio();
+            break;
+        case trackTypeVideo:
+            onTrackTypeVideo();
+            break;
+        case trackTypeDesktop:
+            onTrackTypeDesktop();
+            break;
+        default:
+            onTrackTypeElse();
+    }
+}
+
+function processTrackType<R>(trackType: string, onTrackTypeAudio: () => R, onTrackTypeVideo: () => R, onTrackTypeDesktop?: () => R, onTrackTypeElse?: () => R): R {
+    switch (trackType) {
+        case trackTypeAudio:
+            return onTrackTypeAudio();
+        case trackTypeVideo:
+            return onTrackTypeVideo();
+        case trackTypeDesktop:
+            return onTrackTypeDesktop();
+        default:
+            if (!onTrackTypeElse) {
+                console.warn(`Unknown TrackType: ${trackType}`)
+            }
+            return onTrackTypeElse();
+    }
+}
+
+
 /*  
  *  Checks if muted button was audio or other
  */
-function onMute(track){
+function onRemoteMute(track){
+    const user = getUser(track.getParticipantId());
+    const enabled = !track.isMuted();
+    useTrackType(track.getType(), () => user.setAudioEnabled(enabled), () => user.setVideoEnabled(enabled), () => user.setShareEnabled(enabled));
 
-    if (track.getType() === "audio"){
+    /*
+    if (track.getType() === trackTypeAudio){
         console.log(`is audio, exiting`);
         return;
     }
     
     checkRemoteTracks(track);
+    */
 }
 /**
  * This is called when a user has joined.
  *
  * @param id User id
  */
-function onUserJoined(id) {
-    console.debug('User joined: ' + id); //DEBUG
-    remoteTracks[id] = [];
+function onUserJoined(participantId) {
+    console.debug('User joined: ' + participantId); //DEBUG
+    remoteTracks[participantId] = [];
+    const user = getUser(participantId);
 }
 
 /**
  * This is called when a user has left.
  *
- * @param id User id
+ * @param participantId Participant id
  */
-function onUserLeft(id) {
-    console.debug('User left: ' + id); //DEBUG
+function onUserLeft(participantId) {
+    const user = getUser(participantId);
+    console.debug('User left: ' + participantId); //DEBUG
     console.debug(`abcdefg ` + document.getElementById("canvas")=== null);
     console.debug(); //DEBUG
     //remove video and audio
-    document.getElementById(id + "audio" + "1").remove(); 
-    document.getElementById(id + "video" + "2").remove(); 
+    //document.getElementById(participantId + "audio" + "1").remove();
+    //document.getElementById(participantId + "video" + "2").remove();
 
-    if (!remoteTracks[id]) {
+    //TODO participant.remove();
+    user.remove();
+
+    if (!remoteTracks[participantId]) {
         return;
     }
-    const tracks = remoteTracks[id];
+    const tracks = remoteTracks[participantId];
     for (const item of tracks) {
-        item.detach($(`#${id}${item.getType()}`));
+        //item.detach($(`#${participantId}${item.getType()}`));
     }
 }
 
@@ -292,8 +515,9 @@ function setAudioOutputDevice(selected) {
     JitsiMeetJS.mediaDevices.setAudioOutputDevice(selected.value);
 }
 
-function addRemoteVideoTrack(participant: string, idx: number){
-    $('videobar').append(`<video autoplay='1' style="width: 15%; margin-right:5px;" id='${participant}video${idx}' />`);
+function addRemoteVideoTrack(participantId: string, idx: number){
+
+    //videoBar.append(`<video autoplay='1' style="width: 15%; margin-right:5px;" id='${participant}video${idx}' />`);
     //document.getElementById(participant + "video2").style.width = "50%";
 }
 
@@ -320,10 +544,10 @@ function checkRemoteTracks(track){
         if (remoteTracks[participant][i].getType() === "video"){//could just be "if (i===2)"
             if (track.isMuted()){
                 addRemoteVideoTrack(participant, 2);
-                track.attach($(`#${id}`)[0]);
+                //track.attach($(`#${id}`)[0]);
             }
             else {
-                document.getElementById(participant + type + "2").remove();
+                //document.getElementById(participant + type + "2").remove();
             }
         }
     }
@@ -345,7 +569,7 @@ function switchVideo() {
             localTracks.push(tracks[0]);
             localTracks[1].addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED,() => console.log('local track muted'));
             localTracks[1].addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED,() => console.log('local track stopped'));
-            localTracks[1].attach($('#localVideo1')[0]);
+            //localTracks[1].attach($('#localVideo1')[0]);
             room.addTrack(localTracks[1]);
         })
         .catch(error => console.log(error));
@@ -362,6 +586,7 @@ function unload() {
 // Exported Functions
 
 function toggleMuteByType(type: string) {
+    /*
     let muted: boolean = null;
     for (const track of localTracks) {
         if (track.getType() !== type) {
@@ -370,6 +595,9 @@ function toggleMuteByType(type: string) {
         muted = toggleTrackMute(track);
     }
     return muted;
+    */
+    console.debug(`type: ${type}, selfUser: ${selfUser}`)
+    return processTrackType(type, () => selfUser.toggleAudioTrack(), () => selfUser.toggleVideoTrack());
 }
 
 function nearbyPlayerCheck(players: PlayerRecord, ourPlayer){
@@ -390,11 +618,11 @@ function nearbyPlayerCheck(players: PlayerRecord, ourPlayer){
     }
     //console.log("Players consists of : " + players);
     if (isEmpty) {
-        document.getElementById("playerNearbyIndicator").innerHTML = "Waiting for someone else to join...";
+        playerNearbyIndicator.innerHTML = "Waiting for someone else to join...";
     } else if (playersNearby.length === 0) {
-        document.getElementById("playerNearbyIndicator").innerHTML = "you are lonely :(";
+        playerNearbyIndicator.innerHTML = "you are lonely :(";
     } else {
-        document.getElementById("playerNearbyIndicator").innerHTML = "player nearby";
+        playerNearbyIndicator.innerHTML = "player nearby";
     }
 }
 
@@ -402,9 +630,8 @@ function nearbyPlayerCheck(players: PlayerRecord, ourPlayer){
 
 
 
-
-$(window).on("beforeunload", unload);
-$(window).on("unload", unload);
+window.addEventListener("beforeunload", unload);
+window.addEventListener("unload", unload); // TODO Why Twice?
 JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);          //mutes logger
 JitsiMeetJS.init(optionsInit);
 connection = new JitsiMeetJS.JitsiConnection(null, null, optionsConnection);
@@ -418,8 +645,8 @@ if (JitsiMeetJS.mediaDevices.isDeviceChangeAvailable(deviceOutput)) {
     JitsiMeetJS.mediaDevices.enumerateDevices(devices => {
         const audioOutputDevices = devices.filter(d => d.kind === deviceKindAudio);
         if (audioOutputDevices.length > 1) {
-            $('#audioOutputSelect').html(audioOutputDevices.map(d => `<option value="${d.deviceId}">${d.label}</option>`).join('\n'));
-            $('#audioOutputSelectWrapper').show();
+            //$('#audioOutputSelect').html(audioOutputDevices.map(d => `<option value="${d.deviceId}">${d.label}</option>`).join('\n'));
+            //$('#audioOutputSelectWrapper').show();
         }
     });
 }
