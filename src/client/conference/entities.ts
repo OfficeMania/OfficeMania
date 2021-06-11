@@ -12,6 +12,7 @@ class MediaContainer {
 class User {
 
     // Constants
+    private audioBar: HTMLDivElement;
     private videoBar: HTMLDivElement;
     private camContainer: MediaContainer = new MediaContainer();
     private shareContainer: MediaContainer = new MediaContainer();
@@ -20,7 +21,8 @@ class User {
     userId: string;
     participantId: string;
 
-    constructor(videoBar: HTMLDivElement, userId: string, participantId: string) {
+    constructor(audioBar: HTMLDivElement, videoBar: HTMLDivElement, userId: string, participantId: string) {
+        this.audioBar = audioBar;
         this.videoBar = videoBar;
         this.userId = userId;
         this.participantId = participantId;
@@ -133,8 +135,8 @@ class User {
                     container.audioElement.setAttribute("volume", "1.0");
                     container.audioElement.toggleAttribute("muted", false);
                     //container.audioTrack.attach(container.audioElement);
-                    if (!this.videoBar.contains(container.audioElement)) {
-                        this.videoBar.append(container.audioElement);
+                    if (!this.audioBar.contains(container.audioElement)) {
+                        this.audioBar.append(container.audioElement);
                     }
                 }
             } else {

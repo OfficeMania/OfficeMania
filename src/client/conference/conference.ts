@@ -22,6 +22,7 @@ const deviceInput = "input";
 const deviceKindAudio = "audiooutput";
 const deviceKindVideo = "videooutput";
 
+const audioBar = $<HTMLDivElement>("audio-bar");
 const videoBar = $<HTMLDivElement>("video-bar");
 const playerNearbyIndicator = $<HTMLDivElement>("player-nearby-indicator");
 
@@ -75,14 +76,14 @@ const optionsLocalTracks = {
 
 // Variables
 
-const selfUser = new User(videoBar, null, null);
+const selfUser = new User(audioBar, videoBar, null, null);
 
 const users: User[] = [];
 
 function getUser(participantId: string): User {
     let user = users.find(value => value.participantId === participantId);
     if (!user) {
-        user = new User(videoBar, null, participantId);
+        user = new User(audioBar, videoBar, null, participantId);
         users.push(user);
     }
     return user;
