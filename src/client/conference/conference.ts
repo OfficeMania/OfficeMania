@@ -201,11 +201,10 @@ function onLocalTrackAdded(track, pos: number) {
     track.addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Local Track stopped')); //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Local Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     if (track.getType() === trackTypeVideo) {
-        selfUser.setVideoTrack(track);
-        selfUser.setVideoMuted(false);
+        selfUser.setCamVideoTrack(track);
     } else {
-        selfUser.setAudioTrack(track); //Keep this for muting ourself
-        //selfUser.setAudioEnabled(true); //TODO Wait wouldn't that cause you to hear yourself?
+        //TODO How to make sure that this is the cam audio track and not the share audio track?
+        selfUser.setCamAudioTrack(track, false);
     }
     //TODO What is when you're sharing your Screen? Should you see it yourself?
     if (isJoined) {
@@ -241,12 +240,11 @@ function onRemoteTrackAdded(track): void {
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Remote Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     const id = participantId + track.getType() + idx;
     if (track.getType() === trackTypeVideo) {
-        user.setVideoTrack(track);
-        user.setVideoMuted(false);
+        user.setCamVideoTrack(track);
         //addRemoteVideoTrack(participantId);
     } else {
-        user.setAudioTrack(track);
-        user.setAudioMuted(false);
+        //TODO How to make sure that this is the cam audio track and not the share audio track?
+        user.setCamAudioTrack(track);
         //videoBar.append(`<audio autoplay='1' id='${participantId}audio${idx}' />`);
     }
     //track.attach($(`#${id}`)[0]);
@@ -260,7 +258,7 @@ function onTrackRemoved(track) {
 function onLocalTrackRemoved(track) {
     console.debug(`Remote Track added: ${track}`); //DEBUG
     //TODO
-    removeTrack(selfUser, track.getType());
+    selfUser.removeTrack(track);
 }
 
 function onRemoteTrackRemoved(track) {
@@ -269,15 +267,8 @@ function onRemoteTrackRemoved(track) {
     //document.getElementById(track + "audio1").remove(); 
     //document.getElementById(track + "video2").remove();
     const user = getUser(track.getParticipantId());
-
-    removeTrack(user, track.getType());
-    //TODO
+    user.removeTrack(track);
 }
-
-function removeTrack(user: User, trackType: string) {
-    useTrackType(trackType, () => user.setAudioTrack(null), () => user.setVideoTrack(null), () => user.setShareTrack(null));
-}
-
 function useTrackType(trackType: string, onTrackTypeAudio: () => void, onTrackTypeVideo: () => void, onTrackTypeDesktop?: () => void, onTrackTypeElse?: () => void) {
     switch (trackType) {
         case trackTypeAudio:
@@ -315,9 +306,12 @@ function processTrackType<R>(trackType: string, onTrackTypeAudio: () => R, onTra
  *  Checks if muted button was audio or other
  */
 function onRemoteMute(track) {
+    if (track.getType() === trackTypeAudio){
+        //The Audio Element doesn't needs to be updated on remote mute
+        return;
+    }
     const user = getUser(track.getParticipantId());
-    const mute = track.isMuted();
-    useTrackType(track.getType(), () => user.setAudioMuted(mute), () => user.setVideoMuted(mute), () => user.setShareMuted(mute));
+    user.update();
 
     /*
     if (track.getType() === trackTypeAudio){
@@ -461,11 +455,7 @@ function toggleMuteByType(type: string) {
     return muted;
     */
     console.debug(`type: ${type}, selfUser: ${selfUser}`)
-    return processTrackType(type, () => selfUser.toggleAudioTrack(), () => {
-        const mute = selfUser.toggleVideoTrack();
-        selfUser.setVideoMuted(mute);
-        return mute;
-    });
+    return processTrackType(type, () => selfUser.toggleCamAudio(), () => selfUser.toggleCamVideo());
 }
 
 function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
@@ -491,16 +481,12 @@ function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
     //console.debug(serverRoom.state.players);
     playersAway.forEach((participantId) => {
         const user = getUser(participantId);
-        user.setAudioDisabled(true);
-        user.setVideoDisabled(true);
-        user.setShareDisabled(true);
+        user.setDisabled(true);
         //console.debug(`far away: ${user.participantId}`);
     });
     playersNearby.forEach((participantId) => {
         const user = getUser(participantId);
-        user.setAudioDisabled(false);
-        user.setVideoDisabled(false);
-        user.setShareDisabled(false);
+        user.setDisabled(false);
         //console.debug(`nearby  : ${user.participantId}`);
     });
     //console.log("Players consists of : " + players);
