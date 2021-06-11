@@ -92,7 +92,7 @@ let serverRoom: Room = null;
 
 let connection = null;
 let isJoined = false;
-let room = null;
+let conference = null;
 
 let localTracks = [];
 const remoteTracks = {};
@@ -118,21 +118,19 @@ function onConnectionFailed() {
  * This is called after successfully establishing a connection
  */
 function onConnectionSuccess(id: string) {
-    selfUser.participantId = id;
-    room = connection.initJitsiConference(roomName, optionsConference);
-    //room.setStartMutedPolicy({audio: true});
-    room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onTrackAdded);
-    room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onTrackRemoved);
-    room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
-    room.on(JitsiMeetJS.events.conference.CONFERENCE_LEFT, onConferenceLeft); //TODO Verify that this event exists
-    room.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoined);
-    room.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft);
-    room.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, track => console.debug(`${track.isLocal() ? "Local" : "Remote"} '${track.getType()}' is muted: ${track.isMuted()}`)); //DEBUG
-    room.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, (userID, audioLevel) => console.debug(`${userID} - ${audioLevel}`)); //DEBUG
-    room.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
-    room.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${room.getPhoneNumber()} - ${room.getPhonePin()}`)); //DEBUG //REMOVE
-    room.join();
-
+    conference = connection.initJitsiConference(roomName, optionsConference);
+    //conference.setStartMutedPolicy({audio: true});
+    conference.on(JitsiMeetJS.events.conference.TRACK_ADDED, onTrackAdded);
+    conference.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onTrackRemoved);
+    conference.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
+    conference.on(JitsiMeetJS.events.conference.CONFERENCE_LEFT, onConferenceLeft); //TODO Verify that this event exists
+    conference.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoined);
+    conference.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft);
+    conference.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, track => console.debug(`${track.isLocal() ? "Local" : "Remote"} '${track.getType()}' is muted: ${track.isMuted()}`)); //DEBUG
+    conference.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, (userID, audioLevel) => console.debug(`${userID} - ${audioLevel}`)); //DEBUG
+    conference.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
+    conference.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${conference.getPhoneNumber()} - ${conference.getPhonePin()}`)); //DEBUG //REMOVE
+    conference.join();
 }
 
 /**
@@ -151,7 +149,7 @@ function onDisconnected() {
 function onConferenceJoined() {
     console.debug('Conference joined'); //DEBUG
     isJoined = true;
-    localTracks.forEach(track => room.addTrack(track));
+    localTracks.forEach(track => conference.addTrack(track));
 }
 
 /**
@@ -208,7 +206,7 @@ function onLocalTrackAdded(track, pos: number) {
     }
     //TODO What is when you're sharing your Screen? Should you see it yourself?
     if (isJoined) {
-        room.addTrack(track);
+        conference.addTrack(track);
     }
 }
 
@@ -433,7 +431,7 @@ function switchVideo() {
             localTracks[1].addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, () => console.log('local track muted'));
             localTracks[1].addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => console.log('local track stopped'));
             //localTracks[1].attach($('#localVideo1')[0]);
-            room.addTrack(localTracks[1]);
+            conference.addTrack(localTracks[1]);
         })
         .catch(error => console.log(error));
 }
@@ -443,7 +441,7 @@ function switchVideo() {
  */
 function unload() {
     localTracks.forEach(item => item.dispose);
-    room.leave();
+    conference.leave();
     connection.disconnect();
 }
 
