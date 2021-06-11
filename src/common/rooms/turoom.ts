@@ -106,6 +106,7 @@ export class TURoom extends Room<State> {
         this.state.players[client.sessionId].x = 0;
         this.state.players[client.sessionId].y = 0;
         this.state.players[client.sessionId].cooldown = 0;
+        this.state.players[client.sessionId].participantId = null;
     }
 
     onLeave (client: Client, consented: boolean) {

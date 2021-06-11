@@ -33,7 +33,7 @@ class User {
         }
         this.audio.track = track;
         const element = document.createElement("audio");
-        element.setAttribute("id", `track-audio-${track.getParticipantId()}`);
+        element.setAttribute("id", `track-audio-${this.participantId}`);
         //element.setAttribute("muted", "true"); //TODO Why was that added anyway?
         element.setAttribute("autoplay", "1");
         this.audio.element = element;
@@ -47,7 +47,7 @@ class User {
         }
         this.video.track = track;
         const element = document.createElement("video");
-        element.setAttribute("id", `track-video-${track.getParticipantId()}`);
+        element.setAttribute("id", `track-video-${this.participantId}`);
         element.toggleAttribute("muted", true);
         element.toggleAttribute("playsinline", true);
         element.toggleAttribute("autoplay", true);
@@ -63,7 +63,7 @@ class User {
         }
         this.share.track = track;
         const element = document.createElement("video");
-        element.setAttribute("id", `track-share-${track.getParticipantId()}`);
+        element.setAttribute("id", `track-share-${this.participantId}`);
         element.toggleAttribute("muted", true);
         element.toggleAttribute("playsinline", true);
         element.toggleAttribute("autoplay", true);
