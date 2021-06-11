@@ -1,10 +1,10 @@
-import { Client, Room } from "colyseus.js";
-import { Player, PLAYER_COLORS, TILE_SIZE, updatePosition, updateOwnPosition, syncOwnPosition } from "./player";
-import { InitState, joinAndSync, loadImage, PlayerRecord } from "./util";
-import { convertMapData, drawMapWithChunks, mapInfo, drawMap } from "./map";
-import { choosePlayerSprites } from "./player_sprite";
-import {toggleMuteByType, switchVideo, nearbyPlayerCheck} from "./conference";
-import { getCookie, setCookie} from "./cookie"
+import {Client} from "colyseus.js";
+import {Player, syncOwnPosition, TILE_SIZE, updateOwnPosition, updatePosition} from "./player";
+import {InitState, joinAndSync, loadImage, PlayerRecord} from "./util";
+import {convertMapData, drawMap, mapInfo} from "./map";
+import {choosePlayerSprites} from "./player_sprite";
+import {nearbyPlayerCheck, switchVideo, toggleMuteByType} from "./conference";
+import {getCookie, setCookie} from "./cookie"
 
 
 export var characters: {[key: string]: HTMLImageElement} = {}
@@ -13,7 +13,6 @@ var START_POSITION_Y = -8;
 const MS_PER_UPDATE = 10;
 const MS_PER_UPDATE2 = 15;
 
-// A simple helper function
 function $<T extends HTMLElement>(a: string) {
     return <T>document.getElementById(a);
 }
@@ -181,13 +180,13 @@ async function main() {
 
 
     // Mute Logic
-    const muteButton = $<HTMLButtonElement>("mute_button");
-    const camButton = $<HTMLButtonElement>("cam_button");
-    const switchButton = $<HTMLButtonElement>("switch_button");
+    const muteButton = $<HTMLButtonElement>("button-mute-audio");
+    const camButton = $<HTMLButtonElement>("button-mute-video");
+    const shareButton = $<HTMLButtonElement>("button-share-video");
 
     muteButton.addEventListener("click", () => toggleMute("audio"));
     camButton.addEventListener("click", () => toggleMute("video"));
-    switchButton.addEventListener("click", () => toggleMute("desktop"));
+    shareButton.addEventListener("click", () => toggleMute("desktop"));
 
     function setAudioButtonMute(muted: boolean) {
         muteButton.innerHTML = muted ? "<em class = \"fa fa-microphone-slash\"></em>" : "<em class = \"fa fa-microphone\"></em>";
@@ -198,7 +197,7 @@ async function main() {
     }
 
     function setSwitchToDesktop(muted: boolean){
-        switchButton.innerHTML = muted ? "<em class = \"fa fa-camera\"></em>" : "<em class = \"fa fa-video\"></em>";
+        shareButton.innerHTML = muted ? "<em class = \"fa fa-camera\"></em>" : "<em class = \"fa fa-video\"></em>";
         }
 
     //toggle mute of tracks by type
