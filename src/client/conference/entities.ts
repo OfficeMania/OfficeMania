@@ -28,47 +28,51 @@ class User {
 
     setAudioTrack(track) {
         if (!track) {
-            this.removeContainer(this.audio);
+            User.removeContainer(this.audio);
             return;
         }
         this.audio.track = track;
         const element = document.createElement("audio");
-        element.setAttribute("autoplay", "1");
-        //element.setAttribute("muted", "true"); //TODO Why was that added anyway?
         element.setAttribute("id", `track-audio-${track.getParticipantId()}`);
+        //element.setAttribute("muted", "true"); //TODO Why was that added anyway?
+        element.setAttribute("autoplay", "1");
         this.audio.element = element;
         track.attach(element);
     }
 
     setVideoTrack(track) {
         if (!track) {
-            this.removeContainer(this.video);
+            User.removeContainer(this.video);
             return;
         }
         this.video.track = track;
         const element = document.createElement("video");
-        element.setAttribute("autoplay", "1");
-        element.setAttribute("style", "width:15%; margin-right:5px;");
         element.setAttribute("id", `track-video-${track.getParticipantId()}`);
+        element.toggleAttribute("muted", true);
+        element.toggleAttribute("playsinline", true);
+        element.toggleAttribute("autoplay", true);
+        element.setAttribute("style", "width:15%; margin-right:5px;");
         this.video.element = element;
         track.attach(element);
     }
 
     setShareTrack(track) {
         if (!track) {
-            this.removeContainer(this.share);
+            User.removeContainer(this.share);
             return;
         }
         this.share.track = track;
         const element = document.createElement("video");
-        element.setAttribute("autoplay", "1");
-        element.setAttribute("style", "width:15%; margin-right:5px;");
         element.setAttribute("id", `track-share-${track.getParticipantId()}`);
+        element.toggleAttribute("muted", true);
+        element.toggleAttribute("playsinline", true);
+        element.toggleAttribute("autoplay", true);
+        element.setAttribute("style", "width:15%; margin-right:5px;");
         this.share.element = element;
         track.attach(element);
     }
 
-    private removeContainer(container) {
+    private static removeContainer(container) {
         container.element?.remove();
         container.track?.detach(container.element);
         container.element = null;
@@ -76,18 +80,18 @@ class User {
     }
 
     toggleAudioTrack(): boolean {
-        return this.toggleTrack(this.audio.track);
+        return User.toggleTrack(this.audio.track);
     }
 
     toggleVideoTrack(): boolean {
-        return this.toggleTrack(this.video.track);
+        return User.toggleTrack(this.video.track);
     }
 
     toggleShareTrack(): boolean {
-        return this.toggleTrack(this.share.track);
+        return User.toggleTrack(this.share.track);
     }
 
-    private toggleTrack(track): boolean {
+    private static toggleTrack(track): boolean {
         if (!track) {
             console.warn("toggling undefined or null track?")
             return undefined;
@@ -101,12 +105,15 @@ class User {
         }
     }
 
-    private toggleElement(element: HTMLElement, enabled: boolean) {
+    private toggleElement(element: HTMLVideoElement | HTMLAudioElement, enabled: boolean) {
         if (!element) {
             return;
         }
         if (this.videoBar.contains(element) !== enabled) {
             if (enabled) {
+                if (element.tagName.toLowerCase() === "video") {
+                    element.play();
+                }
                 this.videoBar.append(element);
             } else {
                 element.remove();
