@@ -1,6 +1,7 @@
-import { remoteRoomCall } from "colyseus/lib/MatchMaker";
+//import {JitsiMeetJS} from "./lib-jitsi-meet.min";
+
 //import { Player } from "./player";
-import { PlayerRecord } from "./util";
+import {PlayerRecord} from "./util";
 
 export {roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, switchVideo, nearbyPlayerCheck};
 
@@ -332,7 +333,7 @@ function onTrackAdded(track) {
 function onLocalTrackAdded(track, pos: number) {
 
     //filter out local stream duplicate
-    if(typeof pos === "undefined") {
+    if (typeof pos === "undefined") {
         return;
     }
 
@@ -368,14 +369,17 @@ function onRemoteTrackAdded(track): void {
     if (!remoteTracks[participantId]) {
         remoteTracks[participantId] = [];
     }
-    if(remoteTracks[participantId].length == 2){
+    if (remoteTracks[participantId].length == 2) {
         console.debug(`video and desktop swapping in progress`);
         remoteTracks[participantId].pop();
         //document.getElementById(participantId + "video2").remove(); //wenn ich das aufrufe, wie rufe ich das zurück? -- also beim mute das aufrufen, und beim entmuten wieder hinmachen
     }
     const idx = remoteTracks[participantId].push(track);
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel => console.debug(`Audio Level Remote: ${audioLevel}`)); //DEBUG
-    track.addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, () => {console.debug('Remote Track Mute changed'); onRemoteMute(track);});  //DEBUG
+    track.addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, () => {
+        console.debug('Remote Track Mute changed');
+        onRemoteMute(track);
+    });  //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Remote Track stopped')); //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Remote Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     const id = participantId + track.getType() + idx;
@@ -453,7 +457,7 @@ function processTrackType<R>(trackType: string, onTrackTypeAudio: () => R, onTra
 /*  
  *  Checks if muted button was audio or other
  */
-function onRemoteMute(track){
+function onRemoteMute(track) {
     const user = getUser(track.getParticipantId());
     const enabled = !track.isMuted();
     useTrackType(track.getType(), () => user.setAudioEnabled(enabled), () => user.setVideoEnabled(enabled), () => user.setShareEnabled(enabled));
@@ -467,6 +471,7 @@ function onRemoteMute(track){
     checkRemoteTracks(track);
     */
 }
+
 /**
  * This is called when a user has joined.
  *
@@ -486,7 +491,7 @@ function onUserJoined(participantId) {
 function onUserLeft(participantId) {
     const user = getUser(participantId);
     console.debug('User left: ' + participantId); //DEBUG
-    console.debug(`abcdefg ` + document.getElementById("canvas")=== null);
+    console.debug(`abcdefg ` + document.getElementById("canvas") === null);
     console.debug(); //DEBUG
     //remove video and audio
     //document.getElementById(participantId + "audio" + "1").remove();
@@ -515,7 +520,7 @@ function setAudioOutputDevice(selected) {
     JitsiMeetJS.mediaDevices.setAudioOutputDevice(selected.value);
 }
 
-function addRemoteVideoTrack(participantId: string, idx: number){
+function addRemoteVideoTrack(participantId: string, idx: number) {
 
     //videoBar.append(`<video autoplay='1' style="width: 15%; margin-right:5px;" id='${participant}video${idx}' />`);
     //document.getElementById(participant + "video2").style.width = "50%";
@@ -534,29 +539,30 @@ function toggleTrackMute(track) {
 /*
  *checks the remote tracks, and removes the video track to be muted
  */
-function checkRemoteTracks(track){
+function checkRemoteTracks(track) {
     let participant = track.getParticipantId();
     let type = track.getType();
     const id = participant + track.getType() + 2;
     const i = {};
-    for (let i = 0; i < remoteTracks[participant].length; i++){
-        
-        if (remoteTracks[participant][i].getType() === "video"){//could just be "if (i===2)"
-            if (track.isMuted()){
+    for (let i = 0; i < remoteTracks[participant].length; i++) {
+
+        if (remoteTracks[participant][i].getType() === "video") {//could just be "if (i===2)"
+            if (track.isMuted()) {
                 addRemoteVideoTrack(participant, 2);
                 //track.attach($(`#${id}`)[0]);
-            }
-            else {
+            } else {
                 //document.getElementById(participant + type + "2").remove();
             }
         }
     }
 }
+
 /*
  *switches local videotrack
  */
 let isVideo = true;
-function switchVideo() { 
+
+function switchVideo() {
     isVideo = !isVideo;
     if (localTracks[1]) {
         localTracks[1].dispose();
@@ -567,13 +573,14 @@ function switchVideo() {
     })
         .then(tracks => {
             localTracks.push(tracks[0]);
-            localTracks[1].addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED,() => console.log('local track muted'));
-            localTracks[1].addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED,() => console.log('local track stopped'));
+            localTracks[1].addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, () => console.log('local track muted'));
+            localTracks[1].addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => console.log('local track stopped'));
             //localTracks[1].attach($('#localVideo1')[0]);
             room.addTrack(localTracks[1]);
         })
         .catch(error => console.log(error));
 }
+
 /**
  *
  */
@@ -600,7 +607,7 @@ function toggleMuteByType(type: string) {
     return processTrackType(type, () => selfUser.toggleAudioTrack(), () => selfUser.toggleVideoTrack());
 }
 
-function nearbyPlayerCheck(players: PlayerRecord, ourPlayer){
+function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
     //array with nearby players. use this vor videochat.
     let playersNearby = [];
     let isEmpty: boolean = true;
@@ -627,7 +634,6 @@ function nearbyPlayerCheck(players: PlayerRecord, ourPlayer){
 }
 
 // Code
-
 
 
 window.addEventListener("beforeunload", unload);
