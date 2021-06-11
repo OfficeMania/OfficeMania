@@ -1,7 +1,7 @@
 //import {JitsiMeetJS} from "./lib-jitsi-meet.min";
 
 //import { Player } from "./player";
-import {PlayerRecord} from "./util";
+import {PlayerRecord} from "../util";
 
 export {roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, switchVideo, nearbyPlayerCheck};
 

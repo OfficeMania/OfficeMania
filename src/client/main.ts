@@ -3,7 +3,7 @@ import {Player, syncOwnPosition, TILE_SIZE, updateOwnPosition, updatePosition} f
 import {InitState, joinAndSync, loadImage, PlayerRecord} from "./util";
 import {convertMapData, drawMap, mapInfo} from "./map";
 import {choosePlayerSprites} from "./player_sprite";
-import {nearbyPlayerCheck, switchVideo, toggleMuteByType} from "./conference";
+import {nearbyPlayerCheck, switchVideo, toggleMuteByType} from "./conference/conference";
 import {getCookie, setCookie} from "./cookie"
 
 
