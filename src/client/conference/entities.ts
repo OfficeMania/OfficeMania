@@ -196,6 +196,14 @@ class User {
         this.update();
     }
 
+    isSharing(): boolean {
+        return this.sharing;
+    }
+
+    hasSharingTracks(): boolean {
+        return !!(this.shareContainer.videoTrack || this.shareContainer.audioTrack);
+    }
+
     remove() {
         this.removeElements();
         this.detachTracks();

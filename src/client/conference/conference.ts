@@ -4,7 +4,7 @@ import {PlayerRecord} from "../util";
 import {User} from "./entities";
 import {Room} from "colyseus.js";
 
-export {init as initConference, roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, switchVideo, nearbyPlayerCheck};
+export {init as initConference, roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, toggleSharing, nearbyPlayerCheck};
 
 function $<T extends HTMLElement>(a: string) {
     return <T>document.getElementById(a);
@@ -409,6 +409,20 @@ function checkRemoteTracks(track) {
     }
 }
 
+function askForDesktopShare() {
+    JitsiMeetJS.createLocalTracks({
+        devices: [trackTypeDesktop]
+    }).then(tracks => {
+        tracks.forEach(track => {
+            if (track.getType() === trackTypeVideo) {
+                selfUser.setShareVideoTrack(track);
+            } else {
+                selfUser.setShareAudioTrack(track, false);
+            }
+        });
+    }).catch(error => console.error(error));
+}
+
 /*
  *switches local videotrack
  */
@@ -444,7 +458,7 @@ function unload() {
 
 // Exported Functions
 
-function toggleMuteByType(type: string) {
+function toggleMuteByType(type: string): boolean {
     /*
     let muted: boolean = null;
     for (const track of localTracks) {
@@ -457,6 +471,15 @@ function toggleMuteByType(type: string) {
     */
     console.debug(`type: ${type}, selfUser: ${selfUser}`)
     return processTrackType(type, () => selfUser.toggleCamAudio(), () => selfUser.toggleCamVideo());
+}
+
+function toggleSharing(): boolean {
+    if (!selfUser.hasSharingTracks()) {
+        askForDesktopShare();
+    }
+    const sharing = !selfUser.isSharing();
+    selfUser.setSharing(sharing);
+    return sharing;
 }
 
 function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {

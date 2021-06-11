@@ -3,7 +3,7 @@ import {Player, syncOwnPosition, TILE_SIZE, updateOwnPosition, updatePosition} f
 import {InitState, joinAndSync, loadImage, PlayerRecord} from "./util";
 import {convertMapData, drawMap, mapInfo} from "./map";
 import {choosePlayerSprites} from "./player_sprite";
-import {initConference, nearbyPlayerCheck, switchVideo, toggleMuteByType} from "./conference/conference";
+import {initConference, nearbyPlayerCheck, toggleMuteByType, toggleSharing} from "./conference/conference";
 import {getCookie, setCookie} from "./cookie"
 
 
@@ -196,14 +196,14 @@ async function main() {
         camButton.innerHTML = muted ? "<em class = \"fa fa-video-slash\"></em>" : "<em class = \"fa fa-video\"></em>";
     }
 
-    function setSwitchToDesktop(muted: boolean) {
-        shareButton.innerHTML = muted ? "<em class = \"fa fa-camera\"></em>" : "<em class = \"fa fa-video\"></em>";
+    function setSwitchToDesktop(enabled: boolean) {
+        shareButton.innerHTML = enabled ? "<em class = \"fa fa-stop\"></em>" : "<em class = \"fa fa-desktop\"></em>";
     }
 
     //toggle mute of tracks by type
     function toggleMute(type: string) {
         if (type === "desktop") {
-            switchVideo();
+            setSwitchToDesktop(toggleSharing());
         } else {
             const muted = toggleMuteByType(type);
             if (type === "audio") {
