@@ -1,7 +1,5 @@
-import { Room, Client } from "colyseus";
-import { State, PlayerData } from "./schema/state";
-import { TILE_SIZE } from "../../client/player"
-import { cli } from "webpack";
+import {Client, Room} from "colyseus";
+import {PlayerData, State} from "./schema/state";
 import fs from 'fs';
 
 /*
@@ -102,8 +100,7 @@ export class TURoom extends Room<State> {
     }
 
     onJoin (client: Client) {
-        const playerdata: PlayerData = new PlayerData()
-        this.state.players[client.sessionId] = playerdata;
+        this.state.players[client.sessionId] = new PlayerData();
         this.state.players[client.sessionId].name = "";
         this.state.players[client.sessionId].character = "Adam_48x48.png";
         this.state.players[client.sessionId].x = 0;
