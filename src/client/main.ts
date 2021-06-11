@@ -7,7 +7,7 @@ import {initConference, nearbyPlayerCheck, switchVideo, toggleMuteByType} from "
 import {getCookie, setCookie} from "./cookie"
 
 
-export var characters: {[key: string]: HTMLImageElement} = {}
+export var characters: { [key: string]: HTMLImageElement } = {}
 var START_POSITION_X = -13;
 var START_POSITION_Y = -8;
 const MS_PER_UPDATE = 10;
@@ -40,10 +40,10 @@ async function main() {
 
     //load or set name
     let cookieName = getCookie("username");
-    if(cookieName === ""){
+    if (cookieName === "") {
         let name = window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy");
         name = name.slice(0, 20)
-        if(name === null){
+        if (name === null) {
             name = "Jimmy";
         }
         ourPlayer.name = name;
@@ -55,7 +55,7 @@ async function main() {
 
     //load character
     let cookieCharacter = getCookie("character");
-    if(cookieCharacter !== ""){
+    if (cookieCharacter !== "") {
         ourPlayer.character = cookieCharacter;
         room.send("character", ourPlayer.character)
     }
@@ -69,7 +69,7 @@ async function main() {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
     let width = canvas.width;
-    let height = canvas. height;
+    let height = canvas.height;
     let ctx = canvas.getContext("2d");
 
     //load map from server
@@ -88,7 +88,7 @@ async function main() {
     drawMap(currentMap);
 
     //loads character sprite paths from the server (from movement)
-    for (let path of room.state.playerSpritePaths){
+    for (let path of room.state.playerSpritePaths) {
         characters[path] = await loadImage("/img/characters/" + path);
     }
 
@@ -104,24 +104,24 @@ async function main() {
      * prioDirection is used, so that you can press another direction without
      * needing to let go of the first button pressed
      */
-    function keyPressed(e: KeyboardEvent){
-        if(e.key.toLowerCase() === "s" && !ourPlayer.prioDirection.includes("moveDown")){
+    function keyPressed(e: KeyboardEvent) {
+        if (e.key.toLowerCase() === "s" && !ourPlayer.prioDirection.includes("moveDown")) {
             ourPlayer.prioDirection.unshift("moveDown");
         }
-        if(e.key.toLowerCase() === "w" && !ourPlayer.prioDirection.includes("moveUp")){
+        if (e.key.toLowerCase() === "w" && !ourPlayer.prioDirection.includes("moveUp")) {
             ourPlayer.prioDirection.unshift("moveUp");
         }
-        if(e.key.toLowerCase() === "a" && !ourPlayer.prioDirection.includes("moveLeft")){
+        if (e.key.toLowerCase() === "a" && !ourPlayer.prioDirection.includes("moveLeft")) {
             ourPlayer.prioDirection.unshift("moveLeft");
         }
-        if(e.key.toLowerCase() === "d" && !ourPlayer.prioDirection.includes("moveRight")){
+        if (e.key.toLowerCase() === "d" && !ourPlayer.prioDirection.includes("moveRight")) {
             ourPlayer.prioDirection.unshift("moveRight");
         }
         //iterate through characters
-        if(e.key.toLowerCase() === "c"){
+        if (e.key.toLowerCase() === "c") {
             let filenames = Object.keys(characters);
             let nextIndex = filenames.indexOf(ourPlayer.character) + 1;
-            if (filenames.length <= nextIndex){
+            if (filenames.length <= nextIndex) {
                 nextIndex = 0;
             }
             ourPlayer.character = filenames[nextIndex]
@@ -129,42 +129,41 @@ async function main() {
             room.send("character", filenames[nextIndex]);
         }
         //rename players name
-        if(e.key.toLowerCase() === "r"){
+        if (e.key.toLowerCase() === "r") {
             let name = window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy");
             name = name.slice(0, 20)
-            if (name !== null){
+            if (name !== null) {
                 ourPlayer.name = name;
                 setCookie("username", ourPlayer.name, 100);
                 room.send("name", ourPlayer.name);
             }
         }
-        if(e.key.toLowerCase() === " "){
+        if (e.key.toLowerCase() === " ") {
             //player interacts with object in front of him
             //(ttriggert with space)
         }
     }
 
-    function keyUp(e: KeyboardEvent){
-        if(e.key.toLowerCase() === "s"){
+    function keyUp(e: KeyboardEvent) {
+        if (e.key.toLowerCase() === "s") {
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveDown"), 1);
         }
-        if(e.key.toLowerCase() === "w"){
+        if (e.key.toLowerCase() === "w") {
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveUp"), 1);
         }
-        if(e.key.toLowerCase() === "a"){
+        if (e.key.toLowerCase() === "a") {
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveLeft"), 1);
         }
-        if(e.key.toLowerCase() === "d"){
+        if (e.key.toLowerCase() === "d") {
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveRight"), 1);
         }
     }
 
     //gets called when window is out auf focus
-    function onBlur(){
+    function onBlur() {
         //stops player
         ourPlayer.prioDirection = [];
     }
-
 
 
     document.addEventListener("keydown", keyPressed);
@@ -197,16 +196,15 @@ async function main() {
         camButton.innerHTML = muted ? "<em class = \"fa fa-video-slash\"></em>" : "<em class = \"fa fa-video\"></em>";
     }
 
-    function setSwitchToDesktop(muted: boolean){
+    function setSwitchToDesktop(muted: boolean) {
         shareButton.innerHTML = muted ? "<em class = \"fa fa-camera\"></em>" : "<em class = \"fa fa-video\"></em>";
-        }
+    }
 
     //toggle mute of tracks by type
     function toggleMute(type: string) {
-        if (type === "desktop"){
+        if (type === "desktop") {
             switchVideo();
-        }
-        else {
+        } else {
             const muted = toggleMuteByType(type);
             if (type === "audio") {
                 setAudioButtonMute(muted);
@@ -218,7 +216,6 @@ async function main() {
     }
 
 
-
     /* (from movement)
      * Create a gameLoop-like function for drawing a simple animation
      *
@@ -226,7 +223,6 @@ async function main() {
      */
 
     //const MS_PER_UPDATE = 10;
-
 
 
     //let j = 0;
@@ -255,7 +251,7 @@ async function main() {
         while (lag >= MS_PER_UPDATE) {
             //Update each player's data
             Object.values(players).forEach((player: Player) => {
-                if(player !== ourPlayer){
+                if (player !== ourPlayer) {
                     updatePosition(player, room);
                     player.character = room.state.players[player.id].character;
                     player.name = room.state.players[player.id].name;
@@ -277,7 +273,7 @@ async function main() {
         }
 
         //synchronize own position with the server
-        if(!lastSecond || now - lastSecond >= 100) {
+        if (!lastSecond || now - lastSecond >= 100) {
             lastSecond = now;
             syncOwnPosition(ourPlayer, room);
         }
@@ -304,14 +300,14 @@ async function main() {
         //TODO: draw background on canvas - need to make movestuff here
         ctx.drawImage(background, posX - Math.floor(width / 2), posY - Math.floor(height / 2), width, height, 0, 0, width, height);
 
-        
+
         // Draw each player
         ctx.save();
         Object.values(players).forEach((player: Player, i: number) => {
             //choose the correct sprite
-            if (ourPlayer.id !== player.id){
+            if (ourPlayer.id !== player.id) {
                 //draw everyone else on theire position relatively to you
-                ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round((width / 2) + player.positionX - ourPlayer.positionX), Math.round((height / 2) + player.positionY - ourPlayer.positionY), playerWidth, playerHeight);
+                ctx.drawImage(characters[player.character], player.spriteX, player.spriteY, playerWidth, playerHeight, Math.round((width / 2) + player.positionX - ourPlayer.positionX), Math.round((height / 2) + player.positionY - ourPlayer.positionY), playerWidth, playerHeight);
 
                 //draw name
                 ctx.font = '18px Hevitica';
@@ -319,13 +315,13 @@ async function main() {
 
                 var text = ctx.measureText(player.name);
                 ctx.fillStyle = "rgba(100, 100, 100, 0.5)";
-                ctx.fillRect(Math.round((width / 2) + player.positionX - ourPlayer.positionX) - text.width/2 + 20, Math.round((height / 2) + player.positionY - ourPlayer.positionY) - 4, text.width + 8, 24);
+                ctx.fillRect(Math.round((width / 2) + player.positionX - ourPlayer.positionX) - text.width / 2 + 20, Math.round((height / 2) + player.positionY - ourPlayer.positionY) - 4, text.width + 8, 24);
 
                 ctx.fillStyle = "rgba(255, 255, 255, 1)";
                 ctx.fillText(player.name, Math.round((width / 2) + player.positionX - ourPlayer.positionX) + 24, Math.round((height / 2) + player.positionY - ourPlayer.positionY) + 12)
             } else {
                 //draw yourself always at the same position
-                ctx.drawImage(characters[player.character], player.spriteX, player.spriteY , playerWidth, playerHeight, Math.round(width / 2), Math.round(height / 2), playerWidth, playerHeight);
+                ctx.drawImage(characters[player.character], player.spriteX, player.spriteY, playerWidth, playerHeight, Math.round(width / 2), Math.round(height / 2), playerWidth, playerHeight);
 
                 //draw name
                 ctx.font = '18px Hevitica';
@@ -333,10 +329,10 @@ async function main() {
 
                 var text = ctx.measureText(player.name);
                 ctx.fillStyle = "rgba(100, 100, 100, 0.5)";
-                ctx.fillRect(Math.round(width / 2) - text.width/2 + 20, Math.round(height / 2) - 4, text.width + 8, 24);
+                ctx.fillRect(Math.round(width / 2) - text.width / 2 + 20, Math.round(height / 2) - 4, text.width + 8, 24);
 
                 ctx.fillStyle = "rgba(255, 255, 255, 1)";
-                ctx.fillText(player.name,Math.round(width / 2) + 24, Math.round(height / 2) + 12)
+                ctx.fillText(player.name, Math.round(width / 2) + 24, Math.round(height / 2) + 12)
 
             }
             //draw each character
