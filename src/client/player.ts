@@ -1,6 +1,5 @@
-import { Client, Room } from "colyseus.js";
-import { State } from "../common";
-import { convertMapData, drawMapWithChunks, mapInfo } from "./map";
+import {Room} from "colyseus.js";
+import {mapInfo} from "./map";
 
 //all variables needed to adjust movement speed and length.
 export var MOVEMENT_SPEED = 10;
@@ -19,6 +18,7 @@ export var PLAYER_COLORS = ["red", "blue", "green", "yellow", "black"];
 export interface Player {
     id: string;                 //players id in the room
     name: string;               //players name
+    participantId: string;      //id of the jitsi participant
     character: string;          //the name of the character sprite
     positionX: number;          //posX on the Map
     positionY: number;          //posY on the Map

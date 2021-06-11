@@ -1,6 +1,6 @@
-import { Client, Room } from "colyseus.js";
-import { State } from "../common";
-import { Player } from "./player";
+import {Client, Room} from "colyseus.js";
+import {State} from "../common";
+import {Player} from "./player";
 
 export type InitState = [Room<State>, Player];
 export type PlayerRecord = {[key: string]: Player}
@@ -47,6 +47,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 let player: Player = {
                     id: sessionId,
                     name: "",
+                    participantId: null,
                     character: "Adam_48x48.png",
                     positionX: 0,
                     positionY: 0,

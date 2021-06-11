@@ -259,6 +259,7 @@ async function main() {
                     updatePosition(player, room);
                     player.character = room.state.players[player.id].character;
                     player.name = room.state.players[player.id].name;
+                    player.participantId = room.state.players[player.id].participantId;
                 }
             });
             //Update own player
