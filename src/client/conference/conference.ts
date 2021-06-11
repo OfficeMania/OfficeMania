@@ -1,7 +1,7 @@
 //import {JitsiMeetJS} from "./lib-jitsi-meet.min";
 
 import {PlayerRecord} from "../util";
-import {User} from "./entities";
+import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
 
 export {init as initConference, roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, toggleSharing, nearbyPlayerCheck};
@@ -76,14 +76,14 @@ const optionsLocalTracks = {
 
 // Variables
 
-const selfUser = new User(audioBar, videoBar, null, null);
+const selfUser = new SelfUser(audioBar, videoBar);
 
 const users: User[] = [];
 
 function getUser(participantId: string): User {
     let user = users.find(value => value.participantId === participantId);
     if (!user) {
-        user = new User(audioBar, videoBar, null, participantId);
+        user = new User(audioBar, videoBar, participantId);
         users.push(user);
     }
     return user;
@@ -202,10 +202,10 @@ function onLocalTrackAdded(track, pos: number) {
     track.addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Local Track stopped')); //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Local Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     if (track.getType() === trackTypeVideo) {
-        selfUser.setCamVideoTrack(track);
+        selfUser.setVideoTrack(track);
     } else {
         //TODO How to make sure that this is the cam audio track and not the share audio track?
-        selfUser.setCamAudioTrack(track, false);
+        selfUser.setAudioTrack(track, false);
     }
     //TODO What is when you're sharing your Screen? Should you see it yourself?
     if (isJoined) {
@@ -241,11 +241,11 @@ function onRemoteTrackAdded(track): void {
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Remote Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     const id = participantId + track.getType() + idx;
     if (track.getType() === trackTypeVideo) {
-        user.setCamVideoTrack(track);
+        user.setVideoTrack(track);
         //addRemoteVideoTrack(participantId);
     } else {
         //TODO How to make sure that this is the cam audio track and not the share audio track?
-        user.setCamAudioTrack(track);
+        user.setAudioTrack(track);
         //videoBar.append(`<audio autoplay='1' id='${participantId}audio${idx}' />`);
     }
     //track.attach($(`#${id}`)[0]);
@@ -415,9 +415,9 @@ function askForDesktopShare() {
     }).then(tracks => {
         tracks.forEach(track => {
             if (track.getType() === trackTypeVideo) {
-                selfUser.setShareVideoTrack(track);
+                selfUser.setSharedVideoTrack(track);
             } else {
-                selfUser.setShareAudioTrack(track, false);
+                selfUser.setSharedAudioTrack(track, false);
             }
         });
     }).catch(error => console.error(error));
