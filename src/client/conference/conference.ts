@@ -458,7 +458,11 @@ function toggleMuteByType(type: string) {
     return muted;
     */
     console.debug(`type: ${type}, selfUser: ${selfUser}`)
-    return processTrackType(type, () => selfUser.toggleAudioTrack(), () => selfUser.toggleVideoTrack());
+    return processTrackType(type, () => selfUser.toggleAudioTrack(), () => {
+        const enabled = !selfUser.toggleVideoTrack();
+        selfUser.setVideoEnabled(enabled);
+        return !enabled;
+    });
 }
 
 function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
