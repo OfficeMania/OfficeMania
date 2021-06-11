@@ -1,24 +1,24 @@
+import {trackTypeDesktop, trackTypeVideo} from "./conference";
+
 export {User};
 
-class TrackContainer {
-
-    track: any = null;
-    element: HTMLAudioElement | HTMLVideoElement = null;
-    muted: boolean = false;
-    disabled: boolean = false;
-
+class MediaContainer {
+    audioTrack: any = null;
+    videoTrack: any = null;
+    audioElement: HTMLAudioElement = null;
+    videoElement: HTMLVideoElement = null;
 }
 
 class User {
 
     // Constants
     private videoBar: HTMLDivElement;
+    private camContainer: MediaContainer = new MediaContainer();
+    private shareContainer: MediaContainer = new MediaContainer();
+    // Variables
+    disabled: boolean = false;
     userId: string;
     participantId: string;
-    // Variables
-    private audioContainer: TrackContainer = new TrackContainer();
-    private videoContainer: TrackContainer = new TrackContainer();
-    private shareContainer: TrackContainer = new TrackContainer();
 
     constructor(videoBar: HTMLDivElement, userId: string, participantId: string) {
         this.videoBar = videoBar;
@@ -26,143 +26,126 @@ class User {
         this.participantId = participantId;
     }
 
-    setAudioTrack(track) {
-        if (!track) {
-            User.removeContainer(this.audioContainer);
-            return;
+    removeTrack(track) {
+        if (track.getType() === trackTypeVideo) {
+            this.camContainer.videoTrack = null;
+        } else if (track.getType() === trackTypeDesktop) {
+            this.shareContainer.videoTrack = null;
+        } else {
+            //TODO How to make sure that this is the cam audio track and not the share audio track?
+            this.camContainer.audioTrack = null;
         }
-        this.audioContainer.track = track;
-        const element = document.createElement("audio");
-        element.setAttribute("id", `track-audio-${this.participantId}`);
-        element.setAttribute("muted", "true"); //TODO Why was that added anyway?
-        element.setAttribute("autoplay", "1");
-        this.audioContainer.element = element;
-        this.audioContainer.muted = track.isMuted();
-        track.attach(element);
     }
 
-    setVideoTrack(track) {
+    setCamAudioTrack(track, createElement: boolean = true) {
         if (!track) {
-            User.removeContainer(this.videoContainer);
+            console.warn("the cam audio track should not be set null");
+            this.camContainer.audioTrack = null;
+            this.update();
             return;
         }
-        this.videoContainer.track = track;
+        this.camContainer.audioTrack = track;
+        if (createElement) {
+            const element = document.createElement("audio");
+            element.setAttribute("id", `track-audio-${this.participantId}-${track.getId()}`);
+            //element.toggleAttribute("muted", true);
+            //element.toggleAttribute("playsinline", true);
+            element.toggleAttribute("autoplay", true);
+            //element.setAttribute("style", "width:15%; margin-right:5px;");
+            this.camContainer.audioElement = element;
+            track.attach(element);
+        }
+        this.update();
+    }
+
+    setCamVideoTrack(track) {
+        if (!track) {
+            console.warn("the cam video track should not be set null");
+            this.camContainer.videoTrack = null;
+            this.update();
+            return;
+        }
+        this.camContainer.videoTrack = track;
         const element = document.createElement("video");
-        element.setAttribute("id", `track-video-${this.participantId}`);
+        element.setAttribute("id", `track-video-${this.participantId}-${track.getId()}`);
         element.toggleAttribute("muted", true);
         element.toggleAttribute("playsinline", true);
         element.toggleAttribute("autoplay", true);
         element.setAttribute("style", "width:15%; margin-right:5px;");
-        this.videoContainer.element = element;
-        this.videoContainer.muted = track.isMuted();
+        this.camContainer.videoElement = element;
         track.attach(element);
+        this.update();
     }
 
-    setShareTrack(track) {
-        if (!track) {
-            User.removeContainer(this.shareContainer);
-            return;
-        }
-        this.shareContainer.track = track;
-        const element = document.createElement("video");
-        element.setAttribute("id", `track-share-${this.participantId}`);
-        element.toggleAttribute("muted", true);
-        element.toggleAttribute("playsinline", true);
-        element.toggleAttribute("autoplay", true);
-        element.setAttribute("style", "width:15%; margin-right:5px;");
-        this.shareContainer.element = element;
-        this.shareContainer.muted = track.isMuted();
-        track.attach(element);
+    toggleCamAudio(): boolean {
+        return this.toggleTrack(this.camContainer.audioTrack);
     }
 
-    private static removeContainer(container) {
-        container.element?.remove();
-        container.track?.detach(container.element);
-        container.element = null;
-        container.track = null;
+    toggleCamVideo(): boolean {
+        return this.toggleTrack(this.camContainer.videoTrack);
     }
 
-    toggleAudioTrack(): boolean {
-        return User.toggleTrack(this.audioContainer.track);
-    }
-
-    toggleVideoTrack(): boolean {
-        return User.toggleTrack(this.videoContainer.track);
-    }
-
-    toggleShareTrack(): boolean {
-        return User.toggleTrack(this.shareContainer.track);
-    }
-
-    private static toggleTrack(track): boolean {
+    private toggleTrack(track): boolean {
         if (!track) {
             console.warn("toggling undefined or null track?")
             return undefined;
         }
+        let muted = false;
         if (track.isMuted()) {
-            track.unmute();
-            return false;
+            track.unmute().then(() => this.update());
         } else {
-            track.mute();
-            return true;
+            track.mute().then(() => this.update());
+            muted = true;
         }
+        return muted;
     }
 
-    private setElement(element: HTMLVideoElement | HTMLAudioElement, enabled: boolean) {
-        if (!element) {
-            return;
-        }
-        if (this.videoBar.contains(element) !== enabled) {
-            if (enabled) {
-                if (element.tagName.toLowerCase() === "video") {
-                    element.play();
+    update() {
+        this.updateContainer(this.camContainer);
+        this.updateContainer(this.shareContainer);
+    }
+
+    private updateContainer(container: MediaContainer) {
+        const remove = this.disabled || container.videoTrack?.isMuted();
+        if (container.videoElement) {
+            if (container.videoTrack) {
+                if (this.videoBar.contains(container.videoElement) === remove) {
+                    if (remove) {
+                        container.videoElement.remove();
+                    } else {
+                        container.videoElement.play().then(() => this.videoBar.append(container.videoElement));
+                    }
                 }
-                this.videoBar.append(element);
             } else {
-                element.remove();
+                container.videoElement.remove();
+            }
+        }
+        if (container.audioElement) {
+            if (container.audioTrack) {
+                if (remove) {
+                    container.audioElement.volume = 0.0;
+                    container.audioElement.setAttribute("volume", "0.0");
+                    container.audioElement.toggleAttribute("muted", true);
+                    //container.audioTrack.detach(container.audioElement);
+                    //container.audioElement.remove();
+                } else {
+                    container.audioElement.volume = 1.0;
+                    container.audioElement.setAttribute("volume", "1.0");
+                    container.audioElement.toggleAttribute("muted", false);
+                    //container.audioTrack.attach(container.audioElement);
+                    if (!this.videoBar.contains(container.audioElement)) {
+                        this.videoBar.append(container.audioElement);
+                    }
+                }
+            } else {
+                container.audioElement.remove();
             }
         }
     }
 
-    private updateTrackContainer(trackContainer: TrackContainer) {
-        const enabled = !(trackContainer.disabled || trackContainer.muted);
-        this.setElement(trackContainer.element, enabled);
-    }
-
-    setAudioMuted(muted: boolean) {
-        const container = this.audioContainer;
-        container.muted = muted;
-        this.updateTrackContainer(container);
-    }
-
-    setVideoMuted(muted: boolean) {
-        const container = this.videoContainer;
-        container.muted = muted;
-        this.updateTrackContainer(container);
-    }
-
-    setShareMuted(muted: boolean) {
-        const container = this.shareContainer;
-        container.muted = muted;
-        this.updateTrackContainer(container);
-    }
-
-    setAudioDisabled(disabled: boolean) {
-        const container = this.audioContainer;
-        container.disabled = disabled;
-        this.updateTrackContainer(container);
-    }
-
-    setVideoDisabled(disabled: boolean) {
-        const container = this.videoContainer;
-        container.disabled = disabled;
-        this.updateTrackContainer(container);
-    }
-
-    setShareDisabled(disabled: boolean) {
-        const container = this.shareContainer;
-        container.disabled = disabled;
-        this.updateTrackContainer(container);
+    setDisabled(disabled: boolean) {
+        this.disabled = disabled;
+        this.update();
     }
 
     remove() {
@@ -171,15 +154,17 @@ class User {
     }
 
     private removeElements() {
-        this.audioContainer.element?.remove();
-        this.videoContainer.element?.remove();
-        this.shareContainer.element?.remove();
+        this.camContainer.audioElement?.remove();
+        this.camContainer.videoElement?.remove();
+        this.shareContainer.audioElement?.remove();
+        this.shareContainer.videoElement?.remove();
     }
 
     private detachTracks() {
-        this.audioContainer.track?.detach(this.audioContainer.element);
-        this.videoContainer.track?.detach(this.videoContainer.element);
-        this.shareContainer.track?.detach(this.shareContainer.element);
+        this.camContainer.audioTrack?.detach(this.camContainer.audioElement);
+        this.camContainer.videoTrack?.detach(this.camContainer.videoElement);
+        this.shareContainer.audioTrack?.detach(this.shareContainer.audioElement);
+        this.shareContainer.videoTrack?.detach(this.shareContainer.videoElement);
     }
 
 }
