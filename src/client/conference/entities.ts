@@ -17,7 +17,8 @@ class User {
     private camContainer: MediaContainer = new MediaContainer();
     private shareContainer: MediaContainer = new MediaContainer();
     // Variables
-    disabled: boolean = false;
+    private disabled: boolean = false;
+    private sharing: boolean = false;
     userId: string;
     participantId: string;
 
@@ -39,6 +40,26 @@ class User {
         }
     }
 
+    private static createAudioTrackElement(id: string): HTMLAudioElement {
+        const element = document.createElement("audio");
+        element.setAttribute("id", id);
+        //element.toggleAttribute("muted", true);
+        //element.toggleAttribute("playsinline", true);
+        element.toggleAttribute("autoplay", true);
+        //element.setAttribute("style", "width:15%; margin-right:5px;");
+        return element;
+    }
+
+    private static createVideoTrackElement(id: string): HTMLVideoElement {
+        const element = document.createElement("video");
+        element.setAttribute("id", id);
+        element.toggleAttribute("muted", true);
+        element.toggleAttribute("playsinline", true);
+        element.toggleAttribute("autoplay", true);
+        element.setAttribute("style", "width:15%; margin-right:5px;");
+        return element;
+    }
+
     setCamAudioTrack(track, createElement: boolean = true) {
         if (!track) {
             console.warn("the cam audio track should not be set null");
@@ -48,12 +69,7 @@ class User {
         }
         this.camContainer.audioTrack = track;
         if (createElement) {
-            const element = document.createElement("audio");
-            element.setAttribute("id", `track-audio-${this.participantId}-${track.getId()}`);
-            //element.toggleAttribute("muted", true);
-            //element.toggleAttribute("playsinline", true);
-            element.toggleAttribute("autoplay", true);
-            //element.setAttribute("style", "width:15%; margin-right:5px;");
+            const element = User.createAudioTrackElement(`track-cam-audio-${this.participantId}-${track.getId()}`);
             this.camContainer.audioElement = element;
             track.attach(element);
         }
@@ -68,13 +84,38 @@ class User {
             return;
         }
         this.camContainer.videoTrack = track;
-        const element = document.createElement("video");
-        element.setAttribute("id", `track-video-${this.participantId}-${track.getId()}`);
-        element.toggleAttribute("muted", true);
-        element.toggleAttribute("playsinline", true);
-        element.toggleAttribute("autoplay", true);
-        element.setAttribute("style", "width:15%; margin-right:5px;");
+        const element = User.createVideoTrackElement(`track-cam-video-${this.participantId}-${track.getId()}`);
         this.camContainer.videoElement = element;
+        track.attach(element);
+        this.update();
+    }
+
+    setShareAudioTrack(track, createElement: boolean = true) {
+        if (!track) {
+            console.warn("the share audio track should not be set null");
+            this.shareContainer.audioTrack = null;
+            this.update();
+            return;
+        }
+        this.shareContainer.audioTrack = track;
+        if (createElement) {
+            const element = User.createAudioTrackElement(`track-share-audio-${this.participantId}-${track.getId()}`);
+            this.shareContainer.audioElement = element;
+            track.attach(element);
+        }
+        this.update();
+    }
+
+    setShareVideoTrack(track) {
+        if (!track) {
+            console.warn("the share video track should not be set null");
+            this.shareContainer.videoTrack = null;
+            this.update();
+            return;
+        }
+        this.shareContainer.videoTrack = track;
+        const element = User.createVideoTrackElement(`track-share-video-${this.participantId}-${track.getId()}`);
+        this.shareContainer.videoElement = element;
         track.attach(element);
         this.update();
     }
@@ -104,11 +145,11 @@ class User {
 
     update() {
         this.updateContainer(this.camContainer);
-        this.updateContainer(this.shareContainer);
+        this.updateContainer(this.shareContainer, this.sharing);
     }
 
-    private updateContainer(container: MediaContainer) {
-        const remove = this.disabled || container.videoTrack?.isMuted();
+    private updateContainer(container: MediaContainer, enabled: boolean = true) {
+        const remove = this.disabled || container.videoTrack?.isMuted() || !enabled;
         if (container.videoElement) {
             if (container.videoTrack) {
                 if (this.videoBar.contains(container.videoElement) === remove) {
@@ -147,6 +188,11 @@ class User {
 
     setDisabled(disabled: boolean) {
         this.disabled = disabled;
+        this.update();
+    }
+
+    setSharing(sharing: boolean) {
+        this.sharing = sharing;
         this.update();
     }
 
