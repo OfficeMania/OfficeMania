@@ -131,6 +131,9 @@ function onConnectionSuccess(id: string) {
     conference.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
     conference.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${conference.getPhoneNumber()} - ${conference.getPhonePin()}`)); //DEBUG //REMOVE
     conference.join();
+    selfUser.participantId = conference.myUserId();
+    console.debug("participantId:", selfUser.participantId)
+    serverRoom.send("updateParticipantId", selfUser.participantId);
 }
 
 /**
@@ -219,8 +222,7 @@ function onRemoteTrackAdded(track): void {
     console.debug(`Remote Track added: ${track}`); //DEBUG
     const participantId = track.getParticipantId();
     const user = getUser(participantId);
-    console.debug(`Participant id is: ${participantId}`); //DEBUG
-    console.debug(`User is: ${user}`); //DEBUG
+    //console.debug(`Participant id is: ${participantId}`); //DEBUG
     if (!remoteTracks[participantId]) {
         remoteTracks[participantId] = [];
     }
