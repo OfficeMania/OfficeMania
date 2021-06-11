@@ -1,7 +1,7 @@
 //import {JitsiMeetJS} from "./lib-jitsi-meet.min";
 
-//import { Player } from "./player";
 import {PlayerRecord} from "../util";
+import {User} from "./entities";
 
 export {roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, switchVideo, nearbyPlayerCheck};
 
@@ -72,162 +72,16 @@ const optionsLocalTracks = {
     },*/
 }
 
-
-class User {
-
-    // Constants
-    userId: string;
-    participantId: string;
-    // Variables
-    audio = {
-        track: null,
-        element: HTMLAudioElement
-    }
-    video = {
-        track: null,
-        element: HTMLVideoElement
-    }
-    share = {
-        track: null,
-        element: HTMLVideoElement
-    }
-
-    constructor(userId: string, participantId: string) {
-        this.userId = userId;
-        this.participantId = participantId;
-    }
-
-    setAudioTrack(track) {
-        if (!track) {
-            this.audio.element?.remove();
-            this.audio.track?.detach(this.audio.element);
-            this.audio.element = null;
-            this.audio.track = null;
-            return;
-        }
-        this.audio.track = track;
-        const element = document.createElement("audio");
-        element.setAttribute("autoplay", "1");
-        //element.setAttribute("muted", "true"); //TODO Why was that added anyway?
-        element.setAttribute("id", `track-audio-${track.getParticipantId()}`);
-        this.audio.element = element;
-        track.attach(element);
-    }
-
-    setVideoTrack(track) {
-        if (!track) {
-            this.video.element?.remove();
-            this.video.track?.detach(this.video.element);
-            this.video.element = null;
-            this.video.track = null;
-            return;
-        }
-        this.video.track = track;
-        const element = document.createElement("video");
-        element.setAttribute("autoplay", "1");
-        element.setAttribute("style", "width:15%; margin-right:5px;");
-        element.setAttribute("id", `track-video-${track.getParticipantId()}`);
-        this.video.element = element;
-        track.attach(element);
-    }
-
-    setShareTrack(track) {
-        if (!track) {
-            this.share.element?.remove();
-            this.share.track?.detach(this.share.element);
-            this.share.element = null;
-            this.share.track = null;
-            return;
-        }
-        this.share.track = track;
-        const element = document.createElement("video");
-        element.setAttribute("autoplay", "1");
-        element.setAttribute("style", "width:15%; margin-right:5px;");
-        element.setAttribute("id", `track-share-${track.getParticipantId()}`);
-        this.share.element = element;
-        track.attach(element);
-    }
-
-    toggleAudioTrack(): boolean {
-        return this.toggleTrack(this.audio.track);
-    }
-
-    toggleVideoTrack(): boolean {
-        return this.toggleTrack(this.video.track);
-    }
-
-    toggleShareTrack(): boolean {
-        return this.toggleTrack(this.share.track);
-    }
-
-    toggleTrack(track): boolean {
-        if (!track) {
-            console.warn("toggling undefined or null track?")
-            return undefined;
-        }
-        if (track.isMuted()) {
-            track.unmute();
-            return false;
-        } else {
-            track.mute();
-            return true;
-        }
-    }
-
-    toggleElement(element: HTMLElement, enabled: boolean) {
-        if (!element) {
-            return;
-        }
-        if (videoBar.contains(element) !== enabled) {
-            if (enabled) {
-                videoBar.append(element);
-            } else {
-                element.remove();
-            }
-        }
-    }
-
-    setAudioEnabled(enabled: boolean) {
-        this.toggleElement(this.audio.element, enabled);
-    }
-
-    setVideoEnabled(enabled: boolean) {
-        this.toggleElement(this.video.element, enabled);
-    }
-
-    setShareEnabled(enabled: boolean) {
-        this.toggleElement(this.share.element, enabled);
-    }
-
-    remove() {
-        this.removeElements();
-        this.detachTracks();
-    }
-
-    removeElements() {
-        this.audio.element?.remove();
-        this.video.element?.remove();
-        this.share.element?.remove();
-    }
-
-    detachTracks() {
-        this.audio.track?.detach(this.audio.element);
-        this.video.track?.detach(this.video.element);
-        this.share.track?.detach(this.share.element);
-    }
-
-}
-
 // Variables
 
-const selfUser = new User(null, null);
+const selfUser = new User(videoBar, null, null);
 
 const users: User[] = [];
 
 function getUser(participantId: string): User {
     let user = users.find(value => value.participantId === participantId);
     if (!user) {
-        user = new User(null, participantId);
+        user = new User(videoBar, null, participantId);
         users.push(user);
     }
     return user;
