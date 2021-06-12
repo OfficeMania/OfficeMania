@@ -36,6 +36,9 @@ const audioBar = $<HTMLDivElement>("audio-bar");
 const videoBar = $<HTMLDivElement>("video-bar");
 const playerNearbyIndicator = $<HTMLDivElement>("player-nearby-indicator");
 
+const selfUser = new SelfUser(audioBar, videoBar);
+const users: User[] = [];
+
 // Options
 
 const roomName = "conference-with-safe-name-djlsöncaöeif38723"; //TODO
@@ -65,7 +68,7 @@ const optionsInit = {
 };
 
 const optionsLocalTracks = {
-    devices: [trackTypeAudio, trackTypeVideo,/* trackTypeDesktop*/],
+    devices: [trackTypeAudio, trackTypeVideo],
     //resolution: 180,
     desktopSharingFrameRate: {
         max: 15
@@ -86,28 +89,11 @@ const optionsLocalTracks = {
 
 // Variables
 
-const selfUser = new SelfUser(audioBar, videoBar);
-
-const users: User[] = [];
-
-function getUser(participantId: string): User {
-    let user = users.find(value => value.participantId === participantId);
-    if (!user) {
-        user = new User(conference, audioBar, videoBar, participantId);
-        users.push(user);
-    }
-    return user;
-}
-
 let serverRoom: Room = null;
 
 let connection = null;
 let isJoined = false;
 let conference = null;
-
-let localTracks = [];
-const remoteTracks = {};
-let muted = [];
 
 // Callbacks
 
@@ -243,32 +229,15 @@ function onRemoteTrackAdded(track): void {
     console.debug(`Remote Track added: ${track}`); //DEBUG
     const participantId = track.getParticipantId();
     const user = getUser(participantId);
-    /*
-    //console.debug(`Participant id is: ${participantId}`); //DEBUG
-    if (!remoteTracks[participantId]) {
-        remoteTracks[participantId] = [];
-    }
-    if (remoteTracks[participantId].length == 2) {
-        console.debug(`video and desktop swapping in progress`);
-        remoteTracks[participantId].pop();
-        //document.getElementById(participantId + "video2").remove(); //wenn ich das aufrufe, wie rufe ich das zurück? -- also beim mute das aufrufen, und beim entmuten wieder hinmachen
-    }
-    const idx = remoteTracks[participantId].push(track);
-    */
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel => console.debug(`Audio Level Remote: ${audioLevel}`)); //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, () => onRemoteTrackMuteChanged(track));
     track.addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Remote Track stopped')); //DEBUG
     track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Remote Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
-    //const id = participantId + track.getType() + idx;
     if (track.getType() === trackTypeVideo) {
         user.setVideoTrack(track);
-        //addRemoteVideoTrack(participantId);
     } else {
-        //TODO How to make sure that this is the cam audio track and not the share audio track?
         user.setAudioTrack(track);
-        //videoBar.append(`<audio autoplay='1' id='${participantId}audio${idx}' />`);
     }
-    //track.attach($(`#${id}`)[0]);
     console.debug(`User is: ${user}`); //DEBUG
 }
 
@@ -284,6 +253,49 @@ function onLocalTrackRemoved(track) {
 function onRemoteTrackRemoved(track) {
     console.debug(`Remote Track removed: ${track}`); //DEBUG
     getUser(track.getParticipantId())?.removeTrack(track);
+}
+
+/*  
+ *  Checks if muted button was audio or other
+ */
+function onRemoteTrackMuteChanged(track) {
+    console.debug('Remote Track Mute changed'); //DEBUG
+    if (track.getType() === trackTypeAudio) {
+        //The Audio Element doesn't need to be updated on remote mute change, because it's already silent
+        return;
+    }
+    getUser(track.getParticipantId())?.update();
+}
+
+/**
+ * This is called when a user has joined.
+ *
+ * @param participantId
+ */
+function onUserJoined(participantId) {
+    console.debug('User joined: ' + participantId); //DEBUG
+    getUser(participantId); // Creates a User with the participantId
+}
+
+/**
+ * This is called when a user has left.
+ *
+ * @param participantId Participant id
+ */
+function onUserLeft(participantId) {
+    console.debug('User left: ' + participantId); //DEBUG
+    getUser(participantId)?.remove();
+}
+
+// Functions
+
+function getUser(participantId: string): User {
+    let user = users.find(value => value.participantId === participantId);
+    if (!user) {
+        user = new User(conference, audioBar, videoBar, participantId);
+        users.push(user);
+    }
+    return user;
 }
 
 function useTrackType(trackType: string, onTrackTypeAudio: () => void, onTrackTypeVideo: () => void, onTrackTypeDesktop?: () => void, onTrackTypeElse?: () => void) {
@@ -318,110 +330,6 @@ function processTrackType<R>(trackType: string, onTrackTypeAudio: () => R, onTra
     }
 }
 
-/*  
- *  Checks if muted button was audio or other
- */
-function onRemoteTrackMuteChanged(track) {
-    console.debug('Remote Track Mute changed'); //DEBUG
-    if (track.getType() === trackTypeAudio) {
-        //The Audio Element doesn't need to be updated on remote mute change, because it's already silent
-        return;
-    }
-    getUser(track.getParticipantId())?.update();
-}
-
-/**
- * This is called when a user has joined.
- *
- * @param participantId
- */
-function onUserJoined(participantId) {
-    console.debug('User joined: ' + participantId); //DEBUG
-    getUser(participantId);
-}
-
-/**
- * This is called when a user has left.
- *
- * @param participantId Participant id
- */
-function onUserLeft(participantId) {
-    const user = getUser(participantId);
-    console.debug('User left: ' + participantId); //DEBUG
-    console.debug(`abcdefg ` + document.getElementById("canvas") === null);
-    console.debug(); //DEBUG
-    //remove video and audio
-    //document.getElementById(participantId + "audio" + "1").remove();
-    //document.getElementById(participantId + "video" + "2").remove();
-
-    //TODO participant.remove();
-    user.remove();
-    /*
-    if (!remoteTracks[participantId]) {
-        return;
-    }
-    const tracks = remoteTracks[participantId];
-    for (const item of tracks) {
-        //item.detach($(`#${participantId}${item.getType()}`));
-    }
-    */
-}
-
-// Functions
-
-/**
- * Set Audio Output Device.
- *
- * @param selected Audio Output
- */
-/*
-function setAudioOutputDevice(selected) {
-    JitsiMeetJS.mediaDevices.setAudioOutputDevice(selected.value);
-}
-
-function addRemoteVideoTrack(participantId: string, idx: number) {
-
-    //videoBar.append(`<video autoplay='1' style="width: 15%; margin-right:5px;" id='${participant}video${idx}' />`);
-    //document.getElementById(participant + "video2").style.width = "50%";
-}
-
-function toggleTrackMute(track) {
-    if (track.isMuted()) {
-        track.unmute();
-        return false;
-    } else {
-        track.mute();
-        return true;
-    }
-}
-*/
-
-/*
- *checks the remote tracks, and removes the video track to be muted
- */
-/*
-function checkRemoteTracks(track) {
-    let participant = track.getParticipantId();
-    let type = track.getType();
-    const id = participant + track.getType() + 2;
-    const i = {};
-    for (let i = 0; i < remoteTracks[participant].length; i++) {
-
-        if (remoteTracks[participant][i].getType() === "video") {//could just be "if (i===2)"
-            if (track.isMuted()) {
-                addRemoteVideoTrack(participant, 2);
-                //track.attach($(`#${id}`)[0]);
-            } else {
-                //document.getElementById(participant + type + "2").remove();
-            }
-        }
-    }
-}
-*/
-
-/**
- *
- */
 function unload() {
     selfUser.dispose();
     conference.leave();
@@ -454,17 +362,6 @@ function updateButtons() {
 // Exported Functions
 
 function toggleMuteByType(type: string): boolean {
-    /*
-    let muted: boolean = null;
-    for (const track of localTracks) {
-        if (track.getType() !== type) {
-            continue;
-        }
-        muted = toggleTrackMute(track);
-    }
-    return muted;
-    */
-    console.debug(`type: ${type}, selfUser: ${selfUser}`)
     const muted = processTrackType(type, () => selfUser.toggleCamAudio(), () => selfUser.toggleCamVideo());
     updateButtons();
     return muted;
