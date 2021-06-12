@@ -41,7 +41,7 @@ const users: User[] = [];
 
 // Options
 
-const roomName = "conference-with-safe-name-uzkbgrzighu"; //TODO
+const roomName = "conference-with-safe-name-uzkbgrzighu"; //TODO maybe let the server distribute the conference name and password to the clients?
 
 const optionsHosts = {
     domain: "8x8.vc",
