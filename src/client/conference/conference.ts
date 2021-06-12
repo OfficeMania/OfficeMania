@@ -1,13 +1,12 @@
 //import {JitsiMeetJS} from "./lib-jitsi-meet.min";
 
-import {PlayerRecord} from "../util";
+import {getRoom, PlayerRecord} from "../util";
 import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
 import {setAudioButtonMute, setSwitchToDesktop, setVideoButtonMute} from "../main";
 
 export {
     init as initConference,
-    roomName,
     trackTypeAudio,
     trackTypeVideo,
     trackTypeDesktop,
@@ -41,19 +40,25 @@ const users: User[] = [];
 
 // Options
 
-const roomName = "conference-with-safe-name-uzkbgrzighu"; //TODO maybe let the server distribute the conference name and password to the clients?
+function conferenceData() {
+    return getRoom().state.conference;
+}
 
-const optionsHosts = {
-    domain: "8x8.vc",
-    muc: `conference.${roomName}.8x8.vc`,
-    focus: "focus.8x8.vc"
-};
+function optionsHosts() {
+    return {
+        domain: "8x8.vc",
+        muc: `conference.${conferenceData().id}.8x8.vc`,
+        focus: "focus.8x8.vc"
+    };
+}
 
-const optionsConnection = {
-    hosts: optionsHosts,
-    serviceUrl: "wss://8x8.vc/xmpp-websocket?room=" + roomName,
-    clientNode: "https://jitsi.org/jitsimeet"
-};
+function optionsConnection() {
+    return {
+        hosts: optionsHosts(),
+        serviceUrl: "wss://8x8.vc/xmpp-websocket?room=" + conferenceData().id,
+        clientNode: "https://jitsi.org/jitsimeet"
+    };
+}
 
 const optionsConference = {
     enableLayerSuspension: true,
@@ -115,7 +120,7 @@ function onConnectionFailed() {
  * This is called after successfully establishing a connection
  */
 function onConnectionSuccess() {
-    conference = connection.initJitsiConference(roomName, optionsConference);
+    conference = connection.initJitsiConference(conferenceData().id, optionsConference);
     //conference.setStartMutedPolicy({audio: true});
     conference.on(JitsiMeetJS.events.conference.TRACK_ADDED, onTrackAdded);
     conference.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onTrackRemoved);
@@ -127,7 +132,12 @@ function onConnectionSuccess() {
     conference.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, (userID, audioLevel) => console.debug(`${userID} - ${audioLevel}`)); //DEBUG
     conference.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
     conference.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${conference.getPhoneNumber()} - ${conference.getPhonePin()}`)); //DEBUG //REMOVE
-    conference.join();
+    if (conferenceData().password) {
+        //conference.join(conferenceData().password);
+        conference.join();
+    } else {
+        conference.join();
+    }
     users.forEach(user => user.conference = conference);
     selfUser.conference = conference;
     selfUser.participantId = conference.myUserId();
@@ -415,7 +425,8 @@ function init(room: Room) {
     window.addEventListener("unload", unload); // TODO Why Twice?
     JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);          //mutes logger
     JitsiMeetJS.init(optionsInit);
-    connection = new JitsiMeetJS.JitsiConnection(null, null, optionsConnection);
+    connection = new JitsiMeetJS.JitsiConnection(null, null, optionsConnection());
+    console.debug("conference.id:", conferenceData().id); //DEBUG
     JitsiMeetJS.mediaDevices.addEventListener(JitsiMeetJS.events.mediaDevices.DEVICE_LIST_CHANGED, onDeviceListChanged);
     connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
     connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);

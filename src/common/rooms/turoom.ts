@@ -1,14 +1,19 @@
 import {Client, Room} from "colyseus";
 import {PlayerData, State} from "./schema/state";
 import fs from 'fs';
+import {generateUUIDv4} from "../util";
 
 /*
  * See: https://docs.colyseus.io/server/room/
  */
 export class TURoom extends Room<State> {
     onCreate (options: any) {
-        let state = new State();
+        const state = new State();
         this.setState(state);
+
+        //generate jitsi conference id and password
+        state.conference.id = generateUUIDv4();
+        state.conference.password = generateUUIDv4();
 
         //sets the interval in which update gets called
         this.setSimulationInterval((deltaTime) => this.update(deltaTime));

@@ -5,6 +5,16 @@ import {Player} from "./player";
 export type InitState = [Room<State>, Player];
 export type PlayerRecord = {[key: string]: Player}
 
+let _room: Room<State> = undefined;
+
+export function setRoom(room: Room<State>) {
+    _room = room;
+}
+
+export function getRoom(): Room<State> {
+    return _room;
+}
+
 /*
  * This function returns a promise that is resolve when the image is loaded
  * from the url. Note that this function currently does no error handling.

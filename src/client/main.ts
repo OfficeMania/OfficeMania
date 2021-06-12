@@ -1,6 +1,6 @@
 import {Client} from "colyseus.js";
 import {Player, syncOwnPosition, TILE_SIZE, updateOwnPosition, updatePosition} from "./player";
-import {InitState, joinAndSync, loadImage, PlayerRecord} from "./util";
+import {InitState, joinAndSync, loadImage, PlayerRecord, setRoom} from "./util";
 import {convertMapData, drawMap, mapInfo} from "./map";
 import {choosePlayerSprites} from "./player_sprite";
 import {initConference, nearbyPlayerCheck, toggleMuteByType, toggleSharing} from "./conference/conference";
@@ -80,6 +80,7 @@ async function main() {
      * room and ourPlayer are currently unused, but are probably of use for later
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
+    setRoom(room);
 
     //load or set name
     let cookieName = getCookie("username");
