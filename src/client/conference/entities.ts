@@ -28,6 +28,7 @@ class User {
     protected audioBar: HTMLDivElement;
     protected videoBar: HTMLDivElement;
     participantId: string;
+    conference;
     // Variables
     protected disabled: boolean = false;
     protected audioTrack: any = null;
@@ -35,7 +36,8 @@ class User {
     protected audioElement: HTMLAudioElement = null;
     protected videoElement: HTMLVideoElement = null;
 
-    constructor(audioBar: HTMLDivElement, videoBar: HTMLDivElement, participantId: string) {
+    constructor(conference, audioBar: HTMLDivElement, videoBar: HTMLDivElement, participantId: string) {
+        this.conference = conference;
         this.audioBar = audioBar;
         this.videoBar = videoBar;
         this.participantId = participantId;
@@ -44,11 +46,14 @@ class User {
     removeTrack(track) {
         if (track.getType() === trackTypeVideo) {
             this.videoTrack = null;
+            this.update();
         } else if (track.getType() === trackTypeDesktop) {
             this.videoTrack = null;
+            this.update();
         } else {
             //TODO How to make sure that this is the cam audio track and not the share audio track?
             this.audioTrack = null;
+            this.update();
         }
     }
 
@@ -128,13 +133,10 @@ class User {
                     this.audioElement.volume = 0.0;
                     this.audioElement.setAttribute("volume", "0.0");
                     this.audioElement.toggleAttribute("muted", true);
-                    //this.audioTrack.detach(this.audioElement);
-                    //this.audioElement.remove();
                 } else {
                     this.audioElement.volume = 1.0;
                     this.audioElement.setAttribute("volume", "1.0");
                     this.audioElement.toggleAttribute("muted", false);
-                    //this.audioTrack.attach(this.audioElement);
                     if (!this.audioBar.contains(this.audioElement)) {
                         this.audioBar.append(this.audioElement);
                     }
@@ -165,61 +167,75 @@ class User {
         this.videoTrack?.detach(this.videoElement);
     }
 
+    dispose() {
+        this.disposeAudio();
+        this.disposeVideo();
+    }
+
+    disposeAudio() {
+        this.audioTrack?.detach(this.audioElement);
+        this.audioTrack?.dispose();
+    }
+
+    disposeVideo() {
+        this.videoTrack?.detach(this.videoElement);
+        this.videoTrack?.dispose();
+    }
+
 }
 
 class SelfUser extends User {
 
     protected sharing: boolean = false;
-    protected shareAudioTrack: any = null;
-    protected shareVideoTrack: any = null;
+    // Temp
+    protected tempAudioTrack: any = null;
+    protected tempVideoTrack: any = null;
 
     constructor(audioBar: HTMLDivElement, videoBar: HTMLDivElement) {
-        super(audioBar, videoBar, null);
+        super(null, audioBar, videoBar, null);
     }
 
-    setSharedAudioTrack(track, createElement: boolean = true) {
+    setTempAudioTrack(track) {
         if (!track) {
-            console.warn("the share audio track should not be set null");
-            this.shareAudioTrack = null;
-            this.update();
+            this.tempAudioTrack = null;
             return;
         }
-        //TODO What to do with overridden tracks? detach them?
-        this.shareAudioTrack = track;
-        if (createElement) {
-            const element = createAudioTrackElement(`track-share-audio-${this.participantId}-${track.getId()}`);
-            this.audioElement = element;
-            track.attach(element);
-        }
-        this.update();
+        this.tempAudioTrack = track;
     }
 
-    setSharedVideoTrack(track) {
+    setTempVideoTrack(track) {
         if (!track) {
-            console.warn("the share video track should not be set null");
-            this.shareVideoTrack = null;
-            this.update();
+            this.tempVideoTrack = null;
             return;
         }
-        //TODO What to do with overridden tracks? detach them?
-        this.shareVideoTrack = track;
-        const element = createVideoTrackElement(`track-share-video-${this.participantId}-${track.getId()}`);
-        this.videoElement = element;
-        track.attach(element);
+        this.tempVideoTrack = track;
+    }
+
+    swapTracks() {
+        /*
+        if (this.sharedAudioTrack) {
+            //this.audioTrack?.detach(this.audioElement);
+            this.audioTrack?.dispose();
+            this.audioTrack = this.sharedAudioTrack;
+            this.sharedAudioTrack = null;
+            //this.audioTrack.attach(this.audioElement);
+        }
+        */
+        if (this.tempVideoTrack) {
+            this.videoTrack = this.tempVideoTrack;
+            this.tempVideoTrack = null;
+            this.videoTrack.attach(this.videoElement);
+            this.conference.addTrack(this.videoTrack);
+        }
         this.update();
     }
 
     setSharing(sharing: boolean) {
         this.sharing = sharing;
-        this.update();
     }
 
     isSharing(): boolean {
         return this.sharing;
-    }
-
-    hasSharingTracks(): boolean {
-        return !!(this.shareVideoTrack || this.shareAudioTrack);
     }
 
 }

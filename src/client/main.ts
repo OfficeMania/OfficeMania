@@ -203,7 +203,7 @@ async function main() {
     //toggle mute of tracks by type
     function toggleMute(type: string) {
         if (type === "desktop") {
-            setSwitchToDesktop(toggleSharing());
+            toggleSharing(setSwitchToDesktop);
         } else {
             const muted = toggleMuteByType(type);
             if (type === "audio") {
