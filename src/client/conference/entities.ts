@@ -15,6 +15,7 @@ function createAudioTrackElement(id: string): HTMLAudioElement {
 function createVideoTrackElement(id: string): HTMLVideoElement {
     const element = document.createElement("video");
     element.setAttribute("id", id);
+    element.setAttribute("poster", "/img/pause-standby.png");
     element.toggleAttribute("muted", true);
     element.toggleAttribute("playsinline", true);
     element.toggleAttribute("autoplay", true);
@@ -118,15 +119,41 @@ class User {
         return muted;
     }
 
+    protected pauseVideo(): boolean {
+        return false;
+    }
+
     update() {
         const remove = this.disabled || this.videoTrack?.isMuted();
         if (this.videoElement) {
             if (this.videoTrack) {
-                if (this.videoBar.contains(this.videoElement) === remove) {
+                const changed = this.videoBar.contains(this.videoElement) === remove;
+                const changedPause = this.videoElement.hasAttribute("paused") !== remove;
+                if (changed || changedPause) {
                     if (remove) {
-                        this.videoElement.remove();
+                        this.videoElement.toggleAttribute("paused", true);
                     } else {
-                        this.videoElement.play().then(() => this.videoBar.append(this.videoElement));
+                        this.videoElement.toggleAttribute("paused", false);
+                    }
+                    if (this.pauseVideo()) {
+                        if (!remove && !this.videoBar.contains(this.videoElement)) {
+                            this.videoBar.append(this.videoElement);
+                        }
+                        if (changedPause) {
+                            if (remove) {
+                                this.videoTrack.detach(this.videoElement);
+                            } else {
+                                this.videoTrack.attach(this.videoElement);
+                            }
+                        }
+                    } else {
+                        if (changed) {
+                            if (remove) {
+                                this.videoElement.remove();
+                            } else {
+                                this.videoElement.play().then(() => this.videoBar.append(this.videoElement));
+                            }
+                        }
                     }
                 }
             } else {
@@ -299,6 +326,10 @@ class SelfUser extends User {
         this.videoTrack.attach(this.videoElement);
         this.conference.addTrack(this.videoTrack);
         this.update();
+    }
+
+    protected pauseVideo(): boolean {
+        return this.sharing;
     }
 
     setSharing(sharing: boolean) {
