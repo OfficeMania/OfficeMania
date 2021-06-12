@@ -20,6 +20,18 @@ function createVideoTrackElement(id: string): HTMLVideoElement {
     element.toggleAttribute("playsinline", true);
     element.toggleAttribute("autoplay", true);
     element.setAttribute("style", "width:15%; margin-right:5px;");
+    element.onclick = () => {
+        //TODO Improve this, so that when a video is already big it will be set small again, so only one big at a time
+        //And improve this, so that a big video is maybe centered or even moved from the video-bar into an extra div
+        const big = element.hasAttribute("big");
+        if (big) {
+            element.toggleAttribute("big", false);
+            element.setAttribute("style", "width:15%; margin-right:5px;");
+        } else {
+            element.toggleAttribute("big", true);
+            element.setAttribute("style", "width:75%; margin-right:5px;");
+        }
+    };
     return element;
 }
 
