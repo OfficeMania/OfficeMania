@@ -17,6 +17,49 @@ function $<T extends HTMLElement>(a: string) {
     return <T>document.getElementById(a);
 }
 
+// Mute Buttons
+
+const muteButton = $<HTMLButtonElement>("button-mute-audio");
+const camButton = $<HTMLButtonElement>("button-mute-video");
+const shareButton = $<HTMLButtonElement>("button-share-video");
+
+muteButton.addEventListener("click", () => toggleMute("audio"));
+camButton.addEventListener("click", () => toggleMute("video"));
+shareButton.addEventListener("click", () => toggleMute("desktop")); //TODO Maybe make a confirmation dialog to confirm the stopping of a screenshare?
+
+export function setAudioButtonMute(muted: boolean, sharing: boolean = false) {
+    //muteButton.toggleAttribute("disabled", sharing);
+    muteButton.innerHTML = muted ? "<em class = \"fa fa-microphone-slash\"></em>" : "<em class = \"fa fa-microphone\"></em>";
+}
+
+export function setVideoButtonMute(muted: boolean, sharing: boolean = false) {
+    const camNormal = "<em class = \"fa fa-video\"></em>";
+    const camMuted = "<em class = \"fa fa-video-slash\"></em>";
+    const sharingNormal = "<em class = \"fa fa-pause\"></em>";
+    const sharingMuted = "<em class = \"fa fa-play\"></em>";
+    const textNormal = sharing ? sharingNormal : camNormal;
+    const textMuted = sharing ? sharingMuted : camMuted;
+    camButton.innerHTML = muted ? textMuted : textNormal;
+}
+
+export function setSwitchToDesktop(enabled: boolean) {
+    shareButton.innerHTML = enabled ? "<em class = \"fa fa-user\"></em>" : "<em class = \"fa fa-desktop\"></em>";
+}
+
+//toggle mute of tracks by type
+function toggleMute(type: string) {
+    if (type === "desktop") {
+        toggleSharing(setSwitchToDesktop);
+    } else {
+        const muted = toggleMuteByType(type);
+        if (type === "audio") {
+            //setAudioButtonMute(muted);
+        } else if (type === "video") {
+            //setVideoButtonMute(muted);
+        }
+    }
+}
+
 // async is necessary here, because we use 'await' to resolve the promises
 async function main() {
     /*
@@ -178,42 +221,6 @@ async function main() {
     });
 
     initConference(room);
-
-    // Mute Logic
-    const muteButton = $<HTMLButtonElement>("button-mute-audio");
-    const camButton = $<HTMLButtonElement>("button-mute-video");
-    const shareButton = $<HTMLButtonElement>("button-share-video");
-
-    muteButton.addEventListener("click", () => toggleMute("audio"));
-    camButton.addEventListener("click", () => toggleMute("video"));
-    shareButton.addEventListener("click", () => toggleMute("desktop"));
-
-    function setAudioButtonMute(muted: boolean) {
-        muteButton.innerHTML = muted ? "<em class = \"fa fa-microphone-slash\"></em>" : "<em class = \"fa fa-microphone\"></em>";
-    }
-
-    function setVideoButtonMute(muted: boolean) {
-        camButton.innerHTML = muted ? "<em class = \"fa fa-video-slash\"></em>" : "<em class = \"fa fa-video\"></em>";
-    }
-
-    function setSwitchToDesktop(enabled: boolean) {
-        shareButton.innerHTML = enabled ? "<em class = \"fa fa-user\"></em>" : "<em class = \"fa fa-desktop\"></em>";
-    }
-
-    //toggle mute of tracks by type
-    function toggleMute(type: string) {
-        if (type === "desktop") {
-            toggleSharing(setSwitchToDesktop);
-        } else {
-            const muted = toggleMuteByType(type);
-            if (type === "audio") {
-                setAudioButtonMute(muted);
-            } else if (type === "video") {
-                setVideoButtonMute(muted);
-            }
-        }
-
-    }
 
 
     /* (from movement)
