@@ -41,7 +41,7 @@ const users: User[] = [];
 
 // Options
 
-const roomName = "conference-with-safe-name-djlsöncaöeif38723"; //TODO
+const roomName = "conference-with-safe-name-uzkbgrzighu"; //TODO
 
 const optionsHosts = {
     domain: "8x8.vc",
@@ -151,7 +151,7 @@ function onDisconnected() {
 function onConferenceJoined() {
     console.debug('Conference joined'); //DEBUG
     isJoined = true;
-    //selfUser.addToConference();
+    selfUser.addToConference();
 }
 
 /**
@@ -193,7 +193,7 @@ function onLocalTracksCreated(tracks: any[]) {
 }
 
 function onTrackAdded(track) {
-    onTrack(track, onLocalTrackAdded, onRemoteTrackAdded);
+    onTrack(track, undefined, onRemoteTrackAdded);
 }
 
 function onLocalTrackAdded(track, pos: number) {
@@ -246,7 +246,7 @@ function onTrackRemoved(track) {
 }
 
 function onLocalTrackRemoved(track) {
-    console.debug(`Remote Track added: ${track}`); //DEBUG
+    console.debug(`Local Track removed: ${track}`); //DEBUG
     selfUser.removeTrack(track);
 }
 
