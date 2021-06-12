@@ -165,7 +165,7 @@ function onDisconnected() {
 function onConferenceJoined() {
     console.debug('Conference joined'); //DEBUG
     isJoined = true;
-    localTracks.forEach(track => conference.addTrack(track));
+    //selfUser.addToConference();
 }
 
 /**

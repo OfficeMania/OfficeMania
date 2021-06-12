@@ -219,6 +219,15 @@ class SelfUser extends User {
         super(null, audioBar, videoBar, null);
     }
 
+    addToConference() {
+        if (this.audioTrack) {
+            this.conference.addTrack(this.audioTrack);
+        }
+        if (this.videoTrack) {
+            this.conference.addTrack(this.videoTrack);
+        }
+    }
+
     /*
     get audioMuted(): boolean {
         return this.sharing ? this.sharedAudioMuted : super.audioMuted;
