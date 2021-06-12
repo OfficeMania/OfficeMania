@@ -219,6 +219,7 @@ class SelfUser extends User {
         super(null, audioBar, videoBar, null);
     }
 
+    /*
     get audioMuted(): boolean {
         return this.sharing ? this.sharedAudioMuted : super.audioMuted;
     }
@@ -230,6 +231,7 @@ class SelfUser extends User {
             super.audioMuted = value;
         }
     }
+    */
 
     get videoMuted(): boolean {
         return this.sharing ? this.sharedVideoMuted : super.videoMuted;
