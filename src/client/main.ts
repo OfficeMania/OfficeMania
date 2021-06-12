@@ -197,7 +197,7 @@ async function main() {
     }
 
     function setSwitchToDesktop(enabled: boolean) {
-        shareButton.innerHTML = enabled ? "<em class = \"fa fa-stop\"></em>" : "<em class = \"fa fa-desktop\"></em>";
+        shareButton.innerHTML = enabled ? "<em class = \"fa fa-user\"></em>" : "<em class = \"fa fa-desktop\"></em>";
     }
 
     //toggle mute of tracks by type

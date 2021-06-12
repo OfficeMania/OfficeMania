@@ -31,6 +31,8 @@ class User {
     conference;
     // Variables
     protected disabled: boolean = false;
+    private _audioMuted: boolean = false;
+    private _videoMuted: boolean = false;
     protected audioTrack: any = null;
     protected videoTrack: any = null;
     protected audioElement: HTMLAudioElement = null;
@@ -90,14 +92,18 @@ class User {
     }
 
     toggleCamAudio(): boolean {
-        return this.toggleTrack(this.audioTrack);
+        const muted = this.toggleTrack(this.audioTrack);
+        this.audioMuted = muted;
+        return muted;
     }
 
     toggleCamVideo(): boolean {
-        return this.toggleTrack(this.videoTrack);
+        const muted = this.toggleTrack(this.videoTrack);
+        this.videoMuted = muted;
+        return muted;
     }
 
-    private toggleTrack(track): boolean {
+    private toggleTrack(track: any): boolean {
         if (!track) {
             console.warn("toggling undefined or null track?")
             return undefined;
@@ -152,6 +158,22 @@ class User {
         this.update();
     }
 
+    get audioMuted(): boolean {
+        return this._audioMuted;
+    }
+
+    set audioMuted(value: boolean) {
+        this._audioMuted = value;
+    }
+
+    get videoMuted(): boolean {
+        return this._videoMuted;
+    }
+
+    set videoMuted(value: boolean) {
+        this._videoMuted = value;
+    }
+
     remove() {
         this.removeElements();
         this.detachTracks();
@@ -187,12 +209,38 @@ class User {
 class SelfUser extends User {
 
     protected sharing: boolean = false;
+    private sharedAudioMuted: boolean = false;
+    private sharedVideoMuted: boolean = false;
     // Temp
     protected tempAudioTrack: any = null;
     protected tempVideoTrack: any = null;
 
     constructor(audioBar: HTMLDivElement, videoBar: HTMLDivElement) {
         super(null, audioBar, videoBar, null);
+    }
+
+    get audioMuted(): boolean {
+        return this.sharing ? this.sharedAudioMuted : super.audioMuted;
+    }
+
+    set audioMuted(value: boolean) {
+        if (this.sharing) {
+            this.sharedAudioMuted = value;
+        } else {
+            super.audioMuted = value;
+        }
+    }
+
+    get videoMuted(): boolean {
+        return this.sharing ? this.sharedVideoMuted : super.videoMuted;
+    }
+
+    set videoMuted(value: boolean) {
+        if (this.sharing) {
+            this.sharedVideoMuted = value;
+        } else {
+            super.videoMuted = value;
+        }
     }
 
     setTempAudioTrack(track) {
@@ -222,11 +270,23 @@ class SelfUser extends User {
         }
         */
         if (this.tempVideoTrack) {
-            this.videoTrack = this.tempVideoTrack;
-            this.tempVideoTrack = null;
-            this.videoTrack.attach(this.videoElement);
-            this.conference.addTrack(this.videoTrack);
+            if (!this.sharing && this.tempVideoTrack.isMuted() !== this.videoMuted) {
+                if (this.videoMuted) {
+                    this.tempVideoTrack.mute().then(() => this.swapTracksIntern());
+                } else {
+                    this.tempVideoTrack.unmute().then(() => this.swapTracksIntern());
+                }
+            } else {
+                this.swapTracksIntern();
+            }
         }
+    }
+
+    private swapTracksIntern() {
+        this.videoTrack = this.tempVideoTrack;
+        this.tempVideoTrack = null;
+        this.videoTrack.attach(this.videoElement);
+        this.conference.addTrack(this.videoTrack);
         this.update();
     }
 
