@@ -196,30 +196,6 @@ function onTrackAdded(track) {
     onTrack(track, undefined, onRemoteTrackAdded);
 }
 
-function onLocalTrackAdded(track, pos: number) {
-
-    //filter out local stream duplicate
-    if (typeof pos === "undefined") {
-        return;
-    }
-
-    console.debug(`Local Track added: ${track}`); //DEBUG
-    track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel => console.debug(`Audio Level Local: ${audioLevel}`)); //DEBUG
-    track.addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, () => console.debug('Local Track Mute changed')); //DEBUG
-    track.addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Local Track stopped')); //DEBUG
-    track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Local Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
-    if (track.getType() === trackTypeVideo) {
-        selfUser.setVideoTrack(track);
-    } else {
-        //TODO How to make sure that this is the cam audio track and not the share audio track?
-        selfUser.setAudioTrack(track, false);
-    }
-    //TODO What is when you're sharing your Screen? Should you see it yourself?
-    if (isJoined) {
-        conference.addTrack(track);
-    }
-}
-
 /**
  * Handles remote tracks.
  *
@@ -446,6 +422,8 @@ function init(room: Room) {
     connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, onDisconnected);
     connection.connect();
     createLocalTracks(optionsLocalTracks, onLocalTracksCreated);
+    /*
+    //TODO Implement proper Audio Device Selection
     if (JitsiMeetJS.mediaDevices.isDeviceChangeAvailable(deviceOutput)) {
         JitsiMeetJS.mediaDevices.enumerateDevices(devices => {
             const audioOutputDevices = devices.filter(d => d.kind === deviceKindAudio);
@@ -455,4 +433,5 @@ function init(room: Room) {
             }
         });
     }
+    */
 }
