@@ -92,7 +92,7 @@ const users: User[] = [];
 function getUser(participantId: string): User {
     let user = users.find(value => value.participantId === participantId);
     if (!user) {
-        user = new User(audioBar, videoBar, participantId);
+        user = new User(conference, audioBar, videoBar, participantId);
         users.push(user);
     }
     return user;
@@ -141,6 +141,8 @@ function onConnectionSuccess(id: string) {
     conference.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
     conference.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${conference.getPhoneNumber()} - ${conference.getPhonePin()}`)); //DEBUG //REMOVE
     conference.join();
+    users.forEach(user => user.conference = conference);
+    selfUser.conference = conference;
     selfUser.participantId = conference.myUserId();
     console.debug("participantId:", selfUser.participantId)
     serverRoom.send("updateParticipantId", selfUser.participantId);
@@ -419,20 +421,6 @@ function checkRemoteTracks(track) {
     }
 }
 
-function askForDesktopShare() {
-    JitsiMeetJS.createLocalTracks({
-        devices: [trackTypeDesktop]
-    }).then(tracks => {
-        tracks.forEach(track => {
-            if (track.getType() === trackTypeVideo) {
-                selfUser.setSharedVideoTrack(track);
-            } else {
-                selfUser.setSharedAudioTrack(track, false);
-            }
-        });
-    }).catch(error => console.error(error));
-}
-
 /*
  *switches local videotrack
  */
@@ -466,6 +454,19 @@ function unload() {
     connection.disconnect();
 }
 
+function createLocalTracks(devices: string[], onSuccess: (tracks: any[]) => void, onFailure: (error) => void = console.error) {
+    JitsiMeetJS.createLocalTracks({devices}).then(onSuccess).catch(onFailure);
+}
+
+function disableSharing() {
+    selfUser.disposeVideo();
+    createLocalTracks([trackTypeVideo], (tracks) => {
+        selfUser.setTempVideoTrack(tracks[0]);
+        selfUser.setSharing(false);
+        selfUser.swapTracks();
+    });
+}
+
 // Exported Functions
 
 function toggleMuteByType(type: string): boolean {
@@ -483,13 +484,26 @@ function toggleMuteByType(type: string): boolean {
     return processTrackType(type, () => selfUser.toggleCamAudio(), () => selfUser.toggleCamVideo());
 }
 
-function toggleSharing(): boolean {
-    if (!selfUser.hasSharingTracks()) {
-        askForDesktopShare();
-    }
+function toggleSharing(done: (enabled: boolean) => void) {
     const sharing = !selfUser.isSharing();
-    selfUser.setSharing(sharing);
-    return sharing;
+    if (!sharing) {
+        done(false);
+        disableSharing();
+        return;
+    }
+    selfUser.disposeVideo();
+    createLocalTracks([trackTypeDesktop], (tracks) => {
+        selfUser.setTempVideoTrack(tracks[0]);
+        selfUser.setSharing(true);
+        selfUser.swapTracks();
+        done(true);
+    }, error => {
+        if (error.name !== "gum.screensharing_user_canceled") {
+            console.error(error);
+        }
+        done(false);
+        disableSharing();
+    });
 }
 
 function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
