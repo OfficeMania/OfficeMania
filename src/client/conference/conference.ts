@@ -3,6 +3,7 @@
 import {PlayerRecord} from "../util";
 import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
+import {setAudioButtonMute, setSwitchToDesktop, setVideoButtonMute} from "../main";
 
 export {
     init as initConference,
@@ -464,7 +465,17 @@ function disableSharing() {
         selfUser.setTempVideoTrack(tracks[0]);
         selfUser.setSharing(false);
         selfUser.swapTracks();
+        updateButtons();
     });
+}
+
+function updateButtons() {
+    const audioMuted: boolean = selfUser.audioMuted;
+    const VideoMuted: boolean = selfUser.videoMuted;
+    const sharingEnabled: boolean = selfUser.isSharing();
+    setAudioButtonMute(audioMuted, sharingEnabled);
+    setVideoButtonMute(VideoMuted, sharingEnabled);
+    setSwitchToDesktop(sharingEnabled);
 }
 
 // Exported Functions
@@ -481,7 +492,9 @@ function toggleMuteByType(type: string): boolean {
     return muted;
     */
     console.debug(`type: ${type}, selfUser: ${selfUser}`)
-    return processTrackType(type, () => selfUser.toggleCamAudio(), () => selfUser.toggleCamVideo());
+    const muted = processTrackType(type, () => selfUser.toggleCamAudio(), () => selfUser.toggleCamVideo());
+    updateButtons();
+    return muted;
 }
 
 function toggleSharing(done: (enabled: boolean) => void) {
@@ -497,6 +510,7 @@ function toggleSharing(done: (enabled: boolean) => void) {
         selfUser.setSharing(true);
         selfUser.swapTracks();
         done(true);
+        updateButtons();
     }, error => {
         if (error.name !== "gum.screensharing_user_canceled") {
             console.error(error);
