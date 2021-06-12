@@ -19,7 +19,10 @@ app.use(express.json())
 const gameServer = new Server({
     server: http.createServer(app),
     express: app,
-    pingInterval: 0,
+    //pingInterval: 0, // Number of milliseconds for the server to "ping" the clients. Default: 3000
+    // The clients are going to be forcibly disconnected if they can't respond after pingMaxRetries retries.
+    // Maybe this solves the problem that you can't move after some time doing nothing on the website.
+    //pingMaxRetries: 2, // Maximum allowed number of pings without a response. Default: 2.
 });
 
 // "Mount" the html folder as the root of the website
@@ -59,8 +62,7 @@ app.use('/assets', express.static(path.join(process.cwd(), "assets")));
 app.use('/js', express.static(path.join(process.cwd(), "dist", "client")));
 
 // Register the TURoom (defined in src/common/rooms/turoom.ts)
-gameServer.define("turoom", TURoom)
-    .enableRealtimeListing();
+gameServer.define("turoom", TURoom).enableRealtimeListing();
 
 /*
  * Register colyseus monitor AFTER registering your room handlers
