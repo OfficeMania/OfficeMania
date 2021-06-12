@@ -4,7 +4,16 @@ import {PlayerRecord} from "../util";
 import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
 
-export {init as initConference, roomName, trackTypeAudio, trackTypeVideo, trackTypeDesktop, toggleMuteByType, toggleSharing, nearbyPlayerCheck};
+export {
+    init as initConference,
+    roomName,
+    trackTypeAudio,
+    trackTypeVideo,
+    trackTypeDesktop,
+    toggleMuteByType,
+    toggleSharing,
+    nearbyPlayerCheck
+};
 
 function $<T extends HTMLElement>(a: string) {
     return <T>document.getElementById(a);
@@ -270,6 +279,7 @@ function onRemoteTrackRemoved(track) {
     const user = getUser(track.getParticipantId());
     user.removeTrack(track);
 }
+
 function useTrackType(trackType: string, onTrackTypeAudio: () => void, onTrackTypeVideo: () => void, onTrackTypeDesktop?: () => void, onTrackTypeElse?: () => void) {
     switch (trackType) {
         case trackTypeAudio:
@@ -307,7 +317,7 @@ function processTrackType<R>(trackType: string, onTrackTypeAudio: () => R, onTra
  *  Checks if muted button was audio or other
  */
 function onRemoteMute(track) {
-    if (track.getType() === trackTypeAudio){
+    if (track.getType() === trackTypeAudio) {
         //The Audio Element doesn't needs to be updated on remote mute
         return;
     }
