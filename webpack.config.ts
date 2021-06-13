@@ -11,7 +11,7 @@ const config: Configuration = {
   devtool: IS_DEV ? 'inline-source-map' : false,
   entry: ['./src/client/main'],
   output: {
-    path: path.join(__dirname, 'dist', 'client'),
+    path: path.join(__dirname, 'js', 'client'),
     filename: `[name]-bundle.js`, // `[name]-[fullhash:8]-bundle.js`,
     chunkFilename: `[name]-bundle.js`, // '[name]-[fullhash:8]-bundle.js',
     publicPath: '/client/',

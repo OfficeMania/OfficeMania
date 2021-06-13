@@ -59,7 +59,7 @@ app.use('/assets', express.static(path.join(process.cwd(), "assets")));
  * In an HTML-document you can load the scripts via:
  *   <script src="/js/[script-name]"></script>
  */
-app.use('/js', express.static(path.join(process.cwd(), "dist", "client")));
+app.use('/js', express.static(path.join(process.cwd(), "js", "client")));
 
 // Register the TURoom (defined in src/common/rooms/turoom.ts)
 gameServer.define("turoom", TURoom).enableRealtimeListing();
