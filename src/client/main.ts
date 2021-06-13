@@ -29,10 +29,12 @@ shareButton.addEventListener("click", () => toggleMute("desktop")); //TODO Maybe
 
 export function setAudioButtonMute(muted: boolean, sharing: boolean = false) {
     //muteButton.toggleAttribute("disabled", sharing);
+    muteButton.toggleAttribute("disabled", false);
     muteButton.innerHTML = muted ? "<em class = \"fa fa-microphone-slash\"></em>" : "<em class = \"fa fa-microphone\"></em>";
 }
 
 export function setVideoButtonMute(muted: boolean, sharing: boolean = false) {
+    camButton.toggleAttribute("disabled", false);
     const camNormal = "<em class = \"fa fa-video\"></em>";
     const camMuted = "<em class = \"fa fa-video-slash\"></em>";
     const sharingNormal = "<em class = \"fa fa-pause\"></em>";
@@ -42,7 +44,8 @@ export function setVideoButtonMute(muted: boolean, sharing: boolean = false) {
     camButton.innerHTML = muted ? textMuted : textNormal;
 }
 
-export function setSwitchToDesktop(enabled: boolean) {
+export function setSwitchToDesktop(enabled: boolean, supported: boolean = false) {
+    shareButton.toggleAttribute("disabled", !supported);
     shareButton.innerHTML = enabled ? "<em class = \"fa fa-user\"></em>" : "<em class = \"fa fa-desktop\"></em>";
 }
 
@@ -76,7 +79,7 @@ async function main() {
     /*
      * Before we can launch our main functionality, we need to join a room and
      * wait for our player to be available to the server.
-     * 
+     *
      * room and ourPlayer are currently unused, but are probably of use for later
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);

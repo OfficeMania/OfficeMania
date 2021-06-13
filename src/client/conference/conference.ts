@@ -11,10 +11,7 @@ export {
     init as initConference,
     trackTypeAudio,
     trackTypeVideo,
-    trackTypeDesktop,
-    toggleMuteByType,
-    toggleSharing,
-    nearbyPlayerCheck
+    trackTypeDesktop
 };
 
 function $<T extends HTMLElement>(a: string) {
@@ -344,18 +341,22 @@ function updateButtons() {
     const sharingEnabled: boolean = selfUser.isSharing();
     setAudioButtonMute(audioMuted, sharingEnabled);
     setVideoButtonMute(VideoMuted, sharingEnabled);
-    setSwitchToDesktop(sharingEnabled);
+    setSwitchToDesktop(sharingEnabled, isDesktopSharingSupported());
 }
 
 // Exported Functions
 
-function toggleMuteByType(type: string): boolean {
+export function isDesktopSharingSupported() {
+    return JitsiMeetJSIntern.isDesktopSharingEnabled();
+}
+
+export function toggleMuteByType(type: string): boolean {
     const muted = processTrackType(type, () => selfUser.toggleCamAudio(), () => selfUser.toggleCamVideo());
     updateButtons();
     return muted;
 }
 
-function toggleSharing(done: (enabled: boolean) => void) {
+export function toggleSharing(done: (enabled: boolean) => void) {
     const sharing = !selfUser.isSharing();
     if (!sharing) {
         done(false);
@@ -378,7 +379,7 @@ function toggleSharing(done: (enabled: boolean) => void) {
     });
 }
 
-function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
+export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
     //array with nearby players. use this vor videochat.
     const playersNearby: string[] = [];
     const playersAway: string[] = [];
@@ -427,6 +428,7 @@ function init(room: Room) {
     window.addEventListener("unload", unload); // TODO Why Twice?
     JitsiMeetJSIntern.setLogLevel(JitsiMeetJSIntern.logLevels.ERROR);          //mutes logger
     JitsiMeetJSIntern.init(optionsInit);
+    updateButtons();
     connection = new JitsiMeetJSIntern.JitsiConnection(null, null, optionsConnection());
     console.debug("conference.id:", conferenceData().id); //DEBUG
     JitsiMeetJSIntern.mediaDevices.addEventListener(JitsiMeetJSIntern.events.mediaDevices.DEVICE_LIST_CHANGED, onDeviceListChanged);
