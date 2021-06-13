@@ -1,25 +1,13 @@
-
-
-
-export function setCookie(cname: string, cvalue: string, exdays: number) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires="+ d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+export function setOneTimeCookie(key: string, value: string, path: string = "/") {
+    document.cookie = `${key}=${value};path=${path}`;
 }
 
-export function getCookie(cname: string) {
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for(var i = 0; i <ca.length; i++) {
-      var c = ca[i];
-      while (c.charAt(0) == ' ') {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
-      }
-    }
-    return "";
-  }
+export function setCookie(key: string, value: string, expirationDays: number = 1, path: string = "/") {
+    const date = new Date();
+    date.setTime(date.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
+    document.cookie = `${key}=${value};expires=${date.toUTCString()};path=${path}`;
+}
+
+export function getCookie(key: string) {
+    return document.cookie.match('(^|;)\\s*' + key + '\\s*=\\s*([^;]+)')?.pop() || '';
+}
