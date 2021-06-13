@@ -27,12 +27,17 @@ const trackTypeDesktop = "desktop";
 const deviceOutput = "output";
 const deviceInput = "input";
 
-const deviceKindAudio = "audiooutput";
-const deviceKindVideo = "videooutput";
+const deviceKindAudioOutput = "audiooutput";
+const deviceKindAudioInput = "audioinput";
+const deviceKindVideoInput = "videoinput";
 
 const audioBar = $<HTMLDivElement>("audio-bar");
 const videoBar = $<HTMLDivElement>("video-bar");
-const playerNearbyIndicator = $<HTMLDivElement>("player-nearby-indicator");
+
+//const audioInputSelect = $<HTMLSelectElement>("audio-input-select");
+const audioOutputSelect = $<HTMLSelectElement>("audio-output-select");
+
+const playerNearbyIndicator = $<HTMLParagraphElement>("player-nearby-indicator");
 
 const selfUser = new SelfUser(audioBar, videoBar);
 const users: User[] = [];
@@ -437,16 +442,36 @@ function init(room: Room) {
     connection.addEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_DISCONNECTED, onDisconnected);
     connection.connect();
     createLocalTracks(optionsLocalTracks, onLocalTracksCreated);
-    /*
     //TODO Implement proper Audio Device Selection
-    if (JitsiMeetJSIntern.mediaDevices.isDeviceChangeAvailable(deviceOutput)) {
+    /*
+    if (JitsiMeetJSIntern.mediaDevices.isDeviceChangeAvailable(deviceInput) && false) {
         JitsiMeetJSIntern.mediaDevices.enumerateDevices(devices => {
-            const audioOutputDevices = devices.filter(d => d.kind === deviceKindAudio);
-            if (audioOutputDevices.length > 1) {
-                //$('#audioOutputSelect').html(audioOutputDevices.map(d => `<option value="${d.deviceId}">${d.label}</option>`).join('\n'));
-                //$('#audioOutputSelectWrapper').show();
+            const audioInputDevices = devices.filter(d => d.kind === deviceKindAudioInput);
+            if (audioInputDevices.length > 1) {
+                audioInputDevices.forEach((device) => {
+                    const optionElement = document.createElement("option");
+                    optionElement.value = device.deviceId;
+                    optionElement.innerText = device.label;
+                    audioInputSelect.append(optionElement);
+                });
+                audioInputSelect.onchange = () => console.log(audioInputDevices[audioInputSelect.selectedIndex]);
+                //TODO Set selected Track? Or do we need to create new LocalTracks?
             }
         });
     }
     */
+    if (JitsiMeetJSIntern.mediaDevices.isDeviceChangeAvailable(deviceOutput)) {
+        JitsiMeetJSIntern.mediaDevices.enumerateDevices(devices => {
+            const audioOutputDevices = devices.filter(d => d.kind === deviceKindAudioOutput);
+            if (audioOutputDevices.length > 1) {
+                audioOutputDevices.forEach((device) => {
+                    const optionElement = document.createElement("option");
+                    optionElement.value = device.deviceId;
+                    optionElement.innerText = device.label;
+                    audioOutputSelect.append(optionElement);
+                });
+                audioOutputSelect.onchange = () => JitsiMeetJSIntern.mediaDevices.setAudioOutputDevice(audioOutputDevices[audioOutputSelect.selectedIndex].deviceId);
+            }
+        });
+    }
 }
