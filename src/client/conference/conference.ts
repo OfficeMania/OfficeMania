@@ -88,7 +88,7 @@ const optionsLocalTracks = {
                 min: 720,
             },
         },
-        
+
     },*/
 }
 
@@ -241,7 +241,7 @@ function onRemoteTrackRemoved(track) {
     getUser(track.getParticipantId())?.removeTrack(track);
 }
 
-/*  
+/*
  *  Checks if muted button was audio or other
  */
 function onRemoteTrackMuteChanged(track) {
