@@ -1,7 +1,9 @@
 import * as path from 'path';
-import { Configuration } from 'webpack';
+import {CleanWebpackPlugin} from 'clean-webpack-plugin';
+import {Configuration} from 'webpack';
+import {IS_DEV, SERVER_PORT, WEBPACK_PORT} from './src/server/config';
 
-import { SERVER_PORT, IS_DEV, WEBPACK_PORT } from './src/server/config';
+const webpack = require('webpack');
 
 const nodeModulesPath = path.resolve(__dirname, 'node_modules');
 const targets = IS_DEV ? { chrome: '79', firefox: '72' } : '> 0.25%, not dead';
@@ -10,6 +12,10 @@ const config: Configuration = {
   mode: IS_DEV ? 'development' : 'production',
   devtool: IS_DEV ? 'inline-source-map' : false,
   entry: ['./src/client/main'],
+    plugins: [
+        new webpack.ProgressPlugin(),
+        new CleanWebpackPlugin(),
+    ],
   output: {
     path: path.join(__dirname, 'js', 'client'),
     filename: `[name]-bundle.js`, // `[name]-[fullhash:8]-bundle.js`,
