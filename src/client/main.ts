@@ -84,29 +84,30 @@ async function main() {
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
     setRoom(room);
 
-    function setUsername(value: string, forceUpdate: boolean = false) {
-        const old = ourPlayer.name;
+    function setUsername(value: string) {
         ourPlayer.name = value;
         localStorage.setItem("username", value);
-        if (forceUpdate || old !== value) {
-            room.send("name", ourPlayer.name);
-        }
+        room.send("name", ourPlayer.name);
     }
 
-    //load or set name
+    function setCharacter(value: string) {
+        ourPlayer.character = value;
+        localStorage.setItem("character", ourPlayer.character);
+        room.send("character", ourPlayer.character);
+    }
+
+    //load or ask for name
     const username = localStorage.getItem("username");
-    if (!username || username === "") {
-        setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy");
+    if (username && username !== "") {
+        setCharacter(username);
     } else {
-        ourPlayer.name = username;
-        room.send("name", ourPlayer.name);
+        setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy");
     }
 
     //load character
     const character = localStorage.getItem("character");
     if (character && character !== "") {
-        ourPlayer.character = character;
-        room.send("character", ourPlayer.character)
+        setCharacter(character);
     }
 
     /*
@@ -173,13 +174,11 @@ async function main() {
             if (filenames.length <= nextIndex) {
                 nextIndex = 0;
             }
-            ourPlayer.character = filenames[nextIndex]
-            localStorage.setItem("character", filenames[nextIndex]);
-            room.send("character", filenames[nextIndex]);
+            setCharacter(filenames[nextIndex]);
         }
         //rename players name
         if (e.key.toLowerCase() === "r") {
-            setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy", true);
+            setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy");
         }
         if (e.key.toLowerCase() === " ") {
             //player interacts with object in front of him
