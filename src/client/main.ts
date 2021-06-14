@@ -84,15 +84,23 @@ async function main() {
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
     setRoom(room);
 
+    function setUsername(value: string, forceUpdate: boolean = false) {
+        const old = ourPlayer.name;
+        ourPlayer.name = value;
+        localStorage.setItem("username", value);
+        if (forceUpdate || old !== value) {
+            room.send("name", ourPlayer.name);
+        }
+    }
+
     //load or set name
     const username = localStorage.getItem("username");
     if (!username || username === "") {
-        ourPlayer.name = window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy";
-        localStorage.setItem("username", ourPlayer.name);
+        setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy");
     } else {
         ourPlayer.name = username;
+        room.send("name", ourPlayer.name);
     }
-    room.send("name", ourPlayer.name);
 
     //load character
     const character = localStorage.getItem("character");
@@ -171,13 +179,7 @@ async function main() {
         }
         //rename players name
         if (e.key.toLowerCase() === "r") {
-            let name = window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy");
-            name = name.slice(0, 20)
-            if (name !== null) {
-                ourPlayer.name = name;
-                localStorage.setItem("username", ourPlayer.name);
-                room.send("name", ourPlayer.name);
-            }
+            setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy", true);
         }
         if (e.key.toLowerCase() === " ") {
             //player interacts with object in front of him
