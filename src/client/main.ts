@@ -85,24 +85,19 @@ async function main() {
     setRoom(room);
 
     //load or set name
-    let cookieName = getCookie("username");
-    if (cookieName === "") {
-        let name = window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy");
-        name = name.slice(0, 20)
-        if (name === null) {
-            name = "Jimmy";
-        }
-        ourPlayer.name = name;
-        setCookie("username", ourPlayer.name, 100);
+    const username = localStorage.getItem("username");
+    if (!username || username === "") {
+        ourPlayer.name = window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy";
+        localStorage.setItem("username", ourPlayer.name);
     } else {
-        ourPlayer.name = cookieName;
+        ourPlayer.name = username;
     }
     room.send("name", ourPlayer.name);
 
     //load character
-    let cookieCharacter = getCookie("character");
-    if (cookieCharacter !== "") {
-        ourPlayer.character = cookieCharacter;
+    const character = localStorage.getItem("character");
+    if (character && character !== "") {
+        ourPlayer.character = character;
         room.send("character", ourPlayer.character)
     }
 
@@ -171,7 +166,7 @@ async function main() {
                 nextIndex = 0;
             }
             ourPlayer.character = filenames[nextIndex]
-            setCookie("character", filenames[nextIndex], 100);
+            localStorage.setItem("character", filenames[nextIndex]);
             room.send("character", filenames[nextIndex]);
         }
         //rename players name
@@ -180,7 +175,7 @@ async function main() {
             name = name.slice(0, 20)
             if (name !== null) {
                 ourPlayer.name = name;
-                setCookie("username", ourPlayer.name, 100);
+                localStorage.setItem("username", ourPlayer.name);
                 room.send("name", ourPlayer.name);
             }
         }
