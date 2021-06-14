@@ -4,7 +4,6 @@ import {InitState, joinAndSync, loadImage, PlayerRecord, setRoom} from "./util";
 import {convertMapData, drawMap, mapInfo} from "./map";
 import {choosePlayerSprites} from "./player_sprite";
 import {initConference, nearbyPlayerCheck, toggleMuteByType, toggleSharing} from "./conference/conference";
-import {getCookie, setCookie} from "./cookie"
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}

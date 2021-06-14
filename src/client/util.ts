@@ -34,12 +34,12 @@ export function loadImage(url: string): Promise<HTMLImageElement> {
  * the server state and the client state. The sync-initialization MUST happen
  * immediately after we join the server (i.e. in this function), because on each
  * update colyseus only sends differences. Thus, if we miss the initial update,
- * we work on incomplete data. 
- * 
+ * we work on incomplete data.
+ *
  * This function is asynchronous and returns a promise: Once the server confirms
  * that we joined the room and adds our player to its state, the promise is
  * resolved.
- * 
+ *
  * See: https://docs.colyseus.io/client/client/#joinorcreate-roomname-string-options-any
  */
 export async function joinAndSync(client: Client, players: PlayerRecord): Promise<InitState> {
@@ -100,9 +100,23 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
             /*
              * If the room has any other state that needs to be observed, the
              * code needs to be placed here:
-             * 
+             *
              * ...
              */
         });
     });
+}
+
+export function setOneTimeCookie(key: string, value: string, path: string = "/") {
+    document.cookie = `${key}=${value};path=${path}`;
+}
+
+export function setCookie(key: string, value: string, expirationDays: number = 1, path: string = "/") {
+    const date = new Date();
+    date.setTime(date.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
+    document.cookie = `${key}=${value};expires=${date.toUTCString()};path=${path}`;
+}
+
+export function getCookie(key: string) {
+    return document.cookie.match('(^|;)\\s*' + key + '\\s*=\\s*([^;]+)')?.pop() || '';
 }
