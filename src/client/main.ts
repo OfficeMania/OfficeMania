@@ -87,13 +87,17 @@ async function main() {
     function setUsername(value: string) {
         ourPlayer.name = value;
         localStorage.setItem("username", value);
-        room.send("name", ourPlayer.name);
+        room.send("name", value);
     }
 
     function setCharacter(value: string) {
+        const filenames = Object.keys(characters);
+        if (filenames.indexOf(value) === -1) {
+            value = filenames[0];
+        }
         ourPlayer.character = value;
-        localStorage.setItem("character", ourPlayer.character);
-        room.send("character", ourPlayer.character);
+        localStorage.setItem("character", value);
+        room.send("character", value);
     }
 
     //load or ask for name
