@@ -1,5 +1,4 @@
 import {Room} from "colyseus.js";
-import {mapInfo} from "./map";
 
 //all variables needed to adjust movement speed and length.
 export var MOVEMENT_SPEED = 10;
@@ -72,7 +71,7 @@ export function updatePosition(player: Player, room: Room) {
 
 }
 
-export function updateOwnPosition(player: Player, room: Room, currentMap: mapInfo) {
+export function updateOwnPosition(player: Player, room: Room) {
 
     //initiates movement in one direction and blocks the other directions till the next tile
     if(player.prioDirection.length > 0){
