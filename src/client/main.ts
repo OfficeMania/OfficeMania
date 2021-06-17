@@ -99,7 +99,7 @@ async function main() {
     //load or ask for name
     const username = localStorage.getItem("username");
     if (username && username !== "") {
-        setCharacter(username);
+        setUsername(username);
     } else {
         setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy");
     }
