@@ -108,12 +108,6 @@ async function main() {
         setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy");
     }
 
-    //load character
-    const character = localStorage.getItem("character");
-    if (character && character !== "") {
-        setCharacter(character);
-    }
-
     /*
      * Then, we wait for our map to load
      */
@@ -144,6 +138,12 @@ async function main() {
     //loads character sprite paths from the server (from movement)
     for (let path of room.state.playerSpritePaths) {
         characters[path] = await loadImage("/img/characters/" + path);
+    }
+
+    //load character
+    const character = localStorage.getItem("character");
+    if (character && character !== "") {
+        setCharacter(character);
     }
 
     //sprite dimensions (from movement)
