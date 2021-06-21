@@ -130,6 +130,18 @@ export function updateOwnPosition(player: Player, room: Room) {
             player.moveDirection = null;
         }
     }
+
+    /*
+    * standing is calculated in player_sprite -> choosePlayerSprite.
+    * syncs the position with the server about every second.
+    */
+    if(player.standing > 0 && player.standing % 50 === 0){
+        player.scaledX = room.state.players[player.id].x;
+        player.scaledY = room.state.players[player.id].y;
+        player.positionX = player.scaledX * STEP_SIZE
+        player.positionY = player.scaledY * STEP_SIZE
+    }
+
 }
 
 //syncs the own position from the server
