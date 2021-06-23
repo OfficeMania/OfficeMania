@@ -1,7 +1,7 @@
 import {Client} from "colyseus.js";
 import {Player, syncOwnPosition, TILE_SIZE, updateOwnPosition, updatePosition} from "./player";
 import {InitState, joinAndSync, loadImage, PlayerRecord, setRoom} from "./util";
-import {convertMapData, drawMap, mapInfo} from "./map";
+import {convertMapData, drawMap, mapInfo, solidInfo, fillSolidInfos} from "./map";
 import {choosePlayerSprites} from "./player_sprite";
 import {initConference, nearbyPlayerCheck, toggleMuteByType, toggleSharing} from "./conference/conference";
 import { drawPlayer, loadCharacter, loadInputFuctions, playerLoop } from "./movement";
@@ -107,7 +107,8 @@ async function main() {
 
     let map: Promise<mapInfo> = convertMapData(xml.responseText, room, background);
 
-    let currentMap = new mapInfo((await map).layers, (await map).tilesets, (await map).canvas, (await map).resolution, (await map).textures);
+    let currentMap = new mapInfo((await map).layers, (await map).tilesets, (await map).canvas, (await map).resolution, (await map).textures, (await map).lowestX, (await map).lowestY, (await map).highestY);
+    let collisionInfo: solidInfo[][] = fillSolidInfos(currentMap);
 
     //start position
     let posX: number = (START_POSITION_X + Math.floor(currentMap.widthOfMap / 2)) * currentMap.resolution;

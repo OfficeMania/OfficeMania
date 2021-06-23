@@ -1,7 +1,29 @@
 import { loadImage } from "./util";
 import { Room } from "colyseus.js";
 
-export {drawMapWithChunks, convertMapData, mapInfo, drawMap}
+export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
+
+//map which contains infos if something is solid
+
+class solidInfo {
+
+    isSolid: boolean;
+    content: number;
+
+    constructor() {
+
+        this.isSolid = false
+        this.content = 0;
+    }
+
+    setIsSolid() {
+        this.isSolid = true;
+    }
+
+    setContent(content: number) {
+        this.content = content;
+    }
+}
 
 //only important for infinite maps
 class chunk {
@@ -54,6 +76,9 @@ class chunk {
 
 class mapInfo {
 
+    lowestX: number;
+    lowestY: number;
+    highestY: number;
     layers: layer[];
     tilesets: tileset[];
     heightOfMap: number;
@@ -65,8 +90,11 @@ class mapInfo {
     resolution: number;
     canvas: HTMLCanvasElement;
 
-    constructor(layers: layer[], tilesets: tileset[], canvas: HTMLCanvasElement, resolution: number, textures: Map<string, HTMLImageElement>) {
+    constructor(layers: layer[], tilesets: tileset[], canvas: HTMLCanvasElement, resolution: number, textures: Map<string, HTMLImageElement>, lowestX: number, lowestY: number, highestY: number) {
 
+        this.lowestX = lowestX;
+        this.lowestY = lowestY;
+        this.highestY = highestY;
         this.layers = layers;
         this.tilesets = tilesets;
         this.heightOfMap = canvas.height / (resolution);
@@ -166,6 +194,69 @@ class tileset {
     }
 }
 
+function fillSolidInfos(map: mapInfo) {
+
+    let solidInfoMap: solidInfo[][];
+    let height = Math.abs(map.lowestY - map.highestY);
+    let mapStartX = map.lowestX;
+    let mapStartY = map.lowestY;
+
+    solidInfoMap = [];
+    for (let i: number; i < height * 2; i++) {
+        solidInfoMap[i] = [];
+    }
+
+    for (let l: number; l < map.layers.length; l++) {
+
+        if (map.layers[l].name.search("solid") !== -1 || map.layers[l].name.search("content") !== -1) {
+
+            for (let c: number; c < map.layers[l].chunks.length; c++) {
+
+                for (let y: number; y < 16; y++) {
+
+                    for (let x: number; x < 16; x++) {
+
+                        if (map.layers[l].name.search("solid") !== -1 && map.layers[l].chunks[c].element[x][y] !== 0 && map.layers[l].chunks[c].element[x][y] < 16) {
+
+                            let numbBin: string = map.layers[l].chunks[c].element[x][y].toString(2);
+                            let fillerString: string = "";
+
+                            if (numbBin.length < 4) {
+
+                                for (let i = 0; i < 4 - numbBin.length; i++) {
+                                    fillerString.concat("0");
+                                }
+                                numbBin = fillerString.concat(numbBin);
+                            }
+                            
+                            if (numbBin.charAt(0) === "1") {
+                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setIsSolid();
+                            } 
+                            if (numbBin.charAt(1) === "1") {
+                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setIsSolid();
+                            } 
+                            if (numbBin.charAt(2) === "1") {
+                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setIsSolid();
+                            } 
+                            if (numbBin.charAt(3) === "1") {
+                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setIsSolid();
+                            } 
+                        }
+                        else if (map.layers[l].name.search("content") !== -1 && map.layers[l].chunks[c].element[x][y] !== 0) {
+
+                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setContent(map.layers[l].chunks[c].element[x][y]);
+                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setContent(map.layers[l].chunks[c].element[x][y]);
+                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setContent(map.layers[l].chunks[c].element[x][y]);
+                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setContent(map.layers[l].chunks[c].element[x][y]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return solidInfoMap;
+}
+
 //saves the paths from the templates
 let paths: string[];
 
@@ -226,6 +317,11 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
     let x: string;
     let y: string;
 
+    let lowestX: number;
+    let lowestY: number;
+    let highestY: number;
+    let isSet: boolean = false;
+
     for (let l = 0; l < map.layers.length; l++) {
 
         for (let c = 0; c < map.layers[l].chunks.length; c++) {
@@ -238,6 +334,20 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
 
             dataArray.push(new saveArray(map.layers[l].chunks[c].data));
 
+            if (!isSet) {
+                lowestX = map.layers[l].chunks[c].x;
+                lowestY = map.layers[l].chunks[c].y;
+                highestY = map.layers[l].chunks[c].y + 15;
+            }
+            if (map.layers[l].chunks[c].x < lowestX) {
+                lowestX = map.layers[l].chunks[c].x;
+            }
+            if (map.layers[l].chunks[c].y < lowestY) {
+                lowestY = map.layers[l].chunks[c].y;
+            }
+            if (map.layers[l].chunks[c].y + 15 > highestY) {
+                highestY = map.layers[l].chunks[c].y + 15;
+            }
         }
 
         layerArray.push(new layer(xPos, yPos, dataArray, map.layers[l].name))
@@ -253,7 +363,7 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
         textures.set(tilesetArray[t].path, image);
     }
 
-    return new mapInfo(layerArray, tilesetArray, canvas, resolution, textures);
+    return new mapInfo(layerArray, tilesetArray, canvas, resolution, textures, lowestX, lowestY, highestY);
 }
 
 function convertXCoordinate(x: number, c:chunk, currentX: number, mapWidth: number): number {
@@ -415,3 +525,4 @@ function drawMap(mapData: mapInfo){
         })
     })
 }
+
