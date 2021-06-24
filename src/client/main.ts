@@ -13,6 +13,9 @@ var START_POSITION_Y = -8;
 const MS_PER_UPDATE = 10;
 const MS_PER_UPDATE2 = 15;
 
+export var lowestX;
+export var lowestY;
+
 function $<T extends HTMLElement>(a: string) {
     return <T>document.getElementById(a);
 }
@@ -80,7 +83,7 @@ async function main() {
      * Before we can launch our main functionality, we need to join a room and
      * wait for our player to be available to the server.
      *
-     * room and ourPlayer are currently unused, but are probably of use for later
+     * room and ourPlayer are currently unused, but are probably of use  later
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
     setRoom(room);
@@ -107,8 +110,14 @@ async function main() {
 
     let map: Promise<mapInfo> = convertMapData(xml.responseText, room, background);
 
-    let currentMap = new mapInfo((await map).layers, (await map).tilesets, (await map).canvas, (await map).resolution, (await map).textures, (await map).lowestX, (await map).lowestY, (await map).highestY);
+    let currentMap = new mapInfo((await map).layers, (await map).tilesets, (await map).canvas, (await map).resolution, (await map).textures, (await map).lowestX, (await map).lowestY, (await map).highestY, (await map).highestX);
     let collisionInfo: solidInfo[][] = fillSolidInfos(currentMap);
+    console.log(collisionInfo)
+
+    //retrieve lowest coords
+    lowestX = currentMap.lowestX;
+    lowestY = currentMap.lowestY;
+    console.log(lowestX, lowestY)
 
     //start position
     let posX: number = (START_POSITION_X + Math.floor(currentMap.widthOfMap / 2)) * currentMap.resolution;
@@ -156,7 +165,7 @@ async function main() {
         height = canvas.height;
 
         //calculate everything regarding the player
-        playerLoop(ourPlayer, players, room, now, canvas, ctx)
+        playerLoop(ourPlayer, players, room, now, canvas, ctx, collisionInfo)
 
 
         /*

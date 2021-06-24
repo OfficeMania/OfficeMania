@@ -1,4 +1,7 @@
 import {Room} from "colyseus.js";
+import { solidInfo } from "./map"
+//import { lowestX, lowestY } from "./main"
+
 
 //all variables needed to adjust movement speed and length.
 export var MOVEMENT_SPEED = 10;
@@ -71,41 +74,67 @@ export function updatePosition(player: Player, room: Room) {
 
 }
 
-export function updateOwnPosition(player: Player, room: Room) {
 
+let xCorrection: number = -16;
+let yCorrection: number = -67;
+
+export function updateOwnPosition(player: Player, room: Room, collisionInfo: solidInfo[][]) {
+    
     //initiates movement in one direction and blocks the other directions till the next tile
     if(player.prioDirection.length > 0){
         if(player.prioDirection[0] === "moveDown" && player.moveDirection === null){
-            player.moveDirection = "down"
-            player.facing = "down"
-            player.lastScaledY.pop()
-            player.lastScaledY.unshift(player.scaledY) //stores the previous position
-            player.scaledY++;
-            room.send("move", "moveDown");
+            if(collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1] === undefined || 
+                collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1].isSolid === false){
+                player.moveDirection = "down"
+                player.facing = "down"
+                player.lastScaledY.pop()
+                player.lastScaledY.unshift(player.scaledY) //stores the previous position
+                player.scaledY++;
+                room.send("move", "moveDown");
+            } else {
+                player.facing = "down"
+            }
         }
         if(player.prioDirection[0] === "moveUp" && player.moveDirection === null){
-            player.moveDirection = "up"
-            player.facing = "up"
-            player.lastScaledY.pop()
-            player.lastScaledY.unshift(player.scaledY) //stores the previous position
-            player.scaledY--;
-            room.send("move", "moveUp");
+            if(player.scaledY - yCorrection > 0 && 
+                (collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1] === undefined ||
+                    collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1].isSolid === false)){
+                player.moveDirection = "up"
+                player.facing = "up"
+                player.lastScaledY.pop()
+                player.lastScaledY.unshift(player.scaledY) //stores the previous position
+                player.scaledY--;
+                room.send("move", "moveUp");
+            } else {
+                player.facing = "up"
+            }
         }
         if(player.prioDirection[0] === "moveLeft" && player.moveDirection === null){
-            player.moveDirection = "left"
-            player.facing = "left"
-            player.lastScaledX.pop()
-            player.lastScaledX.unshift(player.scaledX) //stores the previous position
-            player.scaledX--;
-            room.send("move", "moveLeft");
+            if(player.scaledX - xCorrection > 0 &&
+                (collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection] === undefined || 
+                collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection].isSolid === false)){
+                player.moveDirection = "left"
+                player.facing = "left"
+                player.lastScaledX.pop()
+                player.lastScaledX.unshift(player.scaledX) //stores the previous position
+                player.scaledX--;
+                room.send("move", "moveLeft");
+            } else {
+                player.facing = "left"
+            }
         }
         if(player.prioDirection[0] === "moveRight" && player.moveDirection === null){
-            player.moveDirection = "right"
-            player.facing = "right"
-            player.lastScaledX.pop()
-            player.lastScaledX.unshift(player.scaledX) //stores the previous position
-            player.scaledX++;
-            room.send("move", "moveRight");
+            if(collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection] === undefined || 
+                collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection].isSolid === false){
+                player.moveDirection = "right"
+                player.facing = "right"
+                player.lastScaledX.pop()
+                player.lastScaledX.unshift(player.scaledX) //stores the previous position
+                player.scaledX++;
+                room.send("move", "moveRight");
+            } else {
+                player.facing = "right"
+            }
         }
     }
     //moves to the next tile

@@ -2,6 +2,8 @@ import { Player, updateOwnPosition, updatePosition, syncOwnPosition } from "./pl
 import { Room } from "colyseus.js";
 import { loadImage, PlayerRecord } from "./util";
 import { choosePlayerSprites } from "./player_sprite";
+import { solidInfo } from "./map";
+import { lowestX, lowestY } from "./main"
 
 
 function setUsername(value: string, ourPlayer: Player, room: Room) {
@@ -119,7 +121,7 @@ let lag2 = 0;
 let lastSecond = performance.now();
 
 
-export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room, now: number, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D){
+export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room, now: number, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, collisionInfo: solidInfo[][]){
     lag += now - previous;
     lag2 += now - previous;
     previous = now;
@@ -139,7 +141,7 @@ export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room,
                 }
             });
             //Update own player
-            updateOwnPosition(ourPlayer, room);
+            updateOwnPosition(ourPlayer, room, collisionInfo);
 
             lag -= MS_PER_UPDATE;
         }
@@ -157,6 +159,7 @@ export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room,
     if (!lastSecond || now - lastSecond >= 100) {
         lastSecond = now;
         syncOwnPosition(ourPlayer, room);
+        console.log(ourPlayer.scaledX + 16, ourPlayer.scaledY + 67)
     }
 }
 

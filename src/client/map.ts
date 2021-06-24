@@ -79,6 +79,7 @@ class mapInfo {
     lowestX: number;
     lowestY: number;
     highestY: number;
+    highestX: number;
     layers: layer[];
     tilesets: tileset[];
     heightOfMap: number;
@@ -90,11 +91,12 @@ class mapInfo {
     resolution: number;
     canvas: HTMLCanvasElement;
 
-    constructor(layers: layer[], tilesets: tileset[], canvas: HTMLCanvasElement, resolution: number, textures: Map<string, HTMLImageElement>, lowestX: number, lowestY: number, highestY: number) {
+    constructor(layers: layer[], tilesets: tileset[], canvas: HTMLCanvasElement, resolution: number, textures: Map<string, HTMLImageElement>, lowestX: number, lowestY: number, highestY: number, highestX: number) {
 
         this.lowestX = lowestX;
         this.lowestY = lowestY;
         this.highestY = highestY;
+        this.highestX = highestX;
         this.layers = layers;
         this.tilesets = tilesets;
         this.heightOfMap = canvas.height / (resolution);
@@ -198,28 +200,33 @@ function fillSolidInfos(map: mapInfo) {
 
     let solidInfoMap: solidInfo[][];
     let height = Math.abs(map.lowestY - map.highestY);
+    let width = Math.abs(map.lowestX - map.highestX);
     let mapStartX = map.lowestX;
     let mapStartY = map.lowestY;
 
     solidInfoMap = [];
-    for (let i: number; i < height * 2; i++) {
+    for (let i = 0; i < height * 2; i++) {
         solidInfoMap[i] = [];
+        for (let j = 0; j < width * 2; j++) {
+            solidInfoMap[i][j] = new solidInfo();
+        }
     }
 
-    for (let l: number; l < map.layers.length; l++) {
+    for (let l = 0; l < map.layers.length; l++) {
 
-        if (map.layers[l].name.search("solid") !== -1 || map.layers[l].name.search("content") !== -1) {
+        if (map.layers[l].isSolid === true || map.layers[l].name.search("content") !== -1) {
 
-            for (let c: number; c < map.layers[l].chunks.length; c++) {
+            for (let c = 0; c < map.layers[l].chunks.length; c++) {
 
-                for (let y: number; y < 16; y++) {
+                for (let y = 0; y < 16; y++) {
 
-                    for (let x: number; x < 16; x++) {
+                    for (let x = 0; x < 16; x++) {
 
-                        if (map.layers[l].name.search("solid") !== -1 && map.layers[l].chunks[c].element[x][y] !== 0 && map.layers[l].chunks[c].element[x][y] < 16) {
-
+                        if (map.layers[l].isSolid === true && map.layers[l].chunks[c].element[x][y] !== 0 && map.layers[l].chunks[c].element[x][y] < 16) {
+                            
                             let numbBin: string = map.layers[l].chunks[c].element[x][y].toString(2);
                             let fillerString: string = "";
+                            console.log(numbBin)
 
                             if (numbBin.length < 4) {
 
@@ -229,6 +236,7 @@ function fillSolidInfos(map: mapInfo) {
                                 numbBin = fillerString.concat(numbBin);
                             }
                             
+                            //makes diffrent quarters of a block solid
                             if (numbBin.charAt(0) === "1") {
                                 solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setIsSolid();
                             } 
@@ -320,6 +328,7 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
     let lowestX: number;
     let lowestY: number;
     let highestY: number;
+    let highestX: number;
     let isSet: boolean = false;
 
     for (let l = 0; l < map.layers.length; l++) {
@@ -338,6 +347,9 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
                 lowestX = map.layers[l].chunks[c].x;
                 lowestY = map.layers[l].chunks[c].y;
                 highestY = map.layers[l].chunks[c].y + 15;
+                highestX = map.layers[l].chunks[c].x + 15;
+
+                isSet = true;
             }
             if (map.layers[l].chunks[c].x < lowestX) {
                 lowestX = map.layers[l].chunks[c].x;
@@ -348,10 +360,14 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
             if (map.layers[l].chunks[c].y + 15 > highestY) {
                 highestY = map.layers[l].chunks[c].y + 15;
             }
+            if (map.layers[l].chunks[c].x + 15 > highestX) {
+                highestY = map.layers[l].chunks[c].x + 15;
+            }
         }
 
         layerArray.push(new layer(xPos, yPos, dataArray, map.layers[l].name))
     }
+    console.log(lowestX, lowestY, highestX, highestY)
 
     for (let t = 0; t < map.tilesets.length; t++) {
 
@@ -362,8 +378,7 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
         tilesetArray[t].tileWidth = image.naturalWidth;
         textures.set(tilesetArray[t].path, image);
     }
-
-    return new mapInfo(layerArray, tilesetArray, canvas, resolution, textures, lowestX, lowestY, highestY);
+    return new mapInfo(layerArray, tilesetArray, canvas, resolution, textures, lowestX, lowestY, highestY, highestX);
 }
 
 function convertXCoordinate(x: number, c:chunk, currentX: number, mapWidth: number): number {
