@@ -83,8 +83,10 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
     //initiates movement in one direction and blocks the other directions till the next tile
     if(player.prioDirection.length > 0){
         if(player.prioDirection[0] === "moveDown" && player.moveDirection === null){
-            if(collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1] === undefined || 
-                collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1].isSolid === false){
+            if((collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1] === undefined || 
+                collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1].isSolid === false) &&         //dont go in direction if there are objects
+                (collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1] === undefined || 
+                collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1].isSolid === false)){         
                 player.moveDirection = "down"
                 player.facing = "down"
                 player.lastScaledY.pop()
@@ -96,9 +98,11 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
             }
         }
         if(player.prioDirection[0] === "moveUp" && player.moveDirection === null){
-            if((player.scaledY - yCorrection > 0 && 
-                (collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1] === undefined ||
-                    collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1].isSolid === false))){
+            if(player.scaledY - yCorrection > 0 && 
+                ((collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1] === undefined ||
+                    collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1].isSolid === false)&&         //dont go in direction if there are objects
+                    (collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection - 1] === undefined || 
+                    collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection - 1].isSolid === false))){         //dont go in direction if there are objects
                 player.moveDirection = "up"
                 player.facing = "up"
                 player.lastScaledY.pop()
@@ -112,7 +116,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
         if(player.prioDirection[0] === "moveLeft" && player.moveDirection === null){
             if(player.scaledX - xCorrection > 0 &&
                 (collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection] === undefined || 
-                collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection].isSolid === false)){
+                collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection].isSolid === false)){         //dont go in direction if there are objects
                 player.moveDirection = "left"
                 player.facing = "left"
                 player.lastScaledX.pop()
@@ -124,8 +128,8 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
             }
         }
         if(player.prioDirection[0] === "moveRight" && player.moveDirection === null){
-            if(collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection] === undefined || 
-                collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection].isSolid === false){
+            if(collisionInfo[player.scaledX - xCorrection + 2][player.scaledY - yCorrection] === undefined || 
+                collisionInfo[player.scaledX - xCorrection + 2][player.scaledY - yCorrection].isSolid === false){         //dont go in direction if there are objects
                 player.moveDirection = "right"
                 player.facing = "right"
                 player.lastScaledX.pop()
