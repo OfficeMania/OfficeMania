@@ -194,10 +194,11 @@ class tileset {
 function fillSolidInfos(map: mapInfo) {
 
     let solidInfoMap: solidInfo[][];
-    let height = Math.abs(map.lowestY - map.highestY);
-    let width = Math.abs(map.lowestX - map.highestX);
+    let height = Math.abs(map.lowestY - (32)); //map.highestY+1
+    let width = Math.abs(map.lowestX - (48)); //map.highestX+1
     let mapStartX = map.lowestX;
     let mapStartY = map.lowestY;
+    console.log(map.highestX)
 
     solidInfoMap = [];
     for (let i = 0; i < height * 2; i++) {
@@ -235,16 +236,16 @@ function fillSolidInfos(map: mapInfo) {
 
                             //makes diffrent quarters of a block solid
                             if (numbBin.charAt(0) === "1") {
-                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX)][(y + map.layers[l].chunks[c].posY - mapStartY)].setIsSolid();
+                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setIsSolid();
                             } 
                             if (numbBin.charAt(1) === "1") {
-                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) + 1][(y + map.layers[l].chunks[c].posY - mapStartY)].setIsSolid();
+                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setIsSolid();
                             } 
                             if (numbBin.charAt(2) === "1") {
-                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) ][(y + map.layers[l].chunks[c].posY - mapStartY) + 1].setIsSolid();
+                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 ][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setIsSolid();
                             } 
                             if (numbBin.charAt(3) === "1") {
-                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) + 1][(y + map.layers[l].chunks[c].posY - mapStartY) + 1].setIsSolid();
+                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setIsSolid();
                             } 
                         }
                         else if (map.layers[l].name.search("content") !== -1 && map.layers[l].chunks[c].element[x][y] !== 0) {
@@ -358,7 +359,7 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
                 highestY = map.layers[l].chunks[c].y + 15;
             }
             if (map.layers[l].chunks[c].x + 15 > highestX) {
-                highestY = map.layers[l].chunks[c].x + 15;
+                highestX = map.layers[l].chunks[c].x + 15;
             }
         }
 
