@@ -217,7 +217,7 @@ function fillSolidInfos(map: mapInfo) {
 
                     for (let x = 0; x < 16; x++) {
 
-                        if (map.layers[l].name.search("content") !== -1 === true && map.layers[l].chunks[c].element[x][y] !== 0 && map.layers[l].chunks[c].element[x][y] < 16) {
+                        if (map.layers[l].name.search("solid") !== -1 === true && map.layers[l].chunks[c].element[x][y] !== 0 && map.layers[l].chunks[c].element[x][y] < 16) {
                             
                             let numbBin: string = map.layers[l].chunks[c].element[x][y].toString(2);
                             let fillerString: string = "";
