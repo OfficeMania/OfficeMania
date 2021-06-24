@@ -3,7 +3,7 @@ import {Player, syncOwnPosition, TILE_SIZE, updateOwnPosition, updatePosition} f
 import {InitState, joinAndSync, loadImage, PlayerRecord, setRoom} from "./util";
 import {convertMapData, drawMap, mapInfo, solidInfo, fillSolidInfos} from "./map";
 import {choosePlayerSprites} from "./player_sprite";
-import {initConference, nearbyPlayerCheck, toggleMuteByType, toggleSharing} from "./conference/conference";
+import {initConference, nearbyPlayerCheck, onUserUpdate, toggleMuteByType, toggleSharing} from "./conference/conference";
 import { drawPlayer, loadCharacter, loadInputFuctions, playerLoop } from "./movement";
 
 
@@ -182,6 +182,7 @@ async function main() {
             playerNearbyTimer = 0;
 
             nearbyPlayerCheck(players, ourPlayer);
+            onUserUpdate(players);
         }
 
         //DESIGN TODO: when something on the map changes: drawMap

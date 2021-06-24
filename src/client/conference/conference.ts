@@ -349,6 +349,7 @@ function updateButtons() {
     setSwitchToDesktop(sharingEnabled, isDesktopSharingSupported());
 }
 
+
 // Exported Functions
 
 export function isDesktopSharingSupported() {
@@ -416,6 +417,7 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
         //console.debug(`nearby  : ${user.participantId}`);
     });
     //console.log("Players consists of : " + players);
+    /**
     if (isEmpty) {
         playerNearbyIndicator.innerHTML = "Waiting for someone else to join...";
     } else if (playersNearby.length === 0) {
@@ -423,6 +425,12 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
     } else {
         playerNearbyIndicator.innerHTML = "player nearby";
     }
+     */
+}
+
+export function onUserUpdate(players: PlayerRecord) {
+    
+    playerNearbyIndicator.innerText =  "Players online: " + Object.values(players).map((player) => player.name).join(', ');
 }
 
 // Code

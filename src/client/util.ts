@@ -1,5 +1,6 @@
 import {Client, Room} from "colyseus.js";
 import {State} from "../common";
+import { onUserUpdate } from "./conference/conference";
 import {Player} from "./player";
 
 export type InitState = [Room<State>, Player];
@@ -51,7 +52,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
             *
             * See: https://docs.colyseus.io/state/schema/#onadd-instance-key
             */
-            room.state.players.onAdd = function (playerData, sessionId) {
+            room.state.players.onAdd = (playerData, sessionId) => {
                 console.log("Add", sessionId, playerData);
 
                 let player: Player = {
@@ -84,6 +85,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 if (sessionId === room.sessionId) {
                     resolve([room, player]);
                 }
+                //onUserUpdate(players);
             };
 
             /*
@@ -92,11 +94,15 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
             *
             * See: https://docs.colyseus.io/state/schema/#onremove-instance-key
             */
-            room.state.players.onRemove = function (_, sessionId) {
+            room.state.players.onRemove = (_, sessionId)  => {
                 console.log("Remove", sessionId);
                 delete players[sessionId];
+                //onUserUpdate(players);
             };
-
+            /**room.state.players.onChange = (_, sessionId) => {
+                onUserUpdate(players);
+            }*/
+            
             /*
              * If the room has any other state that needs to be observed, the
              * code needs to be placed here:
