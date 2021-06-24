@@ -136,23 +136,23 @@ class User {
     }
 
     update() {
-        const remove = this.disabled || this.videoTrack?.isMuted();
+        const removeVideo = this.disabled || this.videoTrack?.isMuted();
         if (this.videoElement) {
             if (this.videoTrack) {
-                const changed = this.videoBar.contains(this.videoElement) === remove;
-                const changedPause = this.videoElement.hasAttribute("paused") !== remove;
+                const changed = this.videoBar.contains(this.videoElement) === removeVideo;
+                const changedPause = this.videoElement.hasAttribute("paused") !== removeVideo;
                 if (changed || changedPause) {
-                    if (remove) {
+                    if (removeVideo) {
                         this.videoElement.toggleAttribute("paused", true);
                     } else {
                         this.videoElement.toggleAttribute("paused", false);
                     }
                     if (this.pauseVideo()) {
-                        if (!remove && !this.videoBar.contains(this.videoElement)) {
+                        if (!removeVideo && !this.videoBar.contains(this.videoElement)) {
                             this.videoBar.append(this.videoElement);
                         }
                         if (changedPause) {
-                            if (remove) {
+                            if (removeVideo) {
                                 this.videoTrack.detach(this.videoElement);
                             } else {
                                 this.videoTrack.attach(this.videoElement);
@@ -160,7 +160,7 @@ class User {
                         }
                     } else {
                         if (changed) {
-                            if (remove) {
+                            if (removeVideo) {
                                 this.videoElement.remove();
                             } else {
                                 this.videoElement.play().then(() => this.videoBar.append(this.videoElement));
@@ -172,9 +172,10 @@ class User {
                 this.videoElement.remove();
             }
         }
+        const removeAudio = this.disabled || this.audioTrack?.isMuted();
         if (this.audioElement) {
             if (this.audioTrack) {
-                if (remove) {
+                if (removeAudio) {
                     this.audioElement.volume = 0.0;
                     this.audioElement.setAttribute("volume", "0.0");
                     this.audioElement.toggleAttribute("muted", true);
