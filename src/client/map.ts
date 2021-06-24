@@ -206,22 +206,22 @@ function fillSolidInfos(map: mapInfo) {
             solidInfoMap[i][j] = new solidInfo();
         }
     }
-
+    
     for (let l = 0; l < map.layers.length; l++) {
-
-        if (map.layers[l].name.search("solid") !== -1 || map.layers[l].name.search("content") !== -1) {
-
+        
+        if (map.layers[l].name.search("Solid") !== -1 || map.layers[l].name.search("content") !== -1) {
+            
             for (let c = 0; c < map.layers[l].chunks.length; c++) {
 
                 for (let y = 0; y < 16; y++) {
 
                     for (let x = 0; x < 16; x++) {
-
-                        if (map.layers[l].name.search("solid") !== -1 === true && map.layers[l].chunks[c].element[x][y] !== 0 && map.layers[l].chunks[c].element[x][y] < 16) {
+                        
+                        if (map.layers[l].name.search("Solid") !== -1 && map.layers[l].chunks[c].element[x][y] !== 0 && map.layers[l].chunks[c].element[x][y] < 16) {
                             
                             let numbBin: string = map.layers[l].chunks[c].element[x][y].toString(2);
                             let fillerString: string = "";
-                            console.log(numbBin)
+                            
 
                             if (numbBin.length < 4) {
 
@@ -231,18 +231,20 @@ function fillSolidInfos(map: mapInfo) {
                                 numbBin = fillerString.concat(numbBin);
                             }
                             
+                            
+
                             //makes diffrent quarters of a block solid
                             if (numbBin.charAt(0) === "1") {
-                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setIsSolid();
+                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX)][(y + map.layers[l].chunks[c].posY - mapStartY)].setIsSolid();
                             } 
                             if (numbBin.charAt(1) === "1") {
-                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setIsSolid();
+                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) + 1][(y + map.layers[l].chunks[c].posY - mapStartY)].setIsSolid();
                             } 
                             if (numbBin.charAt(2) === "1") {
-                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setIsSolid();
+                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) ][(y + map.layers[l].chunks[c].posY - mapStartY) + 1].setIsSolid();
                             } 
                             if (numbBin.charAt(3) === "1") {
-                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setIsSolid();
+                                solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) + 1][(y + map.layers[l].chunks[c].posY - mapStartY) + 1].setIsSolid();
                             } 
                         }
                         else if (map.layers[l].name.search("content") !== -1 && map.layers[l].chunks[c].element[x][y] !== 0) {
