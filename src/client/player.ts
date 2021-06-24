@@ -75,16 +75,16 @@ export function updatePosition(player: Player, room: Room) {
 }
 
 
-let xCorrection: number = -16;
-let yCorrection: number = -67;
+let xCorrection: number = -38;
+let yCorrection: number = -85;
 
 export function updateOwnPosition(player: Player, room: Room, collisionInfo: solidInfo[][]) {
     
     //initiates movement in one direction and blocks the other directions till the next tile
     if(player.prioDirection.length > 0){
         if(player.prioDirection[0] === "moveDown" && player.moveDirection === null){
-            if(collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1] === undefined || 
-                collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1].isSolid === false){
+            if(collisionInfo[Math.floor((player.scaledX - xCorrection)/2)][Math.floor((player.scaledY - yCorrection)/2) + 1] === undefined || 
+                collisionInfo[Math.floor((player.scaledX - xCorrection)/2)][Math.floor((player.scaledY - yCorrection)/2) + 1].isSolid === false){
                 player.moveDirection = "down"
                 player.facing = "down"
                 player.lastScaledY.pop()
@@ -96,9 +96,9 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
             }
         }
         if(player.prioDirection[0] === "moveUp" && player.moveDirection === null){
-            if(player.scaledY - yCorrection > 0 && 
-                (collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1] === undefined ||
-                    collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1].isSolid === false)){
+            if(Math.floor((player.scaledY - yCorrection)/2) > 0 && 
+                (collisionInfo[Math.floor((player.scaledX - xCorrection)/2)][Math.floor((player.scaledY - yCorrection)/2) - 1] === undefined ||
+                    collisionInfo[Math.floor((player.scaledX - xCorrection)/2)][Math.floor((player.scaledY - yCorrection)/2) - 1].isSolid === false)){
                 player.moveDirection = "up"
                 player.facing = "up"
                 player.lastScaledY.pop()
@@ -110,9 +110,9 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
             }
         }
         if(player.prioDirection[0] === "moveLeft" && player.moveDirection === null){
-            if(player.scaledX - xCorrection > 0 &&
-                (collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection] === undefined || 
-                collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection].isSolid === false)){
+            if(Math.floor((player.scaledX - xCorrection)/2) > 0 &&
+                (collisionInfo[Math.floor((player.scaledX - xCorrection)/2) - 1][Math.floor((player.scaledY - yCorrection)/2)] === undefined || 
+                collisionInfo[Math.floor((player.scaledX - xCorrection)/2) - 1][Math.floor((player.scaledY - yCorrection)/2)].isSolid === false)){
                 player.moveDirection = "left"
                 player.facing = "left"
                 player.lastScaledX.pop()
@@ -124,8 +124,8 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
             }
         }
         if(player.prioDirection[0] === "moveRight" && player.moveDirection === null){
-            if(collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection] === undefined || 
-                collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection].isSolid === false){
+            if(collisionInfo[Math.floor((player.scaledX - xCorrection)/2) + 1][Math.floor((player.scaledY - yCorrection)/2)] === undefined || 
+                collisionInfo[Math.floor((player.scaledX - xCorrection)/2) + 1][Math.floor((player.scaledY - yCorrection)/2)].isSolid === false){
                 player.moveDirection = "right"
                 player.facing = "right"
                 player.lastScaledX.pop()
