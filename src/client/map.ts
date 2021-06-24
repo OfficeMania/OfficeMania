@@ -128,16 +128,11 @@ class layer {
 
     name: string;
     chunks: chunk[];
-    isSolid: boolean;
 
     constructor(x:number[], y:number[], data:saveArray[], layerName: string) {
 
         this.chunks = [];
         this.name = layerName;
-
-        if (layerName.search("solid") !== -1) {
-            this.isSolid = true;
-        } else { this.isSolid = false; }
 
         let tempData: number[] = [];
 
@@ -214,7 +209,7 @@ function fillSolidInfos(map: mapInfo) {
 
     for (let l = 0; l < map.layers.length; l++) {
 
-        if (map.layers[l].isSolid === true || map.layers[l].name.search("content") !== -1) {
+        if (map.layers[l].name.search("solid") !== -1 || map.layers[l].name.search("content") !== -1) {
 
             for (let c = 0; c < map.layers[l].chunks.length; c++) {
 
@@ -222,7 +217,7 @@ function fillSolidInfos(map: mapInfo) {
 
                     for (let x = 0; x < 16; x++) {
 
-                        if (map.layers[l].isSolid === true && map.layers[l].chunks[c].element[x][y] !== 0 && map.layers[l].chunks[c].element[x][y] < 16) {
+                        if (map.layers[l].name.search("content") !== -1 === true && map.layers[l].chunks[c].element[x][y] !== 0 && map.layers[l].chunks[c].element[x][y] < 16) {
                             
                             let numbBin: string = map.layers[l].chunks[c].element[x][y].toString(2);
                             let fillerString: string = "";
