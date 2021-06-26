@@ -3,7 +3,7 @@
 const JitsiMeetJSIntern = JitsiMeetJS;
 
 import {getRoom, PlayerRecord} from "../util";
-import {SelfUser, User} from "./entities";
+import {checkPercentPerVideoElement, SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
 import {setAudioButtonMute, setSwitchToDesktop, setVideoButtonMute} from "../main";
 
@@ -245,6 +245,11 @@ function onRemoteTrackRemoved(track) {
     getUser(track.getParticipantId())?.removeTrack(track);
 }
 
+function updateNumberOfTracks(playersNearby: string[]){
+    checkPercentPerVideoElement(playersNearby);
+    users.forEach(user => user.update());
+}
+
 /*
  *  Checks if muted button was audio or other
  */
@@ -411,10 +416,14 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
         user.setDisabled(true);
         //console.debug(`far away: ${user.participantId}`);
     });
+    checkPercentPerVideoElement(playersNearby);
+    selfUser.updateVideo();
     playersNearby.forEach((participantId) => {
         const user = getUser(participantId);
         user.setDisabled(false);
-        //console.debug(`nearby  : ${user.participantId}`);
+        user.updateVideo();
+        console.debug(`Ratio is: ${user.getRatio()}`);
+        console.debug(`nearby  : ${user.participantId}`);
     });
     //console.log("Players consists of : " + players);
     /**
