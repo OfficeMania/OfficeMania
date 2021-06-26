@@ -12,6 +12,7 @@ export class TURoom extends Room<State> {
         this.setState(state);
 
         //generate jitsi conference id and password
+        //TODO Generate the id and password locally and let the Server create/join the conference BEFORE even setting the state, so no chance that someone else joins before the server!
         state.conference.id = generateUUIDv4();
         state.conference.password = generateUUIDv4();
         //TODO rework the conference so that the server can join a conference too, before anyone else, and become moderator to lock the room down with a password
