@@ -199,6 +199,9 @@ function fillSolidInfos(map: mapInfo) {
     let mapStartX = map.lowestX;
     let mapStartY = map.lowestY;
 
+    height += 32;
+    width += 32;
+
     solidInfoMap = [];
     for (let i = 0; i < height * 2; i++) {
         solidInfoMap[i] = [];
@@ -237,9 +240,9 @@ function fillSolidInfos(map: mapInfo) {
                                     value = map.layers[l].chunks[c].element[x][y] - newTileset.firstGridId;
                                     if (map.layers[l].name.search("Solid") !== -1 && value !== 0 && value < 16) {
 
+                                        value++;
                                         let numbBin: string = value.toString(2);
                                         let fillerString: string = "";
-
 
                                         if (numbBin.length < 4) {
 
@@ -249,20 +252,18 @@ function fillSolidInfos(map: mapInfo) {
                                             numbBin = fillerString.concat(numbBin);
                                         }
 
-
-
-                                        //makes diffrent quarters of a block solid
+                                        //makes different quarters of a block solid
                                         if (numbBin.charAt(0) === "1") {
-                                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX)][(y + map.layers[l].chunks[c].posY - mapStartY)].setIsSolid();
+                                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setIsSolid();
                                         }
                                         if (numbBin.charAt(1) === "1") {
-                                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) + 1][(y + map.layers[l].chunks[c].posY - mapStartY)].setIsSolid();
+                                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setIsSolid();
                                         }
                                         if (numbBin.charAt(2) === "1") {
-                                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) ][(y + map.layers[l].chunks[c].posY - mapStartY) + 1].setIsSolid();
+                                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setIsSolid();
                                         }
                                         if (numbBin.charAt(3) === "1") {
-                                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) + 1][(y + map.layers[l].chunks[c].posY - mapStartY) + 1].setIsSolid();
+                                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setIsSolid();
                                         }
                                     }
                                     else if (map.layers[l].name.search("content") !== -1 && value !== 0) {
@@ -304,7 +305,7 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
     //maps a HTMLImageElement with the name of the sourcefile
     let textures: Map<string, HTMLImageElement>;
 
-    //zoom in and out on the map, 1 is the standart
+    //zoom in and out on the map, 1 is the standard
     let scaling: number;
 
     //saves the tilesets from the map
@@ -385,7 +386,6 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
 
         layerArray.push(new layer(xPos, yPos, dataArray, map.layers[l].name))
     }
-    console.log(lowestX, lowestY, highestX, highestY)
 
     for (let t = 0; t < map.tilesets.length; t++) {
 
@@ -410,7 +410,6 @@ function convertYCoordinate(y: number, c:chunk, currentY: number, mapHeight: num
 }
 
 
-
 //code for infinite maps
 //we have to do it all again because performance sucks
 function drawMapWithChunks (mapData: mapInfo) {
@@ -427,7 +426,7 @@ function drawMapWithChunks (mapData: mapInfo) {
 
                 for (let y = 0; y < 16; y++) {
 
-                    //checks if the y coordinate would be seen on the screen, only works with an odd mapHeigtht
+                    //checks if the y coordinate would be seen on the screen, only works with an odd mapHeight
                     convertedY = convertYCoordinate(y, c, mapData.currentY, mapData.heightOfMap);
                     //if (!(convertedY < 0 || convertedY > mapData.heightOfMap)) {
     
@@ -436,7 +435,7 @@ function drawMapWithChunks (mapData: mapInfo) {
                             //if the value is 0 we do not need to draw
                             if (c.element[x][y] !== 0) {
                             
-                                //checks if the x coordiante would be seen on the screen, only works with an odd mapWidth
+                                //checks if the x coordinate would be seen on the screen, only works with an odd mapWidth
                                 convertedX = convertXCoordinate(x, c, mapData.currentX, mapData.widthOfMap);
                                 //if (!(convertedX < 0 || convertedX > mapData.widthOfMap)) {
 
@@ -476,7 +475,7 @@ function drawMapWithChunks (mapData: mapInfo) {
                                         }
 
                                     } else{
-                                        //draw the image withaout searching
+                                        //draw the image without searching
                                         mapData.ctx.drawImage(mapData.textures.get(c.tilesetForElement[x][y].path), c.tilesetX[x][y], c.tilesetY[x][y], mapData.resolution, mapData.resolution, convertedX * mapData.resolution, convertedY * mapData.resolution, mapData.resolution, mapData.resolution);
                                     }
 
@@ -545,7 +544,7 @@ function drawMap(mapData: mapInfo){
                                     }
                                 }
                             } else{
-                                //draw the image withaout searching
+                                //draw the image without searching
                                 mapData.ctx.drawImage(mapData.textures.get(c.tilesetForElement[x][y].path), c.tilesetX[x][y], c.tilesetY[x][y], mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
                             }
                         }

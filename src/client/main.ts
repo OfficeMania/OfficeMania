@@ -8,8 +8,8 @@ import { drawPlayer, loadCharacter, loadInputFuctions, playerLoop } from "./move
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
-var START_POSITION_X = -13;
-var START_POSITION_Y = -8;
+const START_POSITION_X = -13;
+const START_POSITION_Y = -8;
 const MS_PER_UPDATE = 10;
 const MS_PER_UPDATE2 = 15;
 

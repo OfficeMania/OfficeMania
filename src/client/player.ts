@@ -60,17 +60,6 @@ export function updatePosition(player: Player, room: Room) {
             player.positionX -= PLAYER_MOVEMENT_PER_TICK;
         }
     }
-    //if close enough just set client pos = server pos
-    if(Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE) <= PLAYER_MOVEMENT_PER_TICK){
-        player.positionY = room.state.players[player.id].y * STEP_SIZE
-    } else {
-        //smooth animation to new y coord
-        if(player.positionY < room.state.players[player.id].y * STEP_SIZE){
-            player.positionY += PLAYER_MOVEMENT_PER_TICK;
-        }else if(player.positionY > room.state.players[player.id].y * STEP_SIZE){
-            player.positionY -= PLAYER_MOVEMENT_PER_TICK;
-        }
-    }
 
 }
 

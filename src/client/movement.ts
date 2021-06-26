@@ -126,7 +126,7 @@ export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room,
     lag2 += now - previous;
     previous = now;
 
-    //calculate everithing that needs to be calculated by the second and not the FPS
+    //calculate everything that needs to be calculated by the second and not the FPS
     while (lag >= MS_PER_UPDATE || lag2 >= MS_PER_UPDATE2) {
 
         //calculates players movement
@@ -159,23 +159,24 @@ export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room,
     if (!lastSecond || now - lastSecond >= 100) {
         lastSecond = now;
         syncOwnPosition(ourPlayer, room);
-        console.log(ourPlayer.scaledX + 16, ourPlayer.scaledY + 67)
+        // console.log(ourPlayer.scaledX + 16, ourPlayer.scaledY + 67)
     }
 }
 
 export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters: { [key: string]: HTMLImageElement }, ctx: CanvasRenderingContext2D, width: number, height: number){
      // Draw each player
      Object.values(players).forEach((player: Player, i: number) => {
-        //choose the correct sprite
+        let text;
+//choose the correct sprite
         if (ourPlayer.id !== player.id) {
-            //draw everyone else on theire position relatively to you
+            //draw everyone else on their position relatively to you
             ctx.drawImage(characters[player.character], player.spriteX, player.spriteY, playerWidth, playerHeight, Math.round((width / 2) + player.positionX - ourPlayer.positionX), Math.round((height / 2) + player.positionY - ourPlayer.positionY), playerWidth, playerHeight);
 
             //draw name
             ctx.font = '18px Hevitica';
             ctx.textAlign = "center";
 
-            var text = ctx.measureText(player.name);
+            text = ctx.measureText(player.name);
             ctx.fillStyle = "rgba(100, 100, 100, 0.5)";
             ctx.fillRect(Math.round((width / 2) + player.positionX - ourPlayer.positionX) - text.width / 2 + 20, Math.round((height / 2) + player.positionY - ourPlayer.positionY) - 4, text.width + 8, 24);
 
@@ -189,7 +190,7 @@ export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters:
             ctx.font = '18px Hevitica';
             ctx.textAlign = "center";
 
-            var text = ctx.measureText(player.name);
+            text = ctx.measureText(player.name);
             ctx.fillStyle = "rgba(100, 100, 100, 0.5)";
             ctx.fillRect(Math.round(width / 2) - text.width / 2 + 20, Math.round(height / 2) - 4, text.width + 8, 24);
 
