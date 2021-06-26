@@ -422,8 +422,8 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
         const user = getUser(participantId);
         user.setDisabled(false);
         user.updateVideo();
-        console.debug(`Ratio is: ${user.getRatio()}`);
-        console.debug(`nearby  : ${user.participantId}`);
+        //console.debug(`Ratio is: ${user.getRatio()}`);
+        //console.debug(`nearby  : ${user.participantId}`);
     });
     //console.log("Players consists of : " + players);
     /**

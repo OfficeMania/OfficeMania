@@ -6,6 +6,7 @@ export {User, SelfUser};
 
 let videoElementWitdh: string = "15%";
 let percentPerVideoElement: number = 15;
+const bigVideoBar = $<HTMLDivElement>("big-video-bar");
 
 function createAudioTrackElement(id: string): HTMLAudioElement {
     const element = document.createElement("audio");
@@ -39,6 +40,10 @@ function createVideoTrackElement(id: string): HTMLVideoElement {
             element.style.setProperty("width", widthLarge);
         }
     };
+    return element;
+}
+function createBigVideo(element: HTMLVideoElement):HTMLVideoElement{
+    element.style.setProperty("width", "75%" );
     return element;
 }
 
@@ -160,7 +165,7 @@ class User {
         return false;
     }
     updateVideo(){
-        if(this.videoElement != null) this.videoElement.style.setProperty("width", videoElementWitdh);
+        if(this.videoElement != null && !this.videoElement.hasAttribute("big")) this.videoElement.style.setProperty("width", videoElementWitdh);
         else console.log("videoElement is null");
         
     }
@@ -227,7 +232,7 @@ class User {
         this.disabled = disabled;
         this.update();
     }
-    
+
     getRatio(): boolean{ //true = 16:9, false = 4:3
         let ratio: number = 0;
         if(this.videoElement != null) {ratio = this.videoElement.offsetWidth / this.videoElement.offsetHeight;}
