@@ -1,5 +1,3 @@
-import { Player } from "../player";
-import { PlayerRecord } from "../util";
 import {trackTypeDesktop, trackTypeVideo} from "./conference";
 
 export {User, SelfUser};
@@ -18,7 +16,7 @@ function createAudioTrackElement(id: string): HTMLAudioElement {
     return element;
 }
 
-function createVideoTrackElement(id: string): HTMLVideoElement {
+function createVideoElementContainer(id: string): VideoContainer {
     let widthLarge: string = "75%";
     const element = document.createElement("video");
     element.setAttribute("id", id);
@@ -40,8 +38,9 @@ function createVideoTrackElement(id: string): HTMLVideoElement {
             element.style.setProperty("width", widthLarge);
         }
     };
-    return element;
+    return new VideoContainer(element);
 }
+
 function createBigVideo(element: HTMLVideoElement):HTMLVideoElement{
     element.style.setProperty("width", "75%" );
     return element;
@@ -65,6 +64,59 @@ export function checkPercentPerVideoElement(playersNearby: string[]):number{
     return percentPerVideoElement;
 }
 
+class VideoContainer {
+
+    private _container: HTMLDivElement;
+    private _video: HTMLVideoElement;
+    private _display: HTMLParagraphElement;
+
+    constructor(video: HTMLVideoElement) {
+        this._container = document.createElement("div");
+        this._video = video;
+        this._display = document.createElement("p");
+        this.init();
+    }
+
+    protected init() {
+        this.container.classList.add("video-container")
+        this.container.append(this.video);
+        const overlayElement = document.createElement("div");
+        overlayElement.classList.add("video-overlay");
+        overlayElement.append(this.display);
+        this.container.append(overlayElement);
+        this.display.innerHTML = "<b>You</b>";
+    }
+
+    get container(): HTMLDivElement {
+        return this._container;
+    }
+
+    set container(value: HTMLDivElement) {
+        this._container = value;
+    }
+
+    get video(): HTMLVideoElement {
+        return this._video;
+    }
+
+    set video(value: HTMLVideoElement) {
+        this._video = value;
+    }
+
+    get display(): HTMLParagraphElement {
+        return this._display;
+    }
+
+    set display(value: HTMLParagraphElement) {
+        this._display = value;
+    }
+
+    setDisplay(text: string) {
+        this.display.innerText = text;
+    }
+
+}
+
 class User {
 
     // Constants
@@ -79,7 +131,7 @@ class User {
     protected audioTrack: any = null;
     protected videoTrack: any = null;
     protected audioElement: HTMLAudioElement = null;
-    protected videoElement: HTMLVideoElement = null;
+    protected videoContainer: VideoContainer = null;
 
     constructor(conference, audioBar: HTMLDivElement, videoBar: HTMLDivElement, participantId: string) {
         this.conference = conference;
@@ -128,9 +180,9 @@ class User {
         }
         //TODO What to do with overridden tracks? detach them?
         this.videoTrack = track;
-        const element = createVideoTrackElement(`track-video-${this.participantId}-${track.getId()}`);
-        this.videoElement = element;
-        track.attach(element);
+        const container = createVideoElementContainer(`track-video-${this.participantId}-${track.getId()}`);
+        this.videoContainer = container;
+        track.attach(container.video);
         this.update();
     }
 
@@ -164,47 +216,49 @@ class User {
     protected pauseVideo(): boolean {
         return false;
     }
+
     updateVideo(){
-        if(this.videoElement != null && !this.videoElement.hasAttribute("big")) this.videoElement.style.setProperty("width", videoElementWitdh);
-        else console.log("videoElement is null");
-        
+        if(this.videoContainer != null && !this.videoContainer.video.hasAttribute("big")) this.videoContainer.video.style.setProperty("width", videoElementWitdh);
+        else console.log("videoContainer is null");
+
     }
+
     update() {
         //console.log("update has been called");
         const removeVideo = this.disabled || this.videoTrack?.isMuted();
-        if (this.videoElement) {
+        if (this.videoContainer) {
             if (this.videoTrack) {
-                const changed = this.videoBar.contains(this.videoElement) === removeVideo;
-                const changedPause = this.videoElement.hasAttribute("paused") !== removeVideo;
+                const changed = this.videoBar.contains(this.videoContainer.container) === removeVideo;
+                const changedPause = this.videoContainer.video.hasAttribute("paused") !== removeVideo;
                 if (changed || changedPause) {
                     if (removeVideo) {
-                        this.videoElement.toggleAttribute("paused", true);
+                        this.videoContainer.video.toggleAttribute("paused", true);
                     } else {
-                        this.videoElement.toggleAttribute("paused", false);
+                        this.videoContainer.video.toggleAttribute("paused", false);
                     }
                     if (this.pauseVideo()) {
-                        if (!removeVideo && !this.videoBar.contains(this.videoElement)) {
-                            this.videoBar.append(this.videoElement);
+                        if (!removeVideo && !this.videoBar.contains(this.videoContainer.container)) {
+                            this.videoBar.append(this.videoContainer.container);
                         }
                         if (changedPause) {
                             if (removeVideo) {
-                                this.videoTrack.detach(this.videoElement);
+                                this.videoTrack.detach(this.videoContainer.video);
                             } else {
-                                this.videoTrack.attach(this.videoElement);
+                                this.videoTrack.attach(this.videoContainer.video);
                             }
                         }
                     } else {
                         if (changed) {
                             if (removeVideo) {
-                                this.videoElement.remove();
+                                this.videoContainer.container.remove();
                             } else {
-                                this.videoElement.play().then(() => this.videoBar.append(this.videoElement));
+                                this.videoContainer.video.play().then(() => this.videoBar.append(this.videoContainer.container));
                             }
                         }
                     }
                 }
             } else {
-                this.videoElement.remove();
+                this.videoContainer.container.remove();
             }
         }
         const removeAudio = this.disabled || this.audioTrack?.isMuted();
@@ -233,9 +287,16 @@ class User {
         this.update();
     }
 
+    setDisplay(text: string) {
+        if (!this.videoContainer) {
+            //console.error(this);
+        }
+        this.videoContainer?.setDisplay(text);
+    }
+
     getRatio(): boolean{ //true = 16:9, false = 4:3
         let ratio: number = 0;
-        if(this.videoElement != null) {ratio = this.videoElement.offsetWidth / this.videoElement.offsetHeight;}
+        if(this.videoContainer != null) {ratio = this.videoContainer.video.offsetWidth / this.videoContainer.video.offsetHeight;}
         else return;
         if(1.5 < ratio) return true;
         return false;
@@ -264,12 +325,12 @@ class User {
 
     private removeElements() {
         this.audioElement?.remove();
-        this.videoElement?.remove();
+        this.videoContainer?.container?.remove();
     }
 
     private detachTracks() {
         this.audioTrack?.detach(this.audioElement);
-        this.videoTrack?.detach(this.videoElement);
+        this.videoTrack?.detach(this.videoContainer.video);
     }
 
     dispose() {
@@ -283,7 +344,7 @@ class User {
     }
 
     disposeVideo() {
-        this.videoTrack?.detach(this.videoElement);
+        this.videoTrack?.detach(this.videoContainer.video);
         this.videoTrack?.dispose();
     }
 
@@ -379,7 +440,7 @@ class SelfUser extends User {
     private swapTracksIntern() {
         this.videoTrack = this.tempVideoTrack;
         this.tempVideoTrack = null;
-        this.videoTrack.attach(this.videoElement);
+        this.videoTrack.attach(this.videoContainer.video);
         this.conference.addTrack(this.videoTrack);
         this.update();
     }

@@ -439,6 +439,7 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
 
 export function updateUsers(players: PlayerRecord) {
     playerNearbyIndicator.innerText =  "Players online: " + Object.values(players).map((player) => player.name).join(', ');
+    Object.values(players).forEach((player) => getUser(player.participantId)?.setDisplay(player.name));
 }
 
 // Code
