@@ -41,25 +41,24 @@ function createVideoElementContainer(id: string): VideoContainer {
     return new VideoContainer(element);
 }
 
-function createBigVideo(element: HTMLVideoElement):HTMLVideoElement{
-    element.style.setProperty("width", "75%" );
+function createBigVideo(element: HTMLVideoElement): HTMLVideoElement {
+    element.style.setProperty("width", "75%");
     return element;
 }
 
 //Exported functions
 
-export function getVideoElementWidth(): number{
+export function getVideoElementWidth(): number {
     return percentPerVideoElement;
 }
 
-export function checkPercentPerVideoElement(playersNearby: string[]):number{
+export function checkPercentPerVideoElement(playersNearby: string[]): number {
     let playerCount: number = playersNearby.length + 1;
     let numberOfMax: number = 6;
-    if (playerCount > numberOfMax){
+    if (playerCount > numberOfMax) {
         console.log("more than " + numberOfMax + " players");
-        percentPerVideoElement = Math.floor(100/playerCount) - Math.floor(10/playerCount);
-    }
-    else percentPerVideoElement = 15;
+        percentPerVideoElement = Math.floor(100 / playerCount) - Math.floor(10 / playerCount);
+    } else percentPerVideoElement = 15;
     videoElementWitdh = percentPerVideoElement + "%";
     return percentPerVideoElement;
 }
@@ -217,8 +216,8 @@ class User {
         return false;
     }
 
-    updateVideo(){
-        if(this.videoContainer != null && !this.videoContainer.video.hasAttribute("big")) this.videoContainer.video.style.setProperty("width", videoElementWitdh);
+    updateVideo() {
+        if (this.videoContainer != null && !this.videoContainer.video.hasAttribute("big")) this.videoContainer.video.style.setProperty("width", videoElementWitdh);
         else console.log("videoContainer is null");
 
     }
@@ -294,12 +293,14 @@ class User {
         this.videoContainer?.setDisplay(text);
     }
 
-    getRatio(): boolean{ //true = 16:9, false = 4:3
+    getRatio(): boolean { //true = 16:9, false = 4:3
         let ratio: number = 0;
-        if(this.videoContainer != null) {ratio = this.videoContainer.video.offsetWidth / this.videoContainer.video.offsetHeight;}
-        else return;
-        if(1.5 < ratio) return true;
-        return false;
+        if (this.videoContainer != null) {
+            ratio = this.videoContainer.video.offsetWidth / this.videoContainer.video.offsetHeight;
+        } else {
+            return undefined;
+        }
+        return 1.5 < ratio ? true : false;
     }
 
     get audioMuted(): boolean {
