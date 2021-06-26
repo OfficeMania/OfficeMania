@@ -227,11 +227,15 @@ class User {
         this.disabled = disabled;
         this.update();
     }
-    getRatio(): number{
+    
+    getRatio(): boolean{ //true = 16:9, false = 4:3
         let ratio: number = 0;
-        if(this.videoElement != null) {ratio = this.videoElement.width}
-        return ratio;
+        if(this.videoElement != null) {ratio = this.videoElement.offsetWidth / this.videoElement.offsetHeight;}
+        else return;
+        if(1.5 < ratio) return true;
+        return false;
     }
+
     get audioMuted(): boolean {
         return this._audioMuted;
     }
