@@ -12,24 +12,22 @@
 
         <script src="/js/vendors-bundle.js" defer></script>
     </head>
-    <body style="background-color:rgb(255, 255, 255);margin: 0;">
+    <body>
 
-        <div id="panel-buttons" style="width: 100%; background-color: gray; padding: 10px; position: fixed; top: 0;">
+        <div id="panel-buttons">
             <button id="button-mute-audio" disabled><em class="fa fa-microphone"></em></button>
             <button id="button-mute-video" disabled><em class="fa fa-video"></em></button>
             <button id="button-share-video" disabled><em class="fa fa-desktop"></em></button>
             <label for="audio-output-select">Audio Output: </label><select id="audio-output-select"></select>
-            <p id="player-nearby-indicator" style="display: inline;">Loading...</p>
+            <p id="player-nearby-indicator">Loading...</p>
         </div>
 
 
         <div id="conference">
             <div id="audio-bar"></div>
-            <div id="video-bar" style="width: 100%; position: fixed; top: 48px; text-align: center;"></div>
-            <div id="big-video-bar" style="width: 100%; position: fixed; top: 48px; text-align: center;"></div>
+            <div id="video-bar"></div>
+            <div id="big-video-bar"></div>
         </div>
-
-
 
 
         <canvas id="canvas" width="600" height="600">

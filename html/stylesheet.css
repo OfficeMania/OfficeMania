@@ -1,3 +1,34 @@
+body {
+    background-color: rgb(255, 255, 255);
+    margin: 0;
+}
+
+#panel-buttons {
+    width: 100%;
+    background-color: gray;
+    padding: 10px;
+    position: fixed;
+    top: 0;
+}
+
+#player-nearby-indicator {
+    display: inline;
+}
+
+#video-bar {
+    width: 100%;
+    position: fixed;
+    top: 48px;
+    text-align: center;
+}
+
+#big-video-bar {
+    width: 100%;
+    position: fixed;
+    top: 48px;
+    text-align: center;
+}
+
 .video-container {
     /*position: relative;*/
     display: inline-block;
