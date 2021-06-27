@@ -2,9 +2,6 @@ import {trackTypeDesktop, trackTypeVideo} from "./conference";
 
 export {User, SelfUser};
 
-let videoElementWitdh: string = "15%";
-let percentPerVideoElement: number = 15;
-
 function createAudioTrackElement(id: string): HTMLAudioElement {
     const element = document.createElement("audio");
     element.setAttribute("id", id);
@@ -15,50 +12,26 @@ function createAudioTrackElement(id: string): HTMLAudioElement {
 }
 
 function createVideoElementContainer(id: string): VideoContainer {
-    let widthLarge: string = "75%";
     const element = document.createElement("video");
     element.setAttribute("id", id);
     element.setAttribute("poster", "/img/pause-standby.png");
     element.toggleAttribute("muted", true);
     element.toggleAttribute("playsinline", true);
     element.toggleAttribute("autoplay", true);
-    //element.style.setProperty("width", videoElementWitdh); //TODO
     element.onclick = () => {
         //TODO Improve this, so that when a video is already big it will be set small again, so only one big at a time
         //And improve this, so that a big video is maybe centered or even moved from the video-bar into an extra div
         const big = element.hasAttribute("big");
         if (big) {
             element.toggleAttribute("big", false);
-            //element.style.setProperty("width", videoElementWitdh); //TODO
         } else {
             element.toggleAttribute("big", true);
-            //element.style.setProperty("width", widthLarge); //TODO
         }
     };
     return new VideoContainer(element);
 }
 
-function createBigVideo(element: HTMLVideoElement): HTMLVideoElement {
-    //element.style.setProperty("width", "75%"); //TODO
-    return element;
-}
-
 //Exported functions
-
-export function getVideoElementWidth(): number {
-    return percentPerVideoElement;
-}
-
-export function checkPercentPerVideoElement(playersNearby: string[]): number {
-    let playerCount: number = playersNearby.length + 1;
-    let numberOfMax: number = 6;
-    if (playerCount > numberOfMax) {
-        console.log("more than " + numberOfMax + " players");
-        percentPerVideoElement = Math.floor(100 / playerCount) - Math.floor(10 / playerCount);
-    } else percentPerVideoElement = 15;
-    videoElementWitdh = percentPerVideoElement + "%";
-    return percentPerVideoElement;
-}
 
 class VideoContainer {
 
@@ -215,15 +188,6 @@ class User {
         return false;
     }
 
-    updateVideo() {
-        if (this.videoContainer != null && !this.videoContainer.video.hasAttribute("big")) {
-            //this.videoContainer.video.style.setProperty("width", videoElementWitdh); //TODO
-        }
-        else {
-            console.log("videoContainer is null");
-        }
-    }
-
     update() {
         //console.log("update has been called");
         const removeVideo = this.disabled || this.videoTrack?.isMuted();
@@ -289,20 +253,15 @@ class User {
     }
 
     setDisplay(text: string) {
-        if (!this.videoContainer) {
-            //console.error(this);
-        }
         this.videoContainer?.setDisplay(text);
     }
 
-    getRatio(): boolean { //true = 16:9, false = 4:3
-        let ratio: number = 0;
+    getRatio(): number {
         if (this.videoContainer != null) {
-            ratio = this.videoContainer.video.offsetWidth / this.videoContainer.video.offsetHeight;
+            return this.videoContainer.video.offsetWidth / this.videoContainer.video.offsetHeight;
         } else {
             return undefined;
         }
-        return 1.5 < ratio ? true : false;
     }
 
     get audioMuted(): boolean {
