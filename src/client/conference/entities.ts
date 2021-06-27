@@ -4,7 +4,6 @@ export {User, SelfUser};
 
 let videoElementWitdh: string = "15%";
 let percentPerVideoElement: number = 15;
-const bigVideoBar = $<HTMLDivElement>("big-video-bar");
 
 function createAudioTrackElement(id: string): HTMLAudioElement {
     const element = document.createElement("audio");
@@ -119,6 +118,7 @@ class User {
     // Constants
     protected audioBar: HTMLDivElement;
     protected videoBar: HTMLDivElement;
+    protected focusBar: HTMLDivElement;
     participantId: string;
     conference;
     // Variables
@@ -130,10 +130,11 @@ class User {
     protected audioElement: HTMLAudioElement = null;
     protected videoContainer: VideoContainer = null;
 
-    constructor(conference, audioBar: HTMLDivElement, videoBar: HTMLDivElement, participantId: string) {
+    constructor(conference, audioBar: HTMLDivElement, videoBar: HTMLDivElement, focusBar: HTMLDivElement, participantId: string) {
         this.conference = conference;
         this.audioBar = audioBar;
         this.videoBar = videoBar;
+        this.focusBar = focusBar;
         this.participantId = participantId;
     }
 
@@ -361,8 +362,8 @@ class SelfUser extends User {
     protected tempAudioTrack: any = null;
     protected tempVideoTrack: any = null;
 
-    constructor(audioBar: HTMLDivElement, videoBar: HTMLDivElement) {
-        super(null, audioBar, videoBar, null);
+    constructor(audioBar: HTMLDivElement, videoBar: HTMLDivElement, focusBar: HTMLDivElement) {
+        super(null, audioBar, videoBar, focusBar, null);
     }
 
     addToConference() {

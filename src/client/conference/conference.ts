@@ -33,13 +33,14 @@ const deviceKindVideoInput = "videoinput";
 
 const audioBar = $<HTMLDivElement>("audio-bar");
 const videoBar = $<HTMLDivElement>("video-bar");
+const focusBar = $<HTMLDivElement>("focus-bar");
 
 //const audioInputSelect = $<HTMLSelectElement>("audio-input-select");
 const audioOutputSelect = $<HTMLSelectElement>("audio-output-select");
 
 const playerNearbyIndicator = $<HTMLParagraphElement>("player-nearby-indicator");
 
-const selfUser = new SelfUser(audioBar, videoBar);
+const selfUser = new SelfUser(audioBar, videoBar, focusBar);
 const users: User[] = [];
 
 // Options
@@ -287,7 +288,7 @@ function onUserLeft(participantId) {
 function getUser(participantId: string): User {
     let user = users.find(value => value.participantId === participantId);
     if (!user) {
-        user = new User(conference, audioBar, videoBar, participantId);
+        user = new User(conference, audioBar, videoBar, focusBar, participantId);
         users.push(user);
     }
     return user;

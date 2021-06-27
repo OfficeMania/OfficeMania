@@ -23,7 +23,7 @@ body {
     display: flex;
 }
 
-#big-video-bar {
+#focus-bar {
     width: 100%;
     position: fixed;
     top: 48px;
