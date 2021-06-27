@@ -23,14 +23,7 @@ body {
     display: flex;
 }
 
-#focus-bar {
-    width: 100%;
-    position: fixed;
-    top: 48px;
-    text-align: center;
-}
-
-.video-container {
+#video-bar .video-container {
     /*position: relative;*/
     /*display: inline-block;*/
     /*float: left;*/
@@ -57,4 +50,16 @@ body {
     /*left: 0;*/
     z-index: 1;
     min-width: 0;
+}
+
+#focus-bar {
+    width: 100%;
+    position: fixed;
+    top: 48px;
+    text-align: center;
+}
+
+#focus-bar .video-container {
+    margin: 10% auto;
+    max-width: 70%;
 }

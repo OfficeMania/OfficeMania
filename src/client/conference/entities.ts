@@ -2,16 +2,17 @@ import {trackTypeDesktop, trackTypeVideo} from "./conference";
 
 export {User, SelfUser};
 
+const attributeFocus = "focus";
+const attributeHide = "hide";
+
 function createAudioTrackElement(id: string): HTMLAudioElement {
     const element = document.createElement("audio");
     element.setAttribute("id", id);
-    //element.toggleAttribute("muted", true);
-    //element.toggleAttribute("playsinline", true);
     element.toggleAttribute("autoplay", true);
     return element;
 }
 
-function createVideoElementContainer(id: string): VideoContainer {
+function createVideoElementContainer(id: string, user: User, onUpdate: () => void): VideoContainer {
     const element = document.createElement("video");
     element.setAttribute("id", id);
     element.setAttribute("poster", "/img/pause-standby.png");
@@ -19,14 +20,8 @@ function createVideoElementContainer(id: string): VideoContainer {
     element.toggleAttribute("playsinline", true);
     element.toggleAttribute("autoplay", true);
     element.onclick = () => {
-        //TODO Improve this, so that when a video is already big it will be set small again, so only one big at a time
-        //And improve this, so that a big video is maybe centered or even moved from the video-bar into an extra div
-        const big = element.hasAttribute("big");
-        if (big) {
-            element.toggleAttribute("big", false);
-        } else {
-            element.toggleAttribute("big", true);
-        }
+        user.setFocused(!user.isFocused());
+        onUpdate.call(user);
     };
     return new VideoContainer(element);
 }
@@ -151,7 +146,7 @@ class User {
         }
         //TODO What to do with overridden tracks? detach them?
         this.videoTrack = track;
-        const container = createVideoElementContainer(`track-video-${this.participantId}-${track.getId()}`);
+        const container = createVideoElementContainer(`track-video-${this.participantId}-${track.getId()}`, this, this.updateVideoContainer);
         this.videoContainer = container;
         track.attach(container.video);
         this.update();
@@ -188,6 +183,44 @@ class User {
         return false;
     }
 
+    setHidden(hide: boolean) {
+        this.videoContainer?.video?.toggleAttribute(attributeHide, hide);
+    }
+
+    isHidden(): boolean {
+        return this.videoContainer?.video?.hasAttribute(attributeHide);
+    }
+
+    setFocused(focus: boolean) {
+        this.videoContainer?.video.toggleAttribute(attributeFocus, focus);
+    }
+
+    isFocused(): boolean {
+        return this.videoContainer?.video?.hasAttribute(attributeFocus);
+    }
+
+    protected updateVideoContainer() {
+        if (!this.videoContainer) {
+            return;
+        }
+        const element = this.videoContainer.container;
+        if (this.isHidden()) {
+            if (this.videoBar.contains(element) || this.focusBar.contains(element)) {
+                element.remove();
+            }
+            return;
+        }
+        const focused = this.isFocused();
+        const currentBar = focused ? this.focusBar : this.videoBar;
+        const lastBar = !focused ? this.focusBar : this.videoBar;
+        if (lastBar.contains(element)) {
+            element.remove();
+        }
+        if (!currentBar.contains(element)) {
+            currentBar.append(element);
+        }
+    }
+
     update() {
         //console.log("update has been called");
         const removeVideo = this.disabled || this.videoTrack?.isMuted();
@@ -203,7 +236,8 @@ class User {
                     }
                     if (this.pauseVideo()) {
                         if (!removeVideo && !this.videoBar.contains(this.videoContainer.container)) {
-                            this.videoBar.append(this.videoContainer.container);
+                            this.setHidden(false);
+                            this.updateVideoContainer();
                         }
                         if (changedPause) {
                             if (removeVideo) {
@@ -215,15 +249,20 @@ class User {
                     } else {
                         if (changed) {
                             if (removeVideo) {
-                                this.videoContainer.container.remove();
+                                this.setHidden(true);
+                                this.updateVideoContainer();
                             } else {
-                                this.videoContainer.video.play().then(() => this.videoBar.append(this.videoContainer.container));
+                                this.videoContainer.video.play().then(() => {
+                                    this.setHidden(false);
+                                    this.updateVideoContainer();
+                                });
                             }
                         }
                     }
                 }
             } else {
-                this.videoContainer.container.remove();
+                this.setHidden(true);
+                this.updateVideoContainer();
             }
         }
         const removeAudio = this.disabled || this.audioTrack?.isMuted();
