@@ -12,7 +12,6 @@ function createAudioTrackElement(id: string): HTMLAudioElement {
     //element.toggleAttribute("muted", true);
     //element.toggleAttribute("playsinline", true);
     element.toggleAttribute("autoplay", true);
-    //element.setAttribute("style", "width:15%; margin-right:5px;");
     return element;
 }
 
@@ -24,25 +23,24 @@ function createVideoElementContainer(id: string): VideoContainer {
     element.toggleAttribute("muted", true);
     element.toggleAttribute("playsinline", true);
     element.toggleAttribute("autoplay", true);
-    element.setAttribute("style", "margin-right:5px;");
-    element.style.setProperty("width", videoElementWitdh);
+    //element.style.setProperty("width", videoElementWitdh); //TODO
     element.onclick = () => {
         //TODO Improve this, so that when a video is already big it will be set small again, so only one big at a time
         //And improve this, so that a big video is maybe centered or even moved from the video-bar into an extra div
         const big = element.hasAttribute("big");
         if (big) {
             element.toggleAttribute("big", false);
-            element.style.setProperty("width", videoElementWitdh);
+            //element.style.setProperty("width", videoElementWitdh); //TODO
         } else {
             element.toggleAttribute("big", true);
-            element.style.setProperty("width", widthLarge);
+            //element.style.setProperty("width", widthLarge); //TODO
         }
     };
     return new VideoContainer(element);
 }
 
 function createBigVideo(element: HTMLVideoElement): HTMLVideoElement {
-    element.style.setProperty("width", "75%");
+    //element.style.setProperty("width", "75%"); //TODO
     return element;
 }
 
@@ -217,9 +215,12 @@ class User {
     }
 
     updateVideo() {
-        if (this.videoContainer != null && !this.videoContainer.video.hasAttribute("big")) this.videoContainer.video.style.setProperty("width", videoElementWitdh);
-        else console.log("videoContainer is null");
-
+        if (this.videoContainer != null && !this.videoContainer.video.hasAttribute("big")) {
+            //this.videoContainer.video.style.setProperty("width", videoElementWitdh); //TODO
+        }
+        else {
+            console.log("videoContainer is null");
+        }
     }
 
     update() {
