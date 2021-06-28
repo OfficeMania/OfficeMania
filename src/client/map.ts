@@ -85,8 +85,6 @@ class mapInfo {
     heightOfMap: number;
     widthOfMap: number;
     ctx: CanvasRenderingContext2D;
-    currentX: number;
-    currentY: number;
     textures: Map<string, HTMLImageElement>;
     resolution: number;
     canvas: HTMLCanvasElement;
@@ -102,26 +100,10 @@ class mapInfo {
         this.heightOfMap = canvas.height / (resolution);
         this.widthOfMap = canvas.width / (resolution);
         this.ctx = canvas.getContext("2d");
-        this.currentX = 0;
-        this.currentY = 15;
         this.textures = textures;
         this.resolution = resolution;
         this.canvas = canvas;
     }
-
-    updateScaling(scaling: number) {
-
-        this.heightOfMap = this.heightOfMap / scaling;
-        this.widthOfMap = this.widthOfMap / scaling;
-        this.ctx.scale(scaling, scaling);
-    }
-
-    updatePos(posX: number, posY: number) {
-
-        this.currentX = posX;
-        this.currentY = posY;
-    }
-
 }
 
 class layer {
@@ -399,6 +381,7 @@ async function convertMapData(mapdata:string, room: Room, canvas: HTMLCanvasElem
     return new mapInfo(layerArray, tilesetArray, canvas, resolution, textures, lowestX, lowestY, highestY, highestX);
 }
 
+/*
 function convertXCoordinate(x: number, c:chunk, currentX: number, mapWidth: number): number {
 
     return (x + c.posX - (currentX - Math.floor(mapWidth/2)))
@@ -488,6 +471,7 @@ function drawMapWithChunks (mapData: mapInfo) {
         })
     })
 }
+*/
 
 function drawMap(mapData: mapInfo){
     mapData.layers.forEach(function (l: layer){
