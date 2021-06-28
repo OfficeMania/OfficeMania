@@ -138,8 +138,7 @@ function onConnectionSuccess() {
     conference.on(JitsiMeetJSIntern.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
     conference.on(JitsiMeetJSIntern.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${conference.getPhoneNumber()} - ${conference.getPhonePin()}`)); //DEBUG //REMOVE
     if (conferenceData().password) {
-        //conference.join(conferenceData().password);
-        conference.join();
+        conference.join(conferenceData().password);
     } else {
         conference.join();
     }
