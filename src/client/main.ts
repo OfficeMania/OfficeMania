@@ -1,15 +1,14 @@
 import {Client} from "colyseus.js";
-import {Player, syncOwnPosition, TILE_SIZE, updateOwnPosition, updatePosition} from "./player";
-import {InitState, joinAndSync, loadImage, PlayerRecord, setRoom} from "./util";
-import {convertMapData, drawMap, mapInfo, solidInfo, fillSolidInfos} from "./map";
-import {choosePlayerSprites} from "./player_sprite";
-import {initConference, nearbyPlayerCheck, onUserUpdate, toggleMuteByType, toggleSharing} from "./conference/conference";
-import { drawPlayer, loadCharacter, loadInputFuctions, playerLoop } from "./movement";
+import {TILE_SIZE} from "./player";
+import {InitState, joinAndSync, PlayerRecord, setRoom} from "./util";
+import {convertMapData, drawMap, fillSolidInfos, mapInfo, solidInfo} from "./map";
+import {initConference, nearbyPlayerCheck, toggleMuteByType, toggleSharing, updateUsers} from "./conference/conference";
+import {drawPlayer, loadCharacter, loadInputFuctions, playerLoop} from "./movement";
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
-var START_POSITION_X = -13;
-var START_POSITION_Y = -8;
+const START_POSITION_X = -13;
+const START_POSITION_Y = -8;
 const MS_PER_UPDATE = 10;
 const MS_PER_UPDATE2 = 15;
 
@@ -133,7 +132,7 @@ async function main() {
      * prioDirection is used, so that you can press another direction without
      * needing to let go of the first button pressed
      */
-    
+
     //loads all the input functions
     loadInputFuctions(ourPlayer, room, characters);
 
@@ -180,9 +179,9 @@ async function main() {
         playerNearbyTimer++;
         if (playerNearbyTimer % 20 === 0) {
             playerNearbyTimer = 0;
-
             nearbyPlayerCheck(players, ourPlayer);
-            onUserUpdate(players);
+        } else if (playerNearbyTimer % 20 === 10) {
+            updateUsers(players);
         }
 
         //DESIGN TODO: when something on the map changes: drawMap
@@ -194,7 +193,7 @@ async function main() {
 
         // Draw each player
         drawPlayer(ourPlayer, players, characters, ctx, width, height);
-       
+
         ctx.restore();
 
         // Repeat game loop

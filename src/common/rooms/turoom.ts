@@ -12,9 +12,14 @@ export class TURoom extends Room<State> {
         this.setState(state);
 
         //generate jitsi conference id and password
-        state.conference.id = generateUUIDv4();
-        state.conference.password = generateUUIDv4();
+        const conferenceId = generateUUIDv4();
+        const conferencePassword = generateUUIDv4();
+
         //TODO rework the conference so that the server can join a conference too, before anyone else, and become moderator to lock the room down with a password
+
+        state.conference.id = conferenceId;
+        //state.conference.password = conferencePassword;
+        state.conference.password = undefined;
 
         //sets the interval in which update gets called
         this.setSimulationInterval((deltaTime) => this.update(deltaTime));

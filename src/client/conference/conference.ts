@@ -3,7 +3,7 @@
 const JitsiMeetJSIntern = JitsiMeetJS;
 
 import {getRoom, PlayerRecord} from "../util";
-import {checkPercentPerVideoElement, SelfUser, User} from "./entities";
+import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
 import {setAudioButtonMute, setSwitchToDesktop, setVideoButtonMute} from "../main";
 
@@ -33,13 +33,14 @@ const deviceKindVideoInput = "videoinput";
 
 const audioBar = $<HTMLDivElement>("audio-bar");
 const videoBar = $<HTMLDivElement>("video-bar");
+const focusBar = $<HTMLDivElement>("focus-bar");
 
 //const audioInputSelect = $<HTMLSelectElement>("audio-input-select");
 const audioOutputSelect = $<HTMLSelectElement>("audio-output-select");
 
 const playerNearbyIndicator = $<HTMLParagraphElement>("player-nearby-indicator");
 
-const selfUser = new SelfUser(audioBar, videoBar);
+const selfUser = new SelfUser(audioBar, videoBar, focusBar);
 const users: User[] = [];
 
 // Options
@@ -137,8 +138,7 @@ function onConnectionSuccess() {
     conference.on(JitsiMeetJSIntern.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
     conference.on(JitsiMeetJSIntern.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${conference.getPhoneNumber()} - ${conference.getPhonePin()}`)); //DEBUG //REMOVE
     if (conferenceData().password) {
-        //conference.join(conferenceData().password);
-        conference.join();
+        conference.join(conferenceData().password);
     } else {
         conference.join();
     }
@@ -245,11 +245,6 @@ function onRemoteTrackRemoved(track) {
     getUser(track.getParticipantId())?.removeTrack(track);
 }
 
-function updateNumberOfTracks(playersNearby: string[]){
-    checkPercentPerVideoElement(playersNearby);
-    users.forEach(user => user.update());
-}
-
 /*
  *  Checks if muted button was audio or other
  */
@@ -287,7 +282,7 @@ function onUserLeft(participantId) {
 function getUser(participantId: string): User {
     let user = users.find(value => value.participantId === participantId);
     if (!user) {
-        user = new User(conference, audioBar, videoBar, participantId);
+        user = new User(conference, audioBar, videoBar, focusBar, participantId);
         users.push(user);
     }
     return user;
@@ -416,17 +411,14 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
         user.setDisabled(true);
         //console.debug(`far away: ${user.participantId}`);
     });
-    checkPercentPerVideoElement(playersNearby);
-    selfUser.updateVideo();
     playersNearby.forEach((participantId) => {
         const user = getUser(participantId);
         user.setDisabled(false);
-        user.updateVideo();
-        console.debug(`Ratio is: ${user.getRatio()}`);
-        console.debug(`nearby  : ${user.participantId}`);
+        //console.debug(`Ratio is: ${user.getRatio()}`);
+        //console.debug(`nearby  : ${user.participantId}`);
     });
     //console.log("Players consists of : " + players);
-    /**
+    /*
     if (isEmpty) {
         playerNearbyIndicator.innerHTML = "Waiting for someone else to join...";
     } else if (playersNearby.length === 0) {
@@ -437,9 +429,9 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
      */
 }
 
-export function onUserUpdate(players: PlayerRecord) {
-    
-    playerNearbyIndicator.innerText =  "Players online: " + Object.values(players).map((player) => player.name).join(', ');
+export function updateUsers(players: PlayerRecord) {
+    playerNearbyIndicator.innerText = "Players online: " + Object.values(players).map((player) => player.name).join(', ');
+    Object.values(players).forEach((player) => getUser(player.participantId)?.setDisplay(player.name));
 }
 
 // Code
