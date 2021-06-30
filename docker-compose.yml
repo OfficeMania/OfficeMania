@@ -1,0 +1,10 @@
+version: '3.3'
+services:
+  officemania:
+    build: .
+    #image: [namespace/]repository[:tag]
+    hostname: officemania
+    container_name: officemania
+    ports:
+      - '8080:8080'
+    restart: unless-stopped
