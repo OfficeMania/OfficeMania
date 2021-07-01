@@ -1,7 +1,7 @@
 body {
     background-color: white;
     margin: 0;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
 }
 
 #panel-buttons {
@@ -15,6 +15,7 @@ body {
 #player-nearby-indicator {
     display: inline;
 }
+
 #player-nearby-indicator ul {
     font-size: 200%;
     list-style-type: none;
@@ -60,7 +61,7 @@ body {
     color: black;
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: white;
-    
+
 }
 
 #focus-bar {
