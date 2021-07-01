@@ -1,5 +1,5 @@
 import {Room} from "colyseus.js";
-import { solidInfo } from "./map"
+import {solidInfo} from "./map"
 //import { lowestX, lowestY } from "./main"
 
 
@@ -60,6 +60,17 @@ export function updatePosition(player: Player, room: Room) {
             player.positionX -= PLAYER_MOVEMENT_PER_TICK;
         }
     }
+    //if close enough just set client pos = server pos
+    if(Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE) <= PLAYER_MOVEMENT_PER_TICK){
+        player.positionY = room.state.players[player.id].y * STEP_SIZE
+    } else {
+        //smooth animation to new y coord
+        if(player.positionY < room.state.players[player.id].y * STEP_SIZE){
+            player.positionY += PLAYER_MOVEMENT_PER_TICK;
+        }else if(player.positionY > room.state.players[player.id].y * STEP_SIZE){
+            player.positionY -= PLAYER_MOVEMENT_PER_TICK;
+        }
+    }
 
 }
 
@@ -68,14 +79,14 @@ let xCorrection: number = -38;
 let yCorrection: number = -83;
 
 export function updateOwnPosition(player: Player, room: Room, collisionInfo: solidInfo[][]) {
-    
+
     //initiates movement in one direction and blocks the other directions till the next tile
     if(player.prioDirection.length > 0){
         if(player.prioDirection[0] === "moveDown" && player.moveDirection === null){
-            if((collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1] === undefined || 
+            if((collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1] === undefined ||
                 collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1].isSolid === false) &&         //dont go in direction if there are objects
-                (collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1] === undefined || 
-                collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1].isSolid === false)){         
+                (collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1] === undefined ||
+                collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1].isSolid === false)){
                 player.moveDirection = "down"
                 player.facing = "down"
                 player.lastScaledY.pop()
@@ -87,10 +98,10 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
             }
         }
         if(player.prioDirection[0] === "moveUp" && player.moveDirection === null){
-            if(player.scaledY - yCorrection > 0 && 
+            if(player.scaledY - yCorrection > 0 &&
                 ((collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1] === undefined ||
                     collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1].isSolid === false)&&         //dont go in direction if there are objects
-                    (collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection - 1] === undefined || 
+                    (collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection - 1] === undefined ||
                     collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection - 1].isSolid === false))){         //dont go in direction if there are objects
                 player.moveDirection = "up"
                 player.facing = "up"
@@ -104,7 +115,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
         }
         if(player.prioDirection[0] === "moveLeft" && player.moveDirection === null){
             if(player.scaledX - xCorrection > 0 &&
-                (collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection] === undefined || 
+                (collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection] === undefined ||
                 collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection].isSolid === false)){         //dont go in direction if there are objects
                 player.moveDirection = "left"
                 player.facing = "left"
@@ -117,7 +128,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
             }
         }
         if(player.prioDirection[0] === "moveRight" && player.moveDirection === null){
-            if(collisionInfo[player.scaledX - xCorrection + 2][player.scaledY - yCorrection] === undefined || 
+            if(collisionInfo[player.scaledX - xCorrection + 2][player.scaledY - yCorrection] === undefined ||
                 collisionInfo[player.scaledX - xCorrection + 2][player.scaledY - yCorrection].isSolid === false){         //dont go in direction if there are objects
                 player.moveDirection = "right"
                 player.facing = "right"
