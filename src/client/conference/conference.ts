@@ -1,7 +1,6 @@
 //import {JitsiMeetJS} from "./lib-jitsi-meet.min";
-// @ts-ignore
-const JitsiMeetJSIntern = JitsiMeetJS;
 
+import {createConnectionOptions} from "../../common/util";
 import {getRoom, PlayerRecord} from "../util";
 import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
@@ -13,6 +12,9 @@ export {
     trackTypeVideo,
     trackTypeDesktop
 };
+
+// @ts-ignore
+const JitsiMeetJSIntern = JitsiMeetJS;
 
 function $<T extends HTMLElement>(a: string) {
     return <T>document.getElementById(a);
@@ -74,7 +76,6 @@ const optionsConference = {
 
 const optionsInit = {
     disableAudioLevels: true,
-    startAudioMuted: true,
 };
 
 const optionsLocalTracks = {
@@ -118,7 +119,7 @@ function onDeviceListChanged(devices) {
  * This is called after a connection failed to establish
  */
 function onConnectionFailed() {
-    console.error('Connection Failed!');
+    console.error('Connection to Jitsi Server Failed!');
 }
 
 /**
@@ -153,7 +154,7 @@ function onConnectionSuccess() {
  * This is called after a connection has been closed
  */
 function onDisconnected() {
-    console.debug('Disconnected');
+    console.debug('Disconnected from Jitsi Server');
     connection.removeEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
     connection.removeEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_FAILED, onConnectionFailed);
     connection.removeEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_DISCONNECTED, onDisconnected);
