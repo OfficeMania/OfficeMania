@@ -1,10 +1,10 @@
 import {Client, Room} from "colyseus.js";
 import {State} from "../common";
-import { onUserUpdate } from "./conference/conference";
 import {Player} from "./player";
+import {solidInfo} from "./map";
 
 export type InitState = [Room<State>, Player];
-export type PlayerRecord = {[key: string]: Player}
+export type PlayerRecord = { [key: string]: Player }
 
 let _room: Room<State> = undefined;
 
@@ -64,8 +64,8 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                     positionY: 0,
                     scaledX: 0,
                     scaledY: 0,
-                    lastScaledX: [0,0,0,0,0],
-                    lastScaledY: [0,0,0,0,0],
+                    lastScaledX: [0, 0, 0, 0, 0],
+                    lastScaledY: [0, 0, 0, 0, 0],
                     moveDirection: null,
                     moveTime: 0,
                     prioDirection: [],
@@ -94,7 +94,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
             *
             * See: https://docs.colyseus.io/state/schema/#onremove-instance-key
             */
-            room.state.players.onRemove = (_, sessionId)  => {
+            room.state.players.onRemove = (_, sessionId) => {
                 console.log("Remove", sessionId);
                 delete players[sessionId];
                 //onUserUpdate(players);
@@ -102,7 +102,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
             /**room.state.players.onChange = (_, sessionId) => {
                 onUserUpdate(players);
             }*/
-            
+
             /*
              * If the room has any other state that needs to be observed, the
              * code needs to be placed here:
@@ -125,4 +125,33 @@ export function setCookie(key: string, value: string, expirationDays: number = 1
 
 export function getCookie(key: string) {
     return document.cookie.match('(^|;)\\s*' + key + '\\s*=\\s*([^;]+)')?.pop() || '';
+}
+
+const xCorrection = -38;
+const yCorrection = -83;
+
+export function getCorrectedPlayerCoordinates(player: Player): [number, number] {
+    return [player.scaledX - xCorrection, player.scaledY - yCorrection + 1];
+}
+
+export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionInfo: solidInfo[][]): boolean {
+    const [oneX, oneY] = getCorrectedPlayerCoordinates(playerOne);
+    const [twoX, twoY] = getCorrectedPlayerCoordinates(playerTwo);
+    if (oneX === twoX && oneY === twoY) {
+        return true;
+    }
+    const diffX = Math.abs(oneX - twoX);
+    const diffY = Math.abs(oneY - twoY);
+    const length = Math.ceil(Math.sqrt(diffX * diffX + diffY * diffY));
+    const currentX = (progress) => Math.floor(oneX + (twoX - oneX) * progress);
+    const currentY = (progress) => Math.floor(oneY + (twoY - oneY) * progress);
+    for (let i = 0; i <= length; i++) {
+        const progress = i / length;
+        const x = currentX(progress);
+        const y = currentY(progress);
+        if (collisionInfo[x][y]?.isSolid) {
+            return false;
+        }
+    }
+    return true;
 }
