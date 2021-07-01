@@ -1,10 +1,11 @@
 //import {JitsiMeetJS} from "./lib-jitsi-meet.min";
 
-import {createConnectionOptions} from "../../common/util";
 import {getRoom, PlayerRecord} from "../util";
 import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
 import {setAudioButtonMute, setSwitchToDesktop, setVideoButtonMute} from "../main";
+import {solidInfo} from "../map";
+import {Player} from "../player";
 
 export {
     init as initConference,
@@ -386,9 +387,9 @@ export function toggleSharing(done: (enabled: boolean) => void) {
     });
 }
 
-export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
+export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInfo: solidInfo[][]) {
     //array with nearby players. use this vor videochat.
-    const playersNearby: string[] = [];
+    const playersNearby: Player[] = [];
     const playersAway: string[] = [];
     let isEmpty: boolean = true;
     for (const [key, value] of Object.entries(players)) {
@@ -400,7 +401,7 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
 
         if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 50000) {
             //console.debug("Player nearby: " + value.participantId);
-            playersNearby.push(value.participantId);
+            playersNearby.push(value);
         } else {
             //console.debug("Player away: " + value.participantId);
             playersAway.push(value.participantId);
@@ -412,9 +413,16 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer) {
         user.setDisabled(true);
         //console.debug(`far away: ${user.participantId}`);
     });
-    playersNearby.forEach((participantId) => {
-        const user = getUser(participantId);
-        user.setDisabled(false);
+    //TODO Check for same map
+    const ourRoom = collisionInfo[ourPlayer.positionX][ourPlayer.positionY].content; //TODO Check coordinate scaling
+    playersNearby.forEach((player) => {
+        const user = getUser(player.participantId);
+        if (!ourRoom) {
+            user.setDisabled(false);
+            return;
+        }
+        const room = collisionInfo[player.positionX][player.positionY].content;
+        user.setDisabled(ourRoom !== room);
         //console.debug(`Ratio is: ${user.getRatio()}`);
         //console.debug(`nearby  : ${user.participantId}`);
     });

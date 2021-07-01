@@ -179,7 +179,7 @@ async function main() {
         playerNearbyTimer++;
         if (playerNearbyTimer % 20 === 0) {
             playerNearbyTimer = 0;
-            nearbyPlayerCheck(players, ourPlayer);
+            nearbyPlayerCheck(players, ourPlayer, collisionInfo);
         } else if (playerNearbyTimer % 20 === 10) {
             updateUsers(players);
         }
