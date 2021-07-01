@@ -445,9 +445,8 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
 export function updateUsers(players: PlayerRecord) {
     Object.values(players).forEach((player) => getUser(player.participantId)?.setDisplay(player.name));
     //TODO make on button press
-
+    playerNearbyIndicator.innerText = "";
     if (showParticipantsTab) {
-        playerNearbyIndicator.innerText = ""
         const list = document.createElement("ul");
         Object.values(players).forEach((player) => {
             const item = document.createElement("li");
@@ -455,9 +454,7 @@ export function updateUsers(players: PlayerRecord) {
             list.append(item);
         });
         playerNearbyIndicator.append(list);
-    }
-    else playerNearbyIndicator.innerText = "";
-    
+    }    
 }
 
 export function getShowParticipantsTab(): boolean {
