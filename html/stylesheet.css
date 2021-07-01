@@ -21,6 +21,8 @@ body {
     top: 48px;
     text-align: center;
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #video-bar .video-container {
