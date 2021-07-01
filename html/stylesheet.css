@@ -15,6 +15,13 @@ body {
 #player-nearby-indicator {
     display: inline;
 }
+#player-nearby-indicator ul {
+    font-size: 200%;
+    list-style-type: none;
+    color: black;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: white;
+}
 
 #video-bar {
     width: 100%;
@@ -48,10 +55,10 @@ body {
 }
 
 .video-overlay p {
-    font-size: 100%;
+    font-size: 200%;
     margin: 0;
     color: black;
-    -webkit-text-stroke-width: 0.5px;
+    -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: white;
     
 }
@@ -66,4 +73,12 @@ body {
 #focus-bar .video-container {
     margin: 10% auto;
     max-width: 70%;
+}
+
+#stats-bar {
+    width: 100%;
+    text-align: center;
+    position: fixed;
+    top: 48px;
+    margin: 12% auto;
 }

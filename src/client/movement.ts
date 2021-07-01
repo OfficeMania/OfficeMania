@@ -4,7 +4,9 @@ import { loadImage, PlayerRecord } from "./util";
 import { choosePlayerSprites } from "./player_sprite";
 import { solidInfo } from "./map";
 import { lowestX, lowestY } from "./main"
+import { setShowParticipantsTab, updateUsers } from "./conference/conference";
 
+let yPressed: boolean = false;
 
 function setUsername(value: string, ourPlayer: Player, room: Room) {
     ourPlayer.name = value;
@@ -54,6 +56,11 @@ export function loadInputFuctions(ourPlayer: Player, room: Room, characters: { [
             //player interacts with object in front of him
             //(ttriggert with space)
         }
+        if (e.key.toLowerCase() === "y" && !yPressed){
+            console.log("Y has been pressed"); //DEBUG
+            yPressed = true;
+            setShowParticipantsTab(true);
+        }
     }
 
     function keyUp(e: KeyboardEvent) {
@@ -68,6 +75,10 @@ export function loadInputFuctions(ourPlayer: Player, room: Room, characters: { [
         }
         if (e.key.toLowerCase() === "d") {
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveRight"), 1);
+        }
+        if (e.key.toLowerCase() === "y"){
+            yPressed = false;
+            setShowParticipantsTab(false);
         }
     }
 

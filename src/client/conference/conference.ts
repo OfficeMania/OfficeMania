@@ -46,6 +46,8 @@ const playerNearbyIndicator = $<HTMLParagraphElement>("player-nearby-indicator")
 const selfUser = new SelfUser(audioBar, videoBar, focusBar);
 const users: User[] = [];
 
+let showParticipantsTab = false;
+
 // Options
 
 function conferenceData() {
@@ -426,7 +428,7 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
         }
         const room = collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1].content;
         user.setDisabled(ourRoom !== room);
-        //console.debug(`Ratio is: ${user.getRatio()}`);
+        //console.debug(`Ratio is: ${user.getRatio()}`);        
         //console.debug(`nearby  : ${user.participantId}`);
     });
     //console.log("Players consists of : " + players);
@@ -442,8 +444,28 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
 }
 
 export function updateUsers(players: PlayerRecord) {
-    playerNearbyIndicator.innerText = "Players online: " + Object.values(players).map((player) => player.name).join(', ');
     Object.values(players).forEach((player) => getUser(player.participantId)?.setDisplay(player.name));
+    //TODO make on button press
+
+    if (showParticipantsTab) {
+        playerNearbyIndicator.innerText = ""
+        const list = document.createElement("ul");
+        Object.values(players).forEach((player) => {
+            const item = document.createElement("li");
+            item.innerText = player.name;
+            list.append(item);
+        });
+        playerNearbyIndicator.append(list);
+    }
+    else playerNearbyIndicator.innerText = "";
+    
+}
+
+export function getShowParticipantsTab(): boolean {
+    return showParticipantsTab;
+}
+export function setShowParticipantsTab(setTo: boolean) {
+    showParticipantsTab = setTo;
 }
 
 // Code
