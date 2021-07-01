@@ -387,6 +387,9 @@ export function toggleSharing(done: (enabled: boolean) => void) {
     });
 }
 
+const xCorrection = -38;
+const yCorrection = -83;
+
 export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInfo: solidInfo[][]) {
     //array with nearby players. use this vor videochat.
     const playersNearby: Player[] = [];
@@ -414,14 +417,14 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
         //console.debug(`far away: ${user.participantId}`);
     });
     //TODO Check for same map
-    const ourRoom = collisionInfo[ourPlayer.positionX][ourPlayer.positionY].content; //TODO Check coordinate scaling
+    const ourRoom = collisionInfo[ourPlayer.scaledX - xCorrection][ourPlayer.scaledY - yCorrection + 1].content; //TODO Check coordinate scaling
     playersNearby.forEach((player) => {
         const user = getUser(player.participantId);
         if (!ourRoom) {
             user.setDisabled(false);
             return;
         }
-        const room = collisionInfo[player.positionX][player.positionY].content;
+        const room = collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1].content;
         user.setDisabled(ourRoom !== room);
         //console.debug(`Ratio is: ${user.getRatio()}`);
         //console.debug(`nearby  : ${user.participantId}`);
