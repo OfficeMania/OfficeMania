@@ -1,6 +1,7 @@
 body {
     background-color: white;
     margin: 0;
+    font-family: Arial;
 }
 
 #panel-buttons {
@@ -47,11 +48,12 @@ body {
 }
 
 .video-overlay p {
-    font-size: 200%;
+    font-size: 100%;
     margin: 0;
-    color: white;
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: black;
+    color: black;
+    -webkit-text-stroke-width: 0.5px;
+    -webkit-text-stroke-color: white;
+    
 }
 
 #focus-bar {
