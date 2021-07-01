@@ -1,6 +1,6 @@
 //import {JitsiMeetJS} from "./lib-jitsi-meet.min";
 
-import {getRoom, PlayerRecord} from "../util";
+import {canSeeEachOther, getCorrectedPlayerCoordinates, getRoom, PlayerRecord} from "../util";
 import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
 import {setAudioButtonMute, setSwitchToDesktop, setVideoButtonMute} from "../main";
@@ -387,9 +387,6 @@ export function toggleSharing(done: (enabled: boolean) => void) {
     });
 }
 
-const xCorrection = -38;
-const yCorrection = -83;
-
 export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInfo: solidInfo[][]) {
     //array with nearby players. use this vor videochat.
     const playersNearby: Player[] = [];
@@ -417,15 +414,17 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
         //console.debug(`far away: ${user.participantId}`);
     });
     //TODO Check for same map
-    const ourRoom = collisionInfo[ourPlayer.scaledX - xCorrection][ourPlayer.scaledY - yCorrection + 1].content; //TODO Check coordinate scaling
+    const [ourX, ourY] = getCorrectedPlayerCoordinates(ourPlayer);
+    const ourRoom = collisionInfo[ourX][ourY].content;
     playersNearby.forEach((player) => {
         const user = getUser(player.participantId);
         if (!ourRoom) {
             user.setDisabled(false);
             return;
         }
-        const room = collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1].content;
-        user.setDisabled(ourRoom !== room);
+        const [x, y] = getCorrectedPlayerCoordinates(player);
+        const room = collisionInfo[x][y].content;
+        user.setDisabled(!(ourRoom === room || canSeeEachOther(ourPlayer, player, collisionInfo)));
         //console.debug(`Ratio is: ${user.getRatio()}`);
         //console.debug(`nearby  : ${user.participantId}`);
     });

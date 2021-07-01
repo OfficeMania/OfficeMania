@@ -1,7 +1,7 @@
 import {Client, Room} from "colyseus.js";
 import {State} from "../common";
-import { onUserUpdate } from "./conference/conference";
 import {Player} from "./player";
+import {solidInfo} from "./map";
 
 export type InitState = [Room<State>, Player];
 export type PlayerRecord = {[key: string]: Player}
@@ -125,4 +125,33 @@ export function setCookie(key: string, value: string, expirationDays: number = 1
 
 export function getCookie(key: string) {
     return document.cookie.match('(^|;)\\s*' + key + '\\s*=\\s*([^;]+)')?.pop() || '';
+}
+
+const xCorrection = -38;
+const yCorrection = -83;
+
+export function getCorrectedPlayerCoordinates(player: Player): [number, number] {
+    return [player.scaledX - xCorrection, player.scaledY - yCorrection + 1];
+}
+
+export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionInfo: solidInfo[][]): boolean {
+    const [oneX, oneY] = getCorrectedPlayerCoordinates(playerOne);
+    const [twoX, twoY] = getCorrectedPlayerCoordinates(playerTwo);
+    if (oneX === twoX && oneY === twoY) {
+        return true;
+    }
+    const diffX = Math.abs(oneX - twoX);
+    const diffY = Math.abs(oneY - twoY);
+    const length = Math.ceil(Math.sqrt(diffX * diffX + diffY * diffY));
+    const currentX = (progress) => Math.floor(oneX + (twoX - oneX) * progress);
+    const currentY = (progress) => Math.floor(oneY + (twoY - oneY) * progress);
+    for (let i = 0; i <= length; i++) {
+        const progress = i / length;
+        const x = currentX(progress);
+        const y = currentY(progress);
+        if (collisionInfo[x][y]?.isSolid) {
+            return false;
+        }
+    }
+    return true;
 }
