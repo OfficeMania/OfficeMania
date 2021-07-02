@@ -229,10 +229,11 @@ function fillSolidInfos(map: mapInfo) {
                                 let value: number;
                                 //if this is true we found the right tileset with help of the firstGridId
                                 if (newFirstGridId < map.tilesets[i].firstGridId || i === (map.tilesets.length - 1)) {
-                                    value = map.layers[l].chunks[c].element[x][y] - newTileset.firstGridId;
+
+                                    value = map.layers[l].chunks[c].element[x][y] - newTileset.firstGridId + 1;
+
                                     if (map.layers[l].name.search("Solid") !== -1 && value !== 0 && value < 16) {
 
-                                        value++;
                                         let numbBin: string = value.toString(2);
                                         let fillerString: string = "";
 
@@ -265,7 +266,7 @@ function fillSolidInfos(map: mapInfo) {
                                         solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setContent(value);
                                         solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setContent(value);
                                     }
-                                    else if (map.layers[l].name.search("Rooms") !== -1 && value !== 0) {
+                                    else if (map.layers[l].name.search("Rooms") !== -1) {
 
                                         solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setRoomId(value);
                                         solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setRoomId(value);
@@ -274,6 +275,13 @@ function fillSolidInfos(map: mapInfo) {
                                     }
                                 }
                             }
+                        }
+                        else {
+
+                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setRoomId(0);
+                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setRoomId(0);
+                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setRoomId(0);
+                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setRoomId(0);
                         }
                     }
                 }
