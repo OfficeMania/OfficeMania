@@ -32,15 +32,15 @@ shareButton.addEventListener("click", () => toggleMute("desktop")); //TODO Maybe
 export function setAudioButtonMute(muted: boolean, sharing: boolean = false) {
     //muteButton.toggleAttribute("disabled", sharing);
     muteButton.toggleAttribute("disabled", false);
-    muteButton.innerHTML = muted ? "<em class = \"fa fa-microphone-slash\"></em>" : "<em class = \"fa fa-microphone\"></em>";
+    muteButton.innerHTML = muted ? "<em class = \"fa fa-microphone-slash\"></em><span></span>" : "<em class = \"fa fa-microphone\"></em><span></span>";
 }
 
 export function setVideoButtonMute(muted: boolean, sharing: boolean = false) {
     camButton.toggleAttribute("disabled", false);
-    const camNormal = "<em class = \"fa fa-video\"></em>";
-    const camMuted = "<em class = \"fa fa-video-slash\"></em>";
-    const sharingNormal = "<em class = \"fa fa-pause\"></em>";
-    const sharingMuted = "<em class = \"fa fa-play\"></em>";
+    const camNormal = "<em class = \"fa fa-video\"></em><span></span>";
+    const camMuted = "<em class = \"fa fa-video-slash\"></em><span></span>";
+    const sharingNormal = "<em class = \"fa fa-pause\"></em><span></span>";
+    const sharingMuted = "<em class = \"fa fa-play\"></em><span></span>";
     const textNormal = sharing ? sharingNormal : camNormal;
     const textMuted = sharing ? sharingMuted : camMuted;
     camButton.innerHTML = muted ? textMuted : textNormal;
@@ -48,7 +48,7 @@ export function setVideoButtonMute(muted: boolean, sharing: boolean = false) {
 
 export function setSwitchToDesktop(enabled: boolean, supported: boolean = false) {
     shareButton.toggleAttribute("disabled", !supported);
-    shareButton.innerHTML = enabled ? "<em class = \"fa fa-user\"></em>" : "<em class = \"fa fa-desktop\"></em>";
+    shareButton.innerHTML = enabled ? "<em class = \"fa fa-user\"></em><span></span>" : "<em class = \"fa fa-desktop\"></em><span></span>";
 }
 
 //toggle mute of tracks by type

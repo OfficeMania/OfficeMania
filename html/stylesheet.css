@@ -2,6 +2,7 @@ body {
     background-color: white;
     margin: 0;
     font-family: Arial, sans-serif;
+    overflow: hidden;
 }
 
 #panel-buttons {
@@ -10,17 +11,54 @@ body {
     background: url(./assets/img/navbar-repeat-image.png) top repeat-x;
     
     /*background-color: gray;*/
-    padding: 8px;
+    padding: 7px;
     position: fixed;
     top: 0;
+    border-bottom: 5px solid rgb(189, 154, 103);
+
 }
 button {
     background: url(./assets/img/button-image.png);
     border-radius: 20px;
-    height: 30px;
-    width: 30px;
+    height: 40px;
+    width: 40px;
+    cursor: pointer;
+    right: -50px;
+    position: relative;
+    /*padding-top: 5px;*/
+    transition: 0.5s;
+    font-size: 110%;
+    font-weight: bolde;
+}
+button:hover{
+    transition: 0.5s;
+    background: url(./assets/img/navbar-repeat-image.png);
+    width: auto;
 }
 
+button span:after{
+    transition: 0.5s;
+    right: 0;
+}
+#button-mute-audio:hover span:after{
+    content: '  Microphone'
+}
+#button-mute-video:hover span:after{
+    content: '  Webcam';
+}
+#button-share-video:hover span:after{
+    content: '  Screenshare';
+}
+button:hover span:after{
+    opacity: 1;
+    transition: 0.5s;
+    padding-top: -5px;
+    
+}
+select{
+    float: right;
+    margin-right: 3%;
+}
 #player-nearby-indicator {
     display: inline;
 }
@@ -65,6 +103,7 @@ button {
     width: 100%;
     max-width: 100%;
     min-width: 0;
+    cursor: pointer;
 }
 
 .video-overlay {
