@@ -184,7 +184,7 @@ export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters:
             ctx.drawImage(characters[player.character], player.spriteX, player.spriteY, playerWidth, playerHeight, Math.round((width / 2) + player.positionX - ourPlayer.positionX), Math.round((height / 2) + player.positionY - ourPlayer.positionY), playerWidth, playerHeight);
 
             //draw name
-            ctx.font = '18px Hevitica';
+            ctx.font = '18px Arial';
             ctx.textAlign = "center";
 
             text = ctx.measureText(player.name);
@@ -198,7 +198,7 @@ export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters:
             ctx.drawImage(characters[player.character], player.spriteX, player.spriteY, playerWidth, playerHeight, Math.round(width / 2), Math.round(height / 2), playerWidth, playerHeight);
 
             //draw name
-            ctx.font = '18px Hevitica';
+            ctx.font = '18px Arial';
             ctx.textAlign = "center";
 
             text = ctx.measureText(player.name);
