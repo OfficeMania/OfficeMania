@@ -28,7 +28,7 @@ button {
     /*padding-top: 5px;*/
     transition: 0.5s;
     font-size: 110%;
-    font-weight: bolde;
+    font-weight: bold;
 }
 button:hover{
     transition: 0.5s;
@@ -75,14 +75,14 @@ select{
     display: flex;
     text-align: center;
     position: fixed;
-    top: 48px;
+    top: 0px;
     margin: 12% auto;
 }
 
 #video-bar {
     width: 100%;
     position: fixed;
-    top: 48px;
+    top: 65px;
     text-align: center;
     display: flex;
     align-items: center;
@@ -124,13 +124,13 @@ select{
 #focus-bar {
     width: 100%;
     position: fixed;
-    top: 48px;
+    top: 65px;
     text-align: center;
 }
 
 #focus-bar .video-container {
     margin: 10% auto;
-    max-width: 60%;
+    max-width: 65%;
 }
 
 

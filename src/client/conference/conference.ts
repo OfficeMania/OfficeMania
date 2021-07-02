@@ -170,6 +170,8 @@ function onConferenceJoined() {
     console.debug('Conference joined'); //DEBUG
     isJoined = true;
     selfUser.addToConference();
+    toggleMuteByType("video");
+    toggleMuteByType("audio");
 }
 
 /**
@@ -444,7 +446,6 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
 
 export function updateUsers(players: PlayerRecord) {
     Object.values(players).forEach((player) => getUser(player.participantId)?.setDisplay(player.name));
-    //TODO make on button press
     playerNearbyIndicator.innerText = "";
     if (showParticipantsTab) {
         const list = document.createElement("ul");
@@ -518,5 +519,5 @@ function init(room: Room) {
                 audioOutputSelect.onchange = () => JitsiMeetJSIntern.mediaDevices.setAudioOutputDevice(audioOutputDevices[audioOutputSelect.selectedIndex].deviceId);
             }
         });
-    }
+    }  
 }
