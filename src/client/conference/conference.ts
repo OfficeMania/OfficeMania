@@ -506,7 +506,13 @@ function init(room: Room) {
                 audioOutputDevices.forEach((device) => {
                     const optionElement = document.createElement("option");
                     optionElement.value = device.deviceId;
-                    optionElement.innerText = device.label;
+                    if(device.label ==="Default"){
+                        optionElement.innerText = "Default Audio Device";
+                    }
+                    else {
+                        optionElement.innerText = device.label;
+                    }
+                    
                     audioOutputSelect.append(optionElement);
                 });
                 audioOutputSelect.onchange = () => JitsiMeetJSIntern.mediaDevices.setAudioOutputDevice(audioOutputDevices[audioOutputSelect.selectedIndex].deviceId);
