@@ -6,10 +6,19 @@ body {
 
 #panel-buttons {
     width: 100%;
-    background-color: gray;
-    padding: 10px;
+    /*height: 75px;*/
+    background: url(./assets/img/navbar-repeat-image.png) top repeat-x;
+    
+    /*background-color: gray;*/
+    padding: 8px;
     position: fixed;
     top: 0;
+}
+button {
+    background: url(./assets/img/button-image.png);
+    border-radius: 20px;
+    height: 30px;
+    width: 30px;
 }
 
 #player-nearby-indicator {
@@ -18,10 +27,18 @@ body {
 
 #player-nearby-indicator ul {
     font-size: 200%;
+    font-weight: bolder;
     list-style-type: none;
     color: black;
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: white;
+}
+#stats-bar {
+    display: flex;
+    text-align: center;
+    position: fixed;
+    top: 48px;
+    margin: 12% auto;
 }
 
 #video-bar {
@@ -38,7 +55,7 @@ body {
     width: 100%;
     max-width: 15%;
     min-width: 0;
-    margin-right: 5px;
+    margin-left: 50px;
     flex-shrink: 1;
     overflow: hidden;
 }
@@ -57,6 +74,7 @@ body {
 
 .video-overlay p {
     font-size: 200%;
+    font-weight: bolder;
     margin: 0;
     color: black;
     -webkit-text-stroke-width: 1px;
@@ -73,13 +91,7 @@ body {
 
 #focus-bar .video-container {
     margin: 10% auto;
-    max-width: 70%;
+    max-width: 60%;
 }
 
-#stats-bar {
-    width: 100%;
-    text-align: center;
-    position: fixed;
-    top: 48px;
-    margin: 12% auto;
-}
+
