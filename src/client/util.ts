@@ -131,7 +131,7 @@ const xCorrection = -38;
 const yCorrection = -83;
 
 export function getCorrectedPlayerCoordinates(player: Player): [number, number] {
-    return [player.scaledX - xCorrection, player.scaledY - yCorrection + 1];
+    return [player.scaledX - xCorrection, player.scaledY - yCorrection];
 }
 
 export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionInfo: solidInfo[][]): boolean {
