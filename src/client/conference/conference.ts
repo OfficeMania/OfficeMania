@@ -417,16 +417,16 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
     });
     //TODO Check for same map
     const [ourX, ourY] = getCorrectedPlayerCoordinates(ourPlayer);
-    const ourRoom = collisionInfo[ourX][ourY].content;
+    const ourRoomId = collisionInfo[ourX][ourY].roomId;
     playersNearby.forEach((player) => {
         const user = getUser(player.participantId);
-        if (!ourRoom) {
+        if (!ourRoomId) {
             user.setDisabled(false);
             return;
         }
         const [x, y] = getCorrectedPlayerCoordinates(player);
-        const room = collisionInfo[x][y].content;
-        user.setDisabled(!(ourRoom === room || canSeeEachOther(ourPlayer, player, collisionInfo)));
+        const roomId = collisionInfo[x][y].roomId;
+        user.setDisabled(!(ourRoomId === roomId || canSeeEachOther(ourPlayer, player, collisionInfo)));
         //console.debug(`Ratio is: ${user.getRatio()}`);
         //console.debug(`nearby  : ${user.participantId}`);
     });
@@ -454,7 +454,7 @@ export function updateUsers(players: PlayerRecord) {
             list.append(item);
         });
         playerNearbyIndicator.append(list);
-    }    
+    }
 }
 
 export function getShowParticipantsTab(): boolean {
