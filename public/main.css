@@ -81,6 +81,22 @@ body {
     -webkit-text-stroke-color: white;
 }
 
+#settings-modal form {
+    overflow: hidden;
+}
+
+#settings-modal label {
+    float: left;
+    width: 200px;
+    padding-right: 24px;
+}
+
+#settings-modal input,
+#settings-modal select {
+    float: left;
+    width: calc(100% - 200px);
+}
+
 #stats-bar {
     display: flex;
     text-align: center;
