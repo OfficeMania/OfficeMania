@@ -2,8 +2,16 @@ import {Client} from "colyseus.js";
 import {TILE_SIZE} from "./player";
 import {InitState, joinAndSync, PlayerRecord, setRoom} from "./util";
 import {convertMapData, drawMap, fillSolidInfos, mapInfo, solidInfo} from "./map";
-import {initConference, nearbyPlayerCheck, toggleMuteByType, toggleSharing, updateUsers} from "./conference/conference";
-import {drawPlayer, loadCharacter, loadInputFuctions, playerLoop} from "./movement";
+import {
+    applyConferenceSettings,
+    initConference,
+    loadConferenceSettings,
+    nearbyPlayerCheck,
+    toggleMuteByType,
+    toggleSharing,
+    updateUsers
+} from "./conference/conference";
+import {drawPlayer, loadCharacter, loadInputFuctions, playerLoop, setUsername} from "./movement";
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
@@ -65,6 +73,41 @@ function toggleMute(type: string) {
     }
 }
 
+// Settings
+
+const settingsButton = $<HTMLButtonElement>("button-settings");
+const settingsOkButton = $<HTMLButtonElement>("button-settings-ok");
+//const settingsCancelButton = $<HTMLButtonElement>("button-settings-cancel");
+const settingsApplyButton = $<HTMLButtonElement>("button-settings-apply");
+
+settingsButton.addEventListener("click", () => loadSettings());
+settingsOkButton.addEventListener("click", () => applySettings());
+settingsApplyButton.addEventListener("click", () => applySettings());
+
+const usernameInput = $<HTMLInputElement>("input-settings-username");
+
+let getUsernameIntern: () => string = () => localStorage.getItem("username");
+
+function loadSettings() {
+    if (getUsernameIntern) {
+        usernameInput.value = getUsernameIntern();
+        usernameInput.disabled = false;
+    } else {
+        usernameInput.value = "";
+        usernameInput.disabled = true;
+    }
+    loadConferenceSettings();
+}
+
+let setUsernameIntern: (username: string) => void = undefined;
+
+function applySettings() {
+    if (setUsernameIntern) {
+        setUsernameIntern(usernameInput.value);
+    }
+    applyConferenceSettings();
+}
+
 // async is necessary here, because we use 'await' to resolve the promises
 async function main() {
     /*
@@ -86,6 +129,9 @@ async function main() {
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
     setRoom(room);
+
+    getUsernameIntern = () => ourPlayer.name;
+    setUsernameIntern = (username) => setUsername(username, ourPlayer, room);
 
     //loads all the character information
     loadCharacter(ourPlayer, room, characters);

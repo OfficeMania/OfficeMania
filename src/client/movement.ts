@@ -1,14 +1,13 @@
-import { Player, updateOwnPosition, updatePosition, syncOwnPosition } from "./player";
-import { Room } from "colyseus.js";
-import { loadImage, PlayerRecord } from "./util";
-import { choosePlayerSprites } from "./player_sprite";
-import { solidInfo } from "./map";
-import { lowestX, lowestY } from "./main"
-import { setShowParticipantsTab, updateUsers } from "./conference/conference";
+import {Player, syncOwnPosition, updateOwnPosition, updatePosition} from "./player";
+import {Room} from "colyseus.js";
+import {loadImage, PlayerRecord} from "./util";
+import {choosePlayerSprites} from "./player_sprite";
+import {solidInfo} from "./map";
+import {setShowParticipantsTab} from "./conference/conference";
 
 let yPressed: boolean = false;
 
-function setUsername(value: string, ourPlayer: Player, room: Room) {
+export function setUsername(value: string, ourPlayer: Player, room: Room) {
     ourPlayer.name = value;
     localStorage.setItem("username", value);
     room.send("name", value);
@@ -209,7 +208,7 @@ export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters:
             ctx.fillText(player.name, Math.round(width / 2) + 24, Math.round(height / 2) + 12)
 
         }
-        
+
 
     });
 }

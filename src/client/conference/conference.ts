@@ -38,7 +38,7 @@ const audioBar = $<HTMLDivElement>("audio-bar");
 const videoBar = $<HTMLDivElement>("video-bar");
 const focusBar = $<HTMLDivElement>("focus-bar");
 
-//const audioInputSelect = $<HTMLSelectElement>("audio-input-select");
+const audioInputSelect = $<HTMLSelectElement>("audio-input-select");
 const audioOutputSelect = $<HTMLSelectElement>("audio-output-select");
 
 const playerNearbyIndicator = $<HTMLParagraphElement>("player-nearby-indicator");
@@ -461,8 +461,38 @@ export function updateUsers(players: PlayerRecord) {
 export function getShowParticipantsTab(): boolean {
     return showParticipantsTab;
 }
+
 export function setShowParticipantsTab(setTo: boolean) {
     showParticipantsTab = setTo;
+}
+
+export function loadConferenceSettings() {
+    //TODO
+    if (JitsiMeetJSIntern.mediaDevices.isDeviceChangeAvailable(deviceOutput)) {
+        JitsiMeetJSIntern.mediaDevices.enumerateDevices(devices => {
+            const audioOutputDevices = devices.filter(d => d.kind === deviceKindAudioOutput);
+            if (audioOutputDevices.length > 1) {
+                audioOutputDevices.forEach((device) => {
+                    console.debug(device.kind + ": " + device.label + " id = " + device.deviceId + " (groupId: " + device.groupId + ")");
+                    const optionElement = document.createElement("option");
+                    optionElement.value = device.deviceId;
+                    if(device.label?.toLowerCase() === "default"){
+                        optionElement.innerText = "Default Audio Device";
+                    }
+                    else {
+                        optionElement.innerText = device.label;
+                    }
+                    audioOutputSelect.append(optionElement);
+                });
+                //audioOutputSelect.onchange = () => JitsiMeetJSIntern.mediaDevices.setAudioOutputDevice(audioOutputDevices[audioOutputSelect.selectedIndex].deviceId);
+            }
+        });
+    }
+}
+
+export function applyConferenceSettings() {
+    //TODO
+    //JitsiMeetJSIntern.mediaDevices.setAudioOutputDevice(audioOutputDevices[audioOutputSelect.selectedIndex].deviceId);
 }
 
 // Code
@@ -500,24 +530,5 @@ function init(room: Room) {
         });
     }
     */
-    if (JitsiMeetJSIntern.mediaDevices.isDeviceChangeAvailable(deviceOutput)) {
-        JitsiMeetJSIntern.mediaDevices.enumerateDevices(devices => {
-            const audioOutputDevices = devices.filter(d => d.kind === deviceKindAudioOutput);
-            if (audioOutputDevices.length > 1) {
-                audioOutputDevices.forEach((device) => {
-                    const optionElement = document.createElement("option");
-                    optionElement.value = device.deviceId;
-                    if(device.label ==="Default"){
-                        optionElement.innerText = "Default Audio Device";
-                    }
-                    else {
-                        optionElement.innerText = device.label;
-                    }
-                    
-                    audioOutputSelect.append(optionElement);
-                });
-                audioOutputSelect.onchange = () => JitsiMeetJSIntern.mediaDevices.setAudioOutputDevice(audioOutputDevices[audioOutputSelect.selectedIndex].deviceId);
-            }
-        });
-    }  
+    loadConferenceSettings();
 }
