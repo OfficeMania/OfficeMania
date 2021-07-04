@@ -25,9 +25,9 @@ const gameServer = new Server({
     //pingMaxRetries: 2, // Maximum allowed number of pings without a response. Default: 2.
 });
 
-// "Mount" the html folder as the root of the website
-//app.use('/', serveIndex(path.join(process.cwd(), "html"), {'icons': true}));
-app.use('/', express.static(path.join(process.cwd(), "html")));
+// "Mount" the public folder as the root of the website
+//app.use('/', serveIndex(path.join(process.cwd(), "public"), {'icons': true}));
+app.use('/', express.static(path.join(process.cwd(), "public")));
 
 /*
  * "Mount" the assets/img directory under "[host]/img"
@@ -55,7 +55,7 @@ app.use('/assets', express.static(path.join(process.cwd(), "assets")));
 /*
  * "Mount" the directory where the client JavaScript is generated to (dist/client)
  * under "[host]/img"
- * 
+ *
  * In an HTML-document you can load the scripts via:
  *   <script src="/js/[script-name]"></script>
  */
