@@ -27,12 +27,15 @@ const trackTypeAudio = "audio";
 const trackTypeVideo = "video";
 const trackTypeDesktop = "desktop";
 
-const deviceOutput = "output";
-const deviceInput = "input";
+const deviceDirectionOutput = "output";
+const deviceDirectionInput = "input";
 
-const deviceKindAudioOutput = "audiooutput";
-const deviceKindAudioInput = "audioinput";
-const deviceKindVideoInput = "videoinput";
+const deviceTypeAudio = "audio";
+const deviceTypeVideo = "video";
+
+const deviceKindAudioOutput = deviceTypeAudio + deviceDirectionOutput;
+const deviceKindAudioInput = deviceTypeAudio + deviceDirectionInput;
+const deviceKindVideoInput = deviceTypeVideo + deviceDirectionInput;
 
 const audioBar = $<HTMLDivElement>("audio-bar");
 const videoBar = $<HTMLDivElement>("video-bar");
@@ -355,6 +358,33 @@ function updateButtons() {
     setSwitchToDesktop(sharingEnabled, isDesktopSharingSupported());
 }
 
+function getMediaDeviceInfos(deviceType: string, deviceDirection: string): Promise<MediaDeviceInfo[]> {
+    if (!JitsiMeetJSIntern.mediaDevices.isDeviceChangeAvailable(deviceDirection)) {
+        return undefined;
+    }
+    const kind = deviceType + deviceDirection;
+    JitsiMeetJSIntern.mediaDevices.enumerateDevices(() => console.debug("Updated Media Devices"));
+    return navigator.mediaDevices.enumerateDevices().then((devices) => devices.filter(device => device.kind === kind));
+}
+
+function setMediaDevices(select: HTMLSelectElement, devices: MediaDeviceInfo[], selectedDevice: MediaDeviceInfo) {
+    while (select.firstChild) {
+        select.firstChild.remove();
+    }
+    let selectedIndex = selectedDevice === null ? -1 : 0;
+    let counter = 0;
+    devices.forEach(device => {
+        if (selectedDevice && device.deviceId === selectedDevice.deviceId) {
+            selectedIndex = counter;
+        }
+        counter++;
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.innerText = device.label;
+        select.append(option);
+    });
+    select.selectedIndex = selectedIndex;
+}
 
 // Exported Functions
 
@@ -466,33 +496,32 @@ export function setShowParticipantsTab(setTo: boolean) {
     showParticipantsTab = setTo;
 }
 
-export function loadConferenceSettings() {
-    //TODO
-    if (JitsiMeetJSIntern.mediaDevices.isDeviceChangeAvailable(deviceOutput)) {
-        JitsiMeetJSIntern.mediaDevices.enumerateDevices(devices => {
-            const audioOutputDevices = devices.filter(d => d.kind === deviceKindAudioOutput);
-            if (audioOutputDevices.length > 1) {
-                audioOutputDevices.forEach((device) => {
-                    console.debug(device.kind + ": " + device.label + " id = " + device.deviceId + " (groupId: " + device.groupId + ")");
-                    const optionElement = document.createElement("option");
-                    optionElement.value = device.deviceId;
-                    if(device.label?.toLowerCase() === "default"){
-                        optionElement.innerText = "Default Audio Device";
-                    }
-                    else {
-                        optionElement.innerText = device.label;
-                    }
-                    audioOutputSelect.append(optionElement);
-                });
-                //audioOutputSelect.onchange = () => JitsiMeetJSIntern.mediaDevices.setAudioOutputDevice(audioOutputDevices[audioOutputSelect.selectedIndex].deviceId);
-            }
-        });
-    }
+let audioInputDevices: MediaDeviceInfo[] = null;
+let audioOutputDevices: MediaDeviceInfo[] = null;
+
+let audioInputDevice: MediaDeviceInfo = undefined;
+let audioOutputDevice: MediaDeviceInfo = undefined;
+
+export async function loadConferenceSettings() {
+    // Audio Input
+    audioInputDevices = await getMediaDeviceInfos(deviceTypeAudio, deviceDirectionInput);
+    setMediaDevices(audioInputSelect, audioInputDevices, audioInputDevice);
+    // Audio Output
+    audioOutputDevices = await getMediaDeviceInfos(deviceTypeAudio, deviceDirectionOutput);
+    setMediaDevices(audioOutputSelect, audioOutputDevices, audioOutputDevice);
 }
 
 export function applyConferenceSettings() {
-    //TODO
-    //JitsiMeetJSIntern.mediaDevices.setAudioOutputDevice(audioOutputDevices[audioOutputSelect.selectedIndex].deviceId);
+    // Audio Input
+    if (audioInputDevices) {
+        audioInputDevice = audioInputDevices[audioInputSelect.selectedIndex];
+        //TODO Create new local tracks or what?
+    }
+    // Audio Output
+    if (audioOutputDevices) {
+        audioOutputDevice = audioOutputDevices[audioOutputSelect.selectedIndex];
+        JitsiMeetJSIntern.mediaDevices.setAudioOutputDevice(audioOutputDevice.deviceId);
+    }
 }
 
 // Code
@@ -512,23 +541,5 @@ function init(room: Room) {
     connection.addEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_DISCONNECTED, onDisconnected);
     connection.connect();
     createLocalTracks(optionsLocalTracks, onLocalTracksCreated);
-    //TODO Implement proper Audio Device Selection
-    /*
-    if (JitsiMeetJSIntern.mediaDevices.isDeviceChangeAvailable(deviceInput) && false) {
-        JitsiMeetJSIntern.mediaDevices.enumerateDevices(devices => {
-            const audioInputDevices = devices.filter(d => d.kind === deviceKindAudioInput);
-            if (audioInputDevices.length > 1) {
-                audioInputDevices.forEach((device) => {
-                    const optionElement = document.createElement("option");
-                    optionElement.value = device.deviceId;
-                    optionElement.innerText = device.label;
-                    audioInputSelect.append(optionElement);
-                });
-                audioInputSelect.onchange = () => console.log(audioInputDevices[audioInputSelect.selectedIndex]);
-                //TODO Set selected Track? Or do we need to create new LocalTracks?
-            }
-        });
-    }
-    */
     loadConferenceSettings();
 }
