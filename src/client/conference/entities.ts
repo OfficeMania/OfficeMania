@@ -416,33 +416,40 @@ class SelfUser extends User {
     }
 
     swapTracks() {
-        /*
-        if (this.sharedAudioTrack) {
-            //this.audioTrack?.detach(this.audioElement);
-            this.audioTrack?.dispose();
-            this.audioTrack = this.sharedAudioTrack;
-            this.sharedAudioTrack = null;
-            //this.audioTrack.attach(this.audioElement);
-        }
-        */
-        if (this.tempVideoTrack) {
-            if (!this.sharing && this.tempVideoTrack.isMuted() !== this.videoMuted) {
-                if (this.videoMuted) {
-                    this.tempVideoTrack.mute().then(() => this.swapTracksIntern());
-                } else {
-                    this.tempVideoTrack.unmute().then(() => this.swapTracksIntern());
-                }
+        if (!this.sharing && this.tempVideoTrack && this.tempVideoTrack.isMuted() !== this.videoMuted) {
+            if (this.videoMuted) {
+                this.tempVideoTrack.mute().then(() => this.swapTracksIntern());
             } else {
-                this.swapTracksIntern();
+                this.tempVideoTrack.unmute().then(() => this.swapTracksIntern());
             }
+        } else {
+            this.swapTracksIntern();
         }
     }
 
-    private swapTracksIntern() {
-        this.videoTrack = this.tempVideoTrack;
-        this.tempVideoTrack = null;
-        this.videoTrack.attach(this.videoContainer.video);
-        this.conference.addTrack(this.videoTrack);
+    private async swapTracksIntern() {
+        if (this.tempAudioTrack) {
+            await this.audioTrack?.dispose();
+            console.trace();
+            this.audioTrack = this.tempAudioTrack;
+            this.tempAudioTrack = null;
+            if (this.audioElement) {
+                this.audioTrack.attach(this.audioElement);
+            }
+            this.conference.addTrack(this.audioTrack);
+        }
+        if (this.tempVideoTrack) {
+            if (!this.videoContainer) {
+                this.setVideoTrack(this.tempVideoTrack);
+                this.tempVideoTrack = null;
+                this.conference.addTrack(this.videoTrack);
+                return
+            }
+            this.videoTrack = this.tempVideoTrack;
+            this.tempVideoTrack = null;
+            this.videoTrack.attach(this.videoContainer.video);
+            this.conference.addTrack(this.videoTrack);
+        }
         this.update();
     }
 
