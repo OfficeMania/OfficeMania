@@ -49,6 +49,9 @@ button span:after{
 #button-share-video:hover span:after{
     content: '  Screenshare';
 }
+#button-settings:hover span:after{
+    content: '  Settings';
+}
 button:hover span:after{
     opacity: 1;
     transition: 0.5s;
