@@ -354,7 +354,6 @@ function createVideoTrack(options: {}, sharing: boolean = false) {
 
 function createAudioTrack(micDeviceId: string = undefined) {
     const options = !micDeviceId ? optionsAudioTrack : {...optionsAudioTrack, micDeviceId};
-    console.debug("options: " + options)
     createLocalTracks(options, (tracks) => {
         tracks.forEach(onLocalTrackCreated);
         selfUser.setTempAudioTrack(tracks[0]);

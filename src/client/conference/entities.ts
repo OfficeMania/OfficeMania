@@ -430,7 +430,6 @@ class SelfUser extends User {
     private async swapTracksIntern() {
         if (this.tempAudioTrack) {
             await this.audioTrack?.dispose();
-            console.trace();
             this.audioTrack = this.tempAudioTrack;
             this.tempAudioTrack = null;
             if (this.audioElement) {
