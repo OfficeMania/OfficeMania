@@ -505,10 +505,20 @@ let audioOutputDevice: MediaDeviceInfo = undefined;
 export async function loadConferenceSettings() {
     // Audio Input
     audioInputDevices = await getMediaDeviceInfos(deviceTypeAudio, deviceDirectionInput);
-    setMediaDevices(audioInputSelect, audioInputDevices, audioInputDevice);
+    if (audioInputDevices) {
+        setMediaDevices(audioInputSelect, audioInputDevices, audioInputDevice);
+        audioInputSelect.disabled = false;
+    } else {
+        audioInputSelect.disabled = true;
+    }
     // Audio Output
     audioOutputDevices = await getMediaDeviceInfos(deviceTypeAudio, deviceDirectionOutput);
-    setMediaDevices(audioOutputSelect, audioOutputDevices, audioOutputDevice);
+    if (audioOutputDevices) {
+        setMediaDevices(audioOutputSelect, audioOutputDevices, audioOutputDevice);
+        audioOutputSelect.disabled = false;
+    } else {
+        audioOutputSelect.disabled = true;
+    }
 }
 
 export function applyConferenceSettings() {
