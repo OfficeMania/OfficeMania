@@ -16,7 +16,7 @@ body {
     border-bottom: 5px solid rgb(189, 154, 103);
 }
 
-button {
+#panel-buttons button {
     background: url(./assets/img/button-image.png);
     border-radius: 20px;
     height: 40px;
@@ -30,13 +30,13 @@ button {
     font-weight: bold;
 }
 
-button:hover {
+#panel-buttons button:hover {
     transition: 0.5s;
     background: url(./assets/img/navbar-repeat-image.png);
     width: auto;
 }
 
-button span:after {
+#panel-buttons button span:after {
     transition: 0.5s;
     right: 0;
 }
@@ -57,13 +57,13 @@ button span:after {
     content: '  Settings';
 }
 
-button:hover span:after {
+#panel-buttons button:hover span:after {
     opacity: 1;
     transition: 0.5s;
     padding-top: -5px;
 }
 
-select {
+#panel-buttons select {
     float: right;
     margin-right: 3%;
 }
