@@ -14,7 +14,7 @@ import {
 import {
     drawPlayer,
     loadCharacter,
-    loadInputFuctions,
+    loadInputFunctions,
     playerLoop,
     setCharacter,
     setKeysDisabled,
@@ -260,7 +260,7 @@ async function main() {
      */
 
     //loads all the input functions
-    loadInputFuctions(ourPlayer, room, characters);
+    loadInputFunctions(ourPlayer, room, characters);
 
     // message recieve test
 

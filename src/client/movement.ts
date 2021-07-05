@@ -31,7 +31,7 @@ export function setCharacter(value: string, ourPlayer: Player, room: Room, chara
 }
 
 
-export function loadInputFuctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
+export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
     function keyPressed(e: KeyboardEvent) {
         if (keysDisabled) {
             return;
