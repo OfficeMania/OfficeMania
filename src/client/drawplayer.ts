@@ -1,6 +1,7 @@
 import {Room} from "colyseus.js";
 import {Player, STEP_SIZE} from "./player";
 import {PlayerRecord} from "./util";
+import {State} from "../common";
 
 function playerMovingAnimation(player: Player, direction: string, width: number, height: number) {
     player.standing = 0;
@@ -94,36 +95,44 @@ function playerStandingAnimation(player: Player, width: number, height: number) 
     }
 }
 
+function chooseOwnPlayerSprite(player: Player) {
+    if (player.moveDirection === null) {
+        playerStandingAnimation(player, playerWidth, playerHeight);
+    } else {
+        playerMovingAnimation(player, player.moveDirection, playerWidth, playerHeight);
+    }
+}
+
+function chooseOtherPlayerSprite(player: Player, room: Room<State>) {
+    //sets facing direction to choose sprites
+    if (Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE) > Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)) {
+        if (player.positionX < room.state.players[player.id].x * STEP_SIZE) {
+            player.facing = "right"
+        } else if (player.positionX > room.state.players[player.id].x * STEP_SIZE) {
+            player.facing = "left"
+        }
+    } else if (Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE) < Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)) {
+        if (player.positionY < room.state.players[player.id].y * STEP_SIZE) {
+            player.facing = "down"
+        } else if (player.positionY > room.state.players[player.id].y * STEP_SIZE) {
+            player.facing = "up"
+        }
+    }
+    if (player.positionX === room.state.players[player.id].x * STEP_SIZE && player.positionY === room.state.players[player.id].y * STEP_SIZE) {
+        playerStandingAnimation(player, playerWidth, playerHeight);
+    } else {
+        playerMovingAnimation(player, player.facing, playerWidth, playerHeight);
+    }
+}
+
 /*
  * Chooses the Player sprite depending on walking direction and duration of walking/standing
  */
 export function choosePlayerSprites(room: Room, player: Player, ownPlayer: Player) {
     if (ownPlayer === player) {
-        if (player.moveDirection === null) {
-            playerStandingAnimation(player, playerWidth, playerHeight);
-        } else {
-            playerMovingAnimation(player, player.moveDirection, playerWidth, playerHeight);
-        }
-    } else { //all other players
-        //sets facing direction to choose sprites
-        if (Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE) > Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)) {
-            if (player.positionX < room.state.players[player.id].x * STEP_SIZE) {
-                player.facing = "right"
-            } else if (player.positionX > room.state.players[player.id].x * STEP_SIZE) {
-                player.facing = "left"
-            }
-        } else if (Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE) < Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)) {
-            if (player.positionY < room.state.players[player.id].y * STEP_SIZE) {
-                player.facing = "down"
-            } else if (player.positionY > room.state.players[player.id].y * STEP_SIZE) {
-                player.facing = "up"
-            }
-        }
-        if (player.positionX === room.state.players[player.id].x * STEP_SIZE && player.positionY === room.state.players[player.id].y * STEP_SIZE) {
-            playerStandingAnimation(player, playerWidth, playerHeight);
-        } else {
-            playerMovingAnimation(player, player.facing, playerWidth, playerHeight);
-        }
+        chooseOwnPlayerSprite(player);
+    } else {
+        chooseOtherPlayerSprite(player, room);
     }
 }
 
