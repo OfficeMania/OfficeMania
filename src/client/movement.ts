@@ -8,6 +8,7 @@ import {setShowParticipantsTab} from "./conference/conference";
 let yPressed: boolean = false;
 
 export function setUsername(value: string, ourPlayer: Player, room: Room) {
+    value = value?.slice(0, 20) || "Jimmy";
     ourPlayer.name = value;
     localStorage.setItem("username", value);
     room.send("name", value);
@@ -49,7 +50,7 @@ export function loadInputFuctions(ourPlayer: Player, room: Room, characters: { [
         }
         //rename players name
         if (e.key.toLowerCase() === "r") {
-            setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy", ourPlayer, room);
+            setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy"), ourPlayer, room);
         }
         if (e.key.toLowerCase() === " ") {
             //player interacts with object in front of him
