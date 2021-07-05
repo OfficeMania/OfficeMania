@@ -473,6 +473,17 @@ export function updateUsers(players: PlayerRecord) {
         Object.values(players).forEach((player) => {
             const item = document.createElement("li");
             item.innerText = player.name;
+            //TODO wtf is happening here
+            /*if(selfUser.participantId !== player.participantId){
+                if (getUser(player.participantId).videoMuted){
+                    item.innerText += " video";
+                }
+                if (getUser(player.participantId).audioMuted){
+                    item.innerText += " audio";
+                }
+            }
+            console.log(users);
+            */
             list.append(item);
         });
         playerNearbyIndicator.append(list);
