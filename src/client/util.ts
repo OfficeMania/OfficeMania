@@ -168,6 +168,28 @@ export function getUsername(): string {
     return localStorage.getItem(KEY_USERNAME);
 }
 
+export async function loadCharacter(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
+    //load or ask for name
+    const username = getUsername();
+    if (username && username !== "") {
+        setUsername(username, ourPlayer, room);
+    } else {
+        setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy", ourPlayer, room);
+    }
+
+    //loads character sprite paths from the server (from movement)
+    for (let path of room.state.playerSpritePaths) {
+        characters[path] = await loadImage("/img/characters/" + path);
+    }
+
+
+    //load character
+    const character = getCharacter();
+    if (character && character !== "") {
+        setCharacter(character, ourPlayer, room, characters);
+    }
+}
+
 export function setCharacter(value: string, ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
     const filenames = Object.keys(characters);
     if (filenames.indexOf(value) === -1) {

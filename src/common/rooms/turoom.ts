@@ -53,25 +53,21 @@ export class TURoom extends Room<State> {
 
         //receives movement from all the clients
         this.onMessage("move", (client, message) => {
-            if (this.state.players[client.sessionId].cooldown <= 0) {
-                switch (message) {
-                    case "moveDown": {
-                        this.state.players[client.sessionId].cooldown = 0;
+            if (this.state.players[client.sessionId].cooldown <= 0){
+                switch(message){
+                    case "moveDown":{
                         this.state.players[client.sessionId].y++;
                         break;
                     }
-                    case "moveUp": {
-                        this.state.players[client.sessionId].cooldown = 0;
+                    case "moveUp":{
                         this.state.players[client.sessionId].y--;
                         break;
                     }
-                    case "moveLeft": {
-                        this.state.players[client.sessionId].cooldown = 0;
+                    case "moveLeft":{
                         this.state.players[client.sessionId].x--;
                         break;
                     }
-                    case "moveRight": {
-                        this.state.players[client.sessionId].cooldown = 0;
+                    case "moveRight":{
                         this.state.players[client.sessionId].x++;
                         break;
                     }
@@ -118,11 +114,7 @@ export class TURoom extends Room<State> {
     }
 
     //gameloop for server
-    update(deltaTime) {
-        this.state.players.forEach(player => {
-            if (player.cooldown > 0) {
-                player.cooldown--;
-            }
-        });
+    update (deltaTime) {
+        
     }
 }

@@ -8,7 +8,8 @@ import {
     PlayerRecord,
     setCharacter,
     setRoom,
-    setUsername
+    setUsername,
+    loadCharacter
 } from "./util";
 import {convertMapData, drawMap, fillSolidInfos, mapInfo, solidInfo} from "./map";
 import {
@@ -20,7 +21,10 @@ import {
     toggleSharing,
     updateUsers
 } from "./conference/conference";
-import {drawPlayer, loadCharacter, loadInputFunctions, playerLoop, setKeysDisabled} from "./movement";
+import {playerLoop} from "./movement";
+import {loadInputFunctions, setKeysDisabled} from "./input";
+import {drawPlayer} from "./drawplayer"
+
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
