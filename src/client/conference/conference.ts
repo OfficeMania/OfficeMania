@@ -439,29 +439,18 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
     //array with nearby players. use this vor videochat.
     const playersNearby: Player[] = [];
     const playersAway: string[] = [];
-    let isEmpty: boolean = true;
-    for (const [key, value] of Object.entries(players)) {
+    for (const value of Object.values(players)) {
         if (value.id === ourPlayer.id) {
             continue;
         }
-        isEmpty = false;
-        //console.log(Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2));
-
         if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 50000) {
-            //console.debug("Player nearby: " + value.participantId);
             playersNearby.push(value);
         } else {
-            //console.debug("Player away: " + value.participantId);
             playersAway.push(value.participantId);
         }
     }
-    //console.debug(serverRoom.state.players);
-    playersAway.forEach((participantId) => {
-        const user = getUser(participantId);
-        user.setDisabled(true);
-        //console.debug(`far away: ${user.participantId}`);
-    });
-    //TODO Check for same map
+    playersAway.forEach((participantId) => getUser(participantId).setDisabled(true));
+    //TODO Check if they are on the same map
     const [ourX, ourY] = getCorrectedPlayerCoordinates(ourPlayer);
     const ourRoomId = collisionInfo[ourX][ourY].roomId;
     playersNearby.forEach((player) => {
@@ -473,19 +462,7 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
         const [x, y] = getCorrectedPlayerCoordinates(player);
         const roomId = collisionInfo[x][y].roomId;
         user.setDisabled(!(ourRoomId === roomId || canSeeEachOther(ourPlayer, player, collisionInfo)));
-        //console.debug(`Ratio is: ${user.getRatio()}`);
-        //console.debug(`nearby  : ${user.participantId}`);
     });
-    //console.log("Players consists of : " + players);
-    /*
-    if (isEmpty) {
-        playerNearbyIndicator.innerHTML = "Waiting for someone else to join...";
-    } else if (playersNearby.length === 0) {
-        playerNearbyIndicator.innerHTML = "you are lonely :(";
-    } else {
-        playerNearbyIndicator.innerHTML = "player nearby";
-    }
-     */
 }
 
 export function updateUsers(players: PlayerRecord) {
