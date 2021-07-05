@@ -1,11 +1,6 @@
-<<<<<<< HEAD:src/client/drawplayer.ts
 import { Room } from "colyseus.js";
 import { Player, TILE_SIZE , STEP_SIZE} from "./player";
 import {PlayerRecord} from "./util";
-=======
-import {Room} from "colyseus.js";
-import {Player, STEP_SIZE} from "./player";
->>>>>>> e05c429df4552902f1c1ddfe28741c6425ce06c1:src/client/player_sprite.ts
 
 /*
  * Chooses the Player sprite dependend on walking direction and duration of walking/standing
@@ -206,7 +201,6 @@ export function choosePlayerSprites(room: Room, player: Player, playerWidth: num
         }
     }
 }
-<<<<<<< HEAD:src/client/drawplayer.ts
 
 //sprite dimensions (from movement)
 let playerWidth: number = 48;
@@ -249,5 +243,3 @@ export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters:
         }
     });
 }
-=======
->>>>>>> e05c429df4552902f1c1ddfe28741c6425ce06c1:src/client/player_sprite.ts
