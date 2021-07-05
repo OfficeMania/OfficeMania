@@ -128,7 +128,7 @@ function loadUsernameSettings() {
 }
 
 function convertCharacterName(key: string) {
-    return key.replace(/_/gi, " ").replace(/\d+x\d+\.png/gi, "");
+    return key.replace(/_/gi, " ").replace(/\d\dx\d\d\.png/gi, "");
 }
 
 function loadCharacterSettings() {
