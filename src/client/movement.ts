@@ -6,13 +6,11 @@ import {solidInfo} from "./map";
 import {setShowParticipantsTab} from "./conference/conference";
 
 let yPressed: boolean = false;
-
 let keysDisabled: boolean = false;
 
 export function setKeysDisabled(disabled: boolean) {
     keysDisabled = disabled;
 }
-
 
 export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
     function keyPressed(e: KeyboardEvent) {
@@ -83,13 +81,11 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         ourPlayer.prioDirection = [];
     }
 
-
     document.addEventListener("keydown", keyPressed);
     document.addEventListener("keyup", keyUp);
     window.addEventListener("blur", onBlur);
 
 }
-
 
 export async function loadCharacter(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
     //load or ask for name
@@ -113,7 +109,6 @@ export async function loadCharacter(ourPlayer: Player, room: Room, characters: {
     }
 }
 
-
 const MS_PER_UPDATE = 10;
 const MS_PER_UPDATE2 = 15;
 
@@ -125,7 +120,6 @@ let previous = performance.now();
 let lag = 0;
 let lag2 = 0;
 let lastSecond = performance.now();
-
 
 export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room, now: number, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, collisionInfo: solidInfo[][]) {
     lag += now - previous;
@@ -204,7 +198,5 @@ export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters:
             ctx.fillText(player.name, Math.round(width / 2) + 24, Math.round(height / 2) + 12)
 
         }
-
-
     });
 }
