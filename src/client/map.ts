@@ -239,9 +239,9 @@ function fillSolidInfos(map: mapInfo) {
 
                                         if (numbBin.length < 4) {
 
-                                            // for (let j = 0; j < 4 - numbBin.length; j++) {
-                                            //     fillerString.concat("0");
-                                            // }
+                                            for (let j = 0; j < 4 - numbBin.length; j++) {
+                                                fillerString = fillerString.concat("0");
+                                            }
                                             numbBin = fillerString.concat(numbBin);
                                         }
 
