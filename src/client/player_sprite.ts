@@ -1,5 +1,5 @@
 import {Room} from "colyseus.js";
-import {Player, TILE_SIZE, STEP_SIZE} from "./player";
+import {Player, STEP_SIZE} from "./player";
 
 /*
  * Chooses the Player sprite dependend on walking direction and duration of walking/standing
