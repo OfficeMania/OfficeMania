@@ -189,7 +189,7 @@ class User {
     }
 
     setFocused(focus: boolean) {
-        this.videoContainer?.video.toggleAttribute(attributeFocus, focus);
+        this.videoContainer?.video?.toggleAttribute(attributeFocus, focus);
     }
 
     isFocused(): boolean {
