@@ -1,6 +1,6 @@
 import {Player, syncOwnPosition, updateOwnPosition, updatePosition} from "./player";
 import {Room} from "colyseus.js";
-import {loadImage, PlayerRecord, setCharacter, setUsername} from "./util";
+import {getCharacter, getUsername, loadImage, PlayerRecord, setCharacter, setUsername} from "./util";
 import {choosePlayerSprites} from "./player_sprite";
 import {solidInfo} from "./map";
 import {setShowParticipantsTab} from "./conference/conference";
@@ -89,7 +89,7 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
 
 export async function loadCharacter(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
     //load or ask for name
-    const username = localStorage.getItem("username");
+    const username = getUsername();
     if (username && username !== "") {
         setUsername(username, ourPlayer, room);
     } else {
@@ -103,7 +103,7 @@ export async function loadCharacter(ourPlayer: Player, room: Room, characters: {
 
 
     //load character
-    const character = localStorage.getItem("character");
+    const character = getCharacter();
     if (character && character !== "") {
         setCharacter(character, ourPlayer, room, characters);
     }

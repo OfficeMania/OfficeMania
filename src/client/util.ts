@@ -164,6 +164,10 @@ export function setUsername(value: string, ourPlayer: Player, room: Room) {
     room.send(KEY_USERNAME, value);
 }
 
+export function getUsername(): string {
+    return localStorage.getItem(KEY_USERNAME);
+}
+
 export function setCharacter(value: string, ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
     const filenames = Object.keys(characters);
     if (filenames.indexOf(value) === -1) {
@@ -172,4 +176,24 @@ export function setCharacter(value: string, ourPlayer: Player, room: Room, chara
     ourPlayer.character = value;
     localStorage.setItem(KEY_CHARACTER, value);
     room.send(KEY_CHARACTER, value);
+}
+
+export function getCharacter(): string {
+    return localStorage.getItem(KEY_CHARACTER);
+}
+
+export function setMicDeviceId(value: string) {
+    localStorage.setItem(KEY_MIC_DEVICE_ID, value);
+}
+
+export function getMicDeviceId(): string {
+    return localStorage.getItem(KEY_MIC_DEVICE_ID);
+}
+
+export function setCameraDeviceId (value: string) {
+    localStorage.setItem(KEY_CAMERA_DEVICE_ID, value);
+}
+
+export function getCameraDeviceId(): string {
+    return localStorage.getItem(KEY_CAMERA_DEVICE_ID);
 }

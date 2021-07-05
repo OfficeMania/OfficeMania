@@ -1,6 +1,15 @@
 import {Client} from "colyseus.js";
 import {TILE_SIZE} from "./player";
-import {InitState, joinAndSync, PlayerRecord, setCharacter, setRoom, setUsername} from "./util";
+import {
+    getCharacter,
+    getUsername,
+    InitState,
+    joinAndSync,
+    PlayerRecord,
+    setCharacter,
+    setRoom,
+    setUsername
+} from "./util";
 import {convertMapData, drawMap, fillSolidInfos, mapInfo, solidInfo} from "./map";
 import {
     applyConferenceSettings,
@@ -110,8 +119,8 @@ usernameInput.addEventListener("keydown", () => checkValidSettings());
 usernameInput.addEventListener("paste", () => checkValidSettings());
 usernameInput.addEventListener("input", () => checkValidSettings());
 
-let getUsernameIntern: () => string = () => localStorage.getItem("username");
-let getCharacterIntern: () => string = () => localStorage.getItem("character");
+let getUsernameIntern: () => string = () => getUsername();
+let getCharacterIntern: () => string = () => getCharacter();
 
 function loadUsernameSettings() {
     if (getUsernameIntern) {
