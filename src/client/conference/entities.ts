@@ -416,6 +416,9 @@ class SelfUser extends User {
     }
 
     private async swapTracksIntern() {
+        if (!this.conference) {
+            return; //FIXME When is the Track swapped than?
+        }
         if (this.tempAudioTrack) {
             await this.audioTrack?.dispose();
             this.audioTrack = this.tempAudioTrack;
