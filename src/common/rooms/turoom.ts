@@ -64,22 +64,18 @@ export class TURoom extends Room<State> {
             if (this.state.players[client.sessionId].cooldown <= 0){
                 switch(message){
                     case "moveDown":{
-                        this.state.players[client.sessionId].cooldown = 0;
                         this.state.players[client.sessionId].y++;
                         break;
                     }
                     case "moveUp":{
-                        this.state.players[client.sessionId].cooldown = 0;
                         this.state.players[client.sessionId].y--;
                         break;
                     }
                     case "moveLeft":{
-                        this.state.players[client.sessionId].cooldown = 0;
                         this.state.players[client.sessionId].x--;
                         break;
                     }
                     case "moveRight":{
-                        this.state.players[client.sessionId].cooldown = 0;
                         this.state.players[client.sessionId].x++;
                         break;
                     }
@@ -128,11 +124,6 @@ export class TURoom extends Room<State> {
 
     //gameloop for server
     update (deltaTime) {
-        for (let [id, player] of this.state.players){
-            if (player.cooldown > 0){
-                player.cooldown--;
-            }
-
-        }
+        
     }
 }

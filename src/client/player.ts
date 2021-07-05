@@ -89,8 +89,10 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1].isSolid === false)) {
                 player.moveDirection = "down"
                 player.facing = "down"
+                
                 player.lastScaledY.pop()
                 player.lastScaledY.unshift(player.scaledY) //stores the previous position
+
                 player.scaledY++;
                 room.send("move", "moveDown");
             } else {
@@ -105,8 +107,10 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                         collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection - 1].isSolid === false))) {         //dont go in direction if there are objects
                 player.moveDirection = "up"
                 player.facing = "up"
+
                 player.lastScaledY.pop()
                 player.lastScaledY.unshift(player.scaledY) //stores the previous position
+
                 player.scaledY--;
                 room.send("move", "moveUp");
             } else {
@@ -119,8 +123,10 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection].isSolid === false)) {         //dont go in direction if there are objects
                 player.moveDirection = "left"
                 player.facing = "left"
+
                 player.lastScaledX.pop()
                 player.lastScaledX.unshift(player.scaledX) //stores the previous position
+
                 player.scaledX--;
                 room.send("move", "moveLeft");
             } else {
@@ -132,8 +138,10 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                 collisionInfo[player.scaledX - xCorrection + 2][player.scaledY - yCorrection].isSolid === false) {         //dont go in direction if there are objects
                 player.moveDirection = "right"
                 player.facing = "right"
+
                 player.lastScaledX.pop()
                 player.lastScaledX.unshift(player.scaledX) //stores the previous position
+
                 player.scaledX++;
                 room.send("move", "moveRight");
             } else {
