@@ -57,7 +57,7 @@ export class TURoom extends Room<State> {
         }
 
 
-        //recieves movement from all the clients
+        //receives movement from all the clients
         this.onMessage("move", (client, message) => {
             if (this.state.players[client.sessionId].cooldown <= 0) {
                 switch (message) {
@@ -87,12 +87,12 @@ export class TURoom extends Room<State> {
 
         });
 
-        //recieves character changes
+        //receives character changes
         this.onMessage(KEY_CHARACTER, (client, message) => {
             this.state.players[client.sessionId].character = message;
         });
 
-        //recieves name changes
+        //receives name changes
         this.onMessage(KEY_USERNAME, (client, message) => {
             this.state.players[client.sessionId].name = message;
         });
