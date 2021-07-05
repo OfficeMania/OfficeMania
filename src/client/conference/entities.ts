@@ -49,6 +49,7 @@ class VideoContainer {
         overlayElement.append(this.display);
         this.container.append(overlayElement);
         this.display.innerHTML = "<b>You</b>";
+        this.display.classList.add("unselectable");
     }
 
     get container(): HTMLDivElement {
