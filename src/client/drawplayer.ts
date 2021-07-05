@@ -1,206 +1,212 @@
+<<<<<<< HEAD:src/client/drawplayer.ts
 import { Room } from "colyseus.js";
 import { Player, TILE_SIZE , STEP_SIZE} from "./player";
 import {PlayerRecord} from "./util";
+=======
+import {Room} from "colyseus.js";
+import {Player, STEP_SIZE} from "./player";
+>>>>>>> e05c429df4552902f1c1ddfe28741c6425ce06c1:src/client/player_sprite.ts
 
 /*
  * Chooses the Player sprite dependend on walking direction and duration of walking/standing
  */
-export function choosePlayerSprites(room: Room, player: Player, playerWidth: number, playerHeight: number, ownPlayer: Player){
-    if (ownPlayer === player){
-        if (player.moveDirection === null){
+export function choosePlayerSprites(room: Room, player: Player, playerWidth: number, playerHeight: number, ownPlayer: Player) {
+    if (ownPlayer === player) {
+        if (player.moveDirection === null) {
             player.standing++;
 
             //only activates if player is standing long enough
-            if (player.standing >= 10){
+            if (player.standing >= 10) {
                 player.moving = 0
                 player.spriteY = playerHeight;
                 let x = 0;
 
                 //choose direction
-                switch(player.facing){
-                    case "right":{
+                switch (player.facing) {
+                    case "right": {
                         break;
                     }
-                    case "up":{
-                        x += 6*playerWidth
+                    case "up": {
+                        x += 6 * playerWidth
                         break;
                     }
-                    case "left":{
-                        x += 12*playerWidth
+                    case "left": {
+                        x += 12 * playerWidth
                         break;
                     }
-                    case "down":{
-                        x += 18*playerWidth
+                    case "down": {
+                        x += 18 * playerWidth
                         break;
                     }
                 }
 
                 //standing animation
-                if(player.standing % 300 <= 40){
+                if (player.standing % 300 <= 40) {
                     //do nothing
-                }else if(player.standing % 300 <= 80){
+                } else if (player.standing % 300 <= 80) {
                     x += playerWidth;
-                }else if(player.standing % 300 <= 120){
-                    x += 2*playerWidth;
-                }else if(player.standing % 300 <= 160){
-                    x += 3*playerWidth;
-                }else if(player.standing % 300 <= 200){
-                    x += 4*playerWidth;
-                }else{
-                    x += 5*playerWidth;
+                } else if (player.standing % 300 <= 120) {
+                    x += 2 * playerWidth;
+                } else if (player.standing % 300 <= 160) {
+                    x += 3 * playerWidth;
+                } else if (player.standing % 300 <= 200) {
+                    x += 4 * playerWidth;
+                } else {
+                    x += 5 * playerWidth;
                 }
 
                 player.spriteX = x;
             } else {
                 player.moving++
             }
-        } else{
+        } else {
             player.standing = 0;
             player.moving++;
             let x = 0;
 
             //choose direction
-            switch(player.moveDirection){
-                case "right":{
+            switch (player.moveDirection) {
+                case "right": {
                     break;
                 }
-                case "up":{
-                    x += 6*playerWidth
+                case "up": {
+                    x += 6 * playerWidth
                     break;
                 }
-                case "left":{
-                    x += 12*playerWidth
+                case "left": {
+                    x += 12 * playerWidth
                     break;
                 }
-                case "down":{
-                    x += 18*playerWidth
+                case "down": {
+                    x += 18 * playerWidth
                     break;
                 }
             }
 
             //moving animation
-            if(player.moving % 60 <= 10){
+            if (player.moving % 60 <= 10) {
                 //do nothing
-            }else if(player.moving % 60 <= 20){
+            } else if (player.moving % 60 <= 20) {
                 x += playerWidth;
-            }else if(player.moving % 60 <= 30){
-                x += 2*playerWidth;
-            }else if(player.moving % 60 <= 40){
-                x += 3*playerWidth;
-            }else if(player.moving % 60 <= 50){
-                x += 4*playerWidth;
-            }else{
-                x += 5*playerWidth;
+            } else if (player.moving % 60 <= 30) {
+                x += 2 * playerWidth;
+            } else if (player.moving % 60 <= 40) {
+                x += 3 * playerWidth;
+            } else if (player.moving % 60 <= 50) {
+                x += 4 * playerWidth;
+            } else {
+                x += 5 * playerWidth;
             }
-            
+
             player.spriteX = x
-            player.spriteY = 2*playerHeight
+            player.spriteY = 2 * playerHeight
         }
     } else { //all other players
         //sets facing direction to choose sprites
-        if(Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE) > Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)){
-            if(player.positionX < room.state.players[player.id].x * STEP_SIZE){
+        if (Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE) > Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)) {
+            if (player.positionX < room.state.players[player.id].x * STEP_SIZE) {
                 player.facing = "right"
-            }else if(player.positionX > room.state.players[player.id].x * STEP_SIZE){
+            } else if (player.positionX > room.state.players[player.id].x * STEP_SIZE) {
                 player.facing = "left"
             }
-        } else if (Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE) < Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)){
-            if(player.positionY < room.state.players[player.id].y * STEP_SIZE){
+        } else if (Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE) < Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)) {
+            if (player.positionY < room.state.players[player.id].y * STEP_SIZE) {
                 player.facing = "down"
-            }else if(player.positionY > room.state.players[player.id].y * STEP_SIZE){
+            } else if (player.positionY > room.state.players[player.id].y * STEP_SIZE) {
                 player.facing = "up"
             }
         }
         // player is standing
-        if(player.positionX === room.state.players[player.id].x * STEP_SIZE && player.positionY === room.state.players[player.id].y * STEP_SIZE){
+        if (player.positionX === room.state.players[player.id].x * STEP_SIZE && player.positionY === room.state.players[player.id].y * STEP_SIZE) {
             player.standing++
-            if (player.standing >= 10){
+            if (player.standing >= 10) {
                 player.moving = 0
                 player.spriteY = playerHeight;
                 let x = 0;
 
                 //choose direction
-                switch(player.facing){
-                    case "right":{
+                switch (player.facing) {
+                    case "right": {
                         break;
                     }
-                    case "up":{
-                        x += 6*playerWidth
+                    case "up": {
+                        x += 6 * playerWidth
                         break;
                     }
-                    case "left":{
-                        x += 12*playerWidth
+                    case "left": {
+                        x += 12 * playerWidth
                         break;
                     }
-                    case "down":{
-                        x += 18*playerWidth
+                    case "down": {
+                        x += 18 * playerWidth
                         break;
                     }
                 }
-                
+
                 //standing animation
-                if(player.standing % 300 <= 40){
+                if (player.standing % 300 <= 40) {
                     //do nothing
-                }else if(player.standing % 300 <= 80){
+                } else if (player.standing % 300 <= 80) {
                     x += playerWidth;
-                }else if(player.standing % 300 <= 120){
-                    x += 2*playerWidth;
-                }else if(player.standing % 300 <= 160){
-                    x += 3*playerWidth;
-                }else if(player.standing % 300 <= 200){
-                    x += 4*playerWidth;
-                }else{
-                    x += 5*playerWidth;
+                } else if (player.standing % 300 <= 120) {
+                    x += 2 * playerWidth;
+                } else if (player.standing % 300 <= 160) {
+                    x += 3 * playerWidth;
+                } else if (player.standing % 300 <= 200) {
+                    x += 4 * playerWidth;
+                } else {
+                    x += 5 * playerWidth;
                 }
 
                 player.spriteX = x;
             } else {
                 player.moving++
             }
-        }else{                  // player is moving
+        } else {                  // player is moving
             player.standing = 0;
             player.moving++;
             let x = 0;
 
             //choose direction
-            switch(player.facing){
-                case "right":{
+            switch (player.facing) {
+                case "right": {
                     break;
                 }
-                case "up":{
-                    x += 6*playerWidth
+                case "up": {
+                    x += 6 * playerWidth
                     break;
                 }
-                case "left":{
-                    x += 12*playerWidth
+                case "left": {
+                    x += 12 * playerWidth
                     break;
                 }
-                case "down":{
-                    x += 18*playerWidth
+                case "down": {
+                    x += 18 * playerWidth
                     break;
                 }
             }
 
             //moving animation
-            if(player.moving % 60 <= 10){
+            if (player.moving % 60 <= 10) {
                 //do nothing
-            }else if(player.moving % 60 <= 20){
+            } else if (player.moving % 60 <= 20) {
                 x += playerWidth;
-            }else if(player.moving % 60 <= 30){
-                x += 2*playerWidth;
-            }else if(player.moving % 60 <= 40){
-                x += 3*playerWidth;
-            }else if(player.moving % 60 <= 50){
-                x += 4*playerWidth;
-            }else{
-                x += 5*playerWidth;
+            } else if (player.moving % 60 <= 30) {
+                x += 2 * playerWidth;
+            } else if (player.moving % 60 <= 40) {
+                x += 3 * playerWidth;
+            } else if (player.moving % 60 <= 50) {
+                x += 4 * playerWidth;
+            } else {
+                x += 5 * playerWidth;
             }
-            
+
             player.spriteX = x
-            player.spriteY = 2*playerHeight
+            player.spriteY = 2 * playerHeight
         }
     }
 }
+<<<<<<< HEAD:src/client/drawplayer.ts
 
 //sprite dimensions (from movement)
 let playerWidth: number = 48;
@@ -243,3 +249,5 @@ export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters:
         }
     });
 }
+=======
+>>>>>>> e05c429df4552902f1c1ddfe28741c6425ce06c1:src/client/player_sprite.ts
