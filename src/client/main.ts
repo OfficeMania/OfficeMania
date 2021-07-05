@@ -1,6 +1,6 @@
 import {Client} from "colyseus.js";
 import {TILE_SIZE} from "./player";
-import {InitState, joinAndSync, PlayerRecord, setRoom} from "./util";
+import {InitState, joinAndSync, PlayerRecord, setCharacter, setRoom, setUsername} from "./util";
 import {convertMapData, drawMap, fillSolidInfos, mapInfo, solidInfo} from "./map";
 import {
     applyConferenceSettings,
@@ -11,15 +11,7 @@ import {
     toggleSharing,
     updateUsers
 } from "./conference/conference";
-import {
-    drawPlayer,
-    loadCharacter,
-    loadInputFunctions,
-    playerLoop,
-    setCharacter,
-    setKeysDisabled,
-    setUsername
-} from "./movement";
+import {drawPlayer, loadCharacter, loadInputFunctions, playerLoop, setKeysDisabled} from "./movement";
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}

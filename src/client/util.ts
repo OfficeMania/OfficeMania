@@ -155,3 +155,20 @@ export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionI
     }
     return true;
 }
+
+export function setUsername(value: string, ourPlayer: Player, room: Room) {
+    value = value?.slice(0, 20) || "Jimmy";
+    ourPlayer.name = value;
+    localStorage.setItem("username", value);
+    room.send("name", value);
+}
+
+export function setCharacter(value: string, ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
+    const filenames = Object.keys(characters);
+    if (filenames.indexOf(value) === -1) {
+        value = filenames[0];
+    }
+    ourPlayer.character = value;
+    localStorage.setItem("character", value);
+    room.send("character", value);
+}
