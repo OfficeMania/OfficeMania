@@ -239,7 +239,7 @@ function fillSolidInfos(map: mapInfo) {
 
                                         if (numbBin.length < 4) {
 
-                                            for (let i = 0; i < 4 - numbBin.length; i++) {
+                                            for (let j = 0; j < 4 - numbBin.length; j++) {
                                                 fillerString.concat("0");
                                             }
                                             numbBin = fillerString.concat(numbBin);
@@ -317,29 +317,26 @@ async function convertMapData(mapdata: string, room: Room, canvas: HTMLCanvasEle
 
     paths = [];
 
-    for (let i = 0; i < room.state.templatePaths.length; i++) {
-
-        paths.push(room.state.templatePaths[i]);
-    }
+    room.state.templatePaths.forEach((path) => paths.push(path));
 
     textures = new Map<string, HTMLImageElement>();
     let image: HTMLImageElement;
 
     let map = JSON.parse(mapdata);
 
-    if (map.infinite === "true") {
-        isInfinite = true;
-    } else {
-        isInfinite = false;
-    }
+    // if (map.infinite === "true") {
+    //     isInfinite = true;
+    // } else {
+    //     isInfinite = false;
+    // }
 
     resolution = parseInt(map.tileheight);
 
     canvas.height = map.height * resolution;
     canvas.width = map.width * resolution;
 
-    mapWidth = canvas.width / (resolution * scaling);
-    mapHeight = canvas.height / (resolution * scaling);
+    // mapWidth = canvas.width / (resolution * scaling);
+    // mapHeight = canvas.height / (resolution * scaling);
 
     layerArray = [];
     tilesetArray = [];
