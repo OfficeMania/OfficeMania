@@ -227,3 +227,9 @@ export function appendIcon(element: HTMLElement, icon: string): HTMLSpanElement 
     element.append(span);
     return span;
 }
+
+export function removeChildren(element: HTMLElement) {
+    while (element.firstChild) {
+        element.firstChild.remove();
+    }
+}

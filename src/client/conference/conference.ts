@@ -1,6 +1,13 @@
 //import {JitsiMeetJS} from "./lib-jitsi-meet.min";
 
-import {appendIcon, canSeeEachOther, getCorrectedPlayerCoordinates, getRoom, PlayerRecord} from "../util";
+import {
+    appendIcon,
+    canSeeEachOther,
+    getCorrectedPlayerCoordinates,
+    getRoom,
+    PlayerRecord,
+    removeChildren
+} from "../util";
 import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
 import {setAudioButtonMute, setSwitchToDesktop, setVideoButtonMute} from "../main";
@@ -395,9 +402,7 @@ function getMediaDeviceInfos(deviceType: string, deviceDirection: string): Promi
 }
 
 function setMediaDevices(select: HTMLSelectElement, devices: MediaDeviceInfo[], selectedDevice: MediaDeviceInfo) {
-    while (select.firstChild) {
-        select.firstChild.remove();
-    }
+    removeChildren(select);
     let selectedIndex = selectedDevice === null ? -1 : 0;
     let counter = 0;
     devices.forEach(device => {
@@ -485,9 +490,7 @@ export function createPlayerState<Type extends HTMLElement>(player: Player, elem
 
 export function updateUsers(players: PlayerRecord) {
     Object.values(players).forEach((player) => getUser(player.participantId)?.updatePlayer(player));
-    while (playerNearbyIndicator.firstChild) {
-        playerNearbyIndicator.firstChild.remove();
-    }
+    removeChildren(playerNearbyIndicator);
     if (showParticipantsTab) {
         const list = document.createElement("ul");
         Object.values(players).forEach((player) => list.append(createPlayerState(player, document.createElement("li"))));

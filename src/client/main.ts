@@ -5,11 +5,12 @@ import {
     getUsername,
     InitState,
     joinAndSync,
+    loadCharacter,
     PlayerRecord,
+    removeChildren,
     setCharacter,
     setRoom,
-    setUsername,
-    loadCharacter
+    setUsername
 } from "./util";
 import {convertMapData, drawMap, fillSolidInfos, mapInfo, solidInfo} from "./map";
 import {
@@ -24,7 +25,6 @@ import {
 import {playerLoop} from "./movement";
 import {loadInputFunctions, setKeysDisabled} from "./input";
 import {drawPlayer} from "./drawplayer"
-
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
@@ -137,9 +137,7 @@ function convertCharacterName(key: string) {
 
 function loadCharacterSettings() {
     if (characters) {
-        while (characterSelect.firstChild) {
-            characterSelect.firstChild.remove();
-        }
+        removeChildren(characterSelect);
         const current = getCharacterIntern?.();
         let selectedIndex = -1;
         let counter = 0;
