@@ -92,8 +92,6 @@ class User {
     conference;
     // Variables
     protected disabled: boolean = false;
-    private _audioMuted: boolean = false;
-    private _videoMuted: boolean = false;
     protected audioTrack: any = null;
     protected videoTrack: any = null;
     protected audioElement: HTMLAudioElement = null;
@@ -148,33 +146,6 @@ class User {
         this.videoContainer = container;
         track.attach(container.video);
         this.update();
-    }
-
-    toggleCamAudio(): boolean {
-        const muted = this.toggleTrack(this.audioTrack);
-        this.audioMuted = muted;
-        return muted;
-    }
-
-    toggleCamVideo(): boolean {
-        const muted = this.toggleTrack(this.videoTrack);
-        this.videoMuted = muted;
-        return muted;
-    }
-
-    private toggleTrack(track: any): boolean {
-        if (!track) {
-            console.warn("toggling undefined or null track?")
-            return undefined;
-        }
-        let muted = false;
-        if (track.isMuted()) {
-            track.unmute().then(() => this.update());
-        } else {
-            track.mute().then(() => this.update());
-            muted = true;
-        }
-        return muted;
     }
 
     protected pauseVideo(): boolean {
@@ -301,22 +272,6 @@ class User {
         }
     }
 
-    get audioMuted(): boolean {
-        return this._audioMuted;
-    }
-
-    set audioMuted(value: boolean) {
-        this._audioMuted = value;
-    }
-
-    get videoMuted(): boolean {
-        return this._videoMuted;
-    }
-
-    set videoMuted(value: boolean) {
-        this._videoMuted = value;
-    }
-
     remove() {
         this.removeElements();
         this.detachTracks();
@@ -354,12 +309,38 @@ class SelfUser extends User {
     protected sharing: boolean = false;
     private sharedAudioMuted: boolean = false;
     private sharedVideoMuted: boolean = false;
+    private _audioMuted: boolean = false;
+    private _videoMuted: boolean = false;
     // Temp
     protected tempAudioTrack: any = null;
     protected tempVideoTrack: any = null;
 
     constructor(audioBar: HTMLDivElement, videoBar: HTMLDivElement, focusBar: HTMLDivElement) {
         super(null, audioBar, videoBar, focusBar, null);
+    }
+
+    get audioMuted(): boolean {
+        return this.sharing ? this.sharedAudioMuted : this._audioMuted;
+    }
+
+    set audioMuted(value: boolean) {
+        if (this.sharing) {
+            this.sharedAudioMuted = value;
+        } else {
+            this._audioMuted = value;
+        }
+    }
+
+    get videoMuted(): boolean {
+        return this.sharing ? this.sharedVideoMuted : this._videoMuted;
+    }
+
+    set videoMuted(value: boolean) {
+        if (this.sharing) {
+            this.sharedVideoMuted = value;
+        } else {
+            this._videoMuted = value;
+        }
     }
 
     addToConference() {
@@ -371,30 +352,31 @@ class SelfUser extends User {
         }
     }
 
-    /*
-    get audioMuted(): boolean {
-        return this.sharing ? this.sharedAudioMuted : super.audioMuted;
+    toggleCamAudio(): boolean {
+        const muted = this.toggleTrack(this.audioTrack);
+        this.audioMuted = muted;
+        return muted;
     }
 
-    set audioMuted(value: boolean) {
-        if (this.sharing) {
-            this.sharedAudioMuted = value;
-        } else {
-            super.audioMuted = value;
+    toggleCamVideo(): boolean {
+        const muted = this.toggleTrack(this.videoTrack);
+        this.videoMuted = muted;
+        return muted;
+    }
+
+    private toggleTrack(track: any): boolean {
+        if (!track) {
+            console.warn("toggling undefined or null track?")
+            return undefined;
         }
-    }
-    */
-
-    get videoMuted(): boolean {
-        return this.sharing ? this.sharedVideoMuted : super.videoMuted;
-    }
-
-    set videoMuted(value: boolean) {
-        if (this.sharing) {
-            this.sharedVideoMuted = value;
+        let muted = false;
+        if (track.isMuted()) {
+            track.unmute().then(() => this.update());
         } else {
-            super.videoMuted = value;
+            track.mute().then(() => this.update());
+            muted = true;
         }
+        return muted;
     }
 
     setTempAudioTrack(track) {
