@@ -10,67 +10,63 @@ export function setKeysDisabled(disabled: boolean) {
     keysDisabled = disabled;
 }
 
+function onKey(event: KeyboardEvent, key: string, runnable: () => void) {
+    if (event.key.toLowerCase() === key.toLowerCase()) {
+        runnable();
+    }
+}
+
+function onKeyDirection(event: KeyboardEvent, key: string, ourPlayer: Player = undefined, direction: string = undefined) {
+    if (event.key.toLowerCase() === key.toLowerCase() && !ourPlayer.prioDirection.includes(direction)) {
+        ourPlayer.prioDirection.unshift(direction);
+    }
+}
+
 export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
-    function keyPressed(e: KeyboardEvent) {
+    function onKeyDown(e: KeyboardEvent) {
         if (keysDisabled) {
             return;
         }
-        if (e.key.toLowerCase() === "s" && !ourPlayer.prioDirection.includes("moveDown")) {
-            ourPlayer.prioDirection.unshift("moveDown");
-        }
-        if (e.key.toLowerCase() === "w" && !ourPlayer.prioDirection.includes("moveUp")) {
-            ourPlayer.prioDirection.unshift("moveUp");
-        }
-        if (e.key.toLowerCase() === "a" && !ourPlayer.prioDirection.includes("moveLeft")) {
-            ourPlayer.prioDirection.unshift("moveLeft");
-        }
-        if (e.key.toLowerCase() === "d" && !ourPlayer.prioDirection.includes("moveRight")) {
-            ourPlayer.prioDirection.unshift("moveRight");
-        }
+        onKeyDirection(e, "s", ourPlayer, "moveDown");
+        onKeyDirection(e, "w", ourPlayer, "moveUp");
+        onKeyDirection(e, "a", ourPlayer, "moveLeft");
+        onKeyDirection(e, "d", ourPlayer, "moveRight");
         //iterate through characters
-        if (e.key.toLowerCase() === "c") {
-            let filenames = Object.keys(characters);
+        onKey(e, "c", () => {
+            const filenames = Object.keys(characters);
             let nextIndex = filenames.indexOf(ourPlayer.character) + 1;
             if (filenames.length <= nextIndex) {
                 nextIndex = 0;
             }
             setCharacter(filenames[nextIndex], ourPlayer, room, characters);
-        }
+        });
         //rename players name
-        if (e.key.toLowerCase() === "r") {
-            setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy"), ourPlayer, room);
-        }
-        if (e.key.toLowerCase() === " ") {
-            //player interacts with object in front of him
-            //(ttriggert with space)
-        }
-        if (e.key.toLowerCase() === "y" && !yPressed) {
-            console.log("Y has been pressed"); //DEBUG
-            yPressed = true;
-            setShowParticipantsTab(true);
-        }
+        onKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy"), ourPlayer, room));
+        //player interacts with object in front of him
+        onKey(e, " ", () => {
+            //(triggered with space)
+        });
+        onKey(e, "y", () => {
+            if (!yPressed) {
+                console.log("Y has been pressed"); //DEBUG
+                yPressed = true;
+                setShowParticipantsTab(true);
+            }
+        });
     }
 
-    function keyUp(e: KeyboardEvent) {
+    function onKeyUp(e: KeyboardEvent) {
         if (keysDisabled) {
             return;
         }
-        if (e.key.toLowerCase() === "s") {
-            ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveDown"), 1);
-        }
-        if (e.key.toLowerCase() === "w") {
-            ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveUp"), 1);
-        }
-        if (e.key.toLowerCase() === "a") {
-            ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveLeft"), 1);
-        }
-        if (e.key.toLowerCase() === "d") {
-            ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveRight"), 1);
-        }
-        if (e.key.toLowerCase() === "y") {
+        onKey(e, "s", () => ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveDown"), 1));
+        onKey(e, "w", () => ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveUp"), 1));
+        onKey(e, "a", () => ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveLeft"), 1));
+        onKey(e, "d", () => ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveRight"), 1));
+        onKey(e, "y", () => {
             yPressed = false;
             setShowParticipantsTab(false);
-        }
+        });
     }
 
     //gets called when window is out auf focus
@@ -79,8 +75,7 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         ourPlayer.prioDirection = [];
     }
 
-    document.addEventListener("keydown", keyPressed);
-    document.addEventListener("keyup", keyUp);
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keyup", onKeyUp);
     window.addEventListener("blur", onBlur);
-
 }
