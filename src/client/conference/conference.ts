@@ -473,12 +473,13 @@ export function updateUsers(players: PlayerRecord) {
         Object.values(players).forEach((player) => {
             const item = document.createElement("li");
             item.innerText = player.name;
-            //TODO wtf is happening here
-            /*if(selfUser.participantId !== player.participantId){
-                if (getUser(player.participantId).videoMuted){
+            //TODO
+            /*
+            if(selfUser.participantId !== player.participantId){
+                if (getUser(player.participantId).isVideoMuted()){
                     item.innerText += " video";
                 }
-                if (getUser(player.participantId).audioMuted){
+                if (getUser(player.participantId).isAudioMuted()){
                     item.innerText += " audio";
                 }
             }

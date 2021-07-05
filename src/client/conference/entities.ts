@@ -105,6 +105,14 @@ class User {
         this.participantId = participantId;
     }
 
+    isAudioMuted(): boolean {
+        return this.audioTrack?.isMuted();
+    }
+
+    isVideoMuted(): boolean {
+        return this.videoTrack?.isMuted();
+    }
+
     removeTrack(track) {
         if (track.getType() === trackTypeVideo || track.getType() === trackTypeDesktop) {
             this.videoTrack = null;
