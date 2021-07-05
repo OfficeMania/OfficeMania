@@ -73,12 +73,7 @@ function toggleMute(type: string) {
     if (type === "desktop") {
         toggleSharing(setSwitchToDesktop);
     } else {
-        const muted = toggleMuteByType(type);
-        if (type === "audio") {
-            //setAudioButtonMute(muted);
-        } else if (type === "video") {
-            //setVideoButtonMute(muted);
-        }
+        toggleMuteByType(type);
     }
 }
 
@@ -152,7 +147,7 @@ function loadCharacterSettings() {
             const option = document.createElement("option");
             option.value = key;
             option.innerText = convertCharacterName(key);
-            //option.style.background = `url(${image.src}) no-repeat`; //TODO Doesn't work, also the file contains multiple views of the character
+            option.style.background = `url(${image.src}) no-repeat`; //FIXME Doesn't work, also the file contains multiple views of the character
             characterSelect.append(option);
         }
         characterSelect.selectedIndex = selectedIndex;
