@@ -1,6 +1,6 @@
 //import {JitsiMeetJS} from "./lib-jitsi-meet.min";
 
-import {canSeeEachOther, getCorrectedPlayerCoordinates, getRoom, PlayerRecord} from "../util";
+import {appendIcon, canSeeEachOther, getCorrectedPlayerCoordinates, getRoom, PlayerRecord} from "../util";
 import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
 import {setAudioButtonMute, setSwitchToDesktop, setVideoButtonMute} from "../main";
@@ -467,24 +467,26 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
 
 export function updateUsers(players: PlayerRecord) {
     Object.values(players).forEach((player) => getUser(player.participantId)?.setDisplay(player.name));
-    playerNearbyIndicator.innerText = "";
+    while (playerNearbyIndicator.firstChild) {
+        playerNearbyIndicator.firstChild.remove();
+    }
     if (showParticipantsTab) {
         const list = document.createElement("ul");
         Object.values(players).forEach((player) => {
             const item = document.createElement("li");
-            item.innerText = player.name;
-            //TODO
-            /*
+            const span = document.createElement("span");
+            span.classList.add("player-state-list-text");
+            span.innerText = player.name;
             if(selfUser.participantId !== player.participantId){
-                if (getUser(player.participantId).isVideoMuted()){
-                    item.innerText += " video";
+                const user = getUser(player.participantId);
+                if (user.isAudioMuted()) {
+                    appendIcon(item, "microphone-slash").classList.add("fa-xs");
                 }
-                if (getUser(player.participantId).isAudioMuted()){
-                    item.innerText += " audio";
+                if (user.isVideoMuted()) {
+                    appendIcon(item, "video-slash").classList.add("fa-xs");
                 }
             }
-            console.log(users);
-            */
+            item.append(span);
             list.append(item);
         });
         playerNearbyIndicator.append(list);

@@ -219,3 +219,11 @@ export function setCameraDeviceId (value: string) {
 export function getCameraDeviceId(): string {
     return localStorage.getItem(KEY_CAMERA_DEVICE_ID);
 }
+
+export function appendIcon(element: HTMLElement, icon: string): HTMLSpanElement {
+    const span = document.createElement("span");
+    span.classList.add("fa");
+    span.classList.add(`fa-${icon}`);
+    element.append(span);
+    return span;
+}
