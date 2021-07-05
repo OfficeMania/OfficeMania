@@ -472,10 +472,11 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
 
 export function createPlayerState<Type extends HTMLElement>(player: Player, element: Type): Type {
     element.classList.add("unselectable");
+    element.classList.add("player-state");
     const playerName = document.createElement("span");
     playerName.classList.add("player-state-name");
-    playerName.innerText = player.name;
-    if(selfUser.participantId !== player.participantId){
+    playerName.innerText = player ? player.name : "You";
+    if(player && selfUser.participantId !== player.participantId){
         const user = getUser(player.participantId);
         if (user.isAudioMuted()) {
             appendIcon(element, "microphone-slash").classList.add("fa-xs");

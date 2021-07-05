@@ -84,19 +84,10 @@ body {
 
 #player-nearby-indicator ul {
     font-size: 300%;
-    font-weight: bolder;
-    margin: 0;
-    color: black;
-    -webkit-text-fill-color: black;
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: white;
 }
 
 #player-nearby-indicator li {
     list-style-type: none;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
 }
 
 #settings-modal form {
@@ -155,15 +146,11 @@ body {
     min-width: 0;
 }
 
-.video-overlay p {
+.video-overlay {
     font-size: 200%;
-    font-weight: bolder;
-    margin: 0;
-    color: black;
-    -webkit-text-fill-color: black;
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: white;
-
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #focus-bar {
@@ -178,6 +165,17 @@ body {
     max-width: 65%;
 }
 
+.player-state {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
 .player-state-name {
     padding-left: 10px;
+    font-weight: bolder;
+    color: black;
+    -webkit-text-fill-color: black;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: white;
 }

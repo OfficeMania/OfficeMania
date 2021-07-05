@@ -1,5 +1,6 @@
-import {trackTypeDesktop, trackTypeVideo} from "./conference";
+import {createPlayerState, trackTypeDesktop, trackTypeVideo} from "./conference";
 import {Player} from "../player";
+import {removeChildren} from "../util";
 
 export {User, SelfUser};
 
@@ -31,54 +32,40 @@ function createVideoElementContainer(id: string, user: User, onUpdate: () => voi
 
 class VideoContainer {
 
-    private _container: HTMLDivElement;
-    private _video: HTMLVideoElement;
-    private _display: HTMLParagraphElement;
+    private readonly _container: HTMLDivElement;
+    private readonly _video: HTMLVideoElement;
+    private readonly _overlay: HTMLDivElement;
 
     constructor(video: HTMLVideoElement) {
         this._container = document.createElement("div");
         this._video = video;
-        this._display = document.createElement("p");
+        this._overlay = document.createElement("div");
         this.init();
     }
 
     protected init() {
         this.container.classList.add("video-container")
         this.container.append(this.video);
-        const overlayElement = document.createElement("div");
-        overlayElement.classList.add("video-overlay");
-        overlayElement.append(this.display);
-        this.container.append(overlayElement);
-        this.display.innerHTML = "<b>You</b>";
-        this.display.classList.add("unselectable");
+        this.overlay.classList.add("video-overlay");
+        this.container.append(this.overlay);
+        this.updatePlayerState(undefined);
     }
 
     get container(): HTMLDivElement {
         return this._container;
     }
 
-    set container(value: HTMLDivElement) {
-        this._container = value;
-    }
-
     get video(): HTMLVideoElement {
         return this._video;
     }
 
-    set video(value: HTMLVideoElement) {
-        this._video = value;
+    get overlay(): HTMLDivElement {
+        return this._overlay;
     }
 
-    get display(): HTMLParagraphElement {
-        return this._display;
-    }
-
-    set display(value: HTMLParagraphElement) {
-        this._display = value;
-    }
-
-    setDisplay(text: string) {
-        this.display.innerText = text;
+    updatePlayerState(player: Player) {
+        removeChildren(this.overlay);
+        this.overlay.append(createPlayerState(player, document.createElement("div")));
     }
 
 }
@@ -269,12 +256,8 @@ class User {
         this.update();
     }
 
-    setDisplay(text: string) {
-        this.videoContainer?.setDisplay(text);
-    }
-
     updatePlayer(player: Player) {
-        this.setDisplay(player.name);
+        this.videoContainer?.updatePlayerState(player);
     }
 
     getRatio(): number {
