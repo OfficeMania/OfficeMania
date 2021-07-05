@@ -31,7 +31,7 @@ export function setCharacter(value: string, ourPlayer: Player, room: Room, chara
 }
 
 
-export function loadInputFuctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }){
+export function loadInputFuctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
     function keyPressed(e: KeyboardEvent) {
         if (keysDisabled) {
             return;
@@ -65,7 +65,7 @@ export function loadInputFuctions(ourPlayer: Player, room: Room, characters: { [
             //player interacts with object in front of him
             //(ttriggert with space)
         }
-        if (e.key.toLowerCase() === "y" && !yPressed){
+        if (e.key.toLowerCase() === "y" && !yPressed) {
             console.log("Y has been pressed"); //DEBUG
             yPressed = true;
             setShowParticipantsTab(true);
@@ -88,7 +88,7 @@ export function loadInputFuctions(ourPlayer: Player, room: Room, characters: { [
         if (e.key.toLowerCase() === "d") {
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveRight"), 1);
         }
-        if (e.key.toLowerCase() === "y"){
+        if (e.key.toLowerCase() === "y") {
             yPressed = false;
             setShowParticipantsTab(false);
         }
@@ -108,7 +108,7 @@ export function loadInputFuctions(ourPlayer: Player, room: Room, characters: { [
 }
 
 
-export async function loadCharacter(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }){
+export async function loadCharacter(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
     //load or ask for name
     const username = localStorage.getItem("username");
     if (username && username !== "") {
@@ -144,7 +144,7 @@ let lag2 = 0;
 let lastSecond = performance.now();
 
 
-export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room, now: number, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, collisionInfo: solidInfo[][]){
+export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room, now: number, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, collisionInfo: solidInfo[][]) {
     lag += now - previous;
     lag2 += now - previous;
     previous = now;
@@ -153,7 +153,7 @@ export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room,
     while (lag >= MS_PER_UPDATE || lag2 >= MS_PER_UPDATE2) {
 
         //calculates players movement
-        if (lag >= MS_PER_UPDATE) {
+        if (lag >= MS_PER_UPDATE) {
             //Update each player's data
             Object.values(players).forEach((player: Player) => {
                 if (player !== ourPlayer) {
@@ -186,9 +186,9 @@ export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room,
     }
 }
 
-export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters: { [key: string]: HTMLImageElement }, ctx: CanvasRenderingContext2D, width: number, height: number){
-     // Draw each player
-     Object.values(players).forEach((player: Player, i: number) => {
+export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters: { [key: string]: HTMLImageElement }, ctx: CanvasRenderingContext2D, width: number, height: number) {
+    // Draw each player
+    Object.values(players).forEach((player: Player, i: number) => {
         let text;
 //choose the correct sprite
         if (ourPlayer.id !== player.id) {

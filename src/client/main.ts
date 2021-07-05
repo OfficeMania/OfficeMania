@@ -98,7 +98,7 @@ const usernameInput = $<HTMLInputElement>("input-settings-username");
 const characterSelect = $<HTMLSelectElement>("character-select");
 
 const observer = new MutationObserver(mutations => mutations.forEach(() => setKeysDisabled(!settingsModal.style.display.match(/none/))));
-observer.observe(settingsModal, { attributes: true, attributeFilter: ['style'] });
+observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
 
 function checkValidSettings() {
     const valid = checkValidUsernameInput();
