@@ -11,7 +11,7 @@ import {
     toggleSharing,
     updateUsers
 } from "./conference/conference";
-import {drawPlayer, loadCharacter, loadInputFuctions, playerLoop, setUsername} from "./movement";
+import {drawPlayer, loadCharacter, loadInputFuctions, playerLoop, setCharacter, setUsername} from "./movement";
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
@@ -85,10 +85,12 @@ settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
 
 const usernameInput = $<HTMLInputElement>("input-settings-username");
+const characterSelect = $<HTMLSelectElement>("character-select");
 
 let getUsernameIntern: () => string = () => localStorage.getItem("username");
+let getCharacterIntern: () => string = () => localStorage.getItem("character");
 
-function loadSettings() {
+function loadUsernameSettings() {
     if (getUsernameIntern) {
         usernameInput.value = getUsernameIntern();
         usernameInput.disabled = false;
@@ -96,14 +98,49 @@ function loadSettings() {
         usernameInput.value = "";
         usernameInput.disabled = true;
     }
-    loadConferenceSettings();
+}
+
+function loadCharacterSettings() {
+    if (characters) {
+        while (characterSelect.firstChild) {
+            characterSelect.firstChild.remove();
+        }
+        const current = getCharacterIntern?.();
+        let selectedIndex = -1;
+        let counter = 0;
+        for (const [key, image] of Object.entries(characters)) {
+            if (current && key === current) {
+                selectedIndex = counter;
+            }
+            counter++;
+            const option = document.createElement("option");
+            option.value = key;
+            option.innerText = key;
+            //option.style.background = `url(${image.src}) no-repeat`; //TODO Doesn't work, also the file contains multiple views of the character
+            characterSelect.append(option);
+        }
+        characterSelect.selectedIndex = selectedIndex;
+        characterSelect.disabled = false;
+    } else {
+        characterSelect.disabled = true;
+    }
+}
+
+function loadSettings() {
+    loadUsernameSettings();
+    loadCharacterSettings();
+    loadConferenceSettings().catch(console.error);
 }
 
 let setUsernameIntern: (username: string) => void = undefined;
+let setCharacterIntern: (character: string) => void = undefined;
 
 function applySettings() {
-    if (setUsernameIntern) {
+    if (setUsernameIntern && usernameInput.value) {
         setUsernameIntern(usernameInput.value);
+    }
+    if (setCharacterIntern && characterSelect.value) {
+        setCharacterIntern(characterSelect.value);
     }
     applyConferenceSettings();
 }
@@ -131,7 +168,9 @@ async function main() {
     setRoom(room);
 
     getUsernameIntern = () => ourPlayer.name;
+    getCharacterIntern = () => ourPlayer.character;
     setUsernameIntern = (username) => setUsername(username, ourPlayer, room);
+    setCharacterIntern = (character) => setCharacter(character, ourPlayer, room, characters);
 
     //loads all the character information
     loadCharacter(ourPlayer, room, characters);

@@ -13,7 +13,7 @@ export function setUsername(value: string, ourPlayer: Player, room: Room) {
     room.send("name", value);
 }
 
-function setCharacter(value: string, ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
+export function setCharacter(value: string, ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
     const filenames = Object.keys(characters);
     if (filenames.indexOf(value) === -1) {
         value = filenames[0];
