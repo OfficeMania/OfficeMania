@@ -100,6 +100,10 @@ function loadUsernameSettings() {
     }
 }
 
+function convertCharacterName(key: string) {
+    return key.replace(/_/gi, " ").replace(/\d+x\d+\.png/gi, "");
+}
+
 function loadCharacterSettings() {
     if (characters) {
         while (characterSelect.firstChild) {
@@ -115,7 +119,7 @@ function loadCharacterSettings() {
             counter++;
             const option = document.createElement("option");
             option.value = key;
-            option.innerText = key;
+            option.innerText = convertCharacterName(key);
             //option.style.background = `url(${image.src}) no-repeat`; //TODO Doesn't work, also the file contains multiple views of the character
             characterSelect.append(option);
         }
