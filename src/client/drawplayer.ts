@@ -2,7 +2,7 @@ import {Room} from "colyseus.js";
 import {Player, STEP_SIZE} from "./player";
 import {PlayerRecord} from "./util";
 
-function playerMovingAnimation(player: Player, direction: string, playerWidth: number, playerHeight: number) {
+function playerMovingAnimation(player: Player, direction: string, width: number, height: number) {
     player.standing = 0;
     player.moving++;
     let x = 0;
@@ -13,15 +13,15 @@ function playerMovingAnimation(player: Player, direction: string, playerWidth: n
             break;
         }
         case "up": {
-            x += 6 * playerWidth
+            x += 6 * width
             break;
         }
         case "left": {
-            x += 12 * playerWidth
+            x += 12 * width
             break;
         }
         case "down": {
-            x += 18 * playerWidth
+            x += 18 * width
             break;
         }
     }
@@ -30,28 +30,28 @@ function playerMovingAnimation(player: Player, direction: string, playerWidth: n
     if (player.moving % 60 <= 10) {
         //do nothing
     } else if (player.moving % 60 <= 20) {
-        x += playerWidth;
+        x += width;
     } else if (player.moving % 60 <= 30) {
-        x += 2 * playerWidth;
+        x += 2 * width;
     } else if (player.moving % 60 <= 40) {
-        x += 3 * playerWidth;
+        x += 3 * width;
     } else if (player.moving % 60 <= 50) {
-        x += 4 * playerWidth;
+        x += 4 * width;
     } else {
-        x += 5 * playerWidth;
+        x += 5 * width;
     }
 
     player.spriteX = x
-    player.spriteY = 2 * playerHeight
+    player.spriteY = 2 * height
 }
 
-function playerStandingAnimation(player: Player, playerHeight: number, playerWidth: number) {
+function playerStandingAnimation(player: Player, width: number, height: number) {
     player.standing++;
 
     //only activates if player is standing long enough
     if (player.standing >= 10) {
         player.moving = 0
-        player.spriteY = playerHeight;
+        player.spriteY = height;
         let x = 0;
 
         //choose direction
@@ -60,15 +60,15 @@ function playerStandingAnimation(player: Player, playerHeight: number, playerWid
                 break;
             }
             case "up": {
-                x += 6 * playerWidth
+                x += 6 * width
                 break;
             }
             case "left": {
-                x += 12 * playerWidth
+                x += 12 * width
                 break;
             }
             case "down": {
-                x += 18 * playerWidth
+                x += 18 * width
                 break;
             }
         }
@@ -77,15 +77,15 @@ function playerStandingAnimation(player: Player, playerHeight: number, playerWid
         if (player.standing % 300 <= 40) {
             //do nothing
         } else if (player.standing % 300 <= 80) {
-            x += playerWidth;
+            x += width;
         } else if (player.standing % 300 <= 120) {
-            x += 2 * playerWidth;
+            x += 2 * width;
         } else if (player.standing % 300 <= 160) {
-            x += 3 * playerWidth;
+            x += 3 * width;
         } else if (player.standing % 300 <= 200) {
-            x += 4 * playerWidth;
+            x += 4 * width;
         } else {
-            x += 5 * playerWidth;
+            x += 5 * width;
         }
 
         player.spriteX = x;
@@ -95,12 +95,12 @@ function playerStandingAnimation(player: Player, playerHeight: number, playerWid
 }
 
 /*
- * Chooses the Player sprite dependend on walking direction and duration of walking/standing
+ * Chooses the Player sprite depending on walking direction and duration of walking/standing
  */
-export function choosePlayerSprites(room: Room, player: Player, playerWidth: number, playerHeight: number, ownPlayer: Player) {
+export function choosePlayerSprites(room: Room, player: Player, ownPlayer: Player) {
     if (ownPlayer === player) {
         if (player.moveDirection === null) {
-            playerStandingAnimation(player, playerHeight, playerWidth);
+            playerStandingAnimation(player, playerWidth, playerHeight);
         } else {
             playerMovingAnimation(player, player.moveDirection, playerWidth, playerHeight);
         }
@@ -120,7 +120,7 @@ export function choosePlayerSprites(room: Room, player: Player, playerWidth: num
             }
         }
         if (player.positionX === room.state.players[player.id].x * STEP_SIZE && player.positionY === room.state.players[player.id].y * STEP_SIZE) {
-            playerStandingAnimation(player, playerHeight, playerWidth);
+            playerStandingAnimation(player, playerWidth, playerHeight);
         } else {
             playerMovingAnimation(player, player.facing, playerWidth, playerHeight);
         }
@@ -128,8 +128,8 @@ export function choosePlayerSprites(room: Room, player: Player, playerWidth: num
 }
 
 //sprite dimensions (from movement)
-let playerWidth: number = 48;
-let playerHeight: number = 96;
+const playerWidth: number = 48;
+const playerHeight: number = 96;
 
 export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters: { [key: string]: HTMLImageElement }, ctx: CanvasRenderingContext2D, width: number, height: number) {
     // Draw each player

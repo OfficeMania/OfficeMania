@@ -7,10 +7,6 @@ import {solidInfo} from "./map";
 const MS_PER_UPDATE = 10;
 const MS_PER_UPDATE2 = 15;
 
-//sprite dimensions (from movement)
-let playerWidth: number = 48;
-let playerHeight: number = 96;
-
 let previous = performance.now();
 let lag = 0;
 let lag2 = 0;
@@ -44,7 +40,7 @@ export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room,
         //animates/chooses character sprite
         if (lag2 >= MS_PER_UPDATE2) {
             Object.values(players).forEach((player: Player) => {
-                choosePlayerSprites(room, player, playerWidth, playerHeight, ourPlayer);
+                choosePlayerSprites(room, player, ourPlayer);
             });
             lag2 -= MS_PER_UPDATE2;
         }
