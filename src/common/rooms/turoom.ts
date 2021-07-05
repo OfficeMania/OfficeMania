@@ -1,7 +1,7 @@
 import {Client, Room} from "colyseus";
 import {PlayerData, State} from "./schema/state";
 import fs from 'fs';
-import {generateUUIDv4} from "../util";
+import {generateUUIDv4, KEY_CHARACTER, KEY_USERNAME} from "../util";
 
 /*
  * See: https://docs.colyseus.io/server/room/
@@ -90,12 +90,12 @@ export class TURoom extends Room<State> {
         });
 
         //recieves character changes
-        this.onMessage("character", (client, message) => {
+        this.onMessage(KEY_CHARACTER, (client, message) => {
             this.state.players[client.sessionId].character = message;
         });
 
         //recieves name changes
-        this.onMessage("name", (client, message) => {
+        this.onMessage(KEY_USERNAME, (client, message) => {
             this.state.players[client.sessionId].name = message;
         });
 
