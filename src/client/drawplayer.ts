@@ -1,6 +1,49 @@
-import { Room } from "colyseus.js";
-import { Player, TILE_SIZE , STEP_SIZE} from "./player";
+import {Room} from "colyseus.js";
+import {Player, STEP_SIZE} from "./player";
 import {PlayerRecord} from "./util";
+
+function playerMovingAnimation(player: Player, direction: string, playerWidth: number, playerHeight: number) {
+    player.standing = 0;
+    player.moving++;
+    let x = 0;
+
+    //choose direction
+    switch (direction) {
+        case "right": {
+            break;
+        }
+        case "up": {
+            x += 6 * playerWidth
+            break;
+        }
+        case "left": {
+            x += 12 * playerWidth
+            break;
+        }
+        case "down": {
+            x += 18 * playerWidth
+            break;
+        }
+    }
+
+    //moving animation
+    if (player.moving % 60 <= 10) {
+        //do nothing
+    } else if (player.moving % 60 <= 20) {
+        x += playerWidth;
+    } else if (player.moving % 60 <= 30) {
+        x += 2 * playerWidth;
+    } else if (player.moving % 60 <= 40) {
+        x += 3 * playerWidth;
+    } else if (player.moving % 60 <= 50) {
+        x += 4 * playerWidth;
+    } else {
+        x += 5 * playerWidth;
+    }
+
+    player.spriteX = x
+    player.spriteY = 2 * playerHeight
+}
 
 /*
  * Chooses the Player sprite dependend on walking direction and duration of walking/standing
@@ -55,46 +98,7 @@ export function choosePlayerSprites(room: Room, player: Player, playerWidth: num
                 player.moving++
             }
         } else {
-            player.standing = 0;
-            player.moving++;
-            let x = 0;
-
-            //choose direction
-            switch (player.moveDirection) {
-                case "right": {
-                    break;
-                }
-                case "up": {
-                    x += 6 * playerWidth
-                    break;
-                }
-                case "left": {
-                    x += 12 * playerWidth
-                    break;
-                }
-                case "down": {
-                    x += 18 * playerWidth
-                    break;
-                }
-            }
-
-            //moving animation
-            if (player.moving % 60 <= 10) {
-                //do nothing
-            } else if (player.moving % 60 <= 20) {
-                x += playerWidth;
-            } else if (player.moving % 60 <= 30) {
-                x += 2 * playerWidth;
-            } else if (player.moving % 60 <= 40) {
-                x += 3 * playerWidth;
-            } else if (player.moving % 60 <= 50) {
-                x += 4 * playerWidth;
-            } else {
-                x += 5 * playerWidth;
-            }
-
-            player.spriteX = x
-            player.spriteY = 2 * playerHeight
+            playerMovingAnimation(player, player.moveDirection, playerWidth, playerHeight);
         }
     } else { //all other players
         //sets facing direction to choose sprites
@@ -158,46 +162,7 @@ export function choosePlayerSprites(room: Room, player: Player, playerWidth: num
                 player.moving++
             }
         } else {                  // player is moving
-            player.standing = 0;
-            player.moving++;
-            let x = 0;
-
-            //choose direction
-            switch (player.facing) {
-                case "right": {
-                    break;
-                }
-                case "up": {
-                    x += 6 * playerWidth
-                    break;
-                }
-                case "left": {
-                    x += 12 * playerWidth
-                    break;
-                }
-                case "down": {
-                    x += 18 * playerWidth
-                    break;
-                }
-            }
-
-            //moving animation
-            if (player.moving % 60 <= 10) {
-                //do nothing
-            } else if (player.moving % 60 <= 20) {
-                x += playerWidth;
-            } else if (player.moving % 60 <= 30) {
-                x += 2 * playerWidth;
-            } else if (player.moving % 60 <= 40) {
-                x += 3 * playerWidth;
-            } else if (player.moving % 60 <= 50) {
-                x += 4 * playerWidth;
-            } else {
-                x += 5 * playerWidth;
-            }
-
-            player.spriteX = x
-            player.spriteY = 2 * playerHeight
+            playerMovingAnimation(player, player.facing, playerWidth, playerHeight);
         }
     }
 }
