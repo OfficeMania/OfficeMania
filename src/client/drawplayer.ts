@@ -147,7 +147,9 @@ export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters:
         //choose the correct sprite
         if (ourPlayer.id !== player.id) {
             //draw everyone else on their position relatively to you
-            ctx.drawImage(characters[player.character], player.spriteX, player.spriteY, playerWidth, playerHeight, Math.round((width / 2) + player.positionX - ourPlayer.positionX), Math.round((height / 2) + player.positionY - ourPlayer.positionY), playerWidth, playerHeight);
+            if (characters[player.character]) {
+                ctx.drawImage(characters[player.character], player.spriteX, player.spriteY, playerWidth, playerHeight, Math.round((width / 2) + player.positionX - ourPlayer.positionX), Math.round((height / 2) + player.positionY - ourPlayer.positionY), playerWidth, playerHeight);
+            }
 
             //draw name
             ctx.font = '18px Arial';
