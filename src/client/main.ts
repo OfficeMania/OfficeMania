@@ -87,6 +87,24 @@ settingsApplyButton.addEventListener("click", () => applySettings());
 const usernameInput = $<HTMLInputElement>("input-settings-username");
 const characterSelect = $<HTMLSelectElement>("character-select");
 
+function checkValidSettings() {
+    const valid = checkValidUsernameInput();
+    settingsOkButton.disabled = !valid;
+    settingsApplyButton.disabled = !valid;
+}
+
+function checkValidUsernameInput(): boolean {
+    const username = usernameInput.value;
+    const valid = !!username.match(/^\w{0,20}$/);
+    usernameInput.style.color = valid ? null : "red";
+    return valid;
+}
+
+usernameInput.addEventListener("change", () => checkValidSettings());
+usernameInput.addEventListener("keydown", () => checkValidSettings());
+usernameInput.addEventListener("paste", () => checkValidSettings());
+usernameInput.addEventListener("input", () => checkValidSettings());
+
 let getUsernameIntern: () => string = () => localStorage.getItem("username");
 let getCharacterIntern: () => string = () => localStorage.getItem("character");
 
