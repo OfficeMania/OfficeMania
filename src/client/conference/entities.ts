@@ -1,4 +1,5 @@
 import {trackTypeDesktop, trackTypeVideo} from "./conference";
+import {Player} from "../player";
 
 export {User, SelfUser};
 
@@ -270,6 +271,10 @@ class User {
 
     setDisplay(text: string) {
         this.videoContainer?.setDisplay(text);
+    }
+
+    updatePlayer(player: Player) {
+        this.setDisplay(player.name);
     }
 
     getRatio(): number {

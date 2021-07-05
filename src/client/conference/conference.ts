@@ -465,30 +465,32 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
     });
 }
 
+export function createPlayerState<Type extends HTMLElement>(player: Player, element: Type): Type {
+    element.classList.add("unselectable");
+    const playerName = document.createElement("span");
+    playerName.classList.add("player-state-name");
+    playerName.innerText = player.name;
+    if(selfUser.participantId !== player.participantId){
+        const user = getUser(player.participantId);
+        if (user.isAudioMuted()) {
+            appendIcon(element, "microphone-slash").classList.add("fa-xs");
+        }
+        if (user.isVideoMuted()) {
+            appendIcon(element, "video-slash").classList.add("fa-xs");
+        }
+    }
+    element.append(playerName);
+    return element;
+}
+
 export function updateUsers(players: PlayerRecord) {
-    Object.values(players).forEach((player) => getUser(player.participantId)?.setDisplay(player.name));
+    Object.values(players).forEach((player) => getUser(player.participantId)?.updatePlayer(player));
     while (playerNearbyIndicator.firstChild) {
         playerNearbyIndicator.firstChild.remove();
     }
     if (showParticipantsTab) {
         const list = document.createElement("ul");
-        Object.values(players).forEach((player) => {
-            const item = document.createElement("li");
-            const span = document.createElement("span");
-            span.classList.add("player-state-list-text");
-            span.innerText = player.name;
-            if(selfUser.participantId !== player.participantId){
-                const user = getUser(player.participantId);
-                if (user.isAudioMuted()) {
-                    appendIcon(item, "microphone-slash").classList.add("fa-xs");
-                }
-                if (user.isVideoMuted()) {
-                    appendIcon(item, "video-slash").classList.add("fa-xs");
-                }
-            }
-            item.append(span);
-            list.append(item);
-        });
+        Object.values(players).forEach((player) => list.append(createPlayerState(player, document.createElement("li"))));
         playerNearbyIndicator.append(list);
     }
 }
