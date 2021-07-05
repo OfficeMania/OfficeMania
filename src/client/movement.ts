@@ -7,6 +7,12 @@ import {setShowParticipantsTab} from "./conference/conference";
 
 let yPressed: boolean = false;
 
+let keysDisabled: boolean = false;
+
+export function setKeysDisabled(disabled: boolean) {
+    keysDisabled = disabled;
+}
+
 export function setUsername(value: string, ourPlayer: Player, room: Room) {
     value = value?.slice(0, 20) || "Jimmy";
     ourPlayer.name = value;
@@ -27,6 +33,9 @@ export function setCharacter(value: string, ourPlayer: Player, room: Room, chara
 
 export function loadInputFuctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }){
     function keyPressed(e: KeyboardEvent) {
+        if (keysDisabled) {
+            return;
+        }
         if (e.key.toLowerCase() === "s" && !ourPlayer.prioDirection.includes("moveDown")) {
             ourPlayer.prioDirection.unshift("moveDown");
         }
@@ -64,6 +73,9 @@ export function loadInputFuctions(ourPlayer: Player, room: Room, characters: { [
     }
 
     function keyUp(e: KeyboardEvent) {
+        if (keysDisabled) {
+            return;
+        }
         if (e.key.toLowerCase() === "s") {
             ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveDown"), 1);
         }

@@ -11,7 +11,15 @@ import {
     toggleSharing,
     updateUsers
 } from "./conference/conference";
-import {drawPlayer, loadCharacter, loadInputFuctions, playerLoop, setCharacter, setUsername} from "./movement";
+import {
+    drawPlayer,
+    loadCharacter,
+    loadInputFuctions,
+    playerLoop,
+    setCharacter,
+    setKeysDisabled,
+    setUsername
+} from "./movement";
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
@@ -75,17 +83,22 @@ function toggleMute(type: string) {
 
 // Settings
 
+const settingsModal = $<HTMLDivElement>("settings-modal");
+
 const settingsButton = $<HTMLButtonElement>("button-settings");
 const settingsOkButton = $<HTMLButtonElement>("button-settings-ok");
 //const settingsCancelButton = $<HTMLButtonElement>("button-settings-cancel");
 const settingsApplyButton = $<HTMLButtonElement>("button-settings-apply");
 
-settingsButton.addEventListener("click", () => loadSettings());
+settingsButton.addEventListener("click", () => onSettingsOpen());
 settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
 
 const usernameInput = $<HTMLInputElement>("input-settings-username");
 const characterSelect = $<HTMLSelectElement>("character-select");
+
+const observer = new MutationObserver(mutations => mutations.forEach(() => setKeysDisabled(!settingsModal.style.display.match(/none/))));
+observer.observe(settingsModal, { attributes: true, attributeFilter: ['style'] });
 
 function checkValidSettings() {
     const valid = checkValidUsernameInput();
@@ -148,10 +161,16 @@ function loadCharacterSettings() {
     }
 }
 
+function onSettingsOpen() {
+    loadSettings();
+    setKeysDisabled(true);
+}
+
 function loadSettings() {
     loadUsernameSettings();
     loadCharacterSettings();
     loadConferenceSettings().catch(console.error);
+    checkValidSettings();
 }
 
 let setUsernameIntern: (username: string) => void = undefined;
