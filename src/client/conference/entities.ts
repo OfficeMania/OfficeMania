@@ -107,10 +107,7 @@ class User {
     }
 
     removeTrack(track) {
-        if (track.getType() === trackTypeVideo) {
-            this.videoTrack = null;
-            this.update();
-        } else if (track.getType() === trackTypeDesktop) {
+        if (track.getType() === trackTypeVideo || track.getType() === trackTypeDesktop) {
             this.videoTrack = null;
             this.update();
         } else {
