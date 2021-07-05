@@ -45,58 +45,62 @@ function playerMovingAnimation(player: Player, direction: string, playerWidth: n
     player.spriteY = 2 * playerHeight
 }
 
+function playerStandingAnimation(player: Player, playerHeight: number, playerWidth: number) {
+    player.standing++;
+
+    //only activates if player is standing long enough
+    if (player.standing >= 10) {
+        player.moving = 0
+        player.spriteY = playerHeight;
+        let x = 0;
+
+        //choose direction
+        switch (player.facing) {
+            case "right": {
+                break;
+            }
+            case "up": {
+                x += 6 * playerWidth
+                break;
+            }
+            case "left": {
+                x += 12 * playerWidth
+                break;
+            }
+            case "down": {
+                x += 18 * playerWidth
+                break;
+            }
+        }
+
+        //standing animation
+        if (player.standing % 300 <= 40) {
+            //do nothing
+        } else if (player.standing % 300 <= 80) {
+            x += playerWidth;
+        } else if (player.standing % 300 <= 120) {
+            x += 2 * playerWidth;
+        } else if (player.standing % 300 <= 160) {
+            x += 3 * playerWidth;
+        } else if (player.standing % 300 <= 200) {
+            x += 4 * playerWidth;
+        } else {
+            x += 5 * playerWidth;
+        }
+
+        player.spriteX = x;
+    } else {
+        player.moving++
+    }
+}
+
 /*
  * Chooses the Player sprite dependend on walking direction and duration of walking/standing
  */
 export function choosePlayerSprites(room: Room, player: Player, playerWidth: number, playerHeight: number, ownPlayer: Player) {
     if (ownPlayer === player) {
         if (player.moveDirection === null) {
-            player.standing++;
-
-            //only activates if player is standing long enough
-            if (player.standing >= 10) {
-                player.moving = 0
-                player.spriteY = playerHeight;
-                let x = 0;
-
-                //choose direction
-                switch (player.facing) {
-                    case "right": {
-                        break;
-                    }
-                    case "up": {
-                        x += 6 * playerWidth
-                        break;
-                    }
-                    case "left": {
-                        x += 12 * playerWidth
-                        break;
-                    }
-                    case "down": {
-                        x += 18 * playerWidth
-                        break;
-                    }
-                }
-
-                //standing animation
-                if (player.standing % 300 <= 40) {
-                    //do nothing
-                } else if (player.standing % 300 <= 80) {
-                    x += playerWidth;
-                } else if (player.standing % 300 <= 120) {
-                    x += 2 * playerWidth;
-                } else if (player.standing % 300 <= 160) {
-                    x += 3 * playerWidth;
-                } else if (player.standing % 300 <= 200) {
-                    x += 4 * playerWidth;
-                } else {
-                    x += 5 * playerWidth;
-                }
-
-                player.spriteX = x;
-            } else {
-                player.moving++
-            }
+            playerStandingAnimation(player, playerHeight, playerWidth);
         } else {
             playerMovingAnimation(player, player.moveDirection, playerWidth, playerHeight);
         }
@@ -115,53 +119,9 @@ export function choosePlayerSprites(room: Room, player: Player, playerWidth: num
                 player.facing = "up"
             }
         }
-        // player is standing
         if (player.positionX === room.state.players[player.id].x * STEP_SIZE && player.positionY === room.state.players[player.id].y * STEP_SIZE) {
-            player.standing++
-            if (player.standing >= 10) {
-                player.moving = 0
-                player.spriteY = playerHeight;
-                let x = 0;
-
-                //choose direction
-                switch (player.facing) {
-                    case "right": {
-                        break;
-                    }
-                    case "up": {
-                        x += 6 * playerWidth
-                        break;
-                    }
-                    case "left": {
-                        x += 12 * playerWidth
-                        break;
-                    }
-                    case "down": {
-                        x += 18 * playerWidth
-                        break;
-                    }
-                }
-
-                //standing animation
-                if (player.standing % 300 <= 40) {
-                    //do nothing
-                } else if (player.standing % 300 <= 80) {
-                    x += playerWidth;
-                } else if (player.standing % 300 <= 120) {
-                    x += 2 * playerWidth;
-                } else if (player.standing % 300 <= 160) {
-                    x += 3 * playerWidth;
-                } else if (player.standing % 300 <= 200) {
-                    x += 4 * playerWidth;
-                } else {
-                    x += 5 * playerWidth;
-                }
-
-                player.spriteX = x;
-            } else {
-                player.moving++
-            }
-        } else {                  // player is moving
+            playerStandingAnimation(player, playerHeight, playerWidth);
+        } else {
             playerMovingAnimation(player, player.facing, playerWidth, playerHeight);
         }
     }
