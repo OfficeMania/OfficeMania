@@ -233,3 +233,10 @@ export function removeChildren(element: HTMLElement) {
         element.firstChild.remove();
     }
 }
+
+export function createPlayerAvatar(character: string): HTMLDivElement {
+    const playerAvatar = document.createElement("div");
+    playerAvatar.classList.add("player-avatar");
+    playerAvatar.style.backgroundImage = `url(img/characters/${character})`;
+    return playerAvatar;
+}

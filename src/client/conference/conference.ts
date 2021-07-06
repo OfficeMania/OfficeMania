@@ -3,6 +3,7 @@
 import {
     appendIcon,
     canSeeEachOther,
+    createPlayerAvatar,
     getCorrectedPlayerCoordinates,
     getRoom,
     PlayerRecord,
@@ -478,7 +479,7 @@ export function createPlayerState<Type extends HTMLElement>(player: Player, elem
     const playerName = document.createElement("span");
     playerName.classList.add("player-state-name");
     playerName.innerText = player ? player.name : "You";
-    if(player && selfUser.participantId !== player.participantId){
+    if (player && selfUser.participantId !== player.participantId) {
         const user = getUser(player.participantId);
         if (user.isAudioMuted()) {
             appendIcon(element, "microphone-slash").classList.add("fa-xs");
@@ -489,10 +490,8 @@ export function createPlayerState<Type extends HTMLElement>(player: Player, elem
     }
     element.append(playerName);
     if (player?.character) {
-        const playerAvatar = document.createElement("div");
+        const playerAvatar = createPlayerAvatar(player.character);
         playerAvatar.classList.add("player-state-avatar");
-        playerAvatar.classList.add("player-avatar");
-        playerAvatar.style.backgroundImage = `url(img/characters/${player.character})`;
         element.append(playerAvatar);
     }
     return element;
