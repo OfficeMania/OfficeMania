@@ -146,7 +146,7 @@ function loadCharacterSettings() {
         const current = getCharacterIntern?.();
         let selectedIndex = -1;
         let counter = 0;
-        for (const [key, image] of Object.entries(characters)) {
+        for (const key of Object.keys(characters)) {
             if (current && key === current) {
                 selectedIndex = counter;
             }
@@ -154,7 +154,6 @@ function loadCharacterSettings() {
             const option = document.createElement("option");
             option.value = key;
             option.innerText = convertCharacterName(key);
-            option.style.background = `url(${image.src}) no-repeat`; //FIXME Doesn't work, also the file contains multiple views of the character
             characterSelect.append(option);
         }
         characterSelect.selectedIndex = selectedIndex;
