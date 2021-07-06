@@ -225,7 +225,7 @@ body {
 #player-online-container {
     position: fixed;
     background-color: var(--bg-primary);
-    transition: width 600ms ease;
+    transition: width 600ms ease, height 500ms ease;
     overflow: hidden;
 }
 
@@ -270,12 +270,25 @@ body {
 @media only screen and (min-width: 600px) {
     #player-online-container {
         right: 0;
+    }
+
+    #player-online-container.horizontal-animation {
         bottom: 0;
         width: 0;
         height: calc(100vh - 64px);
     }
 
-    #player-online-container.hover {
+    #player-online-container.vertical-animation {
+        top: 64px;
         width: 36rem;
+        height: 0;
+    }
+
+    #player-online-container.hover.horizontal-animation {
+        width: 36rem;
+    }
+
+    #player-online-container.hover.vertical-animation {
+        height: calc(100vh - 64px);
     }
 }
