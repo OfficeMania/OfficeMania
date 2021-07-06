@@ -214,6 +214,17 @@ body {
     -webkit-text-stroke-color: white;
 }
 
+.player-state-avatar {
+    margin: 5px 10px 5px 4px;
+}
+
+.player-avatar {
+    background-repeat: no-repeat;
+    width: 48px;
+    height: 96px;
+    background-position: calc(-3 * 48px) 0;
+}
+
 #player-online-container {
     position: fixed;
     background-color: var(--bg-primary);

@@ -488,6 +488,13 @@ export function createPlayerState<Type extends HTMLElement>(player: Player, elem
         }
     }
     element.append(playerName);
+    if (player?.character) {
+        const playerAvatar = document.createElement("div");
+        playerAvatar.classList.add("player-state-avatar");
+        playerAvatar.classList.add("player-avatar");
+        playerAvatar.style.backgroundImage = `url(img/characters/${player.character})`;
+        element.append(playerAvatar);
+    }
     return element;
 }
 
