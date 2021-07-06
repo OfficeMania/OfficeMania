@@ -1,6 +1,7 @@
 import {Client} from "colyseus.js";
 import {TILE_SIZE} from "./player";
 import {
+    createPlayerAvatar,
     getCharacter,
     getUsername,
     InitState,
@@ -101,12 +102,16 @@ settingsApplyButton.addEventListener("click", () => applySettings());
 
 const usernameInput = $<HTMLInputElement>("input-settings-username");
 const characterSelect = $<HTMLSelectElement>("character-select");
+const characterPreview = $<HTMLSelectElement>("character-preview");
 
 const observer = new MutationObserver(mutations => mutations.forEach(() => setKeysDisabled(!settingsModal.style.display.match(/none/))));
 observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
 
 function checkValidSettings() {
-    const valid = checkValidUsernameInput();
+    let valid = checkValidUsernameInput();
+    if (!checkValidCharacterSelect()) {
+        valid = false;
+    }
     settingsOkButton.disabled = !valid;
     settingsApplyButton.disabled = !valid;
 }
@@ -118,10 +123,18 @@ function checkValidUsernameInput(): boolean {
     return valid;
 }
 
+function checkValidCharacterSelect(): boolean {
+    removeChildren(characterPreview);
+    characterPreview.append(createPlayerAvatar(characterSelect.value));
+    return true;
+}
+
 usernameInput.addEventListener("change", () => checkValidSettings());
 usernameInput.addEventListener("keydown", () => checkValidSettings());
 usernameInput.addEventListener("paste", () => checkValidSettings());
 usernameInput.addEventListener("input", () => checkValidSettings());
+
+characterSelect.addEventListener("change", () => checkValidSettings());
 
 let getUsernameIntern: () => string = () => getUsername();
 let getCharacterIntern: () => string = () => getCharacter();

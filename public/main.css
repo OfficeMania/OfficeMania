@@ -143,6 +143,15 @@ body {
     width: calc(100% - 200px);
 }
 
+#settings-body {
+    display: flex;
+    justify-content: center;
+}
+
+#character-preview {
+    margin: 0 auto;
+}
+
 #stats-bar {
     display: flex;
     text-align: center;

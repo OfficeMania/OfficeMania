@@ -39,23 +39,26 @@
                         <h4 class="modal-title">Settings</h4>
                     </div>
                     <div class="modal-body">
-                        <form>
-                            <label for="input-settings-username">Username</label>
-                            <input type="text" id="input-settings-username" name="username" autocomplete="off">
-                            <br>
-                            <br>
-                            <label for="character-select">Character</label>
-                            <select id="character-select"></select>
-                            <br>
-                            <br>
-                            <label for="audio-input-select">Audio Input Device</label>
-                            <select id="audio-input-select"></select>
-                            <br>
-                            <br>
-                            <label for="audio-output-select">Audio Output Device</label>
-                            <select id="audio-output-select"></select>
-                            <input type="submit" value="Submit" disabled hidden>
-                        </form>
+                        <div id="settings-body">
+                            <form>
+                                <label for="input-settings-username">Username</label>
+                                <input type="text" id="input-settings-username" name="username" autocomplete="off">
+                                <br>
+                                <br>
+                                <label for="character-select">Character</label>
+                                <select id="character-select"></select>
+                                <br>
+                                <br>
+                                <label for="audio-input-select">Audio Input Device</label>
+                                <select id="audio-input-select"></select>
+                                <br>
+                                <br>
+                                <label for="audio-output-select">Audio Output Device</label>
+                                <select id="audio-output-select"></select>
+                                <input type="submit" value="Submit" disabled hidden>
+                            </form>
+                            <div id="character-preview"></div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button id="button-settings-ok" type="button" class="btn btn-default" data-dismiss="modal">OK</button>
