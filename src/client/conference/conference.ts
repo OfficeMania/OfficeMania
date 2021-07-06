@@ -52,7 +52,6 @@ const focusBar = $<HTMLDivElement>("focus-bar");
 const audioInputSelect = $<HTMLSelectElement>("audio-input-select");
 const audioOutputSelect = $<HTMLSelectElement>("audio-output-select");
 
-const playerNearbyIndicator = $<HTMLParagraphElement>("player-nearby-indicator");
 const playerOnlineContainer = $<HTMLUListElement>("player-online-container");
 const playerOnlineList = $<HTMLUListElement>("player-online-list");
 
@@ -499,14 +498,6 @@ export function createPlayerState<Type extends HTMLElement>(player: Player, elem
 
 export function updateUsers(players: PlayerRecord) {
     Object.values(players).forEach((player) => getUser(player.participantId)?.updatePlayer(player));
-    /*
-    removeChildren(playerNearbyIndicator);
-    if (showParticipantsTab) {
-        const list = document.createElement("ul");
-        Object.values(players).forEach((player) => list.append(createPlayerState(player, document.createElement("li"))));
-        playerNearbyIndicator.append(list);
-    }
-    */
     removeChildren(playerOnlineList);
     Object.values(players).forEach((player) => playerOnlineList.append(createPlayerState(player, document.createElement("li"))));
 }
