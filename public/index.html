@@ -19,10 +19,16 @@
     <body>
 
         <div id="panel-buttons">
-            <button id="button-mute-audio" disabled><em class="fa fa-microphone"></em><span></span></button>
-            <button id="button-mute-video" disabled><em class="fa fa-video"></em><span></span></button>
-            <button id="button-share-video" disabled><em class="fa fa-desktop"></em><span></span></button>
-            <button id="button-settings" data-toggle="modal" data-target="#settings-modal"><em class="fa fa-cog"></em><span></span></button>
+            <div class="group">
+                <button id="button-mute-audio" disabled><em class="fa fa-microphone"></em><span></span></button>
+                <button id="button-mute-video" disabled><em class="fa fa-video"></em><span></span></button>
+                <button id="button-share-video" disabled><em class="fa fa-desktop"></em><span></span></button>
+            </div>
+            <div class="divider"></div>
+            <div class="group">
+                <button id="button-settings" data-toggle="modal" data-target="#settings-modal"><em class="fa fa-cog"></em><span></span></button>
+                <button id="button-users" disabled><em class="fa fa-user-friends"></em><span></span></button>
+            </div>
         </div>
 
         <div id="settings-modal" class="modal fade" role="dialog">
