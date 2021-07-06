@@ -239,11 +239,12 @@ body {
     height: 100%;
 }
 
-#player-online-list li {
+#player-online-list .player-state {
     width: 100%;
 }
 
-#player-online-list span {
+#player-online-list .player-state-name,
+#player-online-list .player-state-mute {
     color: white;
     font-size: 200%;
     -webkit-text-fill-color: white;

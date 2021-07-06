@@ -481,10 +481,14 @@ export function createPlayerState<Type extends HTMLElement>(player: Player, elem
     if (player && selfUser.participantId !== player.participantId) {
         const user = getUser(player.participantId);
         if (user.isAudioMuted()) {
-            appendIcon(element, "microphone-slash").classList.add("fa-xs");
+            const icon = appendIcon(element, "microphone-slash");
+            icon.classList.add("fa-xs");
+            icon.classList.add("player-state-mute");
         }
         if (user.isVideoMuted()) {
-            appendIcon(element, "video-slash").classList.add("fa-xs");
+            const icon = appendIcon(element, "video-slash");
+            icon.classList.add("fa-xs");
+            icon.classList.add("player-state-mute");
         }
     }
     element.append(playerName);
