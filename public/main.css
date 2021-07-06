@@ -271,11 +271,10 @@ body {
     #player-online-container {
         right: 0;
         bottom: 0;
-        width: 5rem;
+        width: 0;
         height: calc(100vh - 64px);
     }
 
-    #player-online-container:hover,
     #player-online-container.hover {
         width: 36rem;
     }
