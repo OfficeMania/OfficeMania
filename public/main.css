@@ -144,9 +144,6 @@ body {
 .video-overlay {
     z-index: 1;
     min-width: 0;
-}
-
-.video-overlay {
     font-size: 200%;
     display: flex;
     align-items: center;
