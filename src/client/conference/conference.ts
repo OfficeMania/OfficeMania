@@ -472,7 +472,7 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
     });
 }
 
-export function createPlayerState<Type extends HTMLElement>(player: Player, element: Type): Type {
+export function createPlayerState<Type extends HTMLElement>(player: Player, element: Type, showCharacter: boolean = false): Type {
     element.classList.add("unselectable");
     element.classList.add("player-state");
     const playerName = document.createElement("span");
@@ -488,7 +488,7 @@ export function createPlayerState<Type extends HTMLElement>(player: Player, elem
         }
     }
     element.append(playerName);
-    if (player?.character) {
+    if (showCharacter && player?.character) {
         const playerAvatar = createPlayerAvatar(player.character);
         playerAvatar.classList.add("player-state-avatar");
         element.append(playerAvatar);
@@ -499,7 +499,7 @@ export function createPlayerState<Type extends HTMLElement>(player: Player, elem
 export function updateUsers(players: PlayerRecord) {
     Object.values(players).forEach((player) => getUser(player.participantId)?.updatePlayer(player));
     removeChildren(playerOnlineList);
-    Object.values(players).forEach((player) => playerOnlineList.append(createPlayerState(player, document.createElement("li"))));
+    Object.values(players).forEach((player) => playerOnlineList.append(createPlayerState(player, document.createElement("li"), true)));
 }
 
 export function toggleShowParticipantsTab(): boolean {
