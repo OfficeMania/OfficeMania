@@ -20,6 +20,7 @@ import {
     nearbyPlayerCheck,
     toggleMuteByType,
     toggleSharing,
+    toggleShowParticipantsTab,
     updateUsers
 } from "./conference/conference";
 import {playerLoop} from "./movement";
@@ -86,11 +87,15 @@ function toggleMute(type: string) {
 const settingsModal = $<HTMLDivElement>("settings-modal");
 
 const settingsButton = $<HTMLButtonElement>("button-settings");
+const usersButton  = $<HTMLButtonElement>("button-users");
+
 const settingsOkButton = $<HTMLButtonElement>("button-settings-ok");
 //const settingsCancelButton = $<HTMLButtonElement>("button-settings-cancel");
 const settingsApplyButton = $<HTMLButtonElement>("button-settings-apply");
 
 settingsButton.addEventListener("click", () => onSettingsOpen());
+usersButton.addEventListener("click", () => toggleShowParticipantsTab());
+
 settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
 
