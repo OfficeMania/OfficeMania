@@ -115,18 +115,6 @@ body {
     margin-right: 3%;
 }
 
-#player-nearby-indicator {
-    display: inline;
-}
-
-#player-nearby-indicator ul {
-    font-size: 300%;
-}
-
-#player-nearby-indicator li {
-    list-style-type: none;
-}
-
 #settings-modal form {
     overflow: hidden;
 }
