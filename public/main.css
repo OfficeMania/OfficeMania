@@ -55,7 +55,7 @@ body {
     margin: 5px;
     color: #3a3a50;
     background: #f8f8f8;
-    border: 0px;
+    border: 0;
     border-radius: 10px;
     position: relative;
 }
@@ -156,7 +156,7 @@ body {
     display: flex;
     text-align: center;
     position: fixed;
-    top: 0px;
+    top: 0;
     margin: 12% auto;
 }
 
