@@ -3,6 +3,7 @@
 import {
     appendIcon,
     canSeeEachOther,
+    createPlayerAvatar,
     getCorrectedPlayerCoordinates,
     getRoom,
     PlayerRecord,
@@ -51,7 +52,8 @@ const focusBar = $<HTMLDivElement>("focus-bar");
 const audioInputSelect = $<HTMLSelectElement>("audio-input-select");
 const audioOutputSelect = $<HTMLSelectElement>("audio-output-select");
 
-const playerNearbyIndicator = $<HTMLParagraphElement>("player-nearby-indicator");
+const playerOnlineContainer = $<HTMLUListElement>("player-online-container");
+const playerOnlineList = $<HTMLUListElement>("player-online-list");
 
 const selfUser = new SelfUser(audioBar, videoBar, focusBar);
 const users: User[] = [];
@@ -470,33 +472,43 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
     });
 }
 
-export function createPlayerState<Type extends HTMLElement>(player: Player, element: Type): Type {
+export function createPlayerState<Type extends HTMLElement>(player: Player, element: Type, showCharacter: boolean = false): Type {
     element.classList.add("unselectable");
     element.classList.add("player-state");
     const playerName = document.createElement("span");
     playerName.classList.add("player-state-name");
     playerName.innerText = player ? player.name : "You";
-    if(player && selfUser.participantId !== player.participantId){
+    if (player && selfUser.participantId !== player.participantId) {
         const user = getUser(player.participantId);
         if (user.isAudioMuted()) {
-            appendIcon(element, "microphone-slash").classList.add("fa-xs");
+            const icon = appendIcon(element, "microphone-slash");
+            icon.classList.add("fa-xs");
+            icon.classList.add("player-state-mute");
         }
         if (user.isVideoMuted()) {
-            appendIcon(element, "video-slash").classList.add("fa-xs");
+            const icon = appendIcon(element, "video-slash");
+            icon.classList.add("fa-xs");
+            icon.classList.add("player-state-mute");
         }
     }
     element.append(playerName);
+    if (showCharacter && player?.character) {
+        const playerAvatar = createPlayerAvatar(player.character);
+        playerAvatar.classList.add("player-state-avatar");
+        element.append(playerAvatar);
+    }
     return element;
 }
 
 export function updateUsers(players: PlayerRecord) {
     Object.values(players).forEach((player) => getUser(player.participantId)?.updatePlayer(player));
-    removeChildren(playerNearbyIndicator);
-    if (showParticipantsTab) {
-        const list = document.createElement("ul");
-        Object.values(players).forEach((player) => list.append(createPlayerState(player, document.createElement("li"))));
-        playerNearbyIndicator.append(list);
-    }
+    removeChildren(playerOnlineList);
+    Object.values(players).forEach((player) => playerOnlineList.append(createPlayerState(player, document.createElement("li"), true)));
+}
+
+export function toggleShowParticipantsTab(): boolean {
+    setShowParticipantsTab(!getShowParticipantsTab());
+    return getShowParticipantsTab();
 }
 
 export function getShowParticipantsTab(): boolean {
@@ -504,6 +516,11 @@ export function getShowParticipantsTab(): boolean {
 }
 
 export function setShowParticipantsTab(setTo: boolean) {
+    if (setTo) {
+        playerOnlineContainer.classList.add("hover");
+    } else {
+        playerOnlineContainer.classList.remove("hover");
+    }
     showParticipantsTab = setTo;
 }
 

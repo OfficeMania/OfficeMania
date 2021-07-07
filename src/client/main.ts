@@ -1,6 +1,7 @@
 import {Client} from "colyseus.js";
 import {TILE_SIZE} from "./player";
 import {
+    createPlayerAvatar,
     getCharacter,
     getUsername,
     InitState,
@@ -20,6 +21,7 @@ import {
     nearbyPlayerCheck,
     toggleMuteByType,
     toggleSharing,
+    toggleShowParticipantsTab,
     updateUsers
 } from "./conference/conference";
 import {playerLoop} from "./movement";
@@ -87,22 +89,30 @@ function toggleMute(type: string) {
 const settingsModal = $<HTMLDivElement>("settings-modal");
 
 const settingsButton = $<HTMLButtonElement>("button-settings");
+const usersButton  = $<HTMLButtonElement>("button-users");
+
 const settingsOkButton = $<HTMLButtonElement>("button-settings-ok");
 //const settingsCancelButton = $<HTMLButtonElement>("button-settings-cancel");
 const settingsApplyButton = $<HTMLButtonElement>("button-settings-apply");
 
 settingsButton.addEventListener("click", () => onSettingsOpen());
+usersButton.addEventListener("click", () => toggleShowParticipantsTab());
+
 settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
 
 const usernameInput = $<HTMLInputElement>("input-settings-username");
 const characterSelect = $<HTMLSelectElement>("character-select");
+const characterPreview = $<HTMLSelectElement>("character-preview");
 
 const observer = new MutationObserver(mutations => mutations.forEach(() => setKeysDisabled(!settingsModal.style.display.match(/none/))));
 observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
 
 function checkValidSettings() {
-    const valid = checkValidUsernameInput();
+    let valid = checkValidUsernameInput();
+    if (!checkValidCharacterSelect()) {
+        valid = false;
+    }
     settingsOkButton.disabled = !valid;
     settingsApplyButton.disabled = !valid;
 }
@@ -114,10 +124,18 @@ function checkValidUsernameInput(): boolean {
     return valid;
 }
 
+function checkValidCharacterSelect(): boolean {
+    removeChildren(characterPreview);
+    characterPreview.append(createPlayerAvatar(characterSelect.value));
+    return true;
+}
+
 usernameInput.addEventListener("change", () => checkValidSettings());
 usernameInput.addEventListener("keydown", () => checkValidSettings());
 usernameInput.addEventListener("paste", () => checkValidSettings());
 usernameInput.addEventListener("input", () => checkValidSettings());
+
+characterSelect.addEventListener("change", () => checkValidSettings());
 
 let getUsernameIntern: () => string = () => getUsername();
 let getCharacterIntern: () => string = () => getCharacter();
@@ -142,7 +160,7 @@ function loadCharacterSettings() {
         const current = getCharacterIntern?.();
         let selectedIndex = -1;
         let counter = 0;
-        for (const [key, image] of Object.entries(characters)) {
+        for (const key of Object.keys(characters)) {
             if (current && key === current) {
                 selectedIndex = counter;
             }
@@ -150,7 +168,6 @@ function loadCharacterSettings() {
             const option = document.createElement("option");
             option.value = key;
             option.innerText = convertCharacterName(key);
-            option.style.background = `url(${image.src}) no-repeat`; //FIXME Doesn't work, also the file contains multiple views of the character
             characterSelect.append(option);
         }
         characterSelect.selectedIndex = selectedIndex;

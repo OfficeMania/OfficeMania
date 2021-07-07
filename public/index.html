@@ -19,10 +19,16 @@
     <body>
 
         <div id="panel-buttons">
-            <button id="button-mute-audio" disabled><em class="fa fa-microphone"></em><span></span></button>
-            <button id="button-mute-video" disabled><em class="fa fa-video"></em><span></span></button>
-            <button id="button-share-video" disabled><em class="fa fa-desktop"></em><span></span></button>
-            <button id="button-settings" data-toggle="modal" data-target="#settings-modal"><em class="fa fa-cog"></em><span></span></button>
+            <div class="group">
+                <button id="button-mute-audio" disabled><em class="fa fa-microphone"></em><span></span></button>
+                <button id="button-mute-video" disabled><em class="fa fa-video"></em><span></span></button>
+                <button id="button-share-video" disabled><em class="fa fa-desktop"></em><span></span></button>
+            </div>
+            <div class="divider"></div>
+            <div class="group">
+                <button id="button-settings" data-toggle="modal" data-target="#settings-modal"><em class="fa fa-cog"></em><span></span></button>
+                <button id="button-users"><em class="fa fa-user-friends"></em><span></span></button>
+            </div>
         </div>
 
         <div id="settings-modal" class="modal fade" role="dialog">
@@ -33,23 +39,26 @@
                         <h4 class="modal-title">Settings</h4>
                     </div>
                     <div class="modal-body">
-                        <form>
-                            <label for="input-settings-username">Username</label>
-                            <input type="text" id="input-settings-username" name="username" autocomplete="off">
-                            <br>
-                            <br>
-                            <label for="character-select">Character</label>
-                            <select id="character-select"></select>
-                            <br>
-                            <br>
-                            <label for="audio-input-select">Audio Input Device</label>
-                            <select id="audio-input-select"></select>
-                            <br>
-                            <br>
-                            <label for="audio-output-select">Audio Output Device</label>
-                            <select id="audio-output-select"></select>
-                            <input type="submit" value="Submit" disabled hidden>
-                        </form>
+                        <div id="settings-body">
+                            <form>
+                                <label for="input-settings-username">Username</label>
+                                <input type="text" id="input-settings-username" name="username" autocomplete="off">
+                                <br>
+                                <br>
+                                <label for="character-select">Character</label>
+                                <select id="character-select"></select>
+                                <br>
+                                <br>
+                                <label for="audio-input-select">Audio Input Device</label>
+                                <select id="audio-input-select"></select>
+                                <br>
+                                <br>
+                                <label for="audio-output-select">Audio Output Device</label>
+                                <select id="audio-output-select"></select>
+                                <input type="submit" value="Submit" disabled hidden>
+                            </form>
+                            <div id="character-preview"></div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button id="button-settings-ok" type="button" class="btn btn-default" data-dismiss="modal">OK</button>
@@ -64,9 +73,12 @@
             <div id="audio-bar"></div>
             <div id="video-bar"></div>
             <div id="focus-bar"></div>
-            <div id="stats-bar"><div id="player-nearby-indicator"></div></div>
         </div>
 
+        <div id="player-online-container" class="vertical-animation">
+            <ul id="player-online-list">
+            </ul>
+        </div>
 
         <canvas id="canvas" width="600" height="600">
             <canvas id="background"></canvas>

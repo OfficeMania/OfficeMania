@@ -1,3 +1,13 @@
+:root {
+    /*font-size: 16px;*/
+    font-family: Arial, sans-serif;
+    --text-primary: #b6b6b6;
+    --text-secondary: #ececec;
+    --bg-primary: #23232e;
+    --bg-secondary: #141418;
+    --transition-speed: 600ms;
+}
+
 body {
     background-color: white;
     margin: 0;
@@ -17,33 +27,56 @@ body {
 
 #panel-buttons {
     width: 100%;
-    /*height: 75px;*/
-    background: url(./assets/img/navbar-repeat-image.png) top repeat-x;
-    /*background-color: gray;*/
     padding: 7px;
     position: fixed;
     top: 0;
-    border-bottom: 5px solid rgb(189, 154, 103);
+    border-bottom: 2px solid #3a3a50;
+    display: flex;
+    flex-direction: row;
+    background: #6c6e85;
+}
+
+#panel-buttons .divider {
+    flex: 1;
+}
+
+#panel-buttons .group {
+    display: flex;
+    flex-direction: row;
 }
 
 #panel-buttons button {
-    background: url(./assets/img/button-image.png);
-    border-radius: 20px;
     height: 40px;
     width: 40px;
     cursor: pointer;
-    right: -50px;
-    position: relative;
-    /*padding-top: 5px;*/
     transition: 0.5s;
     font-size: 110%;
     font-weight: bold;
+    margin: 5px;
+    color: #3a3a50;
+    background: #f8f8f8;
+    border: 0;
+    border-radius: 10px;
+    position: relative;
 }
 
 #panel-buttons button:hover {
     transition: 0.5s;
-    background: url(./assets/img/navbar-repeat-image.png);
-    width: auto;
+}
+
+#panel-buttons button span {
+    display: none;
+    position: absolute;
+    background: rgba(248, 248, 248, 0.8);
+    font-size: x-small;
+    padding: 4px;
+    border-radius: 5px;
+    top: 36px;
+    left: 16px;
+}
+
+#panel-buttons button:hover span {
+    display: block;
 }
 
 #panel-buttons button span:after {
@@ -67,6 +100,10 @@ body {
     content: '  Settings';
 }
 
+#button-users:hover span:after {
+    content: '  Users';
+}
+
 #panel-buttons button:hover span:after {
     opacity: 1;
     transition: 0.5s;
@@ -76,18 +113,6 @@ body {
 #panel-buttons select {
     float: right;
     margin-right: 3%;
-}
-
-#player-nearby-indicator {
-    display: inline;
-}
-
-#player-nearby-indicator ul {
-    font-size: 300%;
-}
-
-#player-nearby-indicator li {
-    list-style-type: none;
 }
 
 #settings-modal form {
@@ -106,11 +131,20 @@ body {
     width: calc(100% - 200px);
 }
 
+#settings-body {
+    display: flex;
+    justify-content: center;
+}
+
+#character-preview {
+    margin: 0 auto;
+}
+
 #stats-bar {
     display: flex;
     text-align: center;
     position: fixed;
-    top: 0px;
+    top: 0;
     margin: 12% auto;
 }
 
@@ -175,4 +209,86 @@ body {
     -webkit-text-fill-color: black;
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: white;
+}
+
+.player-state-avatar {
+    margin: 5px 10px 5px 4px;
+}
+
+.player-avatar {
+    background-repeat: no-repeat;
+    width: 48px;
+    height: 96px;
+    background-position: calc(-3 * 48px) 0;
+}
+
+#player-online-container {
+    position: fixed;
+    background-color: var(--bg-primary);
+    transition: width 600ms ease, height 500ms ease;
+    overflow: hidden;
+}
+
+#player-online-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+#player-online-list .player-state {
+    width: 100%;
+}
+
+#player-online-list .player-state-name,
+#player-online-list .player-state-mute {
+    color: white;
+    font-size: 200%;
+    -webkit-text-fill-color: white;
+    -webkit-text-stroke-width: 0;
+    -webkit-text-stroke-color: black;
+    margin: 5px 10px 5px 0;
+}
+
+/* Small screens */
+@media only screen and (max-width: 600px) {
+    #player-online-container {
+        bottom: 0;
+        width: 100vw;
+        height: 5rem;
+    }
+
+    #player-online-list {
+        flex-direction: row;
+    }
+}
+
+/* Large screens */
+@media only screen and (min-width: 600px) {
+    #player-online-container {
+        right: 0;
+    }
+
+    #player-online-container.horizontal-animation {
+        bottom: 0;
+        width: 0;
+        height: calc(100vh - 64px);
+    }
+
+    #player-online-container.vertical-animation {
+        top: 64px;
+        width: 36rem;
+        height: 0;
+    }
+
+    #player-online-container.hover.horizontal-animation {
+        width: 36rem;
+    }
+
+    #player-online-container.hover.vertical-animation {
+        height: calc(100vh - 64px);
+    }
 }
