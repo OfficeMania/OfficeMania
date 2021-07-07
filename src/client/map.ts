@@ -1,5 +1,7 @@
 import {loadImage} from "./util";
 import {Room} from "colyseus.js";
+import {Interaction} from "./interaction"
+import { Door } from "./door";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -8,13 +10,13 @@ export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 class solidInfo {
 
     isSolid: boolean;
-    content: number;
+    content: Interaction;
     roomId: number;
 
     constructor() {
 
         this.isSolid = false
-        this.content = 0;
+        this.content = null;
         this.roomId = 0;
     }
 
@@ -22,7 +24,7 @@ class solidInfo {
         this.isSolid = true;
     }
 
-    setContent(content: number) {
+    setContent(content: Interaction) {
         this.content = content;
     }
 
@@ -260,10 +262,26 @@ function fillSolidInfos(map: mapInfo) {
                                         }
                                     } else if (map.layers[l].name.search("Content") !== -1 && value !== 0) {
 
-                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setContent(value);
-                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setContent(value);
-                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setContent(value);
-                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setContent(value);
+                                        let object: Interaction;
+
+                                        switch(value) {
+                                            
+                                            //door
+                                            case 1: {}
+                                            case 2: {}
+                                            case 3: {}
+                                            case 4: {}
+                                            case 5: {
+
+                                                object = new Door(value);
+                                                break;
+                                            }
+                                        }
+                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setContent(object);
+                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setContent(object);
+                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setContent(object);
+                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setContent(object);
+
                                     } else if (map.layers[l].name.search("Rooms") !== -1) {
 
                                         solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setRoomId(value);
