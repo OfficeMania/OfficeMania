@@ -16,14 +16,14 @@ export class Whiteboard{
         let ctx = canvas.getContext("2d");
         this.ctx = ctx;
 
-        document.addEventListener('mousedown', function(event) {
+        /*document.addEventListener('mousedown', function(event) {
             if(event.target === canvas){
                 alert("yes");
             } else {
                 alert("no");
             }
             
-                }, false);
+                }, false);*/
 
         canvas.addEventListener('mousemove', this.draw);
         //canvas.addEventListener('mousedown', this.setPosition);
