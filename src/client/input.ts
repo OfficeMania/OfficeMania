@@ -2,6 +2,7 @@ import {Player} from "./player";
 import {Room} from "colyseus.js";
 import {setCharacter, setUsername} from "./util";
 import {setShowParticipantsTab} from "./conference/conference";
+import { Whiteboard } from "./whiteboard";
 
 let yPressed: boolean = false;
 let keysDisabled: boolean = false;
@@ -22,7 +23,7 @@ function onKeyDirection(event: KeyboardEvent, key: string, ourPlayer: Player = u
     }
 }
 
-export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
+export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }, whiteboard: Whiteboard) {
     function onKeyDown(e: KeyboardEvent) {
         if (keysDisabled) {
             return;
@@ -44,7 +45,7 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         onKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy"), ourPlayer, room));
         //player interacts with object in front of him
         onKey(e, " ", () => {
-            //(triggered with space)
+            whiteboard.toggelIsVisible();
         });
         onKey(e, "y", () => {
             if (!yPressed) {

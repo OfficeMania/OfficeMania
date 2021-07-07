@@ -25,6 +25,7 @@ import {
 import {playerLoop} from "./movement";
 import {loadInputFunctions, setKeysDisabled} from "./input";
 import {drawPlayer} from "./drawplayer"
+import {drawWhiteboard, Whiteboard} from "./whiteboard"
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
@@ -248,6 +249,10 @@ async function main() {
 
     drawMap(currentMap);
 
+    //create whiteboard
+    let whiteboardCanvas = $<HTMLCanvasElement>("whiteboard");
+    let whiteboard: Whiteboard = new Whiteboard(whiteboardCanvas);
+
     /* (from movement)
      * movement inputs
      *
@@ -258,7 +263,7 @@ async function main() {
      */
 
     //loads all the input functions
-    loadInputFunctions(ourPlayer, room, characters);
+    loadInputFunctions(ourPlayer, room, characters, whiteboard);
 
     // message recieve test
 
@@ -319,6 +324,14 @@ async function main() {
         drawPlayer(ourPlayer, players, characters, ctx, width, height);
 
         ctx.restore();
+
+        //drawWhiteboard(canvas, whiteboard.getCanvas())
+        if(whiteboard.getIsVisible()){
+            
+            ctx.drawImage(whiteboard.getCanvas(), 100, 100, width - 200, height - 200)
+
+            
+        }
 
         // Repeat game loop
         requestAnimationFrame(loop);
