@@ -346,16 +346,7 @@ async function main() {
         ctx.restore();
 
         //drawWhiteboard(canvas, whiteboard.getCanvas())
-<<<<<<< HEAD
         
-=======
-        if(whiteboard.getIsVisible()){
-
-            ctx.drawImage(whiteboard.getCanvas(), 100, 100, width - 200, height - 200)
-
-
-        }
->>>>>>> 3d8e3389d253137baae2cea55fe05a37d42b692c
 
         // Repeat game loop
         requestAnimationFrame(loop);
