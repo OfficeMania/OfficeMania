@@ -27,7 +27,7 @@ import {
 import {playerLoop} from "./movement";
 import {loadInputFunctions, setKeysDisabled} from "./input";
 import {drawPlayer} from "./drawplayer"
-import {drawWhiteboard, Whiteboard} from "./whiteboard"
+import {Whiteboard} from "./whiteboard"
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
@@ -119,7 +119,7 @@ function checkValidSettings() {
 
 function checkValidUsernameInput(): boolean {
     const username = usernameInput.value;
-    const valid = !!username.match(/^\w{0,20}$/);
+    const valid = !!username.match(/^.{0,20}$/);
     usernameInput.style.color = valid ? null : "red";
     return valid;
 }
@@ -344,10 +344,10 @@ async function main() {
 
         //drawWhiteboard(canvas, whiteboard.getCanvas())
         if(whiteboard.getIsVisible()){
-            
+
             ctx.drawImage(whiteboard.getCanvas(), 100, 100, width - 200, height - 200)
 
-            
+
         }
 
         // Repeat game loop
