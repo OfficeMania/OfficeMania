@@ -5,6 +5,8 @@ import {generateUUIDv4, KEY_CHARACTER, KEY_USERNAME} from "../util";
 
 const path = require('path');
 
+
+
 /*
  * See: https://docs.colyseus.io/server/room/
  */
@@ -74,6 +76,15 @@ export class TURoom extends Room<State> {
                 }
             }
         });
+
+        this.onMessage("startPoint", (client, message) => {
+            
+        });
+
+        this.onMessage("endPoint", (client, message) => {
+            
+        });
+        
 
         //receives character changes
         this.onMessage(KEY_CHARACTER, (client, message) => {

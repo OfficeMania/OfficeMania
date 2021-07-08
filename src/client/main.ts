@@ -268,7 +268,8 @@ async function main() {
 
     //create whiteboard
     let whiteboardCanvas = $<HTMLCanvasElement>("whiteboard");
-    let whiteboard: Whiteboard = new Whiteboard(whiteboardCanvas);
+    let whiteboard: Whiteboard = new Whiteboard(whiteboardCanvas, room);
+    whiteboard.resize(width, height);
 
     /* (from movement)
      * movement inputs
@@ -281,6 +282,8 @@ async function main() {
 
     //loads all the input functions
     loadInputFunctions(ourPlayer, room, characters, whiteboard);
+
+    window.addEventListener('resize', () => whiteboard.resize(window.innerWidth, window.innerHeight))
 
     // message recieve test
 
@@ -343,12 +346,7 @@ async function main() {
         ctx.restore();
 
         //drawWhiteboard(canvas, whiteboard.getCanvas())
-        if(whiteboard.getIsVisible()){
-            
-            ctx.drawImage(whiteboard.getCanvas(), 100, 100, width - 200, height - 200)
-
-            
-        }
+        
 
         // Repeat game loop
         requestAnimationFrame(loop);
