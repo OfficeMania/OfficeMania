@@ -11,6 +11,8 @@ export class ConferenceData extends Schema {
     serverParticipantId: string;
 }
 
+
+
 /*
  * Class to sync the playerdata with the server
  */
@@ -32,6 +34,9 @@ export class PlayerData extends Schema {
 
     @type("string")
     participantId: string;
+
+    @type({array: "number"})
+    paths: ArraySchema<number> = new ArraySchema<number>();
 }
 
 /*

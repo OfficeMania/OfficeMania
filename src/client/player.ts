@@ -36,6 +36,7 @@ export interface Player {
     moving: number;             //time moving to calculate sprite
     spriteX: number;            //posX to locate sprite
     spriteY: number;            //posY to locate sprite
+    whiteboard: number[];
 }
 
 /*
@@ -89,7 +90,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1].isSolid === false)) {
                 player.moveDirection = "down"
                 player.facing = "down"
-                
+
                 player.lastScaledY.pop()
                 player.lastScaledY.unshift(player.scaledY) //stores the previous position
 

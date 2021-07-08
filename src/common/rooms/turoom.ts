@@ -2,10 +2,10 @@ import {Client, Room} from "colyseus";
 import {PlayerData, State} from "./schema/state";
 import fs from 'fs';
 import {generateUUIDv4, KEY_CHARACTER, KEY_USERNAME} from "../util";
+import { cli } from "webpack";
+import { cleanData } from "jquery";
 
 const path = require('path');
-
-
 
 /*
  * See: https://docs.colyseus.io/server/room/
@@ -77,13 +77,16 @@ export class TURoom extends Room<State> {
             }
         });
 
-        this.onMessage("startPoint", (client, message) => {
-            
+        this.onMessage("path", (client, message) => {
+            if (message === -1) {
+                this.state.players[client.sessionId].paths.push(-1);
+            } else {
+                this.state.players[client.sessionId].paths.push(...message);
+            }
+            this.broadcast("redraw", client, { except: client });
         });
 
-        this.onMessage("endPoint", (client, message) => {
-            
-        });
+        
         
 
         //receives character changes

@@ -21,9 +21,13 @@ export class Whiteboard{
         this.canvas = canvas;
         let ctx = canvas.getContext("2d");
 
+        room.onMessage("redraw", (client) => {this.drawOthers(client, this)})
+        
+   
 
         canvas.addEventListener('mousemove', (e) => {this.draw(e, this)});
         canvas.addEventListener('mousedown', (e) => {this.setPosition(e, this)});
+        canvas.addEventListener('mouseup', (e) => {this.mouseup(e, this)});
         canvas.addEventListener('mouseenter', (e) => {this.setPosition(e, this)});
 
         canvas.width = 1280;
@@ -69,6 +73,56 @@ export class Whiteboard{
         this.canvas.style.top = this.offsetY + "px";
     }
 
+    // new position from mouse event
+    private setPosition(e, whiteboard: Whiteboard) {
+        whiteboard.x = e.clientX - whiteboard.offsetX;
+        whiteboard.y = e.clientY - whiteboard.offsetY;
+    }
+
+    private draw(e, whiteboard: Whiteboard) {
+        // mouse left button must be pressed
+        if (e.buttons !== 1) return;
+        
+        var oldX = whiteboard.x;
+        var oldY = whiteboard.y;
+        whiteboard.setPosition(e, whiteboard);
+
+        this.drawLine(oldX, oldY, whiteboard.x, whiteboard.y, whiteboard)
+
+        whiteboard.room.send("path", [oldX, oldY, whiteboard.x, whiteboard.y])
+    }
+
+    drawOthers(client, whiteboard: Whiteboard){
+        console.log(whiteboard.room.state.players[client.sessionId].paths.length);
+        
+    }
+
+    drawLine(firstX: number, firstY: number, secondX: number, secondY: number, whiteboard: Whiteboard){
+        var ctx = whiteboard.canvas.getContext("2d");
+        ctx.beginPath(); // begin
+        
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#c0392b';
+
+        ctx.moveTo(firstX, firstY); // from
+        ctx.lineTo(secondX, secondY); // to
+
+        ctx.stroke(); // draw it!
+    }
+
+
+    private mouseup(e, whiteboard: Whiteboard){
+        whiteboard.room.send("path", -1)
+    }
+  
+
+
+
+
+
+
+
     //doesnt really work
     async resize2(width: number, height: number){
         var imageSrc = this.canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
@@ -80,34 +134,6 @@ export class Whiteboard{
         var image = await loadImage(imageSrc)
         ctx.drawImage(image, 0, 0, oldWidth, oldHeight, 0, 0, width - 200, height - 200);
     }
-
-    // new position from mouse event
-    private setPosition(e, whiteboard: Whiteboard) {
-        whiteboard.x = e.clientX - whiteboard.offsetX;
-        whiteboard.y = e.clientY - whiteboard.offsetY;
-    }
-
-    private draw(e, whiteboard: Whiteboard) {
-        // mouse left button must be pressed
-        if (e.buttons !== 1) return;
-        var ctx = whiteboard.canvas.getContext("2d");
-
-        ctx.beginPath(); // begin
-        
-        ctx.lineWidth = 5;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = '#c0392b';
-        
-        whiteboard.room.send("startPoint", [whiteboard.x, whiteboard.y])
-        ctx.moveTo(whiteboard.x, whiteboard.y); // from
-        whiteboard.setPosition(e, whiteboard);
-        whiteboard.room.send("endPoint", [whiteboard.x, whiteboard.y])
-        ctx.lineTo(whiteboard.x, whiteboard.y); // to
-      
-        ctx.stroke(); // draw it!
-      }
-  
-
 
 }
 
