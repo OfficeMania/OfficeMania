@@ -195,7 +195,9 @@ body {
     margin: 10% auto;
     max-width: 65%;
 }
-
+.modal-hi {
+    width: 1500px;
+}
 .player-state {
     display: flex;
     align-items: center;
