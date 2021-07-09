@@ -1,6 +1,8 @@
 import { Room } from "colyseus.js";
 import { State } from "../common";
-import { loadImage } from "./util";
+import { Player } from "./player";
+import { loadImage, PlayerRecord } from "./util";
+import {ArraySchema} from "@colyseus/schema";
 
 
 
@@ -13,15 +15,17 @@ export class Whiteboard{
     private offsetX: number = 100;
     private offsetY: number = 100;
     private room: Room<State>;
+    private players: PlayerRecord;
     
 
 
-    constructor(canvas: HTMLCanvasElement, room: Room<State>){
+    constructor(canvas: HTMLCanvasElement, room: Room<State>, players: PlayerRecord){
         this.room = room;
+        this.players = players;
         this.canvas = canvas;
         let ctx = canvas.getContext("2d");
 
-        room.onMessage("redraw", (client) => {this.drawOthers(client, this)})
+        room.onMessage("redraw", (client) => {this.drawOthers(client.sessionId, this)})
         
    
 
@@ -89,12 +93,54 @@ export class Whiteboard{
 
         this.drawLine(oldX, oldY, whiteboard.x, whiteboard.y, whiteboard)
 
-        whiteboard.room.send("path", [oldX, oldY, whiteboard.x, whiteboard.y])
+        whiteboard.room.send("path", [oldX, oldY])
     }
 
-    drawOthers(client, whiteboard: Whiteboard){
-        console.log(whiteboard.room.state.players[client.sessionId].paths.length);
+    drawOthers(clientID, whiteboard: Whiteboard){
+        var max: number = whiteboard.room.state.players[clientID].paths.length;
+        var start: number = whiteboard.players[clientID].whiteboard;
+        var paths: ArraySchema<number> = whiteboard.room.state.players[clientID].paths;
+        console.log(paths);
+        var j = 0;
+        var ctx = whiteboard.canvas.getContext("2d");
+
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#c0392b';
+
+        ctx.beginPath(); // begin
         
+        for(var i: number = start; i+3 < max; i++){
+            if(paths[i] === -1){
+                i = i + 1
+                continue;
+            } else if(paths[i + 1] === -1){
+                i = i + 2
+                continue;
+            } else if(paths[i + 2] === -1){
+                i = i + 3
+                continue;
+            } else if(paths[i + 3] === -1){
+                i = i + 4
+                continue;
+            }
+            if(j === 0){
+                whiteboard.makeLine(paths[i], paths[i + 1], paths[i + 2], paths[i+ 3], whiteboard, ctx);
+                j++;
+            }else{
+                j = 0;
+            } 
+        }
+        ctx.stroke(); // draw it!
+
+        
+        whiteboard.players[clientID].whiteboard = max - 2;
+        
+    }
+
+    makeLine(firstX: number, firstY: number, secondX: number, secondY: number, whiteboard: Whiteboard, ctx){
+        ctx.moveTo(firstX, firstY); // from
+        ctx.lineTo(secondX, secondY); // to
     }
 
     drawLine(firstX: number, firstY: number, secondX: number, secondY: number, whiteboard: Whiteboard){
@@ -113,6 +159,7 @@ export class Whiteboard{
 
 
     private mouseup(e, whiteboard: Whiteboard){
+        whiteboard.room.send("path", [whiteboard.x, whiteboard.y])
         whiteboard.room.send("path", -1)
     }
   

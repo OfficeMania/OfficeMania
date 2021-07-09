@@ -1,5 +1,5 @@
 import {Client} from "colyseus.js";
-import {TILE_SIZE} from "./player";
+import {Player, TILE_SIZE} from "./player";
 import {
     createPlayerAvatar,
     getCharacter,
@@ -268,8 +268,15 @@ async function main() {
 
     //create whiteboard
     let whiteboardCanvas = $<HTMLCanvasElement>("whiteboard");
-    let whiteboard: Whiteboard = new Whiteboard(whiteboardCanvas, room);
+    let whiteboard: Whiteboard = new Whiteboard(whiteboardCanvas, room, players);
     whiteboard.resize(width, height);
+    for(var player in players){
+        if (player !== ourPlayer.id){
+            console.log(player)
+            console.log(ourPlayer)
+            whiteboard.drawOthers(player, whiteboard);
+        }
+    }
 
     /* (from movement)
      * movement inputs

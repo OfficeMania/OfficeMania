@@ -36,7 +36,7 @@ export interface Player {
     moving: number;             //time moving to calculate sprite
     spriteX: number;            //posX to locate sprite
     spriteY: number;            //posY to locate sprite
-    whiteboard: number[];
+    whiteboard: number;
 }
 
 /*

@@ -75,7 +75,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                     moving: 0,
                     spriteX: 144,
                     spriteY: 0,
-                    whiteboard: []
+                    whiteboard: 0
                 };
                 players[sessionId] = player;
 
