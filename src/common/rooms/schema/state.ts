@@ -34,7 +34,12 @@ export class PlayerData extends Schema {
 
     @type("string")
     participantId: string;
+}
 
+/*
+ * state of whiteboard players
+ */
+export class WhiteboardPlayer extends Schema{
     @type({array: "number"})
     paths: ArraySchema<number> = new ArraySchema<number>();
 }
@@ -53,7 +58,7 @@ export class PlayerData extends Schema {
  */
 export class State extends Schema {
     @type({map: PlayerData})
-    players = new MapSchema<PlayerData>();
+    players: MapSchema<PlayerData> = new MapSchema<PlayerData>();
 
     @type({array: "string"})
     playerSpritePaths = new ArraySchema<string>();
@@ -63,6 +68,9 @@ export class State extends Schema {
 
     @type(ConferenceData)
     conference: ConferenceData = new ConferenceData();
+
+    @type({map: WhiteboardPlayer})
+    whiteboardPlayer: MapSchema<WhiteboardPlayer> = new MapSchema<WhiteboardPlayer>();
 }
 
 /*

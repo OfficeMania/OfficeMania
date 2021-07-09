@@ -16,6 +16,7 @@ export class Whiteboard{
     private offsetY: number = 100;
     private room: Room<State>;
     private players: PlayerRecord;
+    private whiteboardPlayer: {[key: string]: number} = {};
     
 
 
@@ -49,6 +50,10 @@ export class Whiteboard{
         ctx.lineWidth = 10;
         ctx.rect(0, 0, canvas.width, canvas.height);
         ctx.stroke(); 
+    }
+
+    addPlayer(player: string){
+        this.whiteboardPlayer[player] = 0;
     }
 
     getIsVisible(){
@@ -96,10 +101,10 @@ export class Whiteboard{
         whiteboard.room.send("path", [oldX, oldY])
     }
 
-    drawOthers(clientID, whiteboard: Whiteboard){
-        var max: number = whiteboard.room.state.players[clientID].paths.length;
-        var start: number = whiteboard.players[clientID].whiteboard;
-        var paths: ArraySchema<number> = whiteboard.room.state.players[clientID].paths;
+    drawOthers(clientID: string, whiteboard: Whiteboard){
+        var max: number = whiteboard.room.state.whiteboardPlayer[clientID].paths.length;
+        var start: number = whiteboard.whiteboardPlayer[clientID]
+        var paths: ArraySchema<number> = whiteboard.room.state.whiteboardPlayer[clientID].paths;
         console.log(paths);
         var j = 0;
         var ctx = whiteboard.canvas.getContext("2d");
@@ -134,7 +139,7 @@ export class Whiteboard{
         ctx.stroke(); // draw it!
 
         
-        whiteboard.players[clientID].whiteboard = max - 2;
+        whiteboard.whiteboardPlayer[clientID] = max - 2;
         
     }
 

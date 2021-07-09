@@ -1,5 +1,5 @@
 import {Client, Room} from "colyseus";
-import {PlayerData, State} from "./schema/state";
+import {PlayerData, State, WhiteboardPlayer} from "./schema/state";
 import fs from 'fs';
 import {generateUUIDv4, KEY_CHARACTER, KEY_USERNAME} from "../util";
 import { cli } from "webpack";
@@ -14,6 +14,8 @@ export class TURoom extends Room<State> {
     onCreate(options: any) {
         const state = new State();
         this.setState(state);
+
+        this.autoDispose = false;
 
         //generate jitsi conference id and password
         const conferenceId = generateUUIDv4();
@@ -79,9 +81,9 @@ export class TURoom extends Room<State> {
 
         this.onMessage("path", (client, message) => {
             if (message === -1) {
-                this.state.players[client.sessionId].paths.push(-1);
+                this.state.whiteboardPlayer[client.sessionId].paths.push(-1);
             } else {
-                this.state.players[client.sessionId].paths.push(...message);
+                this.state.whiteboardPlayer[client.sessionId].paths.push(...message);
             }
             this.broadcast("redraw", client, { except: client });
         });
@@ -102,7 +104,6 @@ export class TURoom extends Room<State> {
         this.onMessage("updateParticipantId", (client, message) => {
             this.state.players[client.sessionId].participantId = message; //TODO Maybe let the server join the jitsi conference too (without mic/cam) and then authenticate via the jitsi chat, that a player is linked to a participantId, so that one cannot impersonate another one.
         });
-
     }
 
     onAuth(client: Client, options: any, req: any) {
@@ -117,6 +118,8 @@ export class TURoom extends Room<State> {
         this.state.players[client.sessionId].y = 0;
         this.state.players[client.sessionId].cooldown = 0;
         this.state.players[client.sessionId].participantId = null;
+        this.state.whiteboardPlayer[client.sessionId] = new WhiteboardPlayer();
+        this.broadcast("newPlayer", client);
     }
 
     onLeave(client: Client, consented: boolean) {
