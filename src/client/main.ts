@@ -276,10 +276,7 @@ async function main() {
     let whiteboardCanvas = $<HTMLCanvasElement>("whiteboard");
     let whiteboard: Whiteboard = new Whiteboard(whiteboardCanvas, room, players);
     whiteboard.resize(width, height);
-    console.log(room.state.whiteboardPlayer.keys())
     for(var [player, value] of room.state.whiteboardPlayer){
-        console.log(player)
-        console.log("nay")
         whiteboard.addPlayer(player);
         if (player !== ourPlayer.id){
             whiteboard.drawOthers(player, whiteboard);

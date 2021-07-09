@@ -17,6 +17,8 @@ export class Whiteboard{
     private room: Room<State>;
     private players: PlayerRecord;
     private whiteboardPlayer: {[key: string]: number} = {};
+
+    private clearButton = <HTMLButtonElement>document.getElementById("button-clear-whiteboard");
     
 
 
@@ -26,7 +28,10 @@ export class Whiteboard{
         this.canvas = canvas;
         let ctx = canvas.getContext("2d");
 
+        this.clearButton.addEventListener("click", () => this.clearPressed(this));
+
         room.onMessage("redraw", (client) => {this.drawOthers(client.sessionId, this)})
+        room.onMessage("clearWhiteboard", (message) => {this.clear(this)})
         
    
 
@@ -39,10 +44,11 @@ export class Whiteboard{
         canvas.height = 720; 
         
         
-        this.setup(canvas, ctx);
+        this.setup(canvas);
     }
 
-    private setup(canvas, ctx){
+    private setup(canvas){
+        var ctx = canvas.getContext("2d");
         ctx.fillStyle = "white"
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "black"
@@ -56,6 +62,18 @@ export class Whiteboard{
         this.whiteboardPlayer[player] = 0;
     }
 
+    clearPressed(whiteboard: Whiteboard){
+        whiteboard.room.send("clearWhiteboard")
+        whiteboard.clear(whiteboard);
+    }
+
+    clear(whiteboard: Whiteboard){
+        for(var id in whiteboard.whiteboardPlayer){
+            whiteboard.whiteboardPlayer[id] = 0;
+        }
+        whiteboard.setup(whiteboard.canvas)
+    }
+
     getIsVisible(){
         return this.isVisible;
     }
@@ -64,9 +82,11 @@ export class Whiteboard{
         if(this.isVisible === true){
             this.isVisible = false;
             this.canvas.style.visibility = "hidden";
+            this.clearButton.style.visibility = "hidden";
         } else {
             this.isVisible = true;
             this.canvas.style.visibility = "visible";
+            this.clearButton.style.visibility = "visible";
         }
     }
 
@@ -80,6 +100,9 @@ export class Whiteboard{
 
         this.canvas.style.left = this.offsetX + "px";
         this.canvas.style.top = this.offsetY + "px";
+
+        this.clearButton.style.left = this.offsetX + 4 + "px";
+        this.clearButton.style.top = this.offsetY + 4 + "px";
     }
 
     // new position from mouse event
@@ -111,7 +134,7 @@ export class Whiteboard{
 
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
-        ctx.strokeStyle = '#c0392b';
+        ctx.strokeStyle = 'black';
 
         ctx.beginPath(); // begin
         
@@ -154,7 +177,7 @@ export class Whiteboard{
         
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
-        ctx.strokeStyle = '#c0392b';
+        ctx.strokeStyle = 'black';
 
         ctx.moveTo(firstX, firstY); // from
         ctx.lineTo(secondX, secondY); // to
