@@ -6,9 +6,11 @@ import { Whiteboard } from "./whiteboard";
 
 let yPressed: boolean = false;
 let keysDisabled: boolean = false;
+let interactionOpen: boolean = false;
 
-export function setKeysDisabled(disabled: boolean) {
-    keysDisabled = disabled;
+export function setKeysDisabled(disabledSettings: boolean, disabledInteraction: boolean) {
+    keysDisabled = disabledSettings || disabledInteraction;
+    interactionOpen = disabledInteraction;
 }
 
 function onKey(event: KeyboardEvent, key: string, runnable: () => void) {
