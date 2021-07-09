@@ -64,3 +64,18 @@ export class State extends Schema {
     @type(ConferenceData)
     conference: ConferenceData = new ConferenceData();
 }
+
+/*
+ *state of pong game 
+ */
+export class PongState extends Schema {
+    //0: xBall, 1: yBall, 2: playerA, 3: playerB
+    @type({array: "number"})
+    positions = new ArraySchema<number>();
+
+    @type("number")
+    sizeBall: number;
+    
+    @type("number")
+    sizeBat: number;
+}

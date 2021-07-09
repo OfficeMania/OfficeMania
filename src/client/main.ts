@@ -87,9 +87,10 @@ function toggleMute(type: string) {
 // Settings
 
 const settingsModal = $<HTMLDivElement>("settings-modal");
-
+const pongModal =$<HTMLDivElement>("pong-game");
 const settingsButton = $<HTMLButtonElement>("button-settings");
 const usersButton  = $<HTMLButtonElement>("button-users");
+const pongButton = $<HTMLButtonElement>("button-pong");
 
 const settingsOkButton = $<HTMLButtonElement>("button-settings-ok");
 //const settingsCancelButton = $<HTMLButtonElement>("button-settings-cancel");
@@ -97,6 +98,7 @@ const settingsApplyButton = $<HTMLButtonElement>("button-settings-apply");
 
 settingsButton.addEventListener("click", () => onSettingsOpen());
 usersButton.addEventListener("click", () => toggleShowParticipantsTab());
+pongButton.addEventListener("click", () => onPongOpen());
 
 settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
@@ -105,8 +107,10 @@ const usernameInput = $<HTMLInputElement>("input-settings-username");
 const characterSelect = $<HTMLSelectElement>("character-select");
 const characterPreview = $<HTMLSelectElement>("character-preview");
 
-const observer = new MutationObserver(mutations => mutations.forEach(() => setKeysDisabled(!settingsModal.style.display.match(/none/))));
+const observer = new MutationObserver(mutations => mutations.forEach(() => setKeysDisabled(!settingsModal.style.display.match(/none/), !pongModal.style.display.match(/none/))));
 observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
+observer.observe(pongModal, {attributes: true, attributeFilter: ['style']});
+
 
 function checkValidSettings() {
     let valid = checkValidUsernameInput();
@@ -179,9 +183,11 @@ function loadCharacterSettings() {
 
 function onSettingsOpen() {
     loadSettings();
-    setKeysDisabled(true);
+    setKeysDisabled(true, false);
 }
-
+function onPongOpen() {
+    setKeysDisabled(true, false);
+}
 function loadSettings() {
     loadUsernameSettings();
     loadCharacterSettings();
