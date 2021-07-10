@@ -1,17 +1,16 @@
 import {Player} from "./player";
 import {Room} from "colyseus.js";
-import {setCharacter, setUsername} from "./util";
+import {InputMode, setCharacter, setUsername} from "./util";
 import {setShowParticipantsTab} from "./conference/conference";
 import {Whiteboard} from "./whiteboard";
 import {Direction} from "../common/util";
 
 let yPressed: boolean = false;
-let keysDisabled: boolean = false;
+let inputMode: InputMode = InputMode.NORMAL;
 let interactionOpen: boolean = false;
 
-export function setKeysDisabled(disabledSettings: boolean, disabledInteraction: boolean) {
-    keysDisabled = disabledSettings || disabledInteraction;
-    interactionOpen = disabledInteraction;
+export function setInputMode(input: InputMode) {
+    inputMode = input;
 }
 
 function onKey(event: KeyboardEvent, key: string, runnable: () => void) {
@@ -28,8 +27,12 @@ function onKeyDirection(event: KeyboardEvent, key: string, ourPlayer: Player = u
 
 export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }, whiteboard: Whiteboard) {
     function onKeyDown(e: KeyboardEvent) {
-        if (keysDisabled) {
+        if (inputMode === InputMode.SETTINGS) {
             return;
+        }
+        if (inputMode === InputMode.INTERACTION){
+            onKeyDirection(e, "s", ourPlayer, Direction.DOWN);
+            onKeyDirection(e, "w", ourPlayer, Direction.UP);
         }
         onKeyDirection(e, "s", ourPlayer, Direction.DOWN);
         onKeyDirection(e, "w", ourPlayer, Direction.UP);
@@ -60,7 +63,7 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
     }
 
     function onKeyUp(e: KeyboardEvent) {
-        if (keysDisabled) {
+        if (inputMode !== InputMode.NORMAL) {
             return;
         }
         onKey(e, "s", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.DOWN), 1));
