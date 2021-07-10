@@ -89,9 +89,9 @@ function toggleMute(type: string) {
 // Settings
 
 const settingsModal = $<HTMLDivElement>("settings-modal");
-const pongModal =$<HTMLDivElement>("pong-game");
+const pongModal = $<HTMLDivElement>("pong-game");
 const settingsButton = $<HTMLButtonElement>("button-settings");
-const usersButton  = $<HTMLButtonElement>("button-users");
+const usersButton = $<HTMLButtonElement>("button-users");
 const pongButton = $<HTMLButtonElement>("button-pong");
 
 const settingsOkButton = $<HTMLButtonElement>("button-settings-ok");
@@ -187,9 +187,11 @@ function onSettingsOpen() {
     loadSettings();
     setKeysDisabled(true, false);
 }
+
 function onPongOpen() {
     setKeysDisabled(true, false);
 }
+
 function loadSettings() {
     loadUsernameSettings();
     loadCharacterSettings();
@@ -279,9 +281,9 @@ async function main() {
     let whiteboardCanvas = $<HTMLCanvasElement>("whiteboard");
     let whiteboard: Whiteboard = new Whiteboard(whiteboardCanvas, room, players);
     whiteboard.resize(width, height);
-    for(var [player, value] of room.state.whiteboardPlayer){
+    for (var [player, value] of room.state.whiteboardPlayer) {
         whiteboard.addPlayer(player);
-        if (player !== ourPlayer.id){
+        if (player !== ourPlayer.id) {
             whiteboard.drawOthers(player, whiteboard);
         }
     }
