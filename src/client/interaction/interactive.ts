@@ -1,4 +1,7 @@
-export class Interaction {
+/**
+ * Yes "[Interactive](https://en.wiktionary.org/wiki/interactive#Noun)" is a noun
+ */
+export class Interactive {
 
     private _name: string;
     private _singleton: boolean;

@@ -1,6 +1,6 @@
 import {loadImage} from "./util";
 import {Room} from "colyseus.js";
-import {Interaction} from "./interaction/interaction"
+import {Interactive} from "./interaction/interactive"
 import {Door, DoorDirection} from "./interaction/door";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
@@ -10,7 +10,7 @@ export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 class solidInfo {
 
     isSolid: boolean;
-    content: Interaction;
+    content: Interactive;
     roomId: number;
 
     constructor() {
@@ -24,7 +24,7 @@ class solidInfo {
         this.isSolid = true;
     }
 
-    setContent(content: Interaction) {
+    setContent(content: Interactive) {
         this.content = content;
     }
 
@@ -262,7 +262,7 @@ function fillSolidInfos(map: mapInfo) {
                                         }
                                     } else if (map.layers[l].name.search("Content") !== -1 && value !== 0) {
 
-                                        let object: Interaction;
+                                        let object: Interactive;
 
                                         switch(value) {
 

@@ -1,6 +1,6 @@
-import {Interaction} from "./interaction";
+import {Interactive} from "./interactive";
 
-export class Pong extends Interaction {
+export class Pong extends Interactive {
     playerA: number;
     playerB: number;
 

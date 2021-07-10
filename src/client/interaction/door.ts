@@ -1,4 +1,4 @@
-import {Interaction} from "./interaction"
+import {Interactive} from "./interactive"
 
 export enum DoorDirection {
     UNKNOWN,
@@ -9,7 +9,7 @@ export enum DoorDirection {
     ALWAYS_OPEN
 }
 
-export class Door extends Interaction {
+export class Door extends Interactive {
 
     isClosed: boolean;
     //1: S-->N, 2: W-->E, 3: N-->S, 4: E-->W, 5: Always open.
