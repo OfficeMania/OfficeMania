@@ -23,6 +23,7 @@ import {
     toggleMuteByType,
     toggleSharing,
     toggleShowParticipantsTab,
+    updateChat,
     updateUsers
 } from "./conference/conference";
 import {playerLoop} from "./movement";
@@ -345,6 +346,7 @@ async function main() {
             nearbyPlayerCheck(players, ourPlayer, collisionInfo);
         } else if (playerNearbyTimer % 20 === 10) {
             updateUsers(players);
+            updateChat();
         }
 
         //DESIGN TODO: when something on the map changes: drawMap

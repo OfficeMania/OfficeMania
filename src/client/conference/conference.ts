@@ -211,6 +211,7 @@ function onMessageReceived(participantId: string, message: string, ts: number) {
     console.debug(`participantId: ${participantId}, ts: ${ts}, message: ${message}`); //DEBUG
     const chatItem = createChatItem(getUser(participantId), message);
     if (chatItem) {
+        ensureChatAppend();
         chatList.append(chatItem);
     }
 }
@@ -439,14 +440,21 @@ function createChatItem(user: User, message: string): HTMLLIElement {
     }
     const chatItem = document.createElement("li");
     chatItem.classList.add("chat-list-item");
+    chatItem.setAttribute("data-created", "" + new Date().getTime());
     const messageItem = document.createElement("span");
     messageItem.classList.add("chat-list-item-message");
     messageItem.innerText = message;
     const playerState = document.createElement("div");
     const player = getPlayerByParticipantId(user.participantId);
-    chatItem.append(createPlayerState(player, playerState));
+    chatItem.append(createPlayerState(player, playerState, false, false));
     chatItem.append(messageItem);
     return chatItem;
+}
+
+function ensureChatAppend() {
+    while (chatList.childElementCount > 10) {
+        chatList.firstChild.remove();
+    }
 }
 
 // Exported Functions
@@ -534,6 +542,20 @@ export function updateUsers(players: PlayerRecord) {
     removeChildren(playerOnlineList);
     Object.values(players).forEach((player) => playerOnlineList.append(createPlayerState(player, document.createElement("li"), true)));
 }
+
+export function updateChat() {
+    const now: number = new Date().getTime();
+    const children = chatList.children;
+    for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        const created: number = Number(child.getAttribute("data-created"));
+        if (now - created > 10000) {
+            child.remove();
+        }
+    }
+}
+
+let counter: number = 0;
 
 export function toggleShowParticipantsTab(): boolean {
     setShowParticipantsTab(!getShowParticipantsTab());
