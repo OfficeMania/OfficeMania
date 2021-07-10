@@ -1,7 +1,7 @@
 import {Client, Room} from "colyseus";
 import {PlayerData, State, WhiteboardPlayer} from "./schema/state";
 import fs from 'fs';
-import {generateUUIDv4, KEY_CHARACTER, KEY_USERNAME} from "../util";
+import {generateUUIDv4, KEY_CHARACTER, KEY_USERNAME, MoveDirection} from "../util";
 import {ArraySchema} from "@colyseus/schema";
 
 const path = require('path');
@@ -58,19 +58,19 @@ export class TURoom extends Room<State> {
         this.onMessage("move", (client, message) => {
             if (this.state.players[client.sessionId].cooldown <= 0) {
                 switch (message) {
-                    case "moveDown": {
+                    case MoveDirection.DOWN: {
                         this.state.players[client.sessionId].y++;
                         break;
                     }
-                    case "moveUp": {
+                    case MoveDirection.UP: {
                         this.state.players[client.sessionId].y--;
                         break;
                     }
-                    case "moveLeft": {
+                    case MoveDirection.LEFT: {
                         this.state.players[client.sessionId].x--;
                         break;
                     }
-                    case "moveRight": {
+                    case MoveDirection.RIGHT: {
                         this.state.players[client.sessionId].x++;
                         break;
                     }

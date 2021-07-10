@@ -3,6 +3,7 @@ import {Room} from "colyseus.js";
 import {setCharacter, setUsername} from "./util";
 import {setShowParticipantsTab} from "./conference/conference";
 import {Whiteboard} from "./whiteboard";
+import {MoveDirection} from "../common/util";
 
 let yPressed: boolean = false;
 let keysDisabled: boolean = false;
@@ -30,10 +31,10 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         if (keysDisabled) {
             return;
         }
-        onKeyDirection(e, "s", ourPlayer, "moveDown");
-        onKeyDirection(e, "w", ourPlayer, "moveUp");
-        onKeyDirection(e, "a", ourPlayer, "moveLeft");
-        onKeyDirection(e, "d", ourPlayer, "moveRight");
+        onKeyDirection(e, "s", ourPlayer, MoveDirection.DOWN);
+        onKeyDirection(e, "w", ourPlayer, MoveDirection.UP);
+        onKeyDirection(e, "a", ourPlayer, MoveDirection.LEFT);
+        onKeyDirection(e, "d", ourPlayer, MoveDirection.RIGHT);
         //iterate through characters
         onKey(e, "c", () => {
             const filenames = Object.keys(characters);
@@ -62,10 +63,10 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         if (keysDisabled) {
             return;
         }
-        onKey(e, "s", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf("moveDown"), 1));
-        onKey(e, "w", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf("moveUp"), 1));
-        onKey(e, "a", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf("moveLeft"), 1));
-        onKey(e, "d", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf("moveRight"), 1));
+        onKey(e, "s", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(MoveDirection.DOWN), 1));
+        onKey(e, "w", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(MoveDirection.UP), 1));
+        onKey(e, "a", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(MoveDirection.LEFT), 1));
+        onKey(e, "d", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(MoveDirection.RIGHT), 1));
         onKey(e, "y", () => {
             yPressed = false;
             setShowParticipantsTab(false);
