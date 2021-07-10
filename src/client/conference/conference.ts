@@ -5,6 +5,7 @@ import {
     canSeeEachOther,
     createPlayerAvatar,
     getCorrectedPlayerCoordinates,
+    getPlayerByParticipantId,
     getRoom,
     PlayerRecord,
     removeChildren
@@ -54,6 +55,9 @@ const audioOutputSelect = $<HTMLSelectElement>("audio-output-select");
 
 const playerOnlineContainer = $<HTMLUListElement>("player-online-container");
 const playerOnlineList = $<HTMLUListElement>("player-online-list");
+
+const chatContainer = $<HTMLDivElement>("chat-container");
+const chatList = $<HTMLDivElement>("chat-list");
 
 const selfUser = new SelfUser(audioBar, videoBar, focusBar);
 const users: User[] = [];
@@ -149,6 +153,7 @@ function onConnectionSuccess() {
     conference.on(JitsiMeetJSIntern.events.conference.TRACK_AUDIO_LEVEL_CHANGED, (userID, audioLevel) => console.debug(`${userID} - ${audioLevel}`)); //DEBUG
     conference.on(JitsiMeetJSIntern.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
     conference.on(JitsiMeetJSIntern.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${conference.getPhoneNumber()} - ${conference.getPhonePin()}`)); //DEBUG //REMOVE
+    conference.on(JitsiMeetJSIntern.events.conference.MESSAGE_RECEIVED, onMessageReceived);
     if (conferenceData().password) {
         conference.join(conferenceData().password);
     } else {
@@ -199,6 +204,14 @@ function onTrack(track, onLocal, onRemote) {
         if (onRemote) {
             onRemote(track);
         }
+    }
+}
+
+function onMessageReceived(participantId: string, message: string, ts: number) {
+    console.debug(`participantId: ${participantId}, ts: ${ts}, message: ${message}`); //DEBUG
+    const chatItem = createChatItem(getUser(participantId), message);
+    if (chatItem) {
+        chatList.append(chatItem);
     }
 }
 
@@ -418,6 +431,22 @@ function setMediaDevices(select: HTMLSelectElement, devices: MediaDeviceInfo[], 
         select.append(option);
     });
     select.selectedIndex = selectedIndex;
+}
+
+function createChatItem(user: User, message: string): HTMLLIElement {
+    if (!user || !message) {
+        return null;
+    }
+    const chatItem = document.createElement("li");
+    chatItem.classList.add("chat-list-item");
+    const messageItem = document.createElement("span");
+    messageItem.classList.add("chat-list-item-message");
+    messageItem.innerText = message;
+    const playerState = document.createElement("div");
+    const player = getPlayerByParticipantId(user.participantId);
+    chatItem.append(createPlayerState(player, playerState));
+    chatItem.append(messageItem);
+    return chatItem;
 }
 
 // Exported Functions

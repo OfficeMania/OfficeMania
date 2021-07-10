@@ -255,6 +255,32 @@ body {
     margin: 5px 10px 5px 0;
 }
 
+#chat-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+#chat-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+
+.chat-list-item {
+    font-size: 200%;
+    background-color: rgba(212, 212, 212, 0.5);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.chat-list-item-message {
+    margin-left: 10px;
+}
+
 /* Small screens */
 @media only screen and (max-width: 600px) {
     #player-online-container {
