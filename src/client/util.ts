@@ -9,6 +9,7 @@ export type PlayerRecord = { [key: string]: Player }
 
 let _room: Room<State> = undefined;
 let _players: PlayerRecord = undefined;
+let _chatEnabled: boolean = false;
 
 export function setRoom(room: Room<State>) {
     _room = room;
@@ -24,6 +25,14 @@ export function setPlayers(players: PlayerRecord) {
 
 export function getPlayers(): PlayerRecord {
     return _players;
+}
+
+export function setChatEnabled(chatEnabled: boolean) {
+    _chatEnabled = chatEnabled;
+}
+
+export function getChatEnabled(): boolean {
+    return _chatEnabled;
 }
 
 /*

@@ -4,11 +4,13 @@ import {
     appendIcon,
     canSeeEachOther,
     createPlayerAvatar,
+    getChatEnabled,
     getCorrectedPlayerCoordinates,
     getPlayerByParticipantId,
     getRoom,
     PlayerRecord,
-    removeChildren
+    removeChildren,
+    setChatEnabled
 } from "../util";
 import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
@@ -209,6 +211,9 @@ function onTrack(track, onLocal, onRemote) {
 
 function onMessageReceived(participantId: string, message: string, ts: number) {
     console.debug(`participantId: ${participantId}, ts: ${ts}, message: ${message}`); //DEBUG
+    if (!getChatEnabled()) {
+        return;
+    }
     const chatItem = createChatItem(getUser(participantId), message);
     if (chatItem) {
         ensureChatAppend();
@@ -544,6 +549,9 @@ export function updateUsers(players: PlayerRecord) {
 }
 
 export function updateChat() {
+    if (!getChatEnabled()) {
+        return;
+    }
     const now: number = new Date().getTime();
     const children = chatList.children;
     for (let i = 0; i < children.length; i++) {
