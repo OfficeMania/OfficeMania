@@ -114,39 +114,42 @@ const characterPreview = $<HTMLSelectElement>("character-preview");
 const pongs: Pong[] = [];
 
 const interactionButton = $<HTMLButtonElement>("button-pong");
+
 function onInteraction(ourPlayer: Player, players: PlayerRecord, pongCanvas: HTMLCanvasElement) {
     onPongInteraction(ourPlayer, players, pongCanvas);
 }
 
-function onPongInteraction (ourPlayer: Player, players: PlayerRecord, pongCanvas: HTMLCanvasElement){
-    if (!pongs.some( (pong) => {
-        if(pong.playerA.id === ourPlayer.id){ return true;}
-        else if (pong.playerB.id === ourPlayer.id) { return true}
-    })){
-        if(pongs.every(pong => pong && pong.playerB)) {
+function onPongInteraction(ourPlayer: Player, players: PlayerRecord, pongCanvas: HTMLCanvasElement) {
+    if (!pongs.some((pong) => {
+        if (pong.playerA.id === ourPlayer.id) {
+            return true;
+        } else if (pong.playerB.id === ourPlayer.id) {
+            return true
+        }
+    })) {
+        if (pongs.every(pong => pong && pong.playerB)) {
             const pong = new Pong(pongCanvas, getRoom(), getPlayers(), ourPlayer.id);
             pongs.push(pong);
-        }
-        else {
+        } else {
             pongs.find((pong) => pong && !pong.playerB).join(ourPlayer.id);
         }
-    }
-    else if(pongCanvas.style.visibility === "hidden"){
+    } else if(pongCanvas.style.visibility === "hidden"){
         pongCanvas.style.visibility = "visible";
     }
     else {
-        console.log("already in game, exiting");
+        console.debug("already in game, exiting");
         pongCanvas.style.visibility = "hidden";
-    };
+    }
 }
 
 
 const observer = new MutationObserver(mutations => mutations.forEach(checkInputMode));
 observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
+
 //observer.observe(pongModal, {attributes: true, attributeFilter: ['style']});
 
-function checkInputMode(){
-    if(!settingsModal.style.display.match(/none/)) {
+function checkInputMode() {
+    if (!settingsModal.style.display.match(/none/)) {
         setInputMode(InputMode.SETTINGS);
     }
     //else if ()
@@ -359,6 +362,7 @@ async function main() {
     let playerNearbyTimer = 0;
     let pongCanvas = $<HTMLCanvasElement>("interactive");
     interactionButton.addEventListener("click", () => onInteraction(ourPlayer, players, pongCanvas));
+
     function loop(now: number) {
 
         ctx.clearRect(0, 0, width, height);
