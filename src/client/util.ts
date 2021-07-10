@@ -161,6 +161,26 @@ export function getCookie(key: string) {
 const xCorrection = -38;
 const yCorrection = -83;
 
+export function getCorrectedPlayerFacingCoordinates(player: Player): [number, number] {
+    let deltaX = 0;
+    let deltaY = 0;
+    switch (player.facing) {
+        case Direction.LEFT:
+            deltaX -= 2;
+            break;
+        case Direction.RIGHT:
+            deltaX += 2;
+            break;
+        case Direction.UP:
+            deltaY -= 2;
+            break;
+        case Direction.DOWN:
+            deltaY += 2;
+            break;
+    }
+    return [player.scaledX - xCorrection + deltaX, player.scaledY - yCorrection + deltaY];
+}
+
 export function getCorrectedPlayerCoordinates(player: Player): [number, number] {
     return [player.scaledX - xCorrection, player.scaledY - yCorrection];
 }

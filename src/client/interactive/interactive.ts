@@ -14,37 +14,37 @@ export class Interactive {
     }
 
     /**
-     * gets the name of the interaction
+     * gets the name of the interactive
      */
     get name(): string {
         return this._name;
     }
 
     /**
-     * sets the name of the interaction
+     * sets the name of the interactive
      */
     set name(value: string) {
         this._name = value;
     }
 
     /**
-     * gets if an interaction can be created more than once (e.g. multiple game sessions) or
-     * if an interaction only has a single entity at most (e.g. a door can only be opened or closed once at a time
+     * gets if an interactive can be created more than once (e.g. multiple game sessions) or
+     * if an interactive only has a single entity at most (e.g. a door can only be opened or closed once at a time
      */
     get singleton(): boolean {
         return this._singleton;
     }
 
     /**
-     * sets if an interaction can be created more than once (e.g. multiple game sessions) or
-     * if an interaction only has a single entity at most (e.g. a door can only be opened or closed once at a time
+     * sets if an interactive can be created more than once (e.g. multiple game sessions) or
+     * if an interactive only has a single entity at most (e.g. a door can only be opened or closed once at a time
      */
     set singleton(value: boolean) {
         this._singleton = value;
     }
 
     /**
-     * gets the maximum number of players per interaction (e.g. a door can only be accessed by one player at a time,
+     * gets the maximum number of players per interactive (e.g. a door can only be accessed by one player at a time,
      * but a game instance may have 3 players per game and unrestricted number of sessions)
      */
     get maxPlayer(): number {
@@ -52,7 +52,7 @@ export class Interactive {
     }
 
     /**
-     * sets the maximum number of players per interaction (e.g. a door can only be accessed by one player at a time,
+     * sets the maximum number of players per interactive (e.g. a door can only be accessed by one player at a time,
      * but a game instance may have 3 players per game and unrestricted number of sessions)
      */
     set maxPlayer(value: number) {

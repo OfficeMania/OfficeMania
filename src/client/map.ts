@@ -1,7 +1,7 @@
 import {loadImage} from "./util";
 import {Room} from "colyseus.js";
-import {Interactive} from "./interaction/interactive"
-import {Door, DoorDirection} from "./interaction/door";
+import {Interactive} from "./interactive/interactive"
+import {Door, DoorDirection} from "./interactive/door";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
