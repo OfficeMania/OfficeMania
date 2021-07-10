@@ -2,7 +2,7 @@ import {Player} from "./player";
 import {Room} from "colyseus.js";
 import {setCharacter, setUsername} from "./util";
 import {setShowParticipantsTab} from "./conference/conference";
-import { Whiteboard } from "./whiteboard";
+import {Whiteboard} from "./whiteboard";
 
 let yPressed: boolean = false;
 let keysDisabled: boolean = false;
@@ -20,8 +20,8 @@ function onKey(event: KeyboardEvent, key: string, runnable: () => void) {
 }
 
 function onKeyDirection(event: KeyboardEvent, key: string, ourPlayer: Player = undefined, direction: string = undefined) {
-    if (event.key.toLowerCase() === key.toLowerCase() && !ourPlayer.prioDirection.includes(direction)) {
-        ourPlayer.prioDirection.unshift(direction);
+    if (event.key.toLowerCase() === key.toLowerCase() && !ourPlayer.priorDirections.includes(direction)) {
+        ourPlayer.priorDirections.unshift(direction);
     }
 }
 
@@ -62,10 +62,10 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         if (keysDisabled) {
             return;
         }
-        onKey(e, "s", () => ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveDown"), 1));
-        onKey(e, "w", () => ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveUp"), 1));
-        onKey(e, "a", () => ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveLeft"), 1));
-        onKey(e, "d", () => ourPlayer.prioDirection.splice(ourPlayer.prioDirection.indexOf("moveRight"), 1));
+        onKey(e, "s", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf("moveDown"), 1));
+        onKey(e, "w", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf("moveUp"), 1));
+        onKey(e, "a", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf("moveLeft"), 1));
+        onKey(e, "d", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf("moveRight"), 1));
         onKey(e, "y", () => {
             yPressed = false;
             setShowParticipantsTab(false);
@@ -75,7 +75,7 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
     //gets called when window is out auf focus
     function onBlur() {
         //stops player
-        ourPlayer.prioDirection = [];
+        ourPlayer.priorDirections = [];
     }
 
     document.addEventListener("keydown", onKeyDown);

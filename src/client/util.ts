@@ -94,7 +94,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                     lastScaledY: [0, 0, 0, 0, 0],
                     moveDirection: null,
                     moveTime: 0,
-                    prioDirection: [],
+                    priorDirections: [],
                     facing: Direction.DOWN,
                     standing: 0,
                     moving: 0,
