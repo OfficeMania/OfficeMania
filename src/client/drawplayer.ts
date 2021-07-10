@@ -1,7 +1,8 @@
 import {Room} from "colyseus.js";
 import {Player, STEP_SIZE} from "./player";
-import {Direction, PlayerRecord} from "./util";
+import {PlayerRecord} from "./util";
 import {State} from "../common";
+import {Direction} from "../common/util";
 
 function playerMovingAnimation(player: Player, direction: string, width: number, height: number) {
     player.standing = 0;

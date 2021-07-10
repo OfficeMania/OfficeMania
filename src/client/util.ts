@@ -2,17 +2,10 @@ import {Client, Room} from "colyseus.js";
 import {State} from "../common";
 import {Player} from "./player";
 import {solidInfo} from "./map";
-import {KEY_CAMERA_DEVICE_ID, KEY_CHARACTER, KEY_MIC_DEVICE_ID, KEY_USERNAME} from "../common/util";
+import {Direction, KEY_CAMERA_DEVICE_ID, KEY_CHARACTER, KEY_MIC_DEVICE_ID, KEY_USERNAME} from "../common/util";
 
 export type InitState = [Room<State>, Player];
 export type PlayerRecord = { [key: string]: Player }
-
-export enum Direction {
-    LEFT = "left",
-    RIGHT = "right",
-    UP = "up",
-    DOWN = "down"
-}
 
 let _room: Room<State> = undefined;
 let _players: PlayerRecord = undefined;

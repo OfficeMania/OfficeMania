@@ -15,3 +15,10 @@ export enum MoveDirection {
     UP = "moveUp",
     DOWN = "moveDown"
 }
+
+export enum Direction {
+    LEFT = "left",
+    RIGHT = "right",
+    UP = "up",
+    DOWN = "down"
+}

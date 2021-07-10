@@ -1,7 +1,6 @@
 import {Room} from "colyseus.js";
 import {solidInfo} from "./map"
-import {Direction} from "./util";
-import {MoveDirection} from "../common/util";
+import {Direction, MoveDirection} from "../common/util";
 //import { lowestX, lowestY } from "./main"
 
 
@@ -32,7 +31,7 @@ export interface Player {
     lastScaledY: number[];      //last 5 postion from scaledY
     moveDirection: Direction;      //currently moving in this or none direction
     moveTime: number;           //time moving in current move
-    priorDirections: string[];    //current and last direction button pressed
+    priorDirections: MoveDirection[];    //current and last direction button pressed
     facing: Direction;             //direction facing to calculate sprite while standing still
     standing: number;           //time standing still
     moving: number;             //time moving to calculate sprite
