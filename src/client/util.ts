@@ -10,7 +10,11 @@ import {
     KEY_USERNAME,
     MessageType
 } from "../common/util";
-
+export enum InputMode {
+    NORMAL = 1,
+    SETTINGS,
+    INTERACTION,
+}
 export type InitState = [Room<State>, Player];
 export type PlayerRecord = { [key: string]: Player }
 

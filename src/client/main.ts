@@ -9,6 +9,7 @@ import {
     getRoom,
     getUsername,
     InitState,
+    InputMode,
     joinAndSync,
     loadCharacter,
     PlayerRecord,
@@ -31,7 +32,7 @@ import {
     updateUsers
 } from "./conference/conference";
 import {playerLoop} from "./movement";
-import {loadInputFunctions, setKeysDisabled} from "./input";
+import {loadInputFunctions, setInputMode} from "./input";
 import {drawPlayer} from "./drawplayer"
 import {Whiteboard} from "./whiteboard"
 import {Pong} from "./interactive/pong";
@@ -136,15 +137,21 @@ function onPongInteraction (ourPlayer: Player, players: PlayerRecord, pongCanvas
     else {
         console.log("already in game, exiting");
         pongCanvas.style.visibility = "hidden";
-        setKeysDisabled(false, false);
+        setInputMode(InputMode.NORMAL);
     };
 }
 
 
-const observer = new MutationObserver(mutations => mutations.forEach(() => setKeysDisabled(!settingsModal.style.display.match(/none/), false)));
+const observer = new MutationObserver(mutations => mutations.forEach(checkInputMode));
 observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
 //observer.observe(pongModal, {attributes: true, attributeFilter: ['style']});
 
+function checkInputMode(){
+    if(!settingsModal.style.display.match(/none/)) {
+        setInputMode(InputMode.SETTINGS);
+    }
+    //else if ()
+}
 
 function checkValidSettings() {
     let valid = checkValidUsernameInput();
@@ -217,11 +224,11 @@ function loadCharacterSettings() {
 
 function onSettingsOpen() {
     loadSettings();
-    setKeysDisabled(true, false);
+    setInputMode(InputMode.SETTINGS);
 }
 
 function onPongOpen() {
-    setKeysDisabled(true, false);
+    setInputMode(InputMode.INTERACTION);
 }
 
 function loadSettings() {
