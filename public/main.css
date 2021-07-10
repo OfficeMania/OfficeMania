@@ -190,7 +190,7 @@ body {
 #focus-bar {
     width: 100%;
     position: fixed;
-    top: 65px;
+    top: 90px;
     text-align: center;
 }
 
@@ -198,6 +198,7 @@ body {
     margin: 10% auto;
     max-width: 65%;
 }
+
 .modal-hi {
     width: 1500px;
 }
