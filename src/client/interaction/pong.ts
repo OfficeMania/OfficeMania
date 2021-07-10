@@ -4,12 +4,9 @@ import { PlayerRecord } from "../util";
 import { createTextChangeRange } from "typescript";
 import { State } from "../../common";
 import { Interactive } from "./interactive";
+import { Direction } from "../../common/util";
 
-enum MoveDirection {
-    UP = 1,
-    REST,
-    DOWN,
-}
+
 export class Pong extends Interactive{
     
     gameID: string;
@@ -52,19 +49,19 @@ export class Pong extends Interactive{
 
         room.onMessage("moveUp", (client) => {
             if(this.playerB.id === client.sessionId) {
-                this.playerB.move = MoveDirection.UP;
+                this.playerB.move = Direction.UP;
             }
             else console.log("not player B");
             if(this.playerA.id === client.sessionId) {
-                this.playerA.move = MoveDirection.UP;
+                this.playerA.move = Direction.UP;
             }
         })
         room.onMessage("moveDown", (client) => {
             if(this.playerB.id === client.sessionId) {
-                this.playerB.move = MoveDirection.DOWN;
+                this.playerB.move = Direction.DOWN;
             }
             if(this.playerA.id === client.sessionId) {
-                this.playerA.move = MoveDirection.DOWN;
+                this.playerA.move = Direction.DOWN;
             }
         })
         
@@ -83,7 +80,7 @@ export class Pong extends Interactive{
         }
     }
     updatePos(player: PongPlayer) {
-        if (player.move === MoveDirection.UP){
+        if (player.move === Direction.UP){
             if(player.pos >= 0){
                 player.pos -= this.velBat;
             }
@@ -91,7 +88,7 @@ export class Pong extends Interactive{
                 player.pos = 0;
             }
         }
-        else if (player.move === MoveDirection.DOWN) {
+        else if (player.move === Direction.DOWN) {
             if(player.pos + this.sizeBat<= 1000){
                 player.pos += this.velBat;
             }
@@ -115,13 +112,13 @@ export class Pong extends Interactive{
 }
 class PongPlayer {
     private _id: string;
-    private _move: MoveDirection;
+    private _move: Direction;
     private _score: number;
     private _pos: number;
 
     constructor(id: string){
         this._id = id;
-        this._move = MoveDirection.REST;
+        this._move = null;
         this._score = 0;
         this._pos = 0;
     }
@@ -131,10 +128,10 @@ class PongPlayer {
     set id(id: string) {
         this._id = id;
     }
-    get move(): MoveDirection{
+    get move(): Direction{
         return this._move;
     }
-    set move(move: MoveDirection) {
+    set move(move: Direction) {
         this._move = move;
     }
     get score(): number{
