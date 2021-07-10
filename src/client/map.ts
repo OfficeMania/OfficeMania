@@ -1,7 +1,7 @@
 import {loadImage} from "./util";
 import {Room} from "colyseus.js";
 import {Interaction} from "./interaction/interaction"
-import {Door} from "./interaction/door";
+import {Door, DoorDirection} from "./interaction/door";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -273,7 +273,7 @@ function fillSolidInfos(map: mapInfo) {
                                             case 4: {}
                                             case 5: {
 
-                                                object = new Door(value);
+                                                object = new Door(DoorDirection.ALWAYS_OPEN);
                                                 break;
                                             }
                                         }

@@ -1,15 +1,24 @@
 import {Interaction} from "./interaction"
 
+export enum DoorDirection {
+    UNKNOWN,
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST,
+    ALWAYS_OPEN
+}
+
 export class Door extends Interaction {
 
     isClosed: boolean;
     //1: S-->N, 2: W-->E, 3: N-->S, 4: E-->W, 5: Always open.
-    direction: number;
+    direction: DoorDirection;
     playerId: string;
     posX: number;
     posY: number;
 
-    constructor(direction: number) {
+    constructor(direction: DoorDirection) {
         super("door");
         this.direction = direction;
     }
@@ -31,7 +40,7 @@ export class Door extends Interaction {
             //error
         } else {
             //if you are not allowed to close this door
-            if (this.direction === 5) {
+            if (this.direction === DoorDirection.ALWAYS_OPEN) {
                 //error
             } else {
                 this.playerId = id;
