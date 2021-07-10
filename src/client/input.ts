@@ -14,13 +14,23 @@ export function setKeysDisabled(disabledSettings: boolean, disabledInteraction: 
     interactionOpen = disabledInteraction;
 }
 
-function onKey(event: KeyboardEvent, key: string, runnable: () => void) {
+function isPureKey(event: KeyboardEvent): boolean {
+    return event && !event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey;
+}
+
+function onPureKey(event: KeyboardEvent, key: string, runnable: () => void) {
+    if (!isPureKey(event)) {
+        return;
+    }
     if (event.key.toLowerCase() === key.toLowerCase()) {
         runnable();
     }
 }
 
-function onKeyDirection(event: KeyboardEvent, key: string, ourPlayer: Player = undefined, direction: Direction = undefined) {
+function onPureKeyDirection(event: KeyboardEvent, key: string, ourPlayer: Player = undefined, direction: Direction = undefined) {
+    if (!isPureKey(event)) {
+        return;
+    }
     if (event.key.toLowerCase() === key.toLowerCase() && !ourPlayer.priorDirections.includes(direction)) {
         ourPlayer.priorDirections.unshift(direction);
     }
@@ -31,12 +41,12 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         if (keysDisabled) {
             return;
         }
-        onKeyDirection(e, "s", ourPlayer, Direction.DOWN);
-        onKeyDirection(e, "w", ourPlayer, Direction.UP);
-        onKeyDirection(e, "a", ourPlayer, Direction.LEFT);
-        onKeyDirection(e, "d", ourPlayer, Direction.RIGHT);
+        onPureKeyDirection(e, "s", ourPlayer, Direction.DOWN);
+        onPureKeyDirection(e, "w", ourPlayer, Direction.UP);
+        onPureKeyDirection(e, "a", ourPlayer, Direction.LEFT);
+        onPureKeyDirection(e, "d", ourPlayer, Direction.RIGHT);
         //iterate through characters
-        onKey(e, "c", () => {
+        onPureKey(e, "c", () => {
             const filenames = Object.keys(characters);
             let nextIndex = filenames.indexOf(ourPlayer.character) + 1;
             if (filenames.length <= nextIndex) {
@@ -45,12 +55,12 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
             setCharacter(filenames[nextIndex], ourPlayer, room, characters);
         });
         //rename players name
-        onKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy"), ourPlayer, room));
+        onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy"), ourPlayer, room));
         //player interacts with object in front of him
-        onKey(e, " ", () => {
+        onPureKey(e, " ", () => {
             whiteboard.toggelIsVisible();
         });
-        onKey(e, "y", () => {
+        onPureKey(e, "y", () => {
             if (!yPressed) {
                 console.log("Y has been pressed"); //DEBUG
                 yPressed = true;
@@ -63,11 +73,11 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         if (keysDisabled) {
             return;
         }
-        onKey(e, "s", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.DOWN), 1));
-        onKey(e, "w", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.UP), 1));
-        onKey(e, "a", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.LEFT), 1));
-        onKey(e, "d", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.RIGHT), 1));
-        onKey(e, "y", () => {
+        onPureKey(e, "s", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.DOWN), 1));
+        onPureKey(e, "w", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.UP), 1));
+        onPureKey(e, "a", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.LEFT), 1));
+        onPureKey(e, "d", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.RIGHT), 1));
+        onPureKey(e, "y", () => {
             yPressed = false;
             setShowParticipantsTab(false);
         });
