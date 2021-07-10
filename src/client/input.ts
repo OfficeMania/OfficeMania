@@ -27,7 +27,7 @@ function onPureKey(event: KeyboardEvent, key: string, runnable: () => void) {
     }
 }
 
-function onPureKeyDirection(event: KeyboardEvent, key: string, ourPlayer: Player = undefined, direction: Direction = undefined) {
+function onDirectionKeyDown(event: KeyboardEvent, key: string, ourPlayer: Player = undefined, direction: Direction = undefined) {
     if (!isPureKey(event)) {
         return;
     }
@@ -36,20 +36,27 @@ function onPureKeyDirection(event: KeyboardEvent, key: string, ourPlayer: Player
     }
 }
 
+function onDirectionKeyUp(event: KeyboardEvent, key: string, ourPlayer: Player = undefined, direction: Direction = undefined) {
+    if (!isPureKey(event)) {
+        return;
+    }
+    ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(direction), 1);
+}
+
 export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }, whiteboard: Whiteboard) {
     function onKeyDown(e: KeyboardEvent) {
         if (inputMode === InputMode.SETTINGS) {
             return;
         }
-        if (inputMode === InputMode.INTERACTION){
-            onPureKeyDirection(e, "s", ourPlayer, Direction.DOWN);
-            onPureKeyDirection(e, "w", ourPlayer, Direction.UP);
+        if (inputMode === InputMode.INTERACTION) {
+            onDirectionKeyDown(e, "s", ourPlayer, Direction.DOWN);
+            onDirectionKeyDown(e, "w", ourPlayer, Direction.UP);
             return;
         }
-        onPureKeyDirection(e, "s", ourPlayer, Direction.DOWN);
-        onPureKeyDirection(e, "w", ourPlayer, Direction.UP);
-        onPureKeyDirection(e, "a", ourPlayer, Direction.LEFT);
-        onPureKeyDirection(e, "d", ourPlayer, Direction.RIGHT);
+        onDirectionKeyDown(e, "s", ourPlayer, Direction.DOWN);
+        onDirectionKeyDown(e, "w", ourPlayer, Direction.UP);
+        onDirectionKeyDown(e, "a", ourPlayer, Direction.LEFT);
+        onDirectionKeyDown(e, "d", ourPlayer, Direction.RIGHT);
         //iterate through characters
         onPureKey(e, "c", () => {
             const filenames = Object.keys(characters);
@@ -78,10 +85,10 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         if (inputMode !== InputMode.NORMAL) {
             return;
         }
-        onPureKey(e, "s", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.DOWN), 1));
-        onPureKey(e, "w", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.UP), 1));
-        onPureKey(e, "a", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.LEFT), 1));
-        onPureKey(e, "d", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.RIGHT), 1));
+        onDirectionKeyUp(e, "s", ourPlayer, Direction.DOWN);
+        onDirectionKeyUp(e, "w", ourPlayer, Direction.UP);
+        onDirectionKeyUp(e, "a", ourPlayer, Direction.LEFT);
+        onDirectionKeyUp(e, "d", ourPlayer, Direction.RIGHT);
         onPureKey(e, "y", () => {
             yPressed = false;
             setShowParticipantsTab(false);
