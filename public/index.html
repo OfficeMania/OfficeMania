@@ -108,11 +108,13 @@
             <canvas id="background"></canvas>
         </canvas>
 
-        <canvas id="whiteboard" tabindex='0' width="1920" height="1080"
-        style="position: absolute; left: 0; top: 0; z-index: 1; visibility: hidden;">
-        </canvas>
-        <button id="button-clear-whiteboard" style="position: absolute; top:0; left:0; z-index: 1; visibility: hidden;"><em class="fa fa-trash"></em><span></span></button>
-
+        <div id="whiteboard-bar">
+            <canvas id="whiteboard" tabindex='0' width="1920" height="1080"
+                style="position: absolute; left: 0; top: 0; z-index: 1; visibility: hidden; height: 80%;">
+            </canvas>
+            <button id="button-clear-whiteboard" style="position: absolute; top:0; left:0; z-index: 1; visibility: hidden; margin: 5px;"><em class="fa fa-trash"></em><span></span></button>
+        </div>
+        
         <script src="/js/main-bundle.js" defer></script>
     </body>
 </html>
