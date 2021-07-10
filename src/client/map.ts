@@ -1,7 +1,7 @@
 import {loadImage} from "./util";
 import {Room} from "colyseus.js";
-import {Interaction} from "./interaction"
-import { Door } from "./door";
+import {Interaction} from "./interaction/interaction"
+import {Door} from "./interaction/door";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -265,7 +265,7 @@ function fillSolidInfos(map: mapInfo) {
                                         let object: Interaction;
 
                                         switch(value) {
-                                            
+
                                             //door
                                             case 1: {}
                                             case 2: {}
