@@ -1,6 +1,6 @@
 export class Interaction {
 
-    name:string;
+    name: string;
 
     constructor(name: string) {
         this.name = name;
