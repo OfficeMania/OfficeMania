@@ -2,7 +2,14 @@ import {Client, Room} from "colyseus.js";
 import {State} from "../common";
 import {Player} from "./player";
 import {solidInfo} from "./map";
-import {KEY_CAMERA_DEVICE_ID, KEY_CHARACTER, KEY_MIC_DEVICE_ID, KEY_USERNAME} from "../common/util";
+import {
+    Direction,
+    KEY_CAMERA_DEVICE_ID,
+    KEY_CHARACTER,
+    KEY_MIC_DEVICE_ID,
+    KEY_USERNAME,
+    MessageType
+} from "../common/util";
 
 export type InitState = [Room<State>, Player];
 export type PlayerRecord = { [key: string]: Player }
@@ -87,8 +94,8 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                     lastScaledY: [0, 0, 0, 0, 0],
                     moveDirection: null,
                     moveTime: 0,
-                    prioDirection: [],
-                    facing: "down",
+                    priorDirections: [],
+                    facing: Direction.DOWN,
                     standing: 0,
                     moving: 0,
                     spriteX: 144,
@@ -180,7 +187,7 @@ export function setUsername(value: string, ourPlayer: Player, room: Room) {
     value = value?.slice(0, 20) || "Jimmy";
     ourPlayer.name = value;
     localStorage.setItem(KEY_USERNAME, value);
-    room.send(KEY_USERNAME, value);
+    room.send(MessageType.UPDATE_USERNAME, value);
 }
 
 export function getUsername(): string {
@@ -216,7 +223,7 @@ export function setCharacter(value: string, ourPlayer: Player, room: Room, chara
     }
     ourPlayer.character = value;
     localStorage.setItem(KEY_CHARACTER, value);
-    room.send(KEY_CHARACTER, value);
+    room.send(MessageType.UPDATE_CHARACTER, value);
 }
 
 export function getCharacter(): string {

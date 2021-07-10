@@ -2,7 +2,8 @@
 <html lang="de">
     <head>
         <meta name="viewport" content="width=device-width"/>
-        <title>OfficeQuest</title>
+        <title>OfficeMania</title>
+        <link rel="shortcut icon" href="../assets/img/favicon.ico" />
 
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" crossorigin="anonymous">
@@ -17,7 +18,6 @@
         <script src="/js/vendors-bundle.js" defer></script>
     </head>
     <body>
-
         <div id="panel-buttons">
             <div class="group">
                 <button id="button-mute-audio" disabled><em class="fa fa-microphone"></em><span></span></button>
@@ -78,26 +78,25 @@
         </div>
 
         <div id="player-online-container" class="vertical-animation">
-            <ul id="player-online-list">
-            </ul>
+            <ul id="player-online-list"></ul>
         </div>
 
         <div id="chat-container">
-            <ul id="chat-list">
-            </ul>
+            <ul id="chat-list"></ul>
         </div>
         <canvas id="interaction" tabindex='0' width="1000" height="1000" 
         style="position: absolute; left: 20%; top: 20%; z-index: 1;width: 60%; height: 60%; visibility: visible;">
         </canvas>
-        <canvas id="canvas" width="600" height="600" style="position: absolute; left: 0; top: 0; z-index: -1;">
+        <!-- 'canvas' is the main canvas for the map-->
+        <canvas id="canvas" width="600" height="600">
             <canvas id="background"></canvas>
         </canvas>
-        
-        <canvas id="whiteboard" tabindex='0' width="1920" height="1080"
-        style="position: absolute; left: 0; top: 0; z-index: 1; visibility: hidden;">
-        </canvas>
-        <button id="button-clear-whiteboard" style="position: absolute; top:0; left:0; z-index: 1; visibility: hidden;"><em class="fa fa-trash"></em><span></span></button>
-        
+
+        <div id="whiteboard-bar">
+            <canvas id="whiteboard" tabindex='0' width="1920" height="1080"></canvas>
+            <button id="button-clear-whiteboard"><em class="fa fa-trash"></em><span></span></button>
+        </div>
+
         <script src="/js/main-bundle.js" defer></script>
     </body>
 </html>

@@ -2,6 +2,7 @@ import {Room} from "colyseus.js";
 import {Player, STEP_SIZE} from "./player";
 import {PlayerRecord} from "./util";
 import {State} from "../common";
+import {Direction} from "../common/util";
 
 function playerMovingAnimation(player: Player, direction: string, width: number, height: number) {
     player.standing = 0;
@@ -10,18 +11,18 @@ function playerMovingAnimation(player: Player, direction: string, width: number,
 
     //choose direction
     switch (direction) {
-        case "right": {
+        case Direction.RIGHT: {
             break;
         }
-        case "up": {
+        case Direction.UP: {
             x += 6 * width
             break;
         }
-        case "left": {
+        case Direction.LEFT: {
             x += 12 * width
             break;
         }
-        case "down": {
+        case Direction.DOWN: {
             x += 18 * width
             break;
         }
@@ -57,18 +58,18 @@ function playerStandingAnimation(player: Player, width: number, height: number) 
 
         //choose direction
         switch (player.facing) {
-            case "right": {
+            case Direction.RIGHT: {
                 break;
             }
-            case "up": {
+            case Direction.UP: {
                 x += 6 * width
                 break;
             }
-            case "left": {
+            case Direction.LEFT: {
                 x += 12 * width
                 break;
             }
-            case "down": {
+            case Direction.DOWN: {
                 x += 18 * width
                 break;
             }
@@ -107,15 +108,15 @@ function chooseOtherPlayerSprite(player: Player, room: Room<State>) {
     //sets facing direction to choose sprites
     if (Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE) > Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)) {
         if (player.positionX < room.state.players[player.id].x * STEP_SIZE) {
-            player.facing = "right"
+            player.facing = Direction.RIGHT
         } else if (player.positionX > room.state.players[player.id].x * STEP_SIZE) {
-            player.facing = "left"
+            player.facing = Direction.LEFT
         }
     } else if (Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE) < Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)) {
         if (player.positionY < room.state.players[player.id].y * STEP_SIZE) {
-            player.facing = "down"
+            player.facing = Direction.DOWN
         } else if (player.positionY > room.state.players[player.id].y * STEP_SIZE) {
-            player.facing = "up"
+            player.facing = Direction.UP
         }
     }
     if (player.positionX === room.state.players[player.id].x * STEP_SIZE && player.positionY === room.state.players[player.id].y * STEP_SIZE) {

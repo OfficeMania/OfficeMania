@@ -45,7 +45,7 @@ export class WhiteboardPlayer extends Schema{
 }
 
 /*
- *state of pong game 
+ *state of pong game
  */
 export class PongState extends Schema {
     //0: xBall, 1: yBall, 2: playerA, 3: playerB
@@ -54,10 +54,12 @@ export class PongState extends Schema {
 
     @type("number")
     sizeBall: number;
-    
+
     @type("number")
     sizeBat: number;
 }
+
+
 /*
  * The state of a room. Each variable that is annotated with a @type decorator
  * automatically gets synced with the clients.
@@ -89,5 +91,3 @@ export class State extends Schema {
     @type({map: PongState})
     pongStates: MapSchema<PongState> = new MapSchema<PongState>();
 }
-
-

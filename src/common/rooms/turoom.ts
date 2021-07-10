@@ -1,7 +1,7 @@
 import {Client, Room} from "colyseus";
 import {PlayerData, State, WhiteboardPlayer} from "./schema/state";
 import fs from 'fs';
-import {generateUUIDv4, KEY_CHARACTER, KEY_USERNAME} from "../util";
+import {Direction, generateUUIDv4, MessageType} from "../util";
 import {ArraySchema} from "@colyseus/schema";
 
 const path = require('path');
@@ -55,22 +55,22 @@ export class TURoom extends Room<State> {
         }
 
         //receives movement from all the clients
-        this.onMessage("move", (client, message) => {
+        this.onMessage(MessageType.MOVE, (client, message) => {
             if (this.state.players[client.sessionId].cooldown <= 0) {
                 switch (message) {
-                    case "moveDown": {
+                    case Direction.DOWN: {
                         this.state.players[client.sessionId].y++;
                         break;
                     }
-                    case "moveUp": {
+                    case Direction.UP: {
                         this.state.players[client.sessionId].y--;
                         break;
                     }
-                    case "moveLeft": {
+                    case Direction.LEFT: {
                         this.state.players[client.sessionId].x--;
                         break;
                     }
-                    case "moveRight": {
+                    case Direction.RIGHT: {
                         this.state.players[client.sessionId].x++;
                         break;
                     }
@@ -78,34 +78,34 @@ export class TURoom extends Room<State> {
             }
         });
 
-        this.onMessage("path", (client, message) => {
+        this.onMessage(MessageType.PATH, (client, message) => {
             if (message === -1) {
                 this.state.whiteboardPlayer[client.sessionId].paths.push(-1);
             } else {
                 this.state.whiteboardPlayer[client.sessionId].paths.push(...message);
             }
-            this.broadcast("redraw", client, {except: client});
+            this.broadcast(MessageType.REDRAW, client, {except: client});
         });
 
-        this.onMessage("clearWhiteboard", (client, message) => {
+        this.onMessage(MessageType.CLEAR_WHITEBOARD, (client, message) => {
             for (const [, player] of this.state.whiteboardPlayer) {
                 player.paths = new ArraySchema<number>();
             }
-            this.broadcast("clearWhiteboard", {except: client});
+            this.broadcast(MessageType.CLEAR_WHITEBOARD, {except: client});
         });
 
 
         //receives character changes
-        this.onMessage(KEY_CHARACTER, (client, message) => {
+        this.onMessage(MessageType.UPDATE_CHARACTER, (client, message) => {
             this.state.players[client.sessionId].character = message;
         });
 
         //receives name changes
-        this.onMessage(KEY_USERNAME, (client, message) => {
+        this.onMessage(MessageType.UPDATE_USERNAME, (client, message) => {
             this.state.players[client.sessionId].name = message;
         });
 
-        this.onMessage("updateParticipantId", (client, message) => {
+        this.onMessage(MessageType.UPDATE_PARTICIPANT_ID, (client, message) => {
             this.state.players[client.sessionId].participantId = message; //TODO Maybe let the server join the jitsi conference too (without mic/cam) and then authenticate via the jitsi chat, that a player is linked to a participantId, so that one cannot impersonate another one.
         });
     }

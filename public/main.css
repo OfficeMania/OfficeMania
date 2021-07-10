@@ -25,6 +25,14 @@ body {
     cursor: default;
 }
 
+/* main canvas for the map*/
+#canvas {
+    position: absolute; 
+    left: 0; 
+    top: 0; 
+    z-index: -1;
+}
+
 #panel-buttons {
     width: 100%;
     padding: 7px;
@@ -151,7 +159,7 @@ body {
 #video-bar {
     width: 100%;
     position: fixed;
-    top: 65px;
+    top: 70px;
     text-align: center;
     display: flex;
     align-items: center;
@@ -173,6 +181,9 @@ body {
     max-width: 100%;
     min-width: 0;
     cursor: pointer;
+    border-radius: 15px;
+    border-style: solid;
+    border-width: 2px;
 }
 
 .video-overlay {
@@ -187,13 +198,41 @@ body {
 #focus-bar {
     width: 100%;
     position: fixed;
-    top: 65px;
+    top: 90px;
     text-align: center;
 }
 
 #focus-bar .video-container {
     margin: 10% auto;
     max-width: 65%;
+}
+
+#whiteboard {
+    position: absolute; 
+    left: 0; 
+    top: 0; 
+    z-index: 1; 
+    visibility: hidden; 
+    height: 80%;
+}
+
+#whiteboard-bar button {
+    height: 40px;
+    width: 40px;
+    cursor: pointer;
+    font-size: 110%;
+    font-weight: bold;
+    margin: 5px;
+    color: #3a3a50;
+    background: #f8f8f8;
+    border: solid;
+    border-width: 2px;
+    border-radius: 10px;
+    position: absolute; 
+    top:0; 
+    left:0; 
+    z-index: 1; 
+    visibility: hidden;
 }
 
 .player-state {

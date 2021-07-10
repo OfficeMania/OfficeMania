@@ -16,6 +16,7 @@ import {Room} from "colyseus.js";
 import {setAudioButtonMute, setSwitchToDesktop, setVideoButtonMute} from "../main";
 import {solidInfo} from "../map";
 import {Player} from "../player";
+import {MessageType} from "../../common/util";
 
 export {
     init as initConference,
@@ -164,7 +165,7 @@ function onConnectionSuccess() {
     selfUser.conference = conference;
     selfUser.participantId = conference.myUserId();
     console.debug("participantId:", selfUser.participantId)
-    serverRoom.send("updateParticipantId", selfUser.participantId);
+    serverRoom.send(MessageType.UPDATE_PARTICIPANT_ID, selfUser.participantId);
 }
 
 /**

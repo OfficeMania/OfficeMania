@@ -1,14 +1,24 @@
-import {Interaction} from "./interaction"
-export class Door extends Interaction {
+import {Interactive} from "./interactive"
+
+export enum DoorDirection {
+    UNKNOWN,
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST,
+    ALWAYS_OPEN
+}
+
+export class Door extends Interactive {
 
     isClosed: boolean;
     //1: S-->N, 2: W-->E, 3: N-->S, 4: E-->W, 5: Always open.
-    direction: number;
+    direction: DoorDirection;
     playerId: string;
     posX: number;
     posY: number;
 
-    constructor(direction: number) {
+    constructor(direction: DoorDirection) {
         super("door");
         this.direction = direction;
     }
@@ -17,22 +27,22 @@ export class Door extends Interaction {
 
         //TODO
         //Open door if Player who looked is in the room and wants to leave
-        if(this.isClosed){
+        if (this.isClosed) {
             //if direction is inside the room then return false
             return true;
-        } else{
+        } else {
             return false;
         }
     }
 
     lockDoor(id: string) {
-        if(this.isClosed){
+        if (this.isClosed) {
             //error
-        } else{
+        } else {
             //if you are not allowed to close this door
-            if(this.direction === 5){
+            if (this.direction === DoorDirection.ALWAYS_OPEN) {
                 //error
-            } else{
+            } else {
                 this.playerId = id;
                 this.isClosed = true;
             }
@@ -43,12 +53,12 @@ export class Door extends Interaction {
     openDoor(id: string) {
 
         //TODO
-        if(!this.isClosed){
+        if (!this.isClosed) {
             //error
-        } else{
-            if(id === this.playerId){
+        } else {
+            if (id === this.playerId) {
                 this.isClosed = false;
-            } else{
+            } else {
                 //error
             }
         }
@@ -59,18 +69,16 @@ export class Door extends Interaction {
         switch (this.direction) {
 
             case 1: {
-                
+
                 if (playerY > this.posY) {
 
                     this.openDoor(playerId);
-                }
-                else {
+                } else {
 
-                    if(this.isClosed) {
+                    if (this.isClosed) {
 
                         this.openDoor(playerId);
-                    }
-                    else {
+                    } else {
 
                         this.lockDoor(playerId);
                     }
@@ -82,15 +90,13 @@ export class Door extends Interaction {
                 if (playerX < this.posX) {
 
                     this.openDoor(playerId);
-                }
-                else {
+                } else {
 
-                    if(this.isClosed) {
+                    if (this.isClosed) {
 
                         this.openDoor(playerId);
-                    }
-                    else {
-                        
+                    } else {
+
                         this.lockDoor(playerId);
                     }
                 }
@@ -101,15 +107,13 @@ export class Door extends Interaction {
                 if (playerY < this.posY) {
 
                     this.openDoor(playerId);
-                }
-                else {
+                } else {
 
-                    if(this.isClosed) {
+                    if (this.isClosed) {
 
                         this.openDoor(playerId);
-                    }
-                    else {
-                        
+                    } else {
+
                         this.lockDoor(playerId);
                     }
                 }
@@ -120,15 +124,13 @@ export class Door extends Interaction {
                 if (playerX > this.posX) {
 
                     this.openDoor(playerId);
-                }
-                else {
+                } else {
 
-                    if(this.isClosed) {
+                    if (this.isClosed) {
 
                         this.openDoor(playerId);
-                    }
-                    else {
-                        
+                    } else {
+
                         this.lockDoor(playerId);
                     }
                 }
