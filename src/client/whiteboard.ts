@@ -2,6 +2,7 @@ import {Room} from "colyseus.js";
 import {State} from "../common";
 import {loadImage, PlayerRecord} from "./util";
 import {ArraySchema} from "@colyseus/schema";
+import {MessageType} from "../common/util";
 
 
 export class Whiteboard {
@@ -27,10 +28,10 @@ export class Whiteboard {
 
         this.clearButton.addEventListener("click", () => this.clearPressed(this));
 
-        room.onMessage("redraw", (client) => {
+        room.onMessage(MessageType.REDRAW, (client) => {
             this.drawOthers(client.sessionId, this)
         })
-        room.onMessage("clearWhiteboard", (message) => {
+        room.onMessage(MessageType.CLEAR_WHITEBOARD, (message) => {
             this.clear(this)
         })
 
@@ -71,7 +72,7 @@ export class Whiteboard {
     }
 
     clearPressed(whiteboard: Whiteboard) {
-        whiteboard.room.send("clearWhiteboard")
+        whiteboard.room.send(MessageType.CLEAR_WHITEBOARD)
         whiteboard.clear(whiteboard);
     }
 
@@ -129,7 +130,7 @@ export class Whiteboard {
 
         this.drawLine(oldX, oldY, whiteboard.x, whiteboard.y, whiteboard)
 
-        whiteboard.room.send("path", [oldX, oldY])
+        whiteboard.room.send(MessageType.PATH, [oldX, oldY])
     }
 
     drawOthers(clientID: string, whiteboard: Whiteboard) {
@@ -195,8 +196,8 @@ export class Whiteboard {
 
 
     private mouseup(e, whiteboard: Whiteboard) {
-        whiteboard.room.send("path", [whiteboard.x, whiteboard.y])
-        whiteboard.room.send("path", -1)
+        whiteboard.room.send(MessageType.PATH, [whiteboard.x, whiteboard.y])
+        whiteboard.room.send(MessageType.PATH, -1)
     }
 
 

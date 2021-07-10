@@ -1,6 +1,6 @@
 import {Room} from "colyseus.js";
 import {solidInfo} from "./map"
-import {Direction, MoveDirection} from "../common/util";
+import {Direction, MessageType} from "../common/util";
 //import { lowestX, lowestY } from "./main"
 
 
@@ -31,7 +31,7 @@ export interface Player {
     lastScaledY: number[];      //last 5 postion from scaledY
     moveDirection: Direction;      //currently moving in this or none direction
     moveTime: number;           //time moving in current move
-    priorDirections: MoveDirection[];    //current and last direction button pressed
+    priorDirections: Direction[];    //current and last direction button pressed
     facing: Direction;             //direction facing to calculate sprite while standing still
     standing: number;           //time standing still
     moving: number;             //time moving to calculate sprite
@@ -84,7 +84,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
 
     //initiates movement in one direction and blocks the other directions till the next tile
     if (player.priorDirections.length > 0) {
-        if (player.priorDirections[0] === MoveDirection.DOWN && player.moveDirection === null) {
+        if (player.priorDirections[0] === Direction.DOWN && player.moveDirection === null) {
             if ((collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1] === undefined ||
                 collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1].isSolid === false) &&         //dont go in direction if there are objects
                 (collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1] === undefined ||
@@ -96,12 +96,12 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                 player.lastScaledY.unshift(player.scaledY) //stores the previous position
 
                 player.scaledY++;
-                room.send("move", MoveDirection.DOWN);
+                room.send(MessageType.MOVE, Direction.DOWN);
             } else {
                 player.facing = Direction.DOWN
             }
         }
-        if (player.priorDirections[0] === MoveDirection.UP && player.moveDirection === null) {
+        if (player.priorDirections[0] === Direction.UP && player.moveDirection === null) {
             if (player.scaledY - yCorrection > 0 &&
                 ((collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1] === undefined ||
                     collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1].isSolid === false) &&         //dont go in direction if there are objects
@@ -114,12 +114,12 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                 player.lastScaledY.unshift(player.scaledY) //stores the previous position
 
                 player.scaledY--;
-                room.send("move", MoveDirection.UP);
+                room.send(MessageType.MOVE, Direction.UP);
             } else {
                 player.facing = Direction.UP
             }
         }
-        if (player.priorDirections[0] === MoveDirection.LEFT && player.moveDirection === null) {
+        if (player.priorDirections[0] === Direction.LEFT && player.moveDirection === null) {
             if (player.scaledX - xCorrection > 0 &&
                 (collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection] === undefined ||
                     collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection].isSolid === false)) {         //dont go in direction if there are objects
@@ -130,12 +130,12 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                 player.lastScaledX.unshift(player.scaledX) //stores the previous position
 
                 player.scaledX--;
-                room.send("move", MoveDirection.LEFT);
+                room.send(MessageType.MOVE, Direction.LEFT);
             } else {
                 player.facing = Direction.LEFT
             }
         }
-        if (player.priorDirections[0] === MoveDirection.RIGHT && player.moveDirection === null) {
+        if (player.priorDirections[0] === Direction.RIGHT && player.moveDirection === null) {
             if (collisionInfo[player.scaledX - xCorrection + 2][player.scaledY - yCorrection] === undefined ||
                 collisionInfo[player.scaledX - xCorrection + 2][player.scaledY - yCorrection].isSolid === false) {         //dont go in direction if there are objects
                 player.moveDirection = Direction.RIGHT
@@ -145,7 +145,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                 player.lastScaledX.unshift(player.scaledX) //stores the previous position
 
                 player.scaledX++;
-                room.send("move", MoveDirection.RIGHT);
+                room.send(MessageType.MOVE, Direction.RIGHT);
             } else {
                 player.facing = Direction.RIGHT
             }

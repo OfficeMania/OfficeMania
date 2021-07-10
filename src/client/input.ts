@@ -3,7 +3,7 @@ import {Room} from "colyseus.js";
 import {setCharacter, setUsername} from "./util";
 import {setShowParticipantsTab} from "./conference/conference";
 import {Whiteboard} from "./whiteboard";
-import {MoveDirection} from "../common/util";
+import {Direction} from "../common/util";
 
 let yPressed: boolean = false;
 let keysDisabled: boolean = false;
@@ -20,7 +20,7 @@ function onKey(event: KeyboardEvent, key: string, runnable: () => void) {
     }
 }
 
-function onKeyDirection(event: KeyboardEvent, key: string, ourPlayer: Player = undefined, direction: string = undefined) {
+function onKeyDirection(event: KeyboardEvent, key: string, ourPlayer: Player = undefined, direction: Direction = undefined) {
     if (event.key.toLowerCase() === key.toLowerCase() && !ourPlayer.priorDirections.includes(direction)) {
         ourPlayer.priorDirections.unshift(direction);
     }
@@ -31,10 +31,10 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         if (keysDisabled) {
             return;
         }
-        onKeyDirection(e, "s", ourPlayer, MoveDirection.DOWN);
-        onKeyDirection(e, "w", ourPlayer, MoveDirection.UP);
-        onKeyDirection(e, "a", ourPlayer, MoveDirection.LEFT);
-        onKeyDirection(e, "d", ourPlayer, MoveDirection.RIGHT);
+        onKeyDirection(e, "s", ourPlayer, Direction.DOWN);
+        onKeyDirection(e, "w", ourPlayer, Direction.UP);
+        onKeyDirection(e, "a", ourPlayer, Direction.LEFT);
+        onKeyDirection(e, "d", ourPlayer, Direction.RIGHT);
         //iterate through characters
         onKey(e, "c", () => {
             const filenames = Object.keys(characters);
@@ -63,10 +63,10 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         if (keysDisabled) {
             return;
         }
-        onKey(e, "s", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(MoveDirection.DOWN), 1));
-        onKey(e, "w", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(MoveDirection.UP), 1));
-        onKey(e, "a", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(MoveDirection.LEFT), 1));
-        onKey(e, "d", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(MoveDirection.RIGHT), 1));
+        onKey(e, "s", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.DOWN), 1));
+        onKey(e, "w", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.UP), 1));
+        onKey(e, "a", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.LEFT), 1));
+        onKey(e, "d", () => ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(Direction.RIGHT), 1));
         onKey(e, "y", () => {
             yPressed = false;
             setShowParticipantsTab(false);
