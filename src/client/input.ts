@@ -11,7 +11,9 @@ let inputMode: InputMode = InputMode.NORMAL;
 export function setInputMode(input: InputMode) {
     inputMode = input;
 }
-
+export function getInputMode(): InputMode {
+    return inputMode;
+}
 function isPureKey(event: KeyboardEvent): boolean {
     return event && !event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey;
 }
