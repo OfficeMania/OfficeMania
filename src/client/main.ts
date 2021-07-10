@@ -3,6 +3,8 @@ import {Player, TILE_SIZE} from "./player";
 import {
     createPlayerAvatar,
     getCharacter,
+    getCorrectedPlayerCoordinates,
+    getCorrectedPlayerFacingCoordinates,
     getPlayers,
     getRoom,
     getUsername,
@@ -32,8 +34,7 @@ import {playerLoop} from "./movement";
 import {loadInputFunctions, setKeysDisabled} from "./input";
 import {drawPlayer} from "./drawplayer"
 import {Whiteboard} from "./whiteboard"
-import { Pong } from "./interaction/pong";
-import { State } from "../common";
+import {Pong} from "./interactive/pong";
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
@@ -123,7 +124,7 @@ function onPongInteraction (ourPlayer: Player, players: PlayerRecord, pongCanvas
     if (!pongs.some( (pong) => {
         if(pong.playerA.id === ourPlayer.id){ return true;}
         else if (pong.playerB.id === ourPlayer.id) { return true}
-    })){   
+    })){
         if(pongs.every(pong => pong && pong.playerB)) {
             const pong = new Pong(pongCanvas, getRoom(), getPlayers(), ourPlayer.id);
             pongs.push(pong);
@@ -137,8 +138,6 @@ function onPongInteraction (ourPlayer: Player, players: PlayerRecord, pongCanvas
         pongCanvas.style.visibility = "hidden";
         setKeysDisabled(false, false);
     };
-    
-
 }
 
 
@@ -351,7 +350,7 @@ async function main() {
      */
 
     let playerNearbyTimer = 0;
-    let pongCanvas = $<HTMLCanvasElement>("interaction");
+    let pongCanvas = $<HTMLCanvasElement>("interactive");
     interactionButton.addEventListener("click", () => onInteraction(ourPlayer, players, pongCanvas));
     function loop(now: number) {
 
