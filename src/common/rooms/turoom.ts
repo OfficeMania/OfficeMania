@@ -58,21 +58,21 @@ export class TURoom extends Room<State> {
 
         //receives movement from all the clients
         this.onMessage("move", (client, message) => {
-            if (this.state.players[client.sessionId].cooldown <= 0){
-                switch(message){
-                    case "moveDown":{
+            if (this.state.players[client.sessionId].cooldown <= 0) {
+                switch (message) {
+                    case "moveDown": {
                         this.state.players[client.sessionId].y++;
                         break;
                     }
-                    case "moveUp":{
+                    case "moveUp": {
                         this.state.players[client.sessionId].y--;
                         break;
                     }
-                    case "moveLeft":{
+                    case "moveLeft": {
                         this.state.players[client.sessionId].x--;
                         break;
                     }
-                    case "moveRight":{
+                    case "moveRight": {
                         this.state.players[client.sessionId].x++;
                         break;
                     }
@@ -86,17 +86,16 @@ export class TURoom extends Room<State> {
             } else {
                 this.state.whiteboardPlayer[client.sessionId].paths.push(...message);
             }
-            this.broadcast("redraw", client, { except: client });
+            this.broadcast("redraw", client, {except: client});
         });
 
         this.onMessage("clearWhiteboard", (client, message) => {
-            for(var [whiteboardPlayerID, player] of this.state.whiteboardPlayer){
+            for (var [whiteboardPlayerID, player] of this.state.whiteboardPlayer) {
                 player.paths = new ArraySchema<number>();
             }
-            this.broadcast("clearWhiteboard", { except: client });
+            this.broadcast("clearWhiteboard", {except: client});
         });
-        
-        
+
 
         //receives character changes
         this.onMessage(KEY_CHARACTER, (client, message) => {
@@ -138,7 +137,7 @@ export class TURoom extends Room<State> {
     }
 
     //gameloop for server
-    update (deltaTime) {
-        
+    update(deltaTime) {
+
     }
 }
