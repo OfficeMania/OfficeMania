@@ -7,6 +7,13 @@ import {KEY_CAMERA_DEVICE_ID, KEY_CHARACTER, KEY_MIC_DEVICE_ID, KEY_USERNAME} fr
 export type InitState = [Room<State>, Player];
 export type PlayerRecord = { [key: string]: Player }
 
+export enum Direction {
+    LEFT = "left",
+    RIGHT = "right",
+    UP = "up",
+    DOWN = "down"
+}
+
 let _room: Room<State> = undefined;
 let _players: PlayerRecord = undefined;
 let _chatEnabled: boolean = false;
@@ -88,7 +95,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                     moveDirection: null,
                     moveTime: 0,
                     prioDirection: [],
-                    facing: "down",
+                    facing: Direction.DOWN,
                     standing: 0,
                     moving: 0,
                     spriteX: 144,

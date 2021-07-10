@@ -1,11 +1,11 @@
-import { Player, PLAYER_MOVEMENT_PER_TICK } from "./player";
+import {Player} from "./player";
 
 /*
  * This file tests player.ts. Simply run "npm test" to get the test results.
  *
  * Since the function "untestedFunction" in "player.ts" is not tested, the
  * coverage is reported to be less than 100%.
- * 
+ *
  * Currently, the testEnvironment is set to node (in jest.config.js) so you
  * probably can not access browser-related- / DOM- functions (e.g. getElementById)
  */
@@ -24,7 +24,7 @@ describe("Player", () => {
             moveDirection: null,
             moveTime: 0,
             prioDirection: [],
-            facing: "down",
+            facing: Direction.DOWN,
             standing: 0,
             moving: 0,
             spriteX: 144,

@@ -1,5 +1,6 @@
 import {Room} from "colyseus.js";
 import {solidInfo} from "./map"
+import {Direction} from "./util";
 //import { lowestX, lowestY } from "./main"
 
 
@@ -28,10 +29,10 @@ export interface Player {
     scaledY: number;            //one step changes this by 1
     lastScaledX: number[];      //last 5 postion from scaledX
     lastScaledY: number[];      //last 5 postion from scaledY
-    moveDirection: string;      //currently moving in this or none direction
+    moveDirection: Direction;      //currently moving in this or none direction
     moveTime: number;           //time moving in current move
     prioDirection: string[];    //current and last direction button pressed
-    facing: string;             //direction facing to calculate sprite while standing still
+    facing: Direction;             //direction facing to calculate sprite while standing still
     standing: number;           //time standing still
     moving: number;             //time moving to calculate sprite
     spriteX: number;            //posX to locate sprite
@@ -88,8 +89,8 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                 collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1].isSolid === false) &&         //dont go in direction if there are objects
                 (collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1] === undefined ||
                     collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1].isSolid === false)) {
-                player.moveDirection = "down"
-                player.facing = "down"
+                player.moveDirection = Direction.DOWN
+                player.facing = Direction.DOWN
 
                 player.lastScaledY.pop()
                 player.lastScaledY.unshift(player.scaledY) //stores the previous position
@@ -97,7 +98,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                 player.scaledY++;
                 room.send("move", "moveDown");
             } else {
-                player.facing = "down"
+                player.facing = Direction.DOWN
             }
         }
         if (player.prioDirection[0] === "moveUp" && player.moveDirection === null) {
@@ -106,8 +107,8 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1].isSolid === false) &&         //dont go in direction if there are objects
                     (collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection - 1] === undefined ||
                         collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection - 1].isSolid === false))) {         //dont go in direction if there are objects
-                player.moveDirection = "up"
-                player.facing = "up"
+                player.moveDirection = Direction.UP
+                player.facing = Direction.UP
 
                 player.lastScaledY.pop()
                 player.lastScaledY.unshift(player.scaledY) //stores the previous position
@@ -115,15 +116,15 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                 player.scaledY--;
                 room.send("move", "moveUp");
             } else {
-                player.facing = "up"
+                player.facing = Direction.UP
             }
         }
         if (player.prioDirection[0] === "moveLeft" && player.moveDirection === null) {
             if (player.scaledX - xCorrection > 0 &&
                 (collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection] === undefined ||
                     collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection].isSolid === false)) {         //dont go in direction if there are objects
-                player.moveDirection = "left"
-                player.facing = "left"
+                player.moveDirection = Direction.LEFT
+                player.facing = Direction.LEFT
 
                 player.lastScaledX.pop()
                 player.lastScaledX.unshift(player.scaledX) //stores the previous position
@@ -131,14 +132,14 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                 player.scaledX--;
                 room.send("move", "moveLeft");
             } else {
-                player.facing = "left"
+                player.facing = Direction.LEFT
             }
         }
         if (player.prioDirection[0] === "moveRight" && player.moveDirection === null) {
             if (collisionInfo[player.scaledX - xCorrection + 2][player.scaledY - yCorrection] === undefined ||
                 collisionInfo[player.scaledX - xCorrection + 2][player.scaledY - yCorrection].isSolid === false) {         //dont go in direction if there are objects
-                player.moveDirection = "right"
-                player.facing = "right"
+                player.moveDirection = Direction.RIGHT
+                player.facing = Direction.RIGHT
 
                 player.lastScaledX.pop()
                 player.lastScaledX.unshift(player.scaledX) //stores the previous position
@@ -146,20 +147,20 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                 player.scaledX++;
                 room.send("move", "moveRight");
             } else {
-                player.facing = "right"
+                player.facing = Direction.RIGHT
             }
         }
     }
     //moves to the next tile
     if (player.moveDirection !== null) {
         player.moveTime++;
-        if (player.moveDirection === "down") {
+        if (player.moveDirection === Direction.DOWN) {
             player.positionY += PLAYER_MOVEMENT_PER_TICK;
-        } else if (player.moveDirection === "up") {
+        } else if (player.moveDirection === Direction.UP) {
             player.positionY -= PLAYER_MOVEMENT_PER_TICK;
-        } else if (player.moveDirection === "left") {
+        } else if (player.moveDirection === Direction.LEFT) {
             player.positionX -= PLAYER_MOVEMENT_PER_TICK;
-        } else if (player.moveDirection === "right") {
+        } else if (player.moveDirection === Direction.RIGHT) {
             player.positionX += PLAYER_MOVEMENT_PER_TICK;
         }
         if (player.moveTime === FRAMES_PER_MOVE) {
