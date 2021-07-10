@@ -9,8 +9,7 @@ import {
     getPlayerByParticipantId,
     getRoom,
     PlayerRecord,
-    removeChildren,
-    setChatEnabled
+    removeChildren
 } from "../util";
 import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
@@ -562,8 +561,6 @@ export function updateChat() {
         }
     }
 }
-
-let counter: number = 0;
 
 export function toggleShowParticipantsTab(): boolean {
     setShowParticipantsTab(!getShowParticipantsTab());
