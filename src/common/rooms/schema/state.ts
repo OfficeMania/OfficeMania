@@ -45,6 +45,20 @@ export class WhiteboardPlayer extends Schema{
 }
 
 /*
+ *state of pong game 
+ */
+export class PongState extends Schema {
+    //0: xBall, 1: yBall, 2: playerA, 3: playerB
+    @type({array: "number"})
+    positions = new ArraySchema<number>();
+
+    @type("number")
+    sizeBall: number;
+    
+    @type("number")
+    sizeBat: number;
+}
+/*
  * The state of a room. Each variable that is annotated with a @type decorator
  * automatically gets synced with the clients.
  *
@@ -71,19 +85,9 @@ export class State extends Schema {
 
     @type({map: WhiteboardPlayer})
     whiteboardPlayer: MapSchema<WhiteboardPlayer> = new MapSchema<WhiteboardPlayer>();
+
+    @type({map: PongState})
+    pongStates: MapSchema<PongState> = new MapSchema<PongState>();
 }
 
-/*
- *state of pong game 
- */
-export class PongState extends Schema {
-    //0: xBall, 1: yBall, 2: playerA, 3: playerB
-    @type({array: "number"})
-    positions = new ArraySchema<number>();
 
-    @type("number")
-    sizeBall: number;
-    
-    @type("number")
-    sizeBat: number;
-}

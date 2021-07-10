@@ -1,8 +1,10 @@
 import {Client} from "colyseus.js";
-import {TILE_SIZE} from "./player";
+import {Player, TILE_SIZE} from "./player";
 import {
     createPlayerAvatar,
     getCharacter,
+    getPlayers,
+    getRoom,
     getUsername,
     InitState,
     joinAndSync,
@@ -30,6 +32,8 @@ import {playerLoop} from "./movement";
 import {loadInputFunctions, setKeysDisabled} from "./input";
 import {drawPlayer} from "./drawplayer"
 import {Whiteboard} from "./whiteboard"
+import { Pong } from "./pong";
+import { State } from "../common";
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
@@ -89,7 +93,6 @@ function toggleMute(type: string) {
 // Settings
 
 const settingsModal = $<HTMLDivElement>("settings-modal");
-const pongModal = $<HTMLDivElement>("pong-game");
 const settingsButton = $<HTMLButtonElement>("button-settings");
 const usersButton = $<HTMLButtonElement>("button-users");
 const pongButton = $<HTMLButtonElement>("button-pong");
@@ -109,9 +112,39 @@ const usernameInput = $<HTMLInputElement>("input-settings-username");
 const characterSelect = $<HTMLSelectElement>("character-select");
 const characterPreview = $<HTMLSelectElement>("character-preview");
 
-const observer = new MutationObserver(mutations => mutations.forEach(() => setKeysDisabled(!settingsModal.style.display.match(/none/), !pongModal.style.display.match(/none/))));
+const pongs: Pong[] = [];
+
+const interactionButton = $<HTMLButtonElement>("button-pong");
+function onInteraction(ourPlayer: Player, players: PlayerRecord, pongCanvas: HTMLCanvasElement) {
+    onPongInteraction(ourPlayer, players, pongCanvas);
+}
+
+function onPongInteraction (ourPlayer: Player, players: PlayerRecord, pongCanvas: HTMLCanvasElement){
+    if (!pongs.some( (pong) => {
+        if(pong.playerA.id === ourPlayer.id){ return true;}
+        else if (pong.playerB.id === ourPlayer.id) { return true}
+    })){   
+        if(pongs.every(pong => pong && pong.playerB)) {
+            const pong = new Pong(pongCanvas, getRoom(), getPlayers(), ourPlayer.id);
+            pongs.push(pong);
+        }
+        else {
+            pongs.find((pong) => pong && !pong.playerB).join(ourPlayer.id);
+        }
+    }
+    else {
+        console.log("already in game, exiting");
+        pongCanvas.style.visibility = "hidden";
+        setKeysDisabled(false, false);
+    };
+    
+
+}
+
+
+const observer = new MutationObserver(mutations => mutations.forEach(() => setKeysDisabled(!settingsModal.style.display.match(/none/), false)));
 observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
-observer.observe(pongModal, {attributes: true, attributeFilter: ['style']});
+//observer.observe(pongModal, {attributes: true, attributeFilter: ['style']});
 
 
 function checkValidSettings() {
@@ -318,7 +351,8 @@ async function main() {
      */
 
     let playerNearbyTimer = 0;
-
+    let pongCanvas = $<HTMLCanvasElement>("interaction");
+    interactionButton.addEventListener("click", () => onInteraction(ourPlayer, players, pongCanvas));
     function loop(now: number) {
 
         ctx.clearRect(0, 0, width, height);
