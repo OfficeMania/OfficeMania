@@ -23,7 +23,7 @@ export class Whiteboard {
         this.room = room;
         this.players = players;
         this.canvas = canvas;
-        let ctx = canvas.getContext("2d");
+        //let ctx = canvas.getContext("2d"); // What happens to this, is it even needed any more?
 
         this.clearButton.addEventListener("click", () => this.clearPressed(this));
 
