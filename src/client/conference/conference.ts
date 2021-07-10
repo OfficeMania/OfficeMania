@@ -501,13 +501,13 @@ export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInf
     });
 }
 
-export function createPlayerState<Type extends HTMLElement>(player: Player, element: Type, showCharacter: boolean = false): Type {
+export function createPlayerState<Type extends HTMLElement>(player: Player, element: Type, showCharacter: boolean = false, showMuteState: boolean = true): Type {
     element.classList.add("unselectable");
     element.classList.add("player-state");
     const playerName = document.createElement("span");
     playerName.classList.add("player-state-name");
     playerName.innerText = player ? player.name : "You";
-    if (player && selfUser.participantId !== player.participantId) {
+    if (showMuteState && player && selfUser.participantId !== player.participantId) {
         const user = getUser(player.participantId);
         if (user.isAudioMuted()) {
             const icon = appendIcon(element, "microphone-slash");
