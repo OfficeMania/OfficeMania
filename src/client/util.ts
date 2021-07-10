@@ -8,6 +8,7 @@ export type InitState = [Room<State>, Player];
 export type PlayerRecord = { [key: string]: Player }
 
 let _room: Room<State> = undefined;
+let _players: PlayerRecord = undefined;
 
 export function setRoom(room: Room<State>) {
     _room = room;
@@ -15,6 +16,14 @@ export function setRoom(room: Room<State>) {
 
 export function getRoom(): Room<State> {
     return _room;
+}
+
+export function setPlayers(players: PlayerRecord) {
+    _players = players;
+}
+
+export function getPlayers(): PlayerRecord {
+    return _players;
 }
 
 /*
@@ -240,4 +249,20 @@ export function createPlayerAvatar(character: string): HTMLDivElement {
     playerAvatar.classList.add("player-avatar");
     playerAvatar.style.backgroundImage = `url(img/characters/${character})`;
     return playerAvatar;
+}
+
+export function getPlayerByParticipantId(participantId: string): Player {
+    if (!participantId) {
+        return null;
+    }
+    const players = getPlayers();
+    if (!players) {
+        return null;
+    }
+    for (const player of Object.values(players)) {
+        if (player?.participantId === participantId) {
+            return player;
+        }
+    }
+    return null;
 }

@@ -1,5 +1,5 @@
 import {Client} from "colyseus.js";
-import {Player, TILE_SIZE} from "./player";
+import {TILE_SIZE} from "./player";
 import {
     createPlayerAvatar,
     getCharacter,
@@ -10,6 +10,7 @@ import {
     PlayerRecord,
     removeChildren,
     setCharacter,
+    setPlayers,
     setRoom,
     setUsername
 } from "./util";
@@ -219,7 +220,8 @@ async function main() {
     let client = new Client(protocol + host + portSuffix);
 
     // Keep track of all (active) players (from movement)
-    let players: PlayerRecord = {};
+    const players: PlayerRecord = {};
+    setPlayers(players);
 
     /*
      * Before we can launch our main functionality, we need to join a room and
@@ -358,7 +360,7 @@ async function main() {
         ctx.restore();
 
         //drawWhiteboard(canvas, whiteboard.getCanvas())
-        
+
 
         // Repeat game loop
         requestAnimationFrame(loop);
