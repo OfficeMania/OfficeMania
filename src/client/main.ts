@@ -32,7 +32,7 @@ import {playerLoop} from "./movement";
 import {loadInputFunctions, setKeysDisabled} from "./input";
 import {drawPlayer} from "./drawplayer"
 import {Whiteboard} from "./whiteboard"
-import { Pong } from "./pong";
+import { Pong } from "./interaction/pong";
 import { State } from "../common";
 
 

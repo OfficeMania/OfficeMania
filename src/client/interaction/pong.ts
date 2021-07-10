@@ -1,15 +1,16 @@
-import { State } from "../common";
+
 import { Room } from "colyseus.js";
-import { Interaction } from "./interaction";
-import { PlayerRecord } from "./util";
+import { PlayerRecord } from "../util";
 import { createTextChangeRange } from "typescript";
+import { State } from "../../common";
+import { Interactive } from "./interactive";
 
 enum MoveDirection {
     UP = 1,
     REST,
     DOWN,
 }
-export class Pong extends Interaction{
+export class Pong extends Interactive{
     
     gameID: string;
     canvas: HTMLCanvasElement;
@@ -31,7 +32,7 @@ export class Pong extends Interaction{
     velBat: number = 5;
     posPlayerA: number = 0;
     posPlayerB: number = 0;
-    room: Room<State>;
+    room: Room<State>
     constructor(canvas: HTMLCanvasElement, room: Room<State>, players: PlayerRecord, id: string) {
         super("pong");
         this.gameID = id;
