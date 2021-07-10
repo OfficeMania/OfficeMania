@@ -25,6 +25,14 @@ body {
     cursor: default;
 }
 
+/* main canvas for the map*/
+#canvas {
+    position: absolute; 
+    left: 0; 
+    top: 0; 
+    z-index: -1;
+}
+
 #panel-buttons {
     width: 100%;
     padding: 7px;
@@ -199,6 +207,15 @@ body {
     max-width: 65%;
 }
 
+#whiteboard {
+    position: absolute; 
+    left: 0; 
+    top: 0; 
+    z-index: 1; 
+    visibility: hidden; 
+    height: 80%;
+}
+
 #whiteboard-bar button {
     height: 40px;
     width: 40px;
@@ -211,7 +228,11 @@ body {
     border: solid;
     border-width: 2px;
     border-radius: 10px;
-    position: relative;
+    position: absolute; 
+    top:0; 
+    left:0; 
+    z-index: 1; 
+    visibility: hidden;
 }
 
 .modal-hi {
