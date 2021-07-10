@@ -151,7 +151,7 @@ body {
 #video-bar {
     width: 100%;
     position: fixed;
-    top: 65px;
+    top: 70px;
     text-align: center;
     display: flex;
     align-items: center;
@@ -173,6 +173,9 @@ body {
     max-width: 100%;
     min-width: 0;
     cursor: pointer;
+    border-radius: 15px;
+    border-style: solid;
+    border-width: 2px;
 }
 
 .video-overlay {
