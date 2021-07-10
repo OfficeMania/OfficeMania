@@ -2,9 +2,7 @@ import {Client, Room} from "colyseus";
 import {PlayerData, State, WhiteboardPlayer} from "./schema/state";
 import fs from 'fs';
 import {generateUUIDv4, KEY_CHARACTER, KEY_USERNAME} from "../util";
-import { cli } from "webpack";
-import { cleanData } from "jquery";
-import {ArraySchema, MapSchema, Schema, type} from "@colyseus/schema";
+import {ArraySchema} from "@colyseus/schema";
 
 const path = require('path');
 
@@ -90,7 +88,7 @@ export class TURoom extends Room<State> {
         });
 
         this.onMessage("clearWhiteboard", (client, message) => {
-            for (var [whiteboardPlayerID, player] of this.state.whiteboardPlayer) {
+            for (const [, player] of this.state.whiteboardPlayer) {
                 player.paths = new ArraySchema<number>();
             }
             this.broadcast("clearWhiteboard", {except: client});
