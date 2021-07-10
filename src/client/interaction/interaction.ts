@@ -5,4 +5,5 @@ export class Interaction {
     constructor(name: string) {
         this.name = name;
     }
+
 }
