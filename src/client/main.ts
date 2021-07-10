@@ -3,8 +3,6 @@ import {Player, TILE_SIZE} from "./player";
 import {
     createPlayerAvatar,
     getCharacter,
-    getCorrectedPlayerCoordinates,
-    getCorrectedPlayerFacingCoordinates,
     getPlayers,
     getRoom,
     getUsername,
@@ -33,7 +31,7 @@ import {
     updateUsers
 } from "./conference/conference";
 import {playerLoop} from "./movement";
-import {getInputMode, loadInputFunctions, setInputMode} from "./input";
+import {loadInputFunctions, setInputMode} from "./input";
 import {drawPlayer} from "./drawplayer"
 import {Whiteboard} from "./whiteboard"
 import {Pong} from "./interactive/pong";
@@ -372,12 +370,7 @@ async function main() {
         height = canvas.height;
 
         //calculate everything regarding the player
-        if(getInputMode() === InputMode.NORMAL){
-            playerLoop(ourPlayer, players, room, now, canvas, ctx, collisionInfo)
-        }
-        if(getInputMode() === InputMode.INTERACTION) {
-            console.log("hiya");
-        }
+        playerLoop(ourPlayer, players, room, now, canvas, ctx, collisionInfo);
 
 
         /*
