@@ -97,7 +97,6 @@ function toggleMute(type: string) {
 const settingsModal = $<HTMLDivElement>("settings-modal");
 const settingsButton = $<HTMLButtonElement>("button-settings");
 const usersButton = $<HTMLButtonElement>("button-users");
-const pongButton = $<HTMLButtonElement>("button-pong");
 
 const settingsOkButton = $<HTMLButtonElement>("button-settings-ok");
 //const settingsCancelButton = $<HTMLButtonElement>("button-settings-cancel");
@@ -105,7 +104,6 @@ const settingsApplyButton = $<HTMLButtonElement>("button-settings-apply");
 
 settingsButton.addEventListener("click", () => onSettingsOpen());
 usersButton.addEventListener("click", () => toggleShowParticipantsTab());
-pongButton.addEventListener("click", () => onPongOpen());
 
 settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
@@ -134,10 +132,12 @@ function onPongInteraction (ourPlayer: Player, players: PlayerRecord, pongCanvas
             pongs.find((pong) => pong && !pong.playerB).join(ourPlayer.id);
         }
     }
+    else if(pongCanvas.style.visibility === "hidden"){
+        pongCanvas.style.visibility = "visible";
+    }
     else {
         console.log("already in game, exiting");
         pongCanvas.style.visibility = "hidden";
-        setInputMode(InputMode.NORMAL);
     };
 }
 

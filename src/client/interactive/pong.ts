@@ -35,6 +35,7 @@ export class Pong extends Interactive{
         this.gameID = id;
         this.playerA = new PongPlayer(id);
         this.canvas = canvas;
+        this.canvas.style.visibility = "visible";
         this.ctx = this.canvas.getContext("2d");
         this.ctx.fillStyle = "white"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);

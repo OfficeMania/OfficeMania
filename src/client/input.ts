@@ -33,8 +33,13 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, ourPlayer: Player
     if (!isPureKey(event)) {
         return;
     }
-    if (event.key.toLowerCase() === key.toLowerCase() && !ourPlayer.priorDirections.includes(direction)) {
-        ourPlayer.priorDirections.unshift(direction);
+    if(inputMode === InputMode.NORMAL){
+        if (event.key.toLowerCase() === key.toLowerCase() && !ourPlayer.priorDirections.includes(direction)) {
+            ourPlayer.priorDirections.unshift(direction);
+        }
+    }  
+    else if (inputMode === InputMode.INTERACTION) {
+        //TODO
     }
 }
 
@@ -42,7 +47,12 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, ourPlayer: Player =
     if (!isPureKey(event)) {
         return;
     }
-    ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(direction), 1);
+    if(getInputMode() === InputMode.NORMAL){
+        ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(direction), 1);
+    }
+    else if (inputMode === InputMode.INTERACTION) {
+        //TODO
+    }
 }
 
 export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }, whiteboard: Whiteboard) {
