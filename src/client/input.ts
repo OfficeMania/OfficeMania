@@ -1,9 +1,17 @@
 import {Player} from "./player";
 import {Room} from "colyseus.js";
-import {getOurPlayer, InputMode, setCharacter, setUsername} from "./util";
+import {
+    getCollisionInfo,
+    getCorrectedPlayerFacingCoordinates,
+    getOurPlayer,
+    InputMode,
+    setCharacter,
+    setUsername
+} from "./util";
 import {setShowParticipantsTab} from "./conference/conference";
 import {Whiteboard} from "./whiteboard";
 import {Direction} from "../common/util";
+import {solidInfo} from "./map";
 
 let yPressed: boolean = false;
 let inputMode: InputMode = InputMode.NORMAL;
@@ -69,6 +77,16 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         onDirectionKeyDown(e, "w", ourPlayer, Direction.UP);
         onDirectionKeyDown(e, "a", ourPlayer, Direction.LEFT);
         onDirectionKeyDown(e, "d", ourPlayer, Direction.RIGHT);
+        //player interacts with object in front of him
+        onPureKey(e, " ", () => {
+            const [facingX, facingY] = getCorrectedPlayerFacingCoordinates(ourPlayer);
+            const solidInfo: solidInfo = getCollisionInfo()?.[facingX]?.[facingY];
+            if (!solidInfo) {
+                console.error(`no solidInfo for ${facingX}:${facingY}`);
+                return
+            }
+            solidInfo.content && solidInfo.content.onInteraction();
+        });
         if (inputMode === InputMode.INTERACTION) {
             return;
         }
@@ -83,11 +101,6 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         });
         //rename players name
         onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy"), ourPlayer, room));
-        //player interacts with object in front of him
-        onPureKey(e, " ", () => {
-            //TODO Shut this close the Interaction if pressed again?
-            whiteboard.toggelIsVisible();
-        });
         onPureKey(e, "y", () => {
             if (!yPressed) {
                 console.log("Y has been pressed"); //DEBUG
