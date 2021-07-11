@@ -1,14 +1,12 @@
-
-import { Room } from "colyseus.js";
-import { PlayerRecord } from "../util";
-import { createTextChangeRange } from "typescript";
-import { State } from "../../common";
-import { Interactive } from "./interactive";
-import { Direction } from "../../common/util";
+import {Room} from "colyseus.js";
+import {PlayerRecord} from "../util";
+import {State} from "../../common";
+import {Interactive} from "./interactive";
+import {Direction} from "../../common/util";
 
 
 export class Pong extends Interactive{
-    
+
     gameID: string;
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
@@ -31,7 +29,7 @@ export class Pong extends Interactive{
     posPlayerB: number = 0;
     room: Room<State>
     constructor(canvas: HTMLCanvasElement, room: Room<State>, players: PlayerRecord, id: string) {
-        super("pong");
+        super("pong", false, 2);
         this.gameID = id;
         this.playerA = new PongPlayer(id);
         this.canvas = canvas;
@@ -65,7 +63,7 @@ export class Pong extends Interactive{
                 this.playerA.move = Direction.DOWN;
             }
         })
-        
+
     }
     join(playerB: string){
         this.playerB = new PongPlayer(playerB);
