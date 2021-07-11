@@ -40,12 +40,11 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, ourPlayer: Player
     if (!isPureKey(event)) {
         return;
     }
-    if(inputMode === InputMode.NORMAL){
+    if (inputMode === InputMode.NORMAL) {
         if (event.key.toLowerCase() === key.toLowerCase() && !ourPlayer.priorDirections.includes(direction)) {
             ourPlayer.priorDirections.unshift(direction);
         }
-    }
-    else if (inputMode === InputMode.INTERACTION) {
+    } else if (inputMode === InputMode.INTERACTION) {
         //TODO
     }
 }
@@ -54,10 +53,9 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, ourPlayer: Player =
     if (!isPureKey(event)) {
         return;
     }
-    if(getInputMode() === InputMode.NORMAL){
+    if (getInputMode() === InputMode.NORMAL) {
         ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(direction), 1);
-    }
-    else if (inputMode === InputMode.INTERACTION) {
+    } else if (inputMode === InputMode.INTERACTION) {
         //TODO
     }
 }
