@@ -8,12 +8,11 @@ import {
     setCharacter,
     setUsername
 } from "./util";
-import {setShowParticipantsTab} from "./conference/conference";
+import {toggleShowParticipantsTab} from "./conference/conference";
 import {Whiteboard} from "./whiteboard";
 import {Direction} from "../common/util";
 import {solidInfo} from "./map";
 
-let yPressed: boolean = false;
 let inputMode: InputMode = InputMode.NORMAL;
 
 function resetPlayerDirections() {
@@ -109,13 +108,7 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         });
         //rename players name
         onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy"), ourPlayer, room));
-        onPureKey(e, "y", () => {
-            if (!yPressed) {
-                console.log("Y has been pressed"); //DEBUG
-                yPressed = true;
-                setShowParticipantsTab(true);
-            }
-        });
+        onPureKey(e, "u", () => toggleShowParticipantsTab());
     }
 
     function onKeyUp(e: KeyboardEvent) {
@@ -129,10 +122,6 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         if (inputMode === InputMode.INTERACTION) {
             return;
         }
-        onPureKey(e, "y", () => {
-            yPressed = false;
-            setShowParticipantsTab(false);
-        });
     }
 
     //gets called when window is out auf focus
