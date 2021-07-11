@@ -340,7 +340,7 @@ async function main() {
      */
 
     //loads all the input functions
-    loadInputFunctions(ourPlayer, room, characters, whiteboard);
+    loadInputFunctions();
 
     window.addEventListener('resize', () => whiteboard.resize(window.innerWidth, window.innerHeight))
 
