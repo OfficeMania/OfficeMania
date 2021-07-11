@@ -12,10 +12,11 @@ import {
 } from "../common/util";
 
 export enum InputMode {
-    NORMAL = 1,
-    SETTINGS,
-    INTERACTION,
+    NORMAL = "normal",
+    SETTINGS = "settings",
+    INTERACTION = "interaction",
 }
+
 export type InitState = [Room<State>, Player];
 export type PlayerRecord = { [key: string]: Player }
 
