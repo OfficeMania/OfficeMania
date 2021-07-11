@@ -139,12 +139,11 @@ function onPongInteraction() {
         }
     } else if(interactiveCanvas.style.visibility === "hidden"){
         interactiveCanvas.style.visibility = "visible";
-        checkInputMode();
     } else {
         console.debug("already in pong game, exiting");
         interactiveCanvas.style.visibility = "hidden";
-        checkInputMode();
     }
+    checkInputMode();
 }
 
 
@@ -154,7 +153,7 @@ observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
 //observer.observe(pongModal, {attributes: true, attributeFilter: ['style']});
 
 function checkInputMode() {
-    if (!settingsModal.style.display.match(/none/)) {
+    if (settingsModal.style.display && !settingsModal.style.display.match(/none/)) {
         setInputMode(InputMode.SETTINGS);
     } else if (!interactiveCanvas.style.visibility.match(/hidden/)) {
         setInputMode(InputMode.INTERACTION);
