@@ -397,9 +397,9 @@ async function main() {
         playerNearbyTimer++;
         if (playerNearbyTimer % 20 === 0) {
             playerNearbyTimer = 0;
-            nearbyPlayerCheck(players, ourPlayer, collisionInfo);
+            nearbyPlayerCheck();
         } else if (playerNearbyTimer % 20 === 10) {
-            updateUsers(players);
+            updateUsers();
             updateChat();
         }
 

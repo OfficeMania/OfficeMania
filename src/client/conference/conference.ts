@@ -5,8 +5,11 @@ import {
     canSeeEachOther,
     createPlayerAvatar,
     getChatEnabled,
+    getCollisionInfo,
     getCorrectedPlayerCoordinates,
+    getOurPlayer,
     getPlayerByParticipantId,
+    getPlayers,
     getRoom,
     PlayerRecord,
     removeChildren
@@ -484,7 +487,10 @@ export function toggleSharing(done: (enabled: boolean) => void) {
     enableSharing(done);
 }
 
-export function nearbyPlayerCheck(players: PlayerRecord, ourPlayer, collisionInfo: solidInfo[][]) {
+export function nearbyPlayerCheck() {
+    const players: PlayerRecord = getPlayers();
+    const ourPlayer: Player = getOurPlayer();
+    const collisionInfo: solidInfo[][] = getCollisionInfo();
     //array with nearby players. use this vor videochat.
     const playersNearby: Player[] = [];
     const playersAway: string[] = [];
@@ -542,7 +548,8 @@ export function createPlayerState<Type extends HTMLElement>(player: Player, elem
     return element;
 }
 
-export function updateUsers(players: PlayerRecord) {
+export function updateUsers() {
+    const players: PlayerRecord = getPlayers();
     Object.values(players).forEach((player) => getUser(player.participantId)?.updatePlayer(player));
     removeChildren(playerOnlineList);
     Object.values(players).forEach((player) => playerOnlineList.append(createPlayerState(player, document.createElement("li"), true)));
