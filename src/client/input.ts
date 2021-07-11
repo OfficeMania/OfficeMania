@@ -1,6 +1,6 @@
 import {Player} from "./player";
 import {Room} from "colyseus.js";
-import {InputMode, setCharacter, setUsername} from "./util";
+import {getOurPlayer, InputMode, setCharacter, setUsername} from "./util";
 import {setShowParticipantsTab} from "./conference/conference";
 import {Whiteboard} from "./whiteboard";
 import {Direction} from "../common/util";
@@ -8,8 +8,15 @@ import {Direction} from "../common/util";
 let yPressed: boolean = false;
 let inputMode: InputMode = InputMode.NORMAL;
 
+function resetPlayerDirections() {
+    getOurPlayer().priorDirections.length = 0;
+}
+
 export function setInputMode(input: InputMode) {
     inputMode = input;
+    if (inputMode !== InputMode.NORMAL) {
+        resetPlayerDirections();
+    }
 }
 
 export function getInputMode(): InputMode {
