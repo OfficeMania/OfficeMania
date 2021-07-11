@@ -244,15 +244,12 @@ function loadSettings() {
     checkValidSettings();
 }
 
-let setUsernameIntern: (username: string) => void = undefined;
-let setCharacterIntern: (character: string) => void = undefined;
-
 function applySettings() {
-    if (setUsernameIntern && usernameInput.value) {
-        setUsernameIntern(usernameInput.value);
+    if (usernameInput.value) {
+        setUsername(usernameInput.value);
     }
-    if (setCharacterIntern && characterSelect.value) {
-        setCharacterIntern(characterSelect.value);
+    if (characterSelect.value) {
+        setCharacter(characterSelect.value);
     }
     applyConferenceSettings();
 }
@@ -283,11 +280,9 @@ async function main() {
 
     getUsernameIntern = () => ourPlayer.name;
     getCharacterIntern = () => ourPlayer.character;
-    setUsernameIntern = (username) => setUsername(username, ourPlayer, room);
-    setCharacterIntern = (character) => setCharacter(character, ourPlayer, room, characters);
 
     //loads all the character information
-    loadCharacter(ourPlayer, room, characters);
+    loadCharacter();
 
     /*
      * Then, we wait for our map to load

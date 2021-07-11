@@ -100,10 +100,10 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
             if (filenames.length <= nextIndex) {
                 nextIndex = 0;
             }
-            setCharacter(filenames[nextIndex], ourPlayer, room, characters);
+            setCharacter(filenames[nextIndex]);
         });
         //rename players name
-        onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy"), ourPlayer, room));
+        onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")));
         onPureKey(e, "u", () => toggleShowParticipantsTab());
     }
 

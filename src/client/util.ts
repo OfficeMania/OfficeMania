@@ -10,6 +10,7 @@ import {
     KEY_USERNAME,
     MessageType
 } from "../common/util";
+import {characters} from "./main";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -227,47 +228,46 @@ export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionI
     return true;
 }
 
-export function setUsername(value: string, ourPlayer: Player, room: Room) {
+export function setUsername(value: string) {
     value = value?.slice(0, 20) || "Jimmy";
-    ourPlayer.name = value;
+    getOurPlayer().name = value;
     localStorage.setItem(KEY_USERNAME, value);
-    room.send(MessageType.UPDATE_USERNAME, value);
+    getRoom().send(MessageType.UPDATE_USERNAME, value);
 }
 
 export function getUsername(): string {
     return localStorage.getItem(KEY_USERNAME);
 }
 
-export async function loadCharacter(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
+export async function loadCharacter() {
     //load or ask for name
     const username = getUsername();
     if (username && username !== "") {
-        setUsername(username, ourPlayer, room);
+        setUsername(username);
     } else {
-        setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy", ourPlayer, room);
+        setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy");
     }
 
     //loads character sprite paths from the server (from movement)
-    for (let path of room.state.playerSpritePaths) {
+    for (const path of getRoom().state.playerSpritePaths) {
         characters[path] = await loadImage("/img/characters/" + path);
     }
-
 
     //load character
     const character = getCharacter();
     if (character && character !== "") {
-        setCharacter(character, ourPlayer, room, characters);
+        setCharacter(character);
     }
 }
 
-export function setCharacter(value: string, ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }) {
+export function setCharacter(value: string) {
     const filenames = Object.keys(characters);
     if (filenames.indexOf(value) === -1) {
         value = filenames[0];
     }
-    ourPlayer.character = value;
+    getOurPlayer().character = value;
     localStorage.setItem(KEY_CHARACTER, value);
-    room.send(MessageType.UPDATE_CHARACTER, value);
+    getRoom().send(MessageType.UPDATE_CHARACTER, value);
 }
 
 export function getCharacter(): string {
