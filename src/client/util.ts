@@ -10,6 +10,7 @@ import {
     KEY_USERNAME,
     MessageType
 } from "../common/util";
+
 export enum InputMode {
     NORMAL = 1,
     SETTINGS,
@@ -19,6 +20,7 @@ export type InitState = [Room<State>, Player];
 export type PlayerRecord = { [key: string]: Player }
 
 let _room: Room<State> = undefined;
+let _ourPlayer: Player = undefined;
 let _players: PlayerRecord = undefined;
 let _chatEnabled: boolean = false;
 
@@ -28,6 +30,14 @@ export function setRoom(room: Room<State>) {
 
 export function getRoom(): Room<State> {
     return _room;
+}
+
+export function setOurPlayer(player: Player) {
+    _ourPlayer = player;
+}
+
+export function getOurPlayer(): Player {
+    return _ourPlayer;
 }
 
 export function setPlayers(players: PlayerRecord) {

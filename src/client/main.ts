@@ -15,6 +15,7 @@ import {
     PlayerRecord,
     removeChildren,
     setCharacter,
+    setOurPlayer,
     setPlayers,
     setRoom,
     setUsername
@@ -273,6 +274,7 @@ async function main() {
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
     setRoom(room);
+    setOurPlayer(ourPlayer);
 
     getUsernameIntern = () => ourPlayer.name;
     getCharacterIntern = () => ourPlayer.character;
