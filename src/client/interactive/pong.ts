@@ -3,6 +3,7 @@ import {PlayerRecord} from "../util";
 import {State} from "../../common";
 import {Interactive} from "./interactive";
 import {Direction} from "../../common/util";
+import {onPongInteraction} from "../main";
 
 
 export class Pong extends Interactive{
@@ -107,6 +108,10 @@ export class Pong extends Interactive{
         this.ctx.fillRect(5, this.playerA.pos, 5, this.sizeBat)
         this.ctx.fillStyle ="black";
         this.ctx.fillRect(this.canvas.width-10, this.playerB.pos, 5, this.sizeBat)
+    }
+
+    onInteraction(): void {
+        onPongInteraction();
     }
 }
 class PongPlayer {

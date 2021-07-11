@@ -119,11 +119,7 @@ const pongs: Pong[] = [];
 
 const interactionButton = $<HTMLButtonElement>("button-pong");
 
-function onInteraction() {
-    onPongInteraction();
-}
-
-function onPongInteraction() {
+export function onPongInteraction() {
     const ourPlayer = getOurPlayer();
     if (!pongs.some((pong) => {
         if (pong.playerA.id === ourPlayer.id) {
@@ -369,7 +365,7 @@ async function main() {
      */
 
     let playerNearbyTimer = 0;
-    interactionButton.addEventListener("click", () => onInteraction());
+    interactionButton.addEventListener("click", () => onPongInteraction()); //TODO REMOVE
 
     function loop(now: number) {
 
