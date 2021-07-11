@@ -112,7 +112,7 @@ const usernameInput = $<HTMLInputElement>("input-settings-username");
 const characterSelect = $<HTMLSelectElement>("character-select");
 const characterPreview = $<HTMLSelectElement>("character-preview");
 
-const interactionCanvas = $<HTMLCanvasElement>("interaction");
+const interactiveCanvas = $<HTMLCanvasElement>("interactive");
 
 const pongs: Pong[] = [];
 
@@ -132,17 +132,18 @@ function onPongInteraction() {
         }
     })) {
         if (pongs.every(pong => pong && pong.playerB)) {
-            const pong = new Pong(interactionCanvas, getRoom(), getPlayers(), ourPlayer.id);
+            const pong = new Pong(interactiveCanvas, getRoom(), getPlayers(), ourPlayer.id);
             pongs.push(pong);
         } else {
             pongs.find((pong) => pong && !pong.playerB).join(ourPlayer.id);
         }
-    } else if(interactionCanvas.style.visibility === "hidden"){
-        interactionCanvas.style.visibility = "visible";
-    }
-    else {
-        console.debug("already in game, exiting");
-        interactionCanvas.style.visibility = "hidden";
+    } else if(interactiveCanvas.style.visibility === "hidden"){
+        interactiveCanvas.style.visibility = "visible";
+        checkInputMode();
+    } else {
+        console.debug("already in pong game, exiting");
+        interactiveCanvas.style.visibility = "hidden";
+        checkInputMode();
     }
 }
 
@@ -155,7 +156,7 @@ observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
 function checkInputMode() {
     if (!settingsModal.style.display.match(/none/)) {
         setInputMode(InputMode.SETTINGS);
-    } else if (interactionCanvas.style.visibility.match(/hidden/)) {
+    } else if (!interactiveCanvas.style.visibility.match(/hidden/)) {
         setInputMode(InputMode.INTERACTION);
     } else {
         setInputMode(InputMode.NORMAL);
