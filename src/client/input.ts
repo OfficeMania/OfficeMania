@@ -44,7 +44,7 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, ourPlayer: Player
         if (event.key.toLowerCase() === key.toLowerCase() && !ourPlayer.priorDirections.includes(direction)) {
             ourPlayer.priorDirections.unshift(direction);
         }
-    }  
+    }
     else if (inputMode === InputMode.INTERACTION) {
         //TODO
     }
@@ -65,11 +65,6 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, ourPlayer: Player =
 export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }, whiteboard: Whiteboard) {
     function onKeyDown(e: KeyboardEvent) {
         if (inputMode === InputMode.SETTINGS) {
-            return;
-        }
-        if (inputMode === InputMode.INTERACTION) {
-            onDirectionKeyDown(e, "s", ourPlayer, Direction.DOWN);
-            onDirectionKeyDown(e, "w", ourPlayer, Direction.UP);
             return;
         }
         onDirectionKeyDown(e, "s", ourPlayer, Direction.DOWN);
