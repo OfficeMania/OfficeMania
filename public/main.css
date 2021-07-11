@@ -177,7 +177,6 @@ body {
 
 .video-container video {
     z-index: 0;
-    width: 100%;
     max-width: 100%;
     min-width: 0;
     cursor: pointer;
@@ -205,6 +204,10 @@ body {
 #focus-bar .video-container {
     margin: 10% auto;
     max-width: 65%;
+}
+
+#focus-bar video {
+    height: 65vh;
 }
 
 #whiteboard {
