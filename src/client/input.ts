@@ -69,6 +69,9 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         onDirectionKeyDown(e, "w", ourPlayer, Direction.UP);
         onDirectionKeyDown(e, "a", ourPlayer, Direction.LEFT);
         onDirectionKeyDown(e, "d", ourPlayer, Direction.RIGHT);
+        if (inputMode === InputMode.INTERACTION) {
+            return;
+        }
         //iterate through characters
         onPureKey(e, "c", () => {
             const filenames = Object.keys(characters);
@@ -82,6 +85,7 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
         onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy"), ourPlayer, room));
         //player interacts with object in front of him
         onPureKey(e, " ", () => {
+            //TODO Shut this close the Interaction if pressed again?
             whiteboard.toggelIsVisible();
         });
         onPureKey(e, "y", () => {
@@ -94,13 +98,16 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
     }
 
     function onKeyUp(e: KeyboardEvent) {
-        if (inputMode !== InputMode.NORMAL) {
+        if (inputMode === InputMode.SETTINGS) {
             return;
         }
         onDirectionKeyUp(e, "s", ourPlayer, Direction.DOWN);
         onDirectionKeyUp(e, "w", ourPlayer, Direction.UP);
         onDirectionKeyUp(e, "a", ourPlayer, Direction.LEFT);
         onDirectionKeyUp(e, "d", ourPlayer, Direction.RIGHT);
+        if (inputMode === InputMode.INTERACTION) {
+            return;
+        }
         onPureKey(e, "y", () => {
             yPressed = false;
             setShowParticipantsTab(false);
