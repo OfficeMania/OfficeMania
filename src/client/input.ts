@@ -129,8 +129,7 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
 
     //gets called when window is out auf focus
     function onBlur() {
-        //stops player
-        ourPlayer.priorDirections = [];
+        resetPlayerDirections();
     }
 
     document.addEventListener("keydown", onKeyDown);
