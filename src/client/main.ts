@@ -1,8 +1,9 @@
 import {Client} from "colyseus.js";
-import {Player, TILE_SIZE} from "./player";
+import {TILE_SIZE} from "./player";
 import {
     createPlayerAvatar,
     getCharacter,
+    getOurPlayer,
     getPlayers,
     getRoom,
     getUsername,
@@ -117,11 +118,12 @@ const pongs: Pong[] = [];
 
 const interactionButton = $<HTMLButtonElement>("button-pong");
 
-function onInteraction(ourPlayer: Player, players: PlayerRecord, pongCanvas: HTMLCanvasElement) {
-    onPongInteraction(ourPlayer, players, pongCanvas);
+function onInteraction() {
+    onPongInteraction();
 }
 
-function onPongInteraction(ourPlayer: Player, players: PlayerRecord, pongCanvas: HTMLCanvasElement) {
+function onPongInteraction() {
+    const ourPlayer = getOurPlayer();
     if (!pongs.some((pong) => {
         if (pong.playerA.id === ourPlayer.id) {
             return true;
@@ -130,17 +132,17 @@ function onPongInteraction(ourPlayer: Player, players: PlayerRecord, pongCanvas:
         }
     })) {
         if (pongs.every(pong => pong && pong.playerB)) {
-            const pong = new Pong(pongCanvas, getRoom(), getPlayers(), ourPlayer.id);
+            const pong = new Pong(interactionCanvas, getRoom(), getPlayers(), ourPlayer.id);
             pongs.push(pong);
         } else {
             pongs.find((pong) => pong && !pong.playerB).join(ourPlayer.id);
         }
-    } else if(pongCanvas.style.visibility === "hidden"){
-        pongCanvas.style.visibility = "visible";
+    } else if(interactionCanvas.style.visibility === "hidden"){
+        interactionCanvas.style.visibility = "visible";
     }
     else {
         console.debug("already in game, exiting");
-        pongCanvas.style.visibility = "hidden";
+        interactionCanvas.style.visibility = "hidden";
     }
 }
 
@@ -365,8 +367,7 @@ async function main() {
      */
 
     let playerNearbyTimer = 0;
-    let pongCanvas = $<HTMLCanvasElement>("interactive");
-    interactionButton.addEventListener("click", () => onInteraction(ourPlayer, players, pongCanvas));
+    interactionButton.addEventListener("click", () => onInteraction());
 
     function loop(now: number) {
 
