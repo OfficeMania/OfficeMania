@@ -53,7 +53,7 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, ourPlayer: Player =
     if (!isPureKey(event)) {
         return;
     }
-    if (getInputMode() === InputMode.NORMAL) {
+    if (inputMode === InputMode.NORMAL) {
         ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(direction), 1);
     } else if (inputMode === InputMode.INTERACTION) {
         //TODO
