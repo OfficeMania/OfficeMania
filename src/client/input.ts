@@ -48,12 +48,16 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, ourPlayer: Player
     if (!isPureKey(event)) {
         return;
     }
-    if (inputMode === InputMode.NORMAL) {
-        if (event.key.toLowerCase() === key.toLowerCase() && !ourPlayer.priorDirections.includes(direction)) {
-            ourPlayer.priorDirections.unshift(direction);
-        }
-    } else if (inputMode === InputMode.INTERACTION) {
-        //TODO
+    switch (inputMode) {
+        case InputMode.NORMAL:
+            if (event.key.toLowerCase() === key.toLowerCase() && !ourPlayer.priorDirections.includes(direction)) {
+                ourPlayer.priorDirections.unshift(direction);
+            }
+            break;
+        case InputMode.INTERACTION:
+            //TODO
+            break;
+
     }
 }
 
@@ -61,10 +65,14 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, ourPlayer: Player =
     if (!isPureKey(event)) {
         return;
     }
-    if (inputMode === InputMode.NORMAL) {
-        ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(direction), 1);
-    } else if (inputMode === InputMode.INTERACTION) {
-        //TODO
+    switch (inputMode) {
+        case InputMode.NORMAL:
+            ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(direction), 1);
+            break;
+        case InputMode.INTERACTION:
+            //TODO
+            break;
+
     }
 }
 
