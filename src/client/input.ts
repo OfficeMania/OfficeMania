@@ -35,23 +35,19 @@ function isPureKey(event: KeyboardEvent): boolean {
 }
 
 function onPureKey(event: KeyboardEvent, key: string, runnable: () => void) {
-    if (!isPureKey(event)) {
+    if (!isPureKey(event) || event.key.toLowerCase() !== key.toLowerCase()) {
         return;
     }
-    if (event.key.toLowerCase() === key.toLowerCase()) {
-        runnable();
-    }
+    runnable();
 }
 
 function onDirectionKeyDown(event: KeyboardEvent, key: string, ourPlayer: Player = undefined, direction: Direction = undefined) {
-    if (!isPureKey(event)) {
+    if (!isPureKey(event) || event.key.toLowerCase() !== key.toLowerCase()) {
         return;
     }
     switch (inputMode) {
         case InputMode.NORMAL:
-            if (event.key.toLowerCase() === key.toLowerCase() && !ourPlayer.priorDirections.includes(direction)) {
-                ourPlayer.priorDirections.unshift(direction);
-            }
+            ourPlayer.priorDirections.unshift(direction);
             break;
         case InputMode.INTERACTION:
             //TODO
@@ -61,7 +57,7 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, ourPlayer: Player
 }
 
 function onDirectionKeyUp(event: KeyboardEvent, key: string, ourPlayer: Player = undefined, direction: Direction = undefined) {
-    if (!isPureKey(event)) {
+    if (!isPureKey(event) || event.key.toLowerCase() !== key.toLowerCase()) {
         return;
     }
     switch (inputMode) {
