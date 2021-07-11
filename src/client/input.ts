@@ -1,15 +1,27 @@
-import {Player} from "./player";
-import {Room} from "colyseus.js";
-import {InputMode, setCharacter, setUsername} from "./util";
-import {setShowParticipantsTab} from "./conference/conference";
-import {Whiteboard} from "./whiteboard";
+import {
+    getCollisionInfo,
+    getCorrectedPlayerFacingCoordinates,
+    getOurPlayer,
+    InputMode,
+    setCharacter,
+    setUsername
+} from "./util";
+import {toggleShowParticipantsTab} from "./conference/conference";
 import {Direction} from "../common/util";
+import {solidInfo} from "./map";
+import {characters} from "./main";
 
-let yPressed: boolean = false;
 let inputMode: InputMode = InputMode.NORMAL;
+
+function resetPlayerDirections() {
+    getOurPlayer().priorDirections.length = 0;
+}
 
 export function setInputMode(input: InputMode) {
     inputMode = input;
+    if (inputMode !== InputMode.NORMAL) {
+        resetPlayerDirections();
+    }
 }
 
 export function getInputMode(): InputMode {
@@ -21,44 +33,67 @@ function isPureKey(event: KeyboardEvent): boolean {
 }
 
 function onPureKey(event: KeyboardEvent, key: string, runnable: () => void) {
-    if (!isPureKey(event)) {
+    if (!isPureKey(event) || event.key.toLowerCase() !== key.toLowerCase()) {
         return;
     }
-    if (event.key.toLowerCase() === key.toLowerCase()) {
-        runnable();
+    runnable();
+}
+
+function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direction) {
+    if (!isPureKey(event) || event.key.toLowerCase() !== key.toLowerCase()) {
+        return;
+    }
+    const ourPlayer = getOurPlayer();
+    switch (inputMode) {
+        case InputMode.NORMAL:
+            ourPlayer.priorDirections.unshift(direction);
+            break;
+        case InputMode.INTERACTION:
+            //TODO
+            break;
+
     }
 }
 
-function onDirectionKeyDown(event: KeyboardEvent, key: string, ourPlayer: Player = undefined, direction: Direction = undefined) {
-    if (!isPureKey(event)) {
+function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Direction) {
+    if (!isPureKey(event) || event.key.toLowerCase() !== key.toLowerCase()) {
         return;
     }
-    if (event.key.toLowerCase() === key.toLowerCase() && !ourPlayer.priorDirections.includes(direction)) {
-        ourPlayer.priorDirections.unshift(direction);
+    const ourPlayer = getOurPlayer();
+    switch (inputMode) {
+        case InputMode.NORMAL:
+            ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(direction), 1);
+            break;
+        case InputMode.INTERACTION:
+            //TODO
+            break;
+
     }
 }
 
-function onDirectionKeyUp(event: KeyboardEvent, key: string, ourPlayer: Player = undefined, direction: Direction = undefined) {
-    if (!isPureKey(event)) {
-        return;
-    }
-    ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(direction), 1);
-}
-
-export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { [key: string]: HTMLImageElement }, whiteboard: Whiteboard) {
+export function loadInputFunctions() {
     function onKeyDown(e: KeyboardEvent) {
         if (inputMode === InputMode.SETTINGS) {
             return;
         }
+        const ourPlayer = getOurPlayer();
+        onDirectionKeyDown(e, "s", Direction.DOWN);
+        onDirectionKeyDown(e, "w", Direction.UP);
+        onDirectionKeyDown(e, "a", Direction.LEFT);
+        onDirectionKeyDown(e, "d", Direction.RIGHT);
+        //player interacts with object in front of him
+        onPureKey(e, " ", () => {
+            const [facingX, facingY] = getCorrectedPlayerFacingCoordinates(ourPlayer);
+            const solidInfo: solidInfo = getCollisionInfo()?.[facingX]?.[facingY];
+            if (!solidInfo) {
+                console.error(`no solidInfo for ${facingX}:${facingY}`);
+                return
+            }
+            solidInfo.content && solidInfo.content.onInteraction();
+        });
         if (inputMode === InputMode.INTERACTION) {
-            onDirectionKeyDown(e, "s", ourPlayer, Direction.DOWN);
-            onDirectionKeyDown(e, "w", ourPlayer, Direction.UP);
             return;
         }
-        onDirectionKeyDown(e, "s", ourPlayer, Direction.DOWN);
-        onDirectionKeyDown(e, "w", ourPlayer, Direction.UP);
-        onDirectionKeyDown(e, "a", ourPlayer, Direction.LEFT);
-        onDirectionKeyDown(e, "d", ourPlayer, Direction.RIGHT);
         //iterate through characters
         onPureKey(e, "c", () => {
             const filenames = Object.keys(characters);
@@ -66,41 +101,29 @@ export function loadInputFunctions(ourPlayer: Player, room: Room, characters: { 
             if (filenames.length <= nextIndex) {
                 nextIndex = 0;
             }
-            setCharacter(filenames[nextIndex], ourPlayer, room, characters);
+            setCharacter(filenames[nextIndex]);
         });
         //rename players name
-        onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy"), ourPlayer, room));
-        //player interacts with object in front of him
-        onPureKey(e, " ", () => {
-            whiteboard.toggelIsVisible();
-        });
-        onPureKey(e, "y", () => {
-            if (!yPressed) {
-                console.log("Y has been pressed"); //DEBUG
-                yPressed = true;
-                setShowParticipantsTab(true);
-            }
-        });
+        onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")));
+        onPureKey(e, "u", () => toggleShowParticipantsTab());
     }
 
     function onKeyUp(e: KeyboardEvent) {
-        if (inputMode !== InputMode.NORMAL) {
+        if (inputMode === InputMode.SETTINGS) {
             return;
         }
-        onDirectionKeyUp(e, "s", ourPlayer, Direction.DOWN);
-        onDirectionKeyUp(e, "w", ourPlayer, Direction.UP);
-        onDirectionKeyUp(e, "a", ourPlayer, Direction.LEFT);
-        onDirectionKeyUp(e, "d", ourPlayer, Direction.RIGHT);
-        onPureKey(e, "y", () => {
-            yPressed = false;
-            setShowParticipantsTab(false);
-        });
+        onDirectionKeyUp(e, "s", Direction.DOWN);
+        onDirectionKeyUp(e, "w", Direction.UP);
+        onDirectionKeyUp(e, "a", Direction.LEFT);
+        onDirectionKeyUp(e, "d", Direction.RIGHT);
+        if (inputMode === InputMode.INTERACTION) {
+            return;
+        }
     }
 
     //gets called when window is out auf focus
     function onBlur() {
-        //stops player
-        ourPlayer.priorDirections = [];
+        resetPlayerDirections();
     }
 
     document.addEventListener("keydown", onKeyDown);

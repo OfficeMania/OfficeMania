@@ -1,8 +1,9 @@
 import {Player, syncOwnPosition, updateOwnPosition, updatePosition} from "./player";
 import {Room} from "colyseus.js";
-import {PlayerRecord} from "./util";
+import {InputMode, PlayerRecord} from "./util";
 import {choosePlayerSprites} from "./drawplayer";
 import {solidInfo} from "./map";
+import { getInputMode } from "./input";
 
 const MS_PER_UPDATE = 10;
 const MS_PER_UPDATE2 = 15;
@@ -32,8 +33,9 @@ export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room,
                 }
             });
             //Update own player
+            
             updateOwnPosition(ourPlayer, room, collisionInfo);
-
+            
             lag -= MS_PER_UPDATE;
         }
 

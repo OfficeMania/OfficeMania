@@ -1,14 +1,13 @@
-
-import { Room } from "colyseus.js";
-import { PlayerRecord } from "../util";
-import { createTextChangeRange } from "typescript";
-import { State } from "../../common";
-import { Interactive } from "./interactive";
-import { Direction } from "../../common/util";
+import {Room} from "colyseus.js";
+import {PlayerRecord} from "../util";
+import {State} from "../../common";
+import {Interactive} from "./interactive";
+import {Direction} from "../../common/util";
+import {onPongInteraction} from "../main";
 
 
 export class Pong extends Interactive{
-    
+
     gameID: string;
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
@@ -31,10 +30,11 @@ export class Pong extends Interactive{
     posPlayerB: number = 0;
     room: Room<State>
     constructor(canvas: HTMLCanvasElement, room: Room<State>, players: PlayerRecord, id: string) {
-        super("pong");
+        super("pong", false, 2);
         this.gameID = id;
         this.playerA = new PongPlayer(id);
         this.canvas = canvas;
+        this.canvas.style.visibility = "visible";
         this.ctx = this.canvas.getContext("2d");
         this.ctx.fillStyle = "white"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -64,7 +64,7 @@ export class Pong extends Interactive{
                 this.playerA.move = Direction.DOWN;
             }
         })
-        
+
     }
     join(playerB: string){
         this.playerB = new PongPlayer(playerB);
@@ -108,6 +108,10 @@ export class Pong extends Interactive{
         this.ctx.fillRect(5, this.playerA.pos, 5, this.sizeBat)
         this.ctx.fillStyle ="black";
         this.ctx.fillRect(this.canvas.width-10, this.playerB.pos, 5, this.sizeBat)
+    }
+
+    onInteraction(): void {
+        onPongInteraction();
     }
 }
 class PongPlayer {

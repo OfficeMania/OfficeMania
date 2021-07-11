@@ -23,6 +23,11 @@ export class Door extends Interactive {
         this.direction = direction;
     }
 
+    onInteraction(): void {
+        console.warn("Not implemented on this Door");
+        //TODO This function gets call, when a player presses space bar and faces a Door
+    }
+
     proofIfClosed(playerDirection: number) {
 
         //TODO

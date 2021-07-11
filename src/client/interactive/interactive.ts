@@ -59,5 +59,9 @@ export class Interactive {
         this._maxPlayer = value;
     }
 
+    onInteraction(): void {
+        console.warn("Not implemented on this Interactive");
+    }
+
 }
 

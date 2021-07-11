@@ -1,10 +1,9 @@
 import {Client} from "colyseus.js";
-import {Player, TILE_SIZE} from "./player";
+import {TILE_SIZE} from "./player";
 import {
     createPlayerAvatar,
     getCharacter,
-    getCorrectedPlayerCoordinates,
-    getCorrectedPlayerFacingCoordinates,
+    getOurPlayer,
     getPlayers,
     getRoom,
     getUsername,
@@ -15,6 +14,8 @@ import {
     PlayerRecord,
     removeChildren,
     setCharacter,
+    setCollisionInfo,
+    setOurPlayer,
     setPlayers,
     setRoom,
     setUsername
@@ -32,7 +33,7 @@ import {
     updateUsers
 } from "./conference/conference";
 import {playerLoop} from "./movement";
-import {getInputMode, loadInputFunctions, setInputMode} from "./input";
+import {loadInputFunctions, setInputMode} from "./input";
 import {drawPlayer} from "./drawplayer"
 import {Whiteboard} from "./whiteboard"
 import {Pong} from "./interactive/pong";
@@ -97,7 +98,6 @@ function toggleMute(type: string) {
 const settingsModal = $<HTMLDivElement>("settings-modal");
 const settingsButton = $<HTMLButtonElement>("button-settings");
 const usersButton = $<HTMLButtonElement>("button-users");
-const pongButton = $<HTMLButtonElement>("button-pong");
 
 const settingsOkButton = $<HTMLButtonElement>("button-settings-ok");
 //const settingsCancelButton = $<HTMLButtonElement>("button-settings-cancel");
@@ -105,7 +105,6 @@ const settingsApplyButton = $<HTMLButtonElement>("button-settings-apply");
 
 settingsButton.addEventListener("click", () => onSettingsOpen());
 usersButton.addEventListener("click", () => toggleShowParticipantsTab());
-pongButton.addEventListener("click", () => onPongOpen());
 
 settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
@@ -114,43 +113,50 @@ const usernameInput = $<HTMLInputElement>("input-settings-username");
 const characterSelect = $<HTMLSelectElement>("character-select");
 const characterPreview = $<HTMLSelectElement>("character-preview");
 
+const interactiveCanvas = $<HTMLCanvasElement>("interactive");
+
 const pongs: Pong[] = [];
 
 const interactionButton = $<HTMLButtonElement>("button-pong");
-function onInteraction(ourPlayer: Player, players: PlayerRecord, pongCanvas: HTMLCanvasElement) {
-    onPongInteraction(ourPlayer, players, pongCanvas);
-}
 
-function onPongInteraction (ourPlayer: Player, players: PlayerRecord, pongCanvas: HTMLCanvasElement){
-    if (!pongs.some( (pong) => {
-        if(pong.playerA.id === ourPlayer.id){ return true;}
-        else if (pong.playerB.id === ourPlayer.id) { return true}
-    })){
-        if(pongs.every(pong => pong && pong.playerB)) {
-            const pong = new Pong(pongCanvas, getRoom(), getPlayers(), ourPlayer.id);
-            pongs.push(pong);
+export function onPongInteraction() {
+    const ourPlayer = getOurPlayer();
+    if (!pongs.some((pong) => {
+        if (pong.playerA.id === ourPlayer.id) {
+            return true;
+        } else if (pong.playerB.id === ourPlayer.id) {
+            return true
         }
-        else {
+    })) {
+        if (pongs.every(pong => pong && pong.playerB)) {
+            const pong = new Pong(interactiveCanvas, getRoom(), getPlayers(), ourPlayer.id);
+            pongs.push(pong);
+        } else {
             pongs.find((pong) => pong && !pong.playerB).join(ourPlayer.id);
         }
+    } else if(interactiveCanvas.style.visibility === "hidden"){
+        interactiveCanvas.style.visibility = "visible";
+    } else {
+        console.debug("already in pong game, exiting");
+        interactiveCanvas.style.visibility = "hidden";
     }
-    else {
-        console.log("already in game, exiting");
-        pongCanvas.style.visibility = "hidden";
-        setInputMode(InputMode.NORMAL);
-    };
+    checkInputMode();
 }
 
 
 const observer = new MutationObserver(mutations => mutations.forEach(checkInputMode));
 observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
+
 //observer.observe(pongModal, {attributes: true, attributeFilter: ['style']});
 
-function checkInputMode(){
-    if(!settingsModal.style.display.match(/none/)) {
+function checkInputMode() {
+    if (settingsModal.style.display && !settingsModal.style.display.match(/none/)) {
         setInputMode(InputMode.SETTINGS);
+    } else if (!interactiveCanvas.style.visibility.match(/hidden/)) {
+        setInputMode(InputMode.INTERACTION);
+    } else {
+        setInputMode(InputMode.NORMAL);
     }
-    //else if ()
 }
 
 function checkValidSettings() {
@@ -238,15 +244,12 @@ function loadSettings() {
     checkValidSettings();
 }
 
-let setUsernameIntern: (username: string) => void = undefined;
-let setCharacterIntern: (character: string) => void = undefined;
-
 function applySettings() {
-    if (setUsernameIntern && usernameInput.value) {
-        setUsernameIntern(usernameInput.value);
+    if (usernameInput.value) {
+        setUsername(usernameInput.value);
     }
-    if (setCharacterIntern && characterSelect.value) {
-        setCharacterIntern(characterSelect.value);
+    if (characterSelect.value) {
+        setCharacter(characterSelect.value);
     }
     applyConferenceSettings();
 }
@@ -273,14 +276,13 @@ async function main() {
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
     setRoom(room);
+    setOurPlayer(ourPlayer);
 
     getUsernameIntern = () => ourPlayer.name;
     getCharacterIntern = () => ourPlayer.character;
-    setUsernameIntern = (username) => setUsername(username, ourPlayer, room);
-    setCharacterIntern = (character) => setCharacter(character, ourPlayer, room, characters);
 
     //loads all the character information
-    loadCharacter(ourPlayer, room, characters);
+    loadCharacter();
 
     /*
      * Then, we wait for our map to load
@@ -303,6 +305,7 @@ async function main() {
 
     let currentMap = new mapInfo((await map).layers, (await map).tilesets, (await map).canvas, (await map).resolution, (await map).textures, (await map).lowestX, (await map).lowestY, (await map).highestY, (await map).highestX);
     let collisionInfo: solidInfo[][] = fillSolidInfos(currentMap);
+    setCollisionInfo(collisionInfo);
     console.log(collisionInfo)
 
     //retrieve lowest coords
@@ -337,7 +340,7 @@ async function main() {
      */
 
     //loads all the input functions
-    loadInputFunctions(ourPlayer, room, characters, whiteboard);
+    loadInputFunctions();
 
     window.addEventListener('resize', () => whiteboard.resize(window.innerWidth, window.innerHeight))
 
@@ -357,8 +360,8 @@ async function main() {
      */
 
     let playerNearbyTimer = 0;
-    let pongCanvas = $<HTMLCanvasElement>("interactive");
-    interactionButton.addEventListener("click", () => onInteraction(ourPlayer, players, pongCanvas));
+    interactionButton.addEventListener("click", () => onPongInteraction()); //TODO REMOVE
+
     function loop(now: number) {
 
         ctx.clearRect(0, 0, width, height);
@@ -370,12 +373,7 @@ async function main() {
         height = canvas.height;
 
         //calculate everything regarding the player
-        if(getInputMode() === InputMode.NORMAL){
-            playerLoop(ourPlayer, players, room, now, canvas, ctx, collisionInfo)
-        }
-        if(getInputMode() === InputMode.INTERACTION) {
-            console.log("hiya");
-        }
+        playerLoop(ourPlayer, players, room, now, canvas, ctx, collisionInfo);
 
 
         /*
@@ -390,9 +388,9 @@ async function main() {
         playerNearbyTimer++;
         if (playerNearbyTimer % 20 === 0) {
             playerNearbyTimer = 0;
-            nearbyPlayerCheck(players, ourPlayer, collisionInfo);
+            nearbyPlayerCheck();
         } else if (playerNearbyTimer % 20 === 10) {
-            updateUsers(players);
+            updateUsers();
             updateChat();
         }
 
