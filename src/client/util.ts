@@ -21,6 +21,7 @@ export type InitState = [Room<State>, Player];
 export type PlayerRecord = { [key: string]: Player }
 
 let _room: Room<State> = undefined;
+let _collisionInfo: solidInfo[][] = undefined;
 let _ourPlayer: Player = undefined;
 let _players: PlayerRecord = undefined;
 let _chatEnabled: boolean = false;
@@ -31,6 +32,14 @@ export function setRoom(room: Room<State>) {
 
 export function getRoom(): Room<State> {
     return _room;
+}
+
+export function setCollisionInfo(collisionInfo: solidInfo[][]) {
+    _collisionInfo = collisionInfo;
+}
+
+export function getCollisionInfo(): solidInfo[][] {
+    return _collisionInfo;
 }
 
 export function setOurPlayer(player: Player) {

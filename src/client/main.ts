@@ -14,6 +14,7 @@ import {
     PlayerRecord,
     removeChildren,
     setCharacter,
+    setCollisionInfo,
     setOurPlayer,
     setPlayers,
     setRoom,
@@ -313,6 +314,7 @@ async function main() {
 
     let currentMap = new mapInfo((await map).layers, (await map).tilesets, (await map).canvas, (await map).resolution, (await map).textures, (await map).lowestX, (await map).lowestY, (await map).highestY, (await map).highestX);
     let collisionInfo: solidInfo[][] = fillSolidInfos(currentMap);
+    setCollisionInfo(collisionInfo);
     console.log(collisionInfo)
 
     //retrieve lowest coords
