@@ -111,6 +111,8 @@ const usernameInput = $<HTMLInputElement>("input-settings-username");
 const characterSelect = $<HTMLSelectElement>("character-select");
 const characterPreview = $<HTMLSelectElement>("character-preview");
 
+const interactionCanvas = $<HTMLCanvasElement>("interaction");
+
 const pongs: Pong[] = [];
 
 const interactionButton = $<HTMLButtonElement>("button-pong");
@@ -151,8 +153,11 @@ observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
 function checkInputMode() {
     if (!settingsModal.style.display.match(/none/)) {
         setInputMode(InputMode.SETTINGS);
+    } else if (interactionCanvas.style.visibility.match(/hidden/)) {
+        setInputMode(InputMode.INTERACTION);
+    } else {
+        setInputMode(InputMode.NORMAL);
     }
-    //else if ()
 }
 
 function checkValidSettings() {
