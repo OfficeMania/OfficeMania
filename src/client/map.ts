@@ -2,6 +2,7 @@ import {loadImage} from "./util";
 import {Room} from "colyseus.js";
 import {Interactive} from "./interactive/interactive"
 import {Door, DoorDirection} from "./interactive/door";
+import {PingPongTable} from "./interactive/pingpongtable";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -274,6 +275,10 @@ function fillSolidInfos(map: mapInfo) {
                                             case 5: {
 
                                                 object = new Door(DoorDirection.ALWAYS_OPEN);
+                                                break;
+                                            }
+                                            case 6: {
+                                                object = new PingPongTable();
                                                 break;
                                             }
                                         }
