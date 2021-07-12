@@ -1,3 +1,4 @@
+import { MapSchema } from "@colyseus/schema";
 import {v4 as uuid4} from "uuid";
 
 export const KEY_USERNAME = "username";
@@ -14,14 +15,22 @@ export enum Direction {
 
 export enum MessageType {
     MOVE = "move",
+    MOVE_INTERACTION = "moveInteraction",
     PATH = "path",
     REDRAW = "redraw",
     UPDATE_CHARACTER = "updateCharacter",
     UPDATE_USERNAME = "updateUsername",
     UPDATE_PARTICIPANT_ID = "updateParticipantId",
-    CLEAR_WHITEBOARD = "clearWhiteboard"
+    CLEAR_WHITEBOARD = "clearWhiteboard",
+    INTERACTION = "interaction",
 }
 
 export function generateUUIDv4() {
     return uuid4();
+}
+
+export function getMapSchemaCount(mapSchema: MapSchema): number{
+    let counter: number = 0;
+    mapSchema.forEach(() => counter++);
+    return counter;
 }
