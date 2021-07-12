@@ -1,4 +1,3 @@
-import { MapSchema } from "@colyseus/schema";
 import {v4 as uuid4} from "uuid";
 
 export const KEY_USERNAME = "username";
@@ -27,10 +26,4 @@ export enum MessageType {
 
 export function generateUUIDv4() {
     return uuid4();
-}
-
-export function getMapSchemaCount(mapSchema: MapSchema): number{
-    let counter: number = 0;
-    mapSchema.forEach(() => counter++);
-    return counter;
 }
