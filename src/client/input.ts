@@ -46,7 +46,9 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direct
     const ourPlayer = getOurPlayer();
     switch (inputMode) {
         case InputMode.NORMAL:
-            ourPlayer.priorDirections.unshift(direction);
+            if(!ourPlayer.priorDirections.includes(direction)){
+                ourPlayer.priorDirections.unshift(direction);
+            }
             break;
         case InputMode.INTERACTION:
             //TODO
