@@ -291,8 +291,7 @@ function fillSolidInfos(map: mapInfo) {
                                     }
                                 }
                             }
-                        } else {
-
+                        } else if(map.layers[l].chunks[c].element[x][y] === 0 && map.layers[l].name.search("Rooms") !== -1) {
                             solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setRoomId(0);
                             solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setRoomId(0);
                             solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setRoomId(0);
