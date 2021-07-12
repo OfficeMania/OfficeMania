@@ -2,36 +2,27 @@ import {Room} from "colyseus.js";
 import {PlayerRecord} from "../util";
 import {State} from "../../common";
 import {Interactive} from "./interactive";
-import {Direction} from "../../common/util";
-import {onPongInteraction} from "../main";
+import {Direction, MessageType} from "../../common/util";
 
 
-export class Pong extends Interactive{
+export class Pong{
 
-    gameID: string;
+    
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
     //PlayerIDs
     playerA: PongPlayer;
     playerB: PongPlayer;
-    //B
+
     sizeBall: number;
     posBallX: number;
     posBallY: number;
-    //definded max speed of the Ball
-    velBall: number;
-    //current speed vectors of the Ball
-    velBallX: number;
-    velBallY: number;
 
     sizeBat: number = 15;
-    velBat: number = 5;
     posPlayerA: number = 0;
     posPlayerB: number = 0;
     room: Room<State>
     constructor(canvas: HTMLCanvasElement, room: Room<State>, players: PlayerRecord, id: string) {
-        super("pong", false, 2);
-        this.gameID = id;
         this.playerA = new PongPlayer(id);
         this.canvas = canvas;
         this.canvas.style.visibility = "visible";
@@ -42,64 +33,32 @@ export class Pong extends Interactive{
         this.ctx.fillRect(5, 5, 10, this.sizeBat)
         this.ctx.fillStyle ="black";
         this.ctx.fillRect(this.canvas.width-15, this.canvas.height-5-this.sizeBat, 10, this.sizeBat)
-
-        room.onMessage("playerB", (client) =>{
-            this.join(client.sessionId);
-        })
-
-        room.onMessage("moveUp", (client) => {
-            if(this.playerB.id === client.sessionId) {
-                this.playerB.move = Direction.UP;
-            }
-            else console.log("not player B");
-            if(this.playerA.id === client.sessionId) {
-                this.playerA.move = Direction.UP;
-            }
-        })
-        room.onMessage("moveDown", (client) => {
-            if(this.playerB.id === client.sessionId) {
-                this.playerB.move = Direction.DOWN;
-            }
-            if(this.playerA.id === client.sessionId) {
-                this.playerA.move = Direction.DOWN;
-            }
-        })
-
-    }
-    join(playerB: string){
-        this.playerB = new PongPlayer(playerB);
-        console.log("now player b");
         this.loop();
+
     }
     loop(){
         while(this.playerA.score + this.playerB.score <= 10){
-            this.updatePos(this.playerA);
-            this.updatePos(this.playerB);
-            this.updateBall();
+            this.updatePos();
             this.paint();
         }
+        this.room.send(MessageType.INTERACTION, "pong-stop");
     }
-    updatePos(player: PongPlayer) {
-        if (player.move === Direction.UP){
-            if(player.pos >= 0){
-                player.pos -= this.velBat;
-            }
-            else {
-                player.pos = 0;
-            }
-        }
-        else if (player.move === Direction.DOWN) {
-            if(player.pos + this.sizeBat<= 1000){
-                player.pos += this.velBat;
-            }
-            else {
-                player.pos = 1000 - this.sizeBat;
-            }
+    updatePos() {
+        let currentState = this.room.state.pongStates[this.getGame(this.playerA)];
+        if (currentState) {
+            this.posBallX = currentState.posBall[0];
+            this.posBallY = currentState.posBall[1];
+            this.posPlayerA = currentState.posPlayerA;
+            this.posPlayerB = currentState.posPlayerB;
         }
     }
-    updateBall(){
-        this.posBallX += this.velBallX;
-        this.posBallY += this.velBallY;
+    getGame(client): number{
+        for(let i = 0; i < this.room.state.pongStates.size; i++) {
+            if (this.room.state.pongStates[i.toString()].playerIds[0] === client.sessionId || this.room.state.pongStates[i.toString()].playerIds[1] === client.sessionId){
+                return i;
+            }
+        }
+        return -1;
     }
     paint(){
         this.ctx.fillStyle = "white"
@@ -108,10 +67,6 @@ export class Pong extends Interactive{
         this.ctx.fillRect(5, this.playerA.pos, 5, this.sizeBat)
         this.ctx.fillStyle ="black";
         this.ctx.fillRect(this.canvas.width-10, this.playerB.pos, 5, this.sizeBat)
-    }
-
-    onInteraction(): void {
-        onPongInteraction();
     }
 }
 class PongPlayer {

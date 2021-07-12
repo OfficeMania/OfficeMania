@@ -37,6 +37,8 @@ import {loadInputFunctions, setInputMode} from "./input";
 import {drawPlayer} from "./drawplayer"
 import {Whiteboard} from "./whiteboard"
 import {Pong} from "./interactive/pong";
+import { Room } from "colyseus";
+import { MessageType } from "../common/util";
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
@@ -115,33 +117,9 @@ const characterPreview = $<HTMLSelectElement>("character-preview");
 
 const interactiveCanvas = $<HTMLCanvasElement>("interactive");
 
-const pongs: Pong[] = [];
+//const pongs: Pong[] = [];
 
 const interactionButton = $<HTMLButtonElement>("button-pong");
-
-export function onPongInteraction() {
-    const ourPlayer = getOurPlayer();
-    if (!pongs.some((pong) => {
-        if (pong.playerA.id === ourPlayer.id) {
-            return true;
-        } else if (pong.playerB.id === ourPlayer.id) {
-            return true
-        }
-    })) {
-        if (pongs.every(pong => pong && pong.playerB)) {
-            const pong = new Pong(interactiveCanvas, getRoom(), getPlayers(), ourPlayer.id);
-            pongs.push(pong);
-        } else {
-            pongs.find((pong) => pong && !pong.playerB).join(ourPlayer.id);
-        }
-    } else if(interactiveCanvas.style.visibility === "hidden"){
-        interactiveCanvas.style.visibility = "visible";
-    } else {
-        console.debug("already in pong game, exiting");
-        interactiveCanvas.style.visibility = "hidden";
-    }
-    checkInputMode();
-}
 
 
 const observer = new MutationObserver(mutations => mutations.forEach(checkInputMode));
@@ -149,7 +127,7 @@ observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
 
 //observer.observe(pongModal, {attributes: true, attributeFilter: ['style']});
 
-function checkInputMode() {
+export function checkInputMode() {
     if (settingsModal.style.display && !settingsModal.style.display.match(/none/)) {
         setInputMode(InputMode.SETTINGS);
     } else if (!interactiveCanvas.style.visibility.match(/hidden/)) {
@@ -360,7 +338,7 @@ async function main() {
      */
 
     let playerNearbyTimer = 0;
-    interactionButton.addEventListener("click", () => onPongInteraction()); //TODO REMOVE
+    interactionButton.addEventListener("click", () => {}); //TODO REMOVE
 
     function loop(now: number) {
 

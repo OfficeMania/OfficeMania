@@ -92,6 +92,7 @@ export function loadInputFunctions() {
                 return
             }
             solidInfo.content && solidInfo.content.onInteraction();
+            console.log(solidInfo.content);
         });
         if (inputMode === InputMode.INTERACTION) {
             return;

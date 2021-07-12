@@ -14,6 +14,7 @@ export enum Direction {
 
 export enum MessageType {
     MOVE = "move",
+    MOVE_PONG = "moveInteraction",
     PATH = "path",
     REDRAW = "redraw",
     UPDATE_CHARACTER = "updateCharacter",

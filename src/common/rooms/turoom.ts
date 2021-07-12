@@ -3,6 +3,7 @@ import {PlayerData, PongState, State, WhiteboardPlayer} from "./schema/state";
 import fs from 'fs';
 import {Direction, generateUUIDv4, MessageType} from "../util";
 import {ArraySchema, MapSchema} from "@colyseus/schema";
+import { cli } from "webpack";
 
 const path = require('path');
 
@@ -56,9 +57,6 @@ export class TURoom extends Room<State> {
 
         //receives movement from all the clients
         this.onMessage(MessageType.MOVE, (client, message) => {
-            if(this.getPongGame(client)) {
-                
-            }
             if (this.state.players[client.sessionId].cooldown <= 0) {
                 switch (message) {
                     case Direction.DOWN: {
@@ -80,6 +78,53 @@ export class TURoom extends Room<State> {
                 }
             }
         });
+
+        this.onMessage(MessageType.MOVE_PONG, (client, message) => {
+            if (this.state.pongStates[this.getPongGame(client).toString()] && this.state.pongStates[this.getPongGame(client).toString()].playerA === client.sessionId) {
+                switch (message) {
+                    case Direction.UP: {
+                        if(this.state.pongStates[this.getPongGame(client).toString()].posPlayerA > 0){
+                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerA--;
+                        }
+                        else {
+                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerA = 0;
+                        }
+                        break;
+                    }
+                    case Direction.DOWN: {
+                        if(this.state.pongStates[this.getPongGame(client).toString()].posPlayerA < 1000){
+                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerA++;
+                        }
+                        else {
+                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerA = 1000;
+                        }
+                        break;
+                    }
+                }
+            }
+            else if (this.state.pongStates[this.getPongGame(client).toString()] && this.state.pongStates[this.getPongGame(client).toString()].playerB === client.sessionId) {
+                switch (message) {
+                    case Direction.UP: {
+                        if(this.state.pongStates[this.getPongGame(client).toString()].posPlayerB > 0){
+                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerB--;
+                        }
+                        else {
+                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerB = 0;
+                        }
+                        break;
+                    }
+                    case Direction.DOWN: {
+                        if(this.state.pongStates[this.getPongGame(client).toString()].posPlayerB < 1000){
+                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerB++;
+                        }
+                        else {
+                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerB = 1000;
+                        }
+                        break;
+                    }
+                }
+            }
+        })
 
         this.onMessage(MessageType.INTERACTION, (client, message) => {
             switch (message) {
