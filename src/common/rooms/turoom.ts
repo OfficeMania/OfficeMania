@@ -1,8 +1,8 @@
 import {Client, Room} from "colyseus";
-import {PlayerData, State, WhiteboardPlayer} from "./schema/state";
+import {PlayerData, PongState, State, WhiteboardPlayer} from "./schema/state";
 import fs from 'fs';
 import {Direction, generateUUIDv4, MessageType} from "../util";
-import {ArraySchema} from "@colyseus/schema";
+import {ArraySchema, MapSchema} from "@colyseus/schema";
 
 const path = require('path');
 
@@ -56,6 +56,9 @@ export class TURoom extends Room<State> {
 
         //receives movement from all the clients
         this.onMessage(MessageType.MOVE, (client, message) => {
+            if(this.getPongGame(client)) {
+                
+            }
             if (this.state.players[client.sessionId].cooldown <= 0) {
                 switch (message) {
                     case Direction.DOWN: {
@@ -77,6 +80,41 @@ export class TURoom extends Room<State> {
                 }
             }
         });
+
+        this.onMessage(MessageType.INTERACTION, (client, message) => {
+            switch (message) {
+                case message === "pong": {
+                    let inGame: number = this.getPongGame(client);
+                    if(inGame === -1) {
+                        let emptyGame = this.getEmptyPongGame();
+                        if (emptyGame !== -1) {
+                            if (isStringEmpty(this.state.pongStates[emptyGame].playerIds[0])){
+                                this.state.pongStates[emptyGame].playerIds[0] = client.sessionId;
+                            }
+                            if (isStringEmpty(this.state.pongStates[emptyGame].playerIds[1])){
+                                this.state.pongStates[emptyGame].playerIds[1] = client.sessionId;
+                            }
+                        }
+                        else {
+                            let newPong = new PongState();
+                            newPong.playerIds[0] = client.sessionId;
+                            this.state.pongStates[this.getNextPongSlot().toString()] = newPong;
+                        }
+                    }
+                    break;
+                }
+                case message === "pong-end": {
+                    let inGame: number = this.getPongGame(client);
+                    if(inGame !== -1) {
+                        this.state.pongStates.delete(inGame.toString());
+                    }
+                    break;
+                }
+                default: {
+                    console.log("type of interaction not defined in the turoom onMessage(MessageType.INTERACTION)");
+                }
+            }
+        })
 
         this.onMessage(MessageType.PATH, (client, message) => {
             if (message === -1) {
@@ -138,4 +176,40 @@ export class TURoom extends Room<State> {
     update(deltaTime) {
 
     }
+
+    getPongGame(client): number{
+        for(let i = 0; i < this.state.pongStates.size; i++) {
+            if (this.state.pongStates[i.toString()].playerIds[0] === client.sessionId || this.state.pongStates[i.toString()].playerIds[1] === client.sessionId){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    getEmptyPongGame(): number {
+        for(let i = 0; i < this.state.pongStates.size; i++) {
+            if (!this.state.pongStates[i.toString()].playerIds[0] || !this.state.pongStates[i.toString()].playerIds[1]){
+                return i;
+            }
+        return -1;
+        }
+    }
+
+    getNextPongSlot(): number {
+        for(let i = 0; i <= this.state.pongStates.size; i++) {
+            if (!this.state.pongStates[i.toString()]) {
+                return i;
+            }
+        }
+        return;
+    }
+}
+function isStringEmpty(entry: string): boolean{
+    if(!entry) {
+        return true;
+    }
+    if(entry = ""){
+        return true;
+    }
+    return false;
 }
