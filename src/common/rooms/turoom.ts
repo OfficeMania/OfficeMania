@@ -133,11 +133,13 @@ export class TURoom extends Room<State> {
                     if(inGame === -1) {
                         let emptyGame = this.getEmptyPongGame();
                         if (emptyGame !== -1) {
-                            if (isStringEmpty(this.state.pongStates[emptyGame].playerIds[0])){
-                                this.state.pongStates[emptyGame].playerIds[0] = client.sessionId;
-                            }
-                            if (isStringEmpty(this.state.pongStates[emptyGame].playerIds[1])){
-                                this.state.pongStates[emptyGame].playerIds[1] = client.sessionId;
+                            if (this.state.pongStates[emptyGame]){
+                                if (isStringEmpty(this.state.pongStates[emptyGame].playerIds[0])){
+                                    this.state.pongStates[emptyGame].playerIds[0] = client.sessionId;
+                                }
+                                if (isStringEmpty(this.state.pongStates[emptyGame].playerIds[1])){
+                                    this.state.pongStates[emptyGame].playerIds[1] = client.sessionId;
+                                }
                             }
                         }
                         else {
