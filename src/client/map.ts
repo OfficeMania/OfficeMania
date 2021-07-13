@@ -1,8 +1,9 @@
-import {loadImage} from "./util";
+import {loadImage, getRoom} from "./util";
 import {Room} from "colyseus.js";
 import {Interactive} from "./interactive/interactive"
 import {Door, DoorDirection} from "./interactive/door";
 import {PingPongTable} from "./interactive/pingpongtable";
+import { Whiteboard } from "./whiteboard";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -193,6 +194,7 @@ function fillSolidInfos(map: mapInfo) {
     let width = Math.abs(map.lowestX - map.highestX);
     let mapStartX = map.lowestX;
     let mapStartY = map.lowestY;
+    let room = getRoom();
 
     height += 32;
     width += 32;
@@ -270,32 +272,43 @@ function fillSolidInfos(map: mapInfo) {
                                             //door
                                             case 1: {
 
-                                                object = new Door(DoorDirection.NORTH);
+                                                object = new Door(DoorDirection.NORTH, (x + map.layers[l].chunks[c].posX - mapStartX) * 2, (y + map.layers[l].chunks[c].posY - mapStartY) * 2);
+                                                room.send("newDoor", ((x + map.layers[l].chunks[c].posX - mapStartX) * 2) + "." + ((y + map.layers[l].chunks[c].posY - mapStartY) * 2));
                                                 break;
                                             }
                                             case 2: {
 
-                                                object = new Door(DoorDirection.EAST);
+                                                object = new Door(DoorDirection.EAST, (x + map.layers[l].chunks[c].posX - mapStartX) * 2, (y + map.layers[l].chunks[c].posY - mapStartY) * 2);
+                                                room.send("newDoor", ((x + map.layers[l].chunks[c].posX - mapStartX) * 2) + "." + ((y + map.layers[l].chunks[c].posY - mapStartY) * 2));
                                                 break;
                                             }
                                             case 3: {
 
-                                                object = new Door(DoorDirection.SOUTH);
+                                                object = new Door(DoorDirection.SOUTH, (x + map.layers[l].chunks[c].posX - mapStartX) * 2, (y + map.layers[l].chunks[c].posY - mapStartY) * 2);
+                                                room.send("newDoor", ((x + map.layers[l].chunks[c].posX - mapStartX) * 2) + "." + ((y + map.layers[l].chunks[c].posY - mapStartY) * 2));
                                                 break;
                                             }
                                             case 4: {
 
-                                                object = new Door(DoorDirection.WEST);
+                                                object = new Door(DoorDirection.WEST, (x + map.layers[l].chunks[c].posX - mapStartX) * 2, (y + map.layers[l].chunks[c].posY - mapStartY) * 2);
+                                                room.send("newDoor", ((x + map.layers[l].chunks[c].posX - mapStartX) * 2) + "." + ((y + map.layers[l].chunks[c].posY - mapStartY) * 2));
                                                 break;
                                             }
                                             case 5: {
 
-                                                object = new Door(DoorDirection.ALWAYS_OPEN);
+                                                object = new Door(DoorDirection.ALWAYS_OPEN, (x + map.layers[l].chunks[c].posX - mapStartX) * 2, (y + map.layers[l].chunks[c].posY - mapStartY) * 2);
+                                                room.send("newDoor", ((x + map.layers[l].chunks[c].posX - mapStartX) * 2) + "." + ((y + map.layers[l].chunks[c].posY - mapStartY) * 2));
                                                 break;
                                             }
                                             //pongtable
                                             case 6: {
                                                 object = new PingPongTable();
+                                                break;
+                                            }
+                                            //whiteboard
+                                            case 7: {
+
+                                                //object = new Whiteboard();
                                                 break;
                                             }
                                         }
