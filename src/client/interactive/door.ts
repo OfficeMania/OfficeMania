@@ -38,6 +38,7 @@ export class Door extends Interactive {
     proofIfClosed(playerDirection: number) {
 
         //TODO
+        //update Door from server before
         //Open door if Player who looked is in the room and wants to leave
         if (this.isClosed) {
             //if direction is inside the room then return false
@@ -78,6 +79,7 @@ export class Door extends Interactive {
 
     startInteraction(playerX: number, playerY: number, playerId: string) {
 
+        //update Door before
         switch (this.direction) {
 
             case DoorDirection.NORTH: {
