@@ -268,15 +268,32 @@ function fillSolidInfos(map: mapInfo) {
                                         switch(value) {
 
                                             //door
-                                            case 1: {}
-                                            case 2: {}
-                                            case 3: {}
-                                            case 4: {}
+                                            case 1: {
+
+                                                object = new Door(DoorDirection.NORTH);
+                                                break;
+                                            }
+                                            case 2: {
+
+                                                object = new Door(DoorDirection.EAST);
+                                                break;
+                                            }
+                                            case 3: {
+
+                                                object = new Door(DoorDirection.SOUTH);
+                                                break;
+                                            }
+                                            case 4: {
+
+                                                object = new Door(DoorDirection.WEST);
+                                                break;
+                                            }
                                             case 5: {
 
                                                 object = new Door(DoorDirection.ALWAYS_OPEN);
                                                 break;
                                             }
+                                            //pongtable
                                             case 6: {
                                                 object = new PingPongTable();
                                                 break;
@@ -521,7 +538,7 @@ function drawMap(mapData: mapInfo) {
         l.chunks.forEach(function (c: chunk) {
 
             //if the chunk is not animated
-            if (l.name.search("animated") === -1) {
+            if (l.name.search("animated") === -1 || l.name.search("Content") === -1 || l.name.search("Rooms") === -1 || l.name.search("Solid") === -1) {
 
                 for (let x = 0; x < 16; x++) {
                     for (let y = 0; y < 16; y++) {
