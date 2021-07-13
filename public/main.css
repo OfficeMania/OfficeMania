@@ -210,6 +210,17 @@ body {
     height: 65vh;
 }
 
+#interactive {
+    position: absolute; 
+    left: 20%; 
+    top: 20%; 
+    z-index: 1;
+    width: 60%; 
+    height: 60%; 
+    visibility: hidden;
+    border: 5px black;
+}
+
 #whiteboard {
     position: absolute; 
     left: 0; 
