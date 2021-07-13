@@ -26,10 +26,12 @@ export class Pong{
     constructor(canvas: HTMLCanvasElement, room: Room<State>, players: PlayerRecord, id: string) {
         this.playerA = new PongPlayer(id);
         this.canvas = canvas;
+        this.room = room;
         //this.canvas.style.visibility = "visible";
         this.ctx = this.canvas.getContext("2d");
         this.ctx.fillStyle = "white"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle ="black";
         this.ctx.fillRect(5, 5, 10, this.sizeBat)
         this.ctx.fillStyle ="black";
@@ -64,9 +66,9 @@ export class Pong{
         this.ctx.fillStyle = "white"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle ="black";
+        this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillRect(5, this.playerA.pos, 5, this.sizeBat);
         if (this.playerB) {
-            this.ctx.fillStyle ="black";
             this.ctx.fillRect(this.canvas.width-10, this.playerB.pos, 5, this.sizeBat);
         }
 

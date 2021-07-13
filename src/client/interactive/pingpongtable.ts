@@ -2,9 +2,10 @@ import { Room } from "colyseus.js";
 import { State } from "../../common";
 import { PongState } from "../../common/rooms/schema/state";
 import { MessageType } from "../../common/util";
+import { setInputMode } from "../input";
 import { checkInputMode } from "../main";
 import { Player } from "../player";
-import { getOurPlayer, getPlayers, getRoom, PlayerRecord } from "../util";
+import { getOurPlayer, getPlayers, getRoom, InputMode, PlayerRecord } from "../util";
 import { Interactive } from "./interactive";
 import { Pong, PongPlayer } from "./pong";
 
@@ -29,39 +30,49 @@ export class PingPongTable extends Interactive{
         this.room.send(MessageType.INTERACTION, "pong");
         console.log("Pong game interaction...");
         this.getPongs();
-        this.ourGame = this.pongs[this.getGame(this.ourPlayer.id).toString()];
+        
+        
+        this.ourGame = new Pong(this.canvas, this.room, this.players, this.ourPlayer.id);
         this.ourGame.canvas.style.visibility = "visible";
-        this.ourGame.updatePos();
+        
+        
         checkInputMode();
+        this.room.onMessage(MessageType.INTERACTION, (message) => {
+            if (message === "pong-init") {
+                this.getPongs();
+                console.log(this);
+                this.ourGame = this.pongs[0];//this.getGame(this.ourPlayer.id)
+            }
+            if (message === "pong-update") {
+                this.ourGame.paint();
+            }
+        });
+        
     }
     getPongs() {
         let i = 0;
-        console.log(this.room.state.pongStates.size);
-        while (this.room.state.pongStates[i]) {
+        //console.log(this.room.state.pongStates[i.toString()].playerIds);
+        console.log(this.room.state.pongStates[0]);
+        while (this.room.state.pongStates[i.toString()]) {
+            console.log("state " + i);
             if(!this.pongs[i]) {
-                this.pongs[i] = this.getPongFromState(this.room.state.pongStates[i]);
+                this.pongs[i] = this.getPongFromState(this.room.state.pongStates[i.toString()]);
             }
             this.pongs[i].updatePos();
             i++;
         }
-        /**this.room.state.pongStates.forEach(() => {
-            if(!this.pongs[i]) {
-                this.pongs[i] = this.getPongFromState(this.room.state.pongStates[i]);
-            }
-            this.pongs[i].updatePos();
-            i++;
-        });*/
     }
     getPongFromState(state: PongState): Pong {
-        let pong: Pong = new Pong(this.canvas, this.room, this.players, this.ourPlayer.id);
+        let pong = new Pong(this.canvas, this.room, this.players, this.ourPlayer.id);
         pong.playerA = new PongPlayer(state.playerIds[0]);
         if(state.playerIds[1]) { pong.playerB = new PongPlayer(state.playerIds[1]); }
-        console.log("created a pong game")
+        console.log("created a pong game");
+        pong.updatePos();
         return pong;
     }
-    getGame(client): number{
+    getGame(clientId: string): number{
         for(let i = 0; i < this.room.state.pongStates.size; i++) {
-            if (this.room.state.pongStates[i.toString()].playerIds.array.forEach(id => { id === client.sessionId; })){
+            if (this.room.state.pongStates[i.toString()].playerIds.forEach(id => { id === clientId; })){
                 return i;
             }
         }

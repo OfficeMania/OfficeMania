@@ -36,7 +36,6 @@ import {playerLoop} from "./movement";
 import {getInputMode, loadInputFunctions, setInputMode} from "./input";
 import {drawPlayer} from "./drawplayer"
 import {Whiteboard} from "./whiteboard"
-import {Pong} from "./interactive/pong";
 import { Room } from "colyseus";
 import { MessageType } from "../common/util";
 
@@ -382,7 +381,9 @@ async function main() {
         ctx.restore();
 
         //drawWhiteboard(canvas, whiteboard.getCanvas())
-
+        if (getInputMode() === InputMode.INTERACTION) {
+            
+        }
 
         // Repeat game loop
         requestAnimationFrame(loop);
