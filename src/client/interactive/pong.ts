@@ -7,7 +7,8 @@ import {Direction, MessageType} from "../../common/util";
 
 export class Pong{
 
-    
+    selfGameId: string;
+
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
     //PlayerIDs
@@ -25,7 +26,7 @@ export class Pong{
     constructor(canvas: HTMLCanvasElement, room: Room<State>, players: PlayerRecord, id: string) {
         this.playerA = new PongPlayer(id);
         this.canvas = canvas;
-        this.canvas.style.visibility = "visible";
+        //this.canvas.style.visibility = "visible";
         this.ctx = this.canvas.getContext("2d");
         this.ctx.fillStyle = "white"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -37,36 +38,38 @@ export class Pong{
 
     }
     loop(){
-        while(this.playerA.score + this.playerB.score <= 10){
+        let gameOn = true;
+        if(gameOn){
             this.updatePos();
             this.paint();
+            if(this.playerB) {
+
+            }
         }
         this.room.send(MessageType.INTERACTION, "pong-stop");
     }
     updatePos() {
-        let currentState = this.room.state.pongStates[this.getGame(this.playerA)];
+        let currentState = this.room.state.pongStates.get(this.selfGameId);
         if (currentState) {
             this.posBallX = currentState.posBall[0];
             this.posBallY = currentState.posBall[1];
             this.posPlayerA = currentState.posPlayerA;
-            this.posPlayerB = currentState.posPlayerB;
-        }
-    }
-    getGame(client): number{
-        for(let i = 0; i < this.room.state.pongStates.size; i++) {
-            if (this.room.state.pongStates[i.toString()].playerIds[0] === client.sessionId || this.room.state.pongStates[i.toString()].playerIds[1] === client.sessionId){
-                return i;
+            if (this.playerB) {
+                this.posPlayerB = currentState.posPlayerB;
             }
         }
-        return -1;
     }
+    
     paint(){
         this.ctx.fillStyle = "white"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle ="black";
-        this.ctx.fillRect(5, this.playerA.pos, 5, this.sizeBat)
-        this.ctx.fillStyle ="black";
-        this.ctx.fillRect(this.canvas.width-10, this.playerB.pos, 5, this.sizeBat)
+        this.ctx.fillRect(5, this.playerA.pos, 5, this.sizeBat);
+        if (this.playerB) {
+            this.ctx.fillStyle ="black";
+            this.ctx.fillRect(this.canvas.width-10, this.playerB.pos, 5, this.sizeBat);
+        }
+
     }
 }
 export class PongPlayer {

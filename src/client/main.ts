@@ -33,7 +33,7 @@ import {
     updateUsers
 } from "./conference/conference";
 import {playerLoop} from "./movement";
-import {loadInputFunctions, setInputMode} from "./input";
+import {getInputMode, loadInputFunctions, setInputMode} from "./input";
 import {drawPlayer} from "./drawplayer"
 import {Whiteboard} from "./whiteboard"
 import {Pong} from "./interactive/pong";
@@ -132,6 +132,7 @@ export function checkInputMode() {
     } else {
         setInputMode(InputMode.NORMAL);
     }
+    console.log(getInputMode());
 }
 
 function checkValidSettings() {
