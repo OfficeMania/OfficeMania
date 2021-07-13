@@ -128,7 +128,7 @@ export class TURoom extends Room<State> {
 
         this.onMessage(MessageType.INTERACTION, (client, message) => {
             switch (message) {
-                case message === "pong": {
+                case "pong": {
                     let inGame: number = this.getPongGame(client);
                     if(inGame === -1) {
                         let emptyGame = this.getEmptyPongGame();
@@ -148,7 +148,7 @@ export class TURoom extends Room<State> {
                     }
                     break;
                 }
-                case message === "pong-end": {
+                case "pong-end": {
                     let inGame: number = this.getPongGame(client);
                     if(inGame !== -1) {
                         this.state.pongStates.delete(inGame.toString());
