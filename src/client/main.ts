@@ -119,8 +119,6 @@ const interactiveCanvas = $<HTMLCanvasElement>("interactive");
 
 //const pongs: Pong[] = [];
 
-const interactionButton = $<HTMLButtonElement>("button-pong");
-
 
 const observer = new MutationObserver(mutations => mutations.forEach(checkInputMode));
 observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
@@ -338,7 +336,6 @@ async function main() {
      */
 
     let playerNearbyTimer = 0;
-    interactionButton.addEventListener("click", () => {}); //TODO REMOVE
 
     function loop(now: number) {
 
