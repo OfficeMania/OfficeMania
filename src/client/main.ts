@@ -117,7 +117,6 @@ const characterPreview = $<HTMLSelectElement>("character-preview");
 
 const interactiveCanvas = $<HTMLCanvasElement>("interactive");
 
-//const pongs: Pong[] = [];
 
 
 const observer = new MutationObserver(mutations => mutations.forEach(checkInputMode));
