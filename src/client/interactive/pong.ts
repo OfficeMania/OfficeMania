@@ -69,15 +69,13 @@ export class Pong{
         this.ctx.fillRect(this.canvas.width-10, this.playerB.pos, 5, this.sizeBat)
     }
 }
-class PongPlayer {
+export class PongPlayer {
     private _id: string;
-    private _move: Direction;
     private _score: number;
     private _pos: number;
 
     constructor(id: string){
         this._id = id;
-        this._move = null;
         this._score = 0;
         this._pos = 0;
     }
@@ -86,12 +84,6 @@ class PongPlayer {
     }
     set id(id: string) {
         this._id = id;
-    }
-    get move(): Direction{
-        return this._move;
-    }
-    set move(move: Direction) {
-        this._move = move;
     }
     get score(): number{
         return this._score;
