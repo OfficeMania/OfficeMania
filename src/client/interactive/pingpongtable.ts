@@ -4,6 +4,11 @@ import { getOurPlayer, getRoom } from "../util";
 import { Interactive } from "./interactive";
 
 export class PingPongTable extends Interactive{
+
+    constructor() {
+
+        super("Pingpongtable", true, 2);
+    }
     
     
     onInteraction() {

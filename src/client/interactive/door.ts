@@ -1,4 +1,6 @@
 import {Interactive} from "./interactive"
+import {Player} from "./../player"
+import {getOurPlayer} from "./../util"
 
 export enum DoorDirection {
     UNKNOWN,
@@ -12,20 +14,20 @@ export enum DoorDirection {
 export class Door extends Interactive {
 
     isClosed: boolean;
-    //1: S-->N, 2: W-->E, 3: N-->S, 4: E-->W, 5: Always open.
     direction: DoorDirection;
     playerId: string;
     posX: number;
     posY: number;
 
     constructor(direction: DoorDirection) {
-        super("door");
+        super("door", true, 1);
         this.direction = direction;
     }
 
     onInteraction(): void {
-        console.warn("Not implemented on this Door");
-        //TODO This function gets call, when a player presses space bar and faces a Door
+        
+        let player = getOurPlayer();
+        this.startInteraction(player.positionX, player.positionY, player.id);
     }
 
     proofIfClosed(playerDirection: number) {
@@ -73,7 +75,7 @@ export class Door extends Interactive {
 
         switch (this.direction) {
 
-            case 1: {
+            case DoorDirection.NORTH: {
 
                 if (playerY > this.posY) {
 
@@ -90,7 +92,7 @@ export class Door extends Interactive {
                 }
                 break;
             }
-            case 2: {
+            case DoorDirection.EAST: {
 
                 if (playerX < this.posX) {
 
@@ -107,7 +109,7 @@ export class Door extends Interactive {
                 }
                 break;
             }
-            case 3: {
+            case DoorDirection.SOUTH: {
 
                 if (playerY < this.posY) {
 
@@ -124,7 +126,7 @@ export class Door extends Interactive {
                 }
                 break;
             }
-            case 4: {
+            case DoorDirection.WEST: {
 
                 if (playerX > this.posX) {
 
