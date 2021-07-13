@@ -1,4 +1,11 @@
 /**
+ * for use of $<>("") to get the correct type of object
+ */
+function $<T extends HTMLElement>(a: string) {
+    return <T>document.getElementById(a);
+}
+
+/**
  * Yes "[Interactive](https://en.wiktionary.org/wiki/interactive#Noun)" is a noun
  */
 export class Interactive {
@@ -6,11 +13,14 @@ export class Interactive {
     private _name: string;
     private _singleton: boolean;
     private _maxPlayer: number;
+    canvas: HTMLCanvasElement;
+    
 
     constructor(name: string, singleton: boolean = true, maxPlayer: number = 1) {
         this._name = name;
         this._singleton = singleton;
         this._maxPlayer = maxPlayer;
+        this.canvas = $<HTMLCanvasElement>("interactive");
     }
 
     /**
