@@ -68,6 +68,14 @@ export class PongState extends Schema {
     sizes = new ArraySchema<number>();
 }
 
+export class doorState extends Schema {
+
+    @type("string")
+    playerId: string;
+
+    @type("boolean")
+    isClosed: boolean;
+}
 
 /*
  * The state of a room. Each variable that is annotated with a @type decorator
@@ -99,4 +107,7 @@ export class State extends Schema {
 
     @type({map: PongState})
     pongStates: MapSchema<PongState> = new MapSchema<PongState>();
+
+    @type({map: doorState})
+    doorStates: MapSchema<doorState> = new MapSchema<doorState>();
 }

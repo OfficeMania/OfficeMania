@@ -22,6 +22,7 @@ export enum MessageType {
     UPDATE_PARTICIPANT_ID = "updateParticipantId",
     CLEAR_WHITEBOARD = "clearWhiteboard",
     INTERACTION = "interaction",
+    DOOR = "newDoor"
 }
 
 export function generateUUIDv4() {

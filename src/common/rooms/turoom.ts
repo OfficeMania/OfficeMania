@@ -1,5 +1,5 @@
 import {Client, Room} from "colyseus";
-import {PlayerData, PongState, State, WhiteboardPlayer} from "./schema/state";
+import {doorState, PlayerData, PongState, State, WhiteboardPlayer} from "./schema/state";
 import fs from 'fs';
 import {Direction, generateUUIDv4, MessageType} from "../util";
 import {ArraySchema, MapSchema} from "@colyseus/schema";
@@ -191,6 +191,16 @@ export class TURoom extends Room<State> {
         this.onMessage(MessageType.UPDATE_PARTICIPANT_ID, (client, message) => {
             this.state.players[client.sessionId].participantId = message; //TODO Maybe let the server join the jitsi conference too (without mic/cam) and then authenticate via the jitsi chat, that a player is linked to a participantId, so that one cannot impersonate another one.
         });
+
+        this.onMessage(MessageType.DOOR, (client, message) => {
+
+            if (this.state.doorStates[message] !== null) {
+                
+                this.state.doorStates[message] = new doorState();
+                this.state.doorStates[message].isClosed = false;
+                this.state.doorStates[message].playerId = "";
+            }
+        })
     }
 
     onAuth(client: Client, options: any, req: any) {
