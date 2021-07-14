@@ -186,9 +186,11 @@ export class TURoom extends Room<State> {
     }
 
     onLeave(client: Client, consented: boolean) {
-        if(this.getPongGame(client) !== -1) {
-            let game: PongState = this.state.pongStates[this.getPongGame(client).toString()];
+        let n = this.getPongGame(client);
+        if(n !== -1) {
+            let game: PongState = this.state.pongStates[n.toString()];
             game.playerA === client.sessionId? game.playerA = null: game.playerB = null;
+            game.playerA === null && game.playerB === null? this.state.pongStates.delete(n.toString()): {};
         }
         delete this.state.players[client.sessionId];
     }
