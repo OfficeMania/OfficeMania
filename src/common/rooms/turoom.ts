@@ -111,11 +111,13 @@ export class TURoom extends Room<State> {
                     break;
                 }
                 case "pong-leave": {
-                    let inGame: number = this.getPongGame(client);
-                    if(inGame !== -1) {
-                        let game = this.state.pongStates[inGame.toString()];
-                        game.playerA? game.playerA = null: game.playerB = null;
+                    let n = this.getPongGame(client);
+                    if(n !== -1) {
+                        let game: PongState = this.state.pongStates[n.toString()];
+                        game.playerA === client.sessionId? game.playerA = null: game.playerB = null;
+                        game.playerA === null && game.playerB === null? this.state.pongStates.delete(n.toString()): {};
                     }
+                    
                     break;
                 }
                 case "pong-init":
@@ -184,6 +186,10 @@ export class TURoom extends Room<State> {
     }
 
     onLeave(client: Client, consented: boolean) {
+        if(this.getPongGame(client) !== -1) {
+            let game: PongState = this.state.pongStates[this.getPongGame(client).toString()];
+            game.playerA === client.sessionId? game.playerA = null: game.playerB = null;
+        }
         delete this.state.players[client.sessionId];
     }
 
