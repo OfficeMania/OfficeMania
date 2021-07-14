@@ -3,11 +3,12 @@ import {PlayerRecord} from "../util";
 import {State} from "../../common";
 import {Interactive} from "./interactive";
 import {Direction, MessageType} from "../../common/util";
+import { PongState } from "../../common/rooms/schema/state";
 
-
+let i = 0;
 export class Pong{
 
-    selfGameId: string;
+    selfGameId: number = -1;
     inGame = false;
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
@@ -41,17 +42,32 @@ export class Pong{
     }
     loop(){
         this.updatePos();
-        this.paint();
+        i;
+        if( i = 20) {
+            this.paint();
+            i= 0;
+        }
+        i++
+        
         //this.room.send(MessageType.INTERACTION, "pong-end");
     }
     updatePos() {
-        let currentState = this.room.state.pongStates.get(this.selfGameId);
-        if (currentState) {
-            this.posBallX = currentState.posBall[0];
-            this.posBallY = currentState.posBall[1];
+        let currentState: PongState;
+        if(this.selfGameId !== -1) {
+            currentState = this.room.state.pongStates[this.selfGameId.toString()]
+        }
+        else {console.log("still no")};
+        if(currentState) {
+            if (!currentState.playerIds.at(1) && this.playerB){
+                this.playerB.pos = currentState.posPlayerB;
+            }
+            this.posBallX = currentState.posBall.at(0);
+            this.posBallY = currentState.posBall.at(1);
             this.posPlayerA = currentState.posPlayerA;
+            console.log(this.posPlayerA + "PlayerA");
             if (this.playerB) {
                 this.posPlayerB = currentState.posPlayerB;
+                console.log(this.posPlayerB + " playerB");
             }
         }
     }

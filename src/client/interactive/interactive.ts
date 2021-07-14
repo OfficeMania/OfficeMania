@@ -1,3 +1,5 @@
+import { Direction } from "../../common/util";
+
 /**
  * for use of $<>("") to get the correct type of object
  */
@@ -16,6 +18,7 @@ export class Interactive {
     canvas: HTMLCanvasElement;
     interactiveBar = $<HTMLDivElement>("interactive-bar");
     buttonBar = $<HTMLDivElement>("panel-buttons-interaction")
+    input: Direction[] = [null];
     
 
     constructor(name: string, singleton: boolean = true, maxPlayer: number = 1) {
@@ -77,6 +80,10 @@ export class Interactive {
 
     loop(): void {
         console.warn("loop not implemented");
+    }
+
+    updateInput(): void {
+        console.log("No input method speccified");
     }
 }
 

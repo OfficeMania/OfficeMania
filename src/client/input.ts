@@ -51,8 +51,14 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direct
             }
             break;
         case InputMode.INTERACTION:
-            ourPlayer.priorDirections = [];
-            ourPlayer;
+            let content = checkInteraction(true).content;
+            if(!content.input.includes(direction)){
+                if (content.input[0]) {
+                    content.input[1] = content.input[0];
+                }
+                content.input[0] = direction;
+            }
+            
             break;
 
     }
@@ -68,7 +74,14 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
             ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(direction), 1);
             break;
         case InputMode.INTERACTION:
-            //TODO
+            let content = checkInteraction(true).content;
+            if(content.input.indexOf(direction) === 0) {
+                if(content.input[1]){
+                    content.input[0] = content.input.pop();
+                }
+                else content.input.pop();
+            }
+            else content.input.pop();
             break;
 
     }

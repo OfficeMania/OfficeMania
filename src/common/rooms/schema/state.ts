@@ -66,6 +66,9 @@ export class PongState extends Schema {
     //0: sizeBall, 1: sizeBat
     @type({array: "number"})
     sizes = new ArraySchema<number>();
+    //0: ball, 1: bat
+    @type({array: "number"})
+    velocities = new ArraySchema<number>();
 }
 
 export class doorState extends Schema {

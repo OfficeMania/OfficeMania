@@ -80,49 +80,54 @@ export class TURoom extends Room<State> {
         });
 
         this.onMessage(MessageType.MOVE_PONG, (client, message) => {
-            if (this.state.pongStates[this.getPongGame(client).toString()] && this.state.pongStates[this.getPongGame(client).toString()].playerA === client.sessionId) {
+            //console.log("move_pong recieved" + message);
+            const gameState: PongState = this.state.pongStates[this.getPongGame(client).toString()]
+            //console.log(gameState);
+            if (gameState && gameState.playerIds.at(0) === client.sessionId) {
                 switch (message) {
                     case Direction.UP: {
-                        if(this.state.pongStates[this.getPongGame(client).toString()].posPlayerA > 0){
-                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerA--;
+                        if(gameState.posPlayerA > 0){
+                            gameState.posPlayerA -= gameState.velocities.at(1);
                         }
                         else {
-                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerA = 0;
+                            gameState.posPlayerA = 0;
                         }
                         break;
                     }
                     case Direction.DOWN: {
-                        if(this.state.pongStates[this.getPongGame(client).toString()].posPlayerA < 1000){
-                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerA++;
+                        if(gameState.posPlayerA + gameState.sizes.at(1) < 1000){
+                            gameState.posPlayerA += gameState.velocities.at(1);
                         }
                         else {
-                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerA = 1000;
+                            gameState.posPlayerA = 1000 - gameState.sizes.at(1);
                         }
                         break;
                     }
                 }
+                //console.log(gameState.posPlayerA + " is pos of player a");
             }
-            else if (this.state.pongStates[this.getPongGame(client).toString()] && this.state.pongStates[this.getPongGame(client).toString()].playerB === client.sessionId) {
+            else if (gameState && gameState.playerIds.at(1) === client.sessionId) {
                 switch (message) {
                     case Direction.UP: {
-                        if(this.state.pongStates[this.getPongGame(client).toString()].posPlayerB > 0){
-                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerB--;
+                        if(gameState.posPlayerB > 0){
+                            gameState.posPlayerB -= gameState.velocities.at(1);
                         }
                         else {
-                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerB = 0;
+                            gameState.posPlayerB = 0;
                         }
                         break;
                     }
                     case Direction.DOWN: {
-                        if(this.state.pongStates[this.getPongGame(client).toString()].posPlayerB < 1000){
-                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerB++;
+                        if(gameState.posPlayerB + gameState.sizes.at(1) < 1000){
+                            gameState.posPlayerB += gameState.velocities.at(1);
                         }
                         else {
-                            this.state.pongStates[this.getPongGame(client).toString()].posPlayerB = 1000;
+                            gameState.posPlayerB = 1000 - gameState.sizes.at(1);
                         }
                         break;
                     }
                 }
+                //console.log(gameState.posPlayerB + " is pos of player B");
             }
         })
 
@@ -134,12 +139,11 @@ export class TURoom extends Room<State> {
                         let emptyGame = this.getEmptyPongGame();
                         console.log("empty game: " + emptyGame);
                         if (emptyGame !== -1) {
-                            if (this.state.pongStates[emptyGame.toString()]){
-                                if (!this.state.pongStates[emptyGame.toString()].playerIds.at(0)){
-                                    this.state.pongStates[emptyGame.toString()].playerIds.push(client.sessionId);
-                                }
-                                if (!this.state.pongStates[emptyGame.toString()].playerIds.at(1)){
-                                    this.state.pongStates[emptyGame.toString()].playerIds.push(client.sessionId);
+                            let emptyState: PongState = this.state.pongStates[emptyGame.toString()];
+                            if (emptyState){
+                                if (!emptyState.playerIds.at(1)){
+                                    emptyState.playerIds.push(client.sessionId);
+                                    emptyState.posPlayerB = 500 - (emptyState.sizes.at(1)/2)
                                 }
                             }
                         }
@@ -147,10 +151,14 @@ export class TURoom extends Room<State> {
                             console.log("creating new pongstate");
                             console.log(this.getNextPongSlot());
                             let ar = this.getNextPongSlot();
-                            this.state.pongStates[ar.toString()] = new PongState();
-                            this.state.pongStates[ar.toString()].playerIds.push(client.sessionId);
-                            console.log(this.state.pongStates[ar.toString()].playerIds.indexOf(client.sessionId));
-                            //console.log(this.state.pongStates)
+                            let newState = new PongState();
+                            newState.playerIds.push(client.sessionId);
+                            newState.velocities.push(10,10);
+                            newState.sizes.push(10, 100)
+                            newState.posPlayerA = 500 - (newState.sizes.at(1)/2);
+                            
+                            this.state.pongStates[ar.toString()] = newState;
+                            console.log(this.state.pongStates[ar.toString()].posPlayerA);
                         }
                     }
                     setTimeout(() => client.send(MessageType.INTERACTION, "pong-init"), 1000);

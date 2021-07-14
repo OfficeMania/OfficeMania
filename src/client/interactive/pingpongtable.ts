@@ -1,7 +1,7 @@
 import { Room } from "colyseus.js";
 import { State } from "../../common";
 import { PongState } from "../../common/rooms/schema/state";
-import { MessageType } from "../../common/util";
+import { Direction, MessageType } from "../../common/util";
 import { setInputMode } from "../input";
 import { checkInputMode } from "../main";
 import { Player } from "../player";
@@ -15,13 +15,15 @@ export class PingPongTable extends Interactive{
     room: Room<State>;
     ourPlayer: Player;
     players: PlayerRecord;
-
+    previousInput: Direction[];
     
     constructor() {
         super("pingpongtable", false, 2)
         this.room = getRoom();
         this.players = getPlayers();
         this.pongs = [];
+        this.input = [null];
+        this.previousInput = this.input;
     }
     
     onInteraction() {
@@ -49,9 +51,12 @@ export class PingPongTable extends Interactive{
                     console.log(this.pongs);
                     this.ourGame = this.pongs[this.getGame(this.ourPlayer.id)];
                     console.log(this.ourGame);
+                    
                 }
                 if (message === "pong-update") {
                     if (this.ourGame){
+                        this.ourGame.selfGameId = this.getGame(this.ourPlayer.id);
+                        if(!this.ourGame.playerB){this.updateState()};
                         console.log(this.ourGame)
                         this.ourGame.paint();
                     }
@@ -83,6 +88,13 @@ export class PingPongTable extends Interactive{
         let pong = new Pong(this.canvas, this.room, this.players, this.ourPlayer.id);
         pong.playerA = new PongPlayer(state.playerIds.at(0));
         if(state.playerIds[1]) { pong.playerB = new PongPlayer(state.playerIds.at(1)); }
+        try {
+            pong.sizeBall = state.sizes.at(0);
+            pong.sizeBat = state.sizes.at(1);
+        }
+        catch(e){
+            console.warn("PROPERTY HAS NOT BEEN LOADED INTO PONGSTATE")
+        }
         //console.log("created a pong game");
         //console.log(pong.playerA);
         pong.updatePos();
@@ -101,14 +113,9 @@ export class PingPongTable extends Interactive{
     }
     loop() {
         if(this.ourGame) {
-            if(!this.ourGame.playerB) {
-                try {
-                    this.ourGame.playerB = new PongPlayer(this.room.state.pongStates[this.getGame(this.ourPlayer.id).toString()].playerIds.at(1));
-                    console.log(this.ourGame);
-                }
-                catch(e){console.log("no player B yet");}
-            }
+            
             this.ourGame.loop();
+            this.updateInput();
         }
     }
     leave() {
@@ -118,6 +125,31 @@ export class PingPongTable extends Interactive{
         this.ourGame = new Pong(this.canvas, this.room, this.players, this.ourPlayer.id);
         this.pongs = [];
         checkInputMode();
+    }
+    updateState() {
+        if(this.room.state.pongStates[this.ourGame.selfGameId.toString()].playerIds.at(1) && !this.ourGame.playerB) {
+            console.log("inserting player b");
+            this.ourGame.playerB = new PongPlayer(this.room.state.pongStates[this.getGame(this.ourPlayer.id).toString()].playerIds.at(1));
+            console.log(this.ourGame);
+        }
+    }
+    updateInput() {
+        //console.log(this.input);
+        switch (this.input[0]) {
+            case Direction.UP: {
+                this.room.send(MessageType.MOVE_PONG, Direction.UP);
+                break;
+            }
+            case Direction.DOWN: {
+                this.room.send(MessageType.MOVE_PONG, Direction.DOWN);
+                break;
+            }
+            default: {
+                //this.room.send(MessageType.MOVE_PONG, null);
+                break;
+            }
+        }
+        
     }
 
 }
