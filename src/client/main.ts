@@ -204,6 +204,7 @@ function loadCharacterSettings() {
 }
 
 function onSettingsOpen() {
+    interactiveCanvas.style.visibility = "hidden";
     loadSettings();
     setInputMode(InputMode.SETTINGS);
 }
