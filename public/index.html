@@ -19,13 +19,13 @@
     </head>
     <body>
         <div id="panel-buttons">
-            <div class="group">
+            <div id="group-left">
                 <button id="button-mute-audio" disabled><em class="fa fa-microphone"></em><span></span></button>
                 <button id="button-mute-video" disabled><em class="fa fa-video"></em><span></span></button>
                 <button id="button-share-video" disabled><em class="fa fa-desktop"></em><span></span></button>
             </div>
-            <div class="divider"></div>
-            <div class="group">
+            <div id="panel-buttons-interaction"></div>
+            <div id="group-right">
                 <button id="button-settings" data-toggle="modal" data-target="#settings-modal"><em class="fa fa-cog"></em><span></span></button>
                 <button id="button-users"><em class="fa fa-user-friends"></em><span></span></button>
             </div>
@@ -83,7 +83,10 @@
         <div id="chat-container">
             <ul id="chat-list"></ul>
         </div>
-        <canvas id="interactive" tabindex='0' width="1000" height="1000" >
+        <div id="interactive-bar">
+            <canvas id="interactive" tabindex='0' width="1000" height="1000"></canvas>
+        </div>
+        
         </canvas>
         <!-- 'canvas' is the main canvas for the map-->
         <canvas id="canvas" width="600" height="600">

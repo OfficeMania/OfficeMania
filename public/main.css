@@ -4,6 +4,7 @@
     --text-primary: #b6b6b6;
     --text-secondary: #ececec;
     --bg-primary: #23232e;
+    --bg-primary-op: #23232e8e;
     --bg-secondary: #141418;
     --transition-speed: 600ms;
 }
@@ -44,11 +45,13 @@ body {
     background: #6c6e85;
 }
 
-#panel-buttons .divider {
+#panel-buttons #panel-buttons-interaction {
     flex: 1;
+    display: flex;
+    justify-content: center;
 }
 
-#panel-buttons .group {
+#panel-buttons #group-right {
     display: flex;
     flex-direction: row;
 }
@@ -221,6 +224,26 @@ body {
     border: 5px black;
 }
 
+#interactive-bar button {
+    height: 40px;
+    width: 40px;
+    cursor: pointer;
+    font-size: 110%;
+    font-weight: bold;
+    position: relative;
+    margin: 5px;
+    color: #3a3a50;
+    background: #f8f8f8;
+    border: solid;
+    border-width: 2px;
+    border-radius: 10px;
+    /*position: absolute;*/ 
+    top:0; 
+    left:0; 
+    z-index: 1; 
+    visibility: hidden;
+}
+
 #whiteboard {
     position: absolute; 
     left: 0; 
@@ -277,7 +300,8 @@ body {
 
 #player-online-container {
     position: fixed;
-    background-color: var(--bg-primary);
+    background-color: var(--bg-primary-op);
+    
     transition: width 600ms ease, height 500ms ease;
     overflow: hidden;
 }
