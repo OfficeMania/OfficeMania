@@ -32,11 +32,11 @@ function isPureKey(event: KeyboardEvent): boolean {
     return event && !event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey;
 }
 
-function onPureKey(event: KeyboardEvent, key: string, runnable: () => void) {
+function onPureKey(event: KeyboardEvent, key: string, runnable: (boolean) => void) {
     if (!isPureKey(event) || event.key.toLowerCase() !== key.toLowerCase()) {
         return;
     }
-    runnable();
+    runnable(false);
 }
 
 function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direction) {
@@ -51,7 +51,8 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direct
             }
             break;
         case InputMode.INTERACTION:
-            //TODO
+            ourPlayer.priorDirections = [];
+            ourPlayer;
             break;
 
     }
@@ -84,16 +85,7 @@ export function loadInputFunctions() {
         onDirectionKeyDown(e, "a", Direction.LEFT);
         onDirectionKeyDown(e, "d", Direction.RIGHT);
         //player interacts with object in front of him
-        onPureKey(e, " ", () => {
-            const [facingX, facingY] = getCorrectedPlayerFacingCoordinates(ourPlayer);
-            const solidInfo: solidInfo = getCollisionInfo()?.[facingX]?.[facingY];
-            if (!solidInfo) {
-                console.error(`no solidInfo for ${facingX}:${facingY}`);
-                return
-            }
-            solidInfo.content && solidInfo.content.onInteraction();
-            //console.log(solidInfo.content);
-        });
+        onPureKey(e, " ", checkInteraction);
         if (inputMode === InputMode.INTERACTION) {
             return;
         }
@@ -133,3 +125,17 @@ export function loadInputFunctions() {
     document.addEventListener("keyup", onKeyUp);
     window.addEventListener("blur", onBlur);
 }
+
+export function checkInteraction(inGame: boolean): solidInfo  {
+    const ourPlayer = getOurPlayer();
+    const [facingX, facingY] = getCorrectedPlayerFacingCoordinates(ourPlayer);
+    const solidInfo: solidInfo = getCollisionInfo()?.[facingX]?.[facingY];
+    if (!solidInfo) {
+        console.error(`no solidInfo for ${facingX}:${facingY}`);
+        return
+    }
+    solidInfo.content && !inGame && solidInfo.content.onInteraction();
+            //console.log(solidInfo.content);
+    return solidInfo;
+}
+

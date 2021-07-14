@@ -33,7 +33,7 @@ import {
     updateUsers
 } from "./conference/conference";
 import {playerLoop} from "./movement";
-import {getInputMode, loadInputFunctions, setInputMode} from "./input";
+import {checkInteraction, getInputMode, loadInputFunctions, setInputMode} from "./input";
 import {drawPlayer} from "./drawplayer"
 import {Whiteboard} from "./whiteboard"
 import { Room } from "colyseus";
@@ -383,7 +383,7 @@ async function main() {
 
         //drawWhiteboard(canvas, whiteboard.getCanvas())
         if (getInputMode() === InputMode.INTERACTION) {
-            
+            checkInteraction(true).content.loop();
         }
 
         // Repeat game loop

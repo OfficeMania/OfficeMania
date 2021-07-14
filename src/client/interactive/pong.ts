@@ -8,7 +8,7 @@ import {Direction, MessageType} from "../../common/util";
 export class Pong{
 
     selfGameId: string;
-
+    inGame = false;
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
     //PlayerIDs
@@ -19,7 +19,7 @@ export class Pong{
     posBallX: number;
     posBallY: number;
 
-    sizeBat: number = 15;
+    sizeBat: number = 100;
     posPlayerA: number = 0;
     posPlayerB: number = 0;
     room: Room<State>
@@ -40,14 +40,8 @@ export class Pong{
 
     }
     loop(){
-        let gameOn = true;
-        if(gameOn){
-            this.updatePos();
-            this.paint();
-            if(this.playerB) {
-
-            }
-        }
+        this.updatePos();
+        this.paint();
         //this.room.send(MessageType.INTERACTION, "pong-end");
     }
     updatePos() {

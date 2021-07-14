@@ -75,5 +75,8 @@ export class Interactive {
         console.warn("Not implemented on this Interactive");
     }
 
+    loop(): void {
+        console.warn("loop not implemented");
+    }
 }
 
