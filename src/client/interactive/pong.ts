@@ -5,7 +5,6 @@ import {Interactive} from "./interactive";
 import {Direction, MessageType} from "../../common/util";
 import { PongState } from "../../common/rooms/schema/state";
 
-let i = 0;
 export class Pong{
 
     selfGameId: number = -1;
@@ -21,8 +20,6 @@ export class Pong{
     posBallY: number;
 
     sizeBat: number = 100;
-    posPlayerA: number = 0;
-    posPlayerB: number = 0;
     room: Room<State>
     constructor(canvas: HTMLCanvasElement, room: Room<State>, players: PlayerRecord, id: string) {
         this.playerA = new PongPlayer(id);
@@ -42,12 +39,7 @@ export class Pong{
     }
     loop(){
         this.updatePos();
-        i;
-        if( i = 20) {
-            this.paint();
-            i= 0;
-        }
-        i++
+        this.paint();
         
         //this.room.send(MessageType.INTERACTION, "pong-end");
     }
@@ -63,11 +55,11 @@ export class Pong{
             }
             this.posBallX = currentState.posBall.at(0);
             this.posBallY = currentState.posBall.at(1);
-            this.posPlayerA = currentState.posPlayerA;
-            console.log(this.posPlayerA + "PlayerA");
+            this.playerA.pos = currentState.posPlayerA;
+            console.log(this.playerA.pos + "PlayerA");
             if (this.playerB) {
-                this.posPlayerB = currentState.posPlayerB;
-                console.log(this.posPlayerB + " playerB");
+                this.playerB.pos = currentState.posPlayerB;
+                console.log(this.playerB.pos + " playerB");
             }
         }
     }
@@ -77,9 +69,11 @@ export class Pong{
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle ="black";
         this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillRect(5, this.playerA.pos, 5, this.sizeBat);
+        this.ctx.fillStyle ="black";
+        this.ctx.fillRect(5, this.playerA.pos, 15, this.sizeBat);
         if (this.playerB) {
-            this.ctx.fillRect(this.canvas.width-10, this.playerB.pos, 5, this.sizeBat);
+            this.ctx.fillStyle ="black";
+            this.ctx.fillRect(this.canvas.width-20, this.playerB.pos, 10, this.sizeBat);
         }
 
     }
