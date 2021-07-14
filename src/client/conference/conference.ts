@@ -188,8 +188,8 @@ function onConferenceJoined() {
     console.debug('Conference joined'); //DEBUG
     isJoined = true;
     selfUser.addToConference();
-    toggleMuteByType("video");
-    toggleMuteByType("audio");
+    //toggleMuteByType("video");
+    //toggleMuteByType("audio");
 }
 
 /**
