@@ -10,9 +10,9 @@ function onPongMove(client, message) {
     if (!gameState) {
         return;
     }
-    if (gameState.playerIds.at(0) === client.sessionId) {
+    if (gameState.playerA === client.sessionId) {
         onPongMovePlayer(message, gameState, gameState.posPlayerA, (newPos: number) => gameState.posPlayerA = newPos);
-    } else if (gameState.playerIds.at(1) === client.sessionId) {
+    } else if (gameState.playerB === client.sessionId) {
         onPongMovePlayer(message, gameState, gameState.posPlayerB, (newPos: number) => gameState.posPlayerB = newPos);
     }
 }
