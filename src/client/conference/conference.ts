@@ -641,8 +641,7 @@ export function applyConferenceSettings() {
 
 function init(room: Room) {
     serverRoom = room;
-    window.addEventListener("beforeunload", unload);
-    window.addEventListener("unload", unload); // TODO Why Twice?
+    window.addEventListener("pagehide", unload);
     JitsiMeetJSIntern.setLogLevel(JitsiMeetJSIntern.logLevels.ERROR);          //mutes logger
     JitsiMeetJSIntern.init(optionsInit);
     updateButtons();
