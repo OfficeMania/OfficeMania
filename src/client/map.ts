@@ -146,9 +146,7 @@ class saveArray {
 
     constructor(a: number[]) {
         this.array = [];
-        for (let i = 0; i < a.length; i++) {
-            this.array.push(a[i]);
-        }
+        a.forEach(item => this.array.push(item));
     }
 
 }
@@ -168,9 +166,9 @@ class tileset {
     }
 
     getPath(source: string) {
-        for (let i = 0; i < paths.length; i++) {
-            if (paths[i].includes(source)) {
-                return paths[i];
+        for (const path of paths) {
+            if (path.includes(source)) {
+                return path;
             }
         }
     }
@@ -203,78 +201,76 @@ function fillSolidInfos(map: mapInfo) {
         const isSolidLayer = layer.name.search(LAYER_NAME_SOLID) !== -1;
         const isContentLayer = layer.name.search(LAYER_NAME_CONTENT) !== -1;
         const isRoomsLayer = layer.name.search(LAYER_NAME_ROOMS) !== -1;
-        if (isSolidLayer || isContentLayer || isRoomsLayer) {
-            for (const chunk of layer.chunks) {
-                for (let y = 0; y < 16; y++) {
-                    for (let x = 0; x < 16; x++) {
-                        const chunkElement = chunk.element[x][y];
-                        if (chunkElement !== 0) {
-
-                            let newFirstGridId: number;
-                            let newTileset: tileset;
-
-                            const lastTileSet = map.tilesets[map.tilesets.length - 1];
-
-                            for (const tileSet of map.tilesets){
-
-                                if (chunkElement >= tileSet.firstGridId || map.tilesets.length === 1) {
-
-                                    newFirstGridId = tileSet.firstGridId;
-                                    newTileset = tileSet;
-                                }
-
-                                let value: number;
-                                //if this is true we found the right tileset with help of the firstGridId
-                                if (newFirstGridId < tileSet.firstGridId || tileSet === lastTileSet) {
-
-                                    value = chunkElement - newTileset.firstGridId + 1;
-
-                                    const basePosX = (x + chunk.posX - mapStartX) * 2;
-                                    const basePosY = (y + chunk.posY - mapStartY) * 2;
-                                    if (isSolidLayer && value !== 0 && value < 16) {
-
-                                        let numbBin: string = value.toString(2);
-                                        let fillerString: string = "";
-
-                                        if (numbBin.length < 4) {
-
-                                            for (let j = 0; j < 4 - numbBin.length; j++) {
-                                                fillerString = fillerString.concat("0");
-                                            }
-                                            numbBin = fillerString.concat(numbBin);
-                                        }
-
-                                        //makes different quarters of a block solid
-                                        if (numbBin.charAt(0) === "1") {
-                                            solidInfoMap[basePosX][basePosY].setIsSolid();
-                                        }
-                                        if (numbBin.charAt(1) === "1") {
-                                            solidInfoMap[basePosX + 1][basePosY].setIsSolid();
-                                        }
-                                        if (numbBin.charAt(2) === "1") {
-                                            solidInfoMap[basePosX][basePosY + 1].setIsSolid();
-                                        }
-                                        if (numbBin.charAt(3) === "1") {
-                                            solidInfoMap[basePosX + 1][basePosY + 1].setIsSolid();
-                                        }
-                                    } else if (isContentLayer && value !== 0) {
-                                        const interactive: Interactive = getInteractive(value, basePosX, basePosY, room);
-                                        setSolidInfoMap(solidInfoMap, x, y, (solidInfo) => solidInfo.setContent(interactive));
-
-                                    } else if (isRoomsLayer) {
-                                        setSolidInfoMap(solidInfoMap, x, y, (solidInfo) => solidInfo.setRoomId(value));
-                                    }
-                                }
-                            }
-
-                        } else if (chunkElement === 0 && isRoomsLayer) {
+        if (!(isSolidLayer || isContentLayer || isRoomsLayer)) {
+            continue;
+        }
+        for (const chunk of layer.chunks) {
+            for (let y = 0; y < 16; y++) {
+                for (let x = 0; x < 16; x++) {
+                    const chunkElement = chunk.element[x][y];
+                    if (chunkElement === 0) {
+                        if (isRoomsLayer) {
                             setSolidInfoMap(solidInfoMap, x, y, (solidInfo) => solidInfo.setRoomId(0));
+                        }
+                        continue;
+                    }
+                    let newFirstGridId: number;
+                    let newTileset: tileset;
+                    const lastTileSet = map.tilesets[map.tilesets.length - 1];
+                    for (const tileSet of map.tilesets) {
+
+                        if (chunkElement >= tileSet.firstGridId || map.tilesets.length === 1) {
+
+                            newFirstGridId = tileSet.firstGridId;
+                            newTileset = tileSet;
+                        }
+
+                        let value: number;
+                        //if this is true we found the right tileset with help of the firstGridId
+                        if (newFirstGridId < tileSet.firstGridId || tileSet === lastTileSet) {
+
+                            value = chunkElement - newTileset.firstGridId + 1;
+
+                            const basePosX = (x + chunk.posX - mapStartX) * 2;
+                            const basePosY = (y + chunk.posY - mapStartY) * 2;
+                            if (isSolidLayer && value !== 0 && value < 16) {
+
+                                let numbBin: string = value.toString(2);
+                                let fillerString: string = "";
+
+                                if (numbBin.length < 4) {
+
+                                    for (let j = 0; j < 4 - numbBin.length; j++) {
+                                        fillerString = fillerString.concat("0");
+                                    }
+                                    numbBin = fillerString.concat(numbBin);
+                                }
+
+                                //makes different quarters of a block solid
+                                if (numbBin.charAt(0) === "1") {
+                                    solidInfoMap[basePosX][basePosY].setIsSolid();
+                                }
+                                if (numbBin.charAt(1) === "1") {
+                                    solidInfoMap[basePosX + 1][basePosY].setIsSolid();
+                                }
+                                if (numbBin.charAt(2) === "1") {
+                                    solidInfoMap[basePosX][basePosY + 1].setIsSolid();
+                                }
+                                if (numbBin.charAt(3) === "1") {
+                                    solidInfoMap[basePosX + 1][basePosY + 1].setIsSolid();
+                                }
+                            } else if (isContentLayer && value !== 0) {
+                                const interactive: Interactive = getInteractive(value, basePosX, basePosY, room);
+                                setSolidInfoMap(solidInfoMap, x, y, (solidInfo) => solidInfo.setContent(interactive));
+
+                            } else if (isRoomsLayer) {
+                                setSolidInfoMap(solidInfoMap, x, y, (solidInfo) => solidInfo.setRoomId(value));
+                            }
                         }
                     }
                 }
             }
         }
-
     }
     return solidInfoMap;
 }
@@ -518,71 +514,59 @@ function drawMapWithChunks (mapData: mapInfo) {
 */
 
 function drawMap(mapData: mapInfo) {
-    mapData.layers.forEach(function (l: layer) {
-        l.chunks.forEach(function (c: chunk) {
-
+    for (const layer of mapData.layers) {
+        for (const chunk of layer.chunks) {
             //if the chunk is not animated
-            if (l.name.search(LAYER_NAME_ANIMATED) === -1 && l.name.search(LAYER_NAME_CONTENT) === -1 && l.name.search(LAYER_NAME_ROOMS) === -1 && l.name.search(LAYER_NAME_SOLID) === -1) {
-
-                for (let x = 0; x < 16; x++) {
-                    for (let y = 0; y < 16; y++) {
-
-                        //dont paint if there is nothing
-                        if (c.element[x][y] !== 0) {
-                            let positionX: number;
-                            let positionY: number;
-
-                            //calculates the position on the canvas
-                            positionX = x + c.posX + Math.floor(mapData.widthOfMap / 2);
-                            positionY = y + c.posY + Math.floor(mapData.heightOfMap / 2);
-
-                            //if this Element was never painted before
-                            if (c.tilesetForElement[x][y] === null) {
-                                //saves a tileset, we need this to find the right one
-                                let newFirstGridId: number;
-                                let newTileset: tileset;
-                                let entry = c.element[x][y];
-
-                                for (let i = 0; i < mapData.tilesets.length; i++) {
-
-                                    if (entry >= mapData.tilesets[i].firstGridId || mapData.tilesets.length === 1) {
-
-                                        newFirstGridId = mapData.tilesets[i].firstGridId;
-                                        newTileset = mapData.tilesets[i];
-                                    }
-
-                                    let value: number;
-                                    let sourceX: number;
-                                    let sourceY: number;
-                                    //if this is true we found the right tileset with help of the firstGridId
-                                    if (newFirstGridId < mapData.tilesets[i].firstGridId || i === (mapData.tilesets.length - 1)) {
-
-                                        c.tilesetForElement[x][y] = newTileset;
-                                        value = c.element[x][y] - newTileset.firstGridId;
-
-                                        //calculates the right position from the required texture
-                                        sourceX = (value % (newTileset.tileWidth / mapData.resolution)) * mapData.resolution
-                                        c.tilesetX[x][y] = sourceX;
-                                        sourceY = Math.floor(value / (newTileset.tileWidth / mapData.resolution)) * mapData.resolution;
-                                        c.tilesetY[x][y] = sourceY;
-
-                                        //Create an array with used templates to boost performance
-                                        mapData.ctx.drawImage(mapData.textures.get(newTileset.path), sourceX, sourceY, mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
-                                        i = mapData.tilesets.length;
-                                    }
-                                }
-                            } else {
-                                //draw the image without searching
-                                mapData.ctx.drawImage(mapData.textures.get(c.tilesetForElement[x][y].path), c.tilesetX[x][y], c.tilesetY[x][y], mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
-                            }
-                        }
-                    }
-                }
-            } else {
+            if (!(layer.name.search(LAYER_NAME_ANIMATED) === -1 && layer.name.search(LAYER_NAME_CONTENT) === -1 && layer.name.search(LAYER_NAME_ROOMS) === -1 && layer.name.search(LAYER_NAME_SOLID) === -1)) {
                 //draw gif
                 //https://stackoverflow.com/questions/48234696/how-to-put-a-gif-with-canvas
+                continue;
             }
-        })
-    })
+            for (let x = 0; x < 16; x++) {
+                for (let y = 0; y < 16; y++) {
+                    const chunkElement = chunk.element[x][y];
+                    if (chunkElement === 0) {
+                        //dont paint if there is nothing
+                        continue;
+                    }
+                    let positionX: number;
+                    let positionY: number;
+                    positionX = x + chunk.posX + Math.floor(mapData.widthOfMap / 2);
+                    positionY = y + chunk.posY + Math.floor(mapData.heightOfMap / 2);
+                    const tileSetElement = chunk.tilesetForElement[x][y];
+                    if (tileSetElement !== null) {
+                        //draw the image without searching
+                        mapData.ctx.drawImage(mapData.textures.get(tileSetElement.path), chunk.tilesetX[x][y], chunk.tilesetY[x][y], mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
+                        continue;
+                    }
+                    //saves a tileset, we need this to find the right one
+                    let newFirstGridId: number;
+                    let newTileset: tileset;
+                    const lastTileSet: tileset = mapData.tilesets[mapData.tilesets.length - 1];
+                    for (const tileSet of mapData.tilesets) {
+                        if (chunkElement >= tileSet.firstGridId || mapData.tilesets.length === 1) {
+                            newFirstGridId = tileSet.firstGridId;
+                            newTileset = tileSet;
+                        }
+                        let value: number;
+                        let sourceX: number;
+                        let sourceY: number;
+                        //if this is true we found the right tileset with help of the firstGridId
+                        if (!(newFirstGridId < tileSet.firstGridId || tileSet === lastTileSet)) {
+                            continue;
+                        }
+                        chunk.tilesetForElement[x][y] = newTileset;
+                        value = chunkElement - newTileset.firstGridId;
+                        sourceX = (value % (newTileset.tileWidth / mapData.resolution)) * mapData.resolution
+                        chunk.tilesetX[x][y] = sourceX;
+                        sourceY = Math.floor(value / (newTileset.tileWidth / mapData.resolution)) * mapData.resolution;
+                        chunk.tilesetY[x][y] = sourceY;
+                        mapData.ctx.drawImage(mapData.textures.get(newTileset.path), sourceX, sourceY, mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
 
