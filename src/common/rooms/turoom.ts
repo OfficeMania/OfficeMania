@@ -2,8 +2,8 @@ import {Client, Room} from "colyseus";
 import {doorState, PlayerData, PongState, State, WhiteboardPlayer} from "./schema/state";
 import fs from 'fs';
 import {Direction, generateUUIDv4, MessageType} from "../util";
-import {ArraySchema, MapSchema} from "@colyseus/schema";
-import { cli } from "webpack";
+import {ArraySchema} from "@colyseus/schema";
+import {registerPongHandler} from "../handler/ponghandler";
 
 const path = require('path');
 
@@ -33,27 +33,11 @@ export class TURoom extends Room<State> {
         //sets the interval in which update gets called
         this.setSimulationInterval((deltaTime) => this.update(deltaTime));
 
-
         //loads paths from assets
         fs.readdirSync('./assets/img/characters').filter(file => file.includes(".png")).forEach(file => this.state.playerSpritePaths.push(file));
 
         //loads paths from templates
         getPaths("./assets/templates", this.state);
-
-        function getPaths(startPath, newState: State) {
-            if (!fs.existsSync(startPath)) {
-                return;
-            }
-            fs.readdirSync(startPath).forEach(file => {
-                const filename: string = path.join(startPath, file);
-                const stat = fs.lstatSync(filename);
-                if (stat.isDirectory()) {
-                    getPaths(filename, newState);
-                } else if (filename.indexOf("png") >= 0) {
-                    newState.templatePaths.push(filename);
-                }
-            })
-        }
 
         //receives movement from all the clients
         this.onMessage(MessageType.MOVE, (client, message) => {
@@ -79,57 +63,7 @@ export class TURoom extends Room<State> {
             }
         });
 
-        this.onMessage(MessageType.MOVE_PONG, (client, message) => {
-            //console.log("move_pong recieved" + message);
-            const gameState: PongState = this.state.pongStates[this.getPongGame(client).toString()]
-            //console.log(gameState);
-            if (gameState && gameState.playerA === client.sessionId) {
-                switch (message) {
-                    case Direction.UP: {
-                        if(gameState.posPlayerA > 0){
-                            gameState.posPlayerA -= gameState.velocities.at(1);
-                        }
-                        else {
-                            gameState.posPlayerA = 0;
-                        }
-                        break;
-                    }
-                    case Direction.DOWN: {
-                        if(gameState.posPlayerA + gameState.sizes.at(1) < 1000){
-                            gameState.posPlayerA += gameState.velocities.at(1);
-                        }
-                        else {
-                            gameState.posPlayerA = 1000 - gameState.sizes.at(1);
-                        }
-                        break;
-                    }
-                }
-                //console.log(gameState.posPlayerA + " is pos of player a");
-            }
-            else if (gameState && gameState.playerB === client.sessionId) {
-                switch (message) {
-                    case Direction.UP: {
-                        if(gameState.posPlayerB > 0){
-                            gameState.posPlayerB -= gameState.velocities.at(1);
-                        }
-                        else {
-                            gameState.posPlayerB = 0;
-                        }
-                        break;
-                    }
-                    case Direction.DOWN: {
-                        if(gameState.posPlayerB + gameState.sizes.at(1) < 1000){
-                            gameState.posPlayerB += gameState.velocities.at(1);
-                        }
-                        else {
-                            gameState.posPlayerB = 1000 - gameState.sizes.at(1);
-                        }
-                        break;
-                    }
-                }
-                //console.log(gameState.posPlayerB + " is pos of player B");
-            }
-        })
+        registerPongHandler.call(this);
 
         this.onMessage(MessageType.INTERACTION, (client, message) => {
             switch (message) {
@@ -160,7 +94,7 @@ export class TURoom extends Room<State> {
                             newState.velocities.push(10,10);
                             newState.sizes.push(10, 100)
                             newState.posPlayerA = 500 - (newState.sizes.at(1)/2);
-                            
+
                             this.state.pongStates[ar.toString()] = newState;
                             console.log(this.state.pongStates[ar.toString()].posPlayerA);
                         }
@@ -208,7 +142,6 @@ export class TURoom extends Room<State> {
             this.broadcast(MessageType.CLEAR_WHITEBOARD, {except: client});
         });
 
-
         //receives character changes
         this.onMessage(MessageType.UPDATE_CHARACTER, (client, message) => {
             this.state.players[client.sessionId].character = message;
@@ -226,7 +159,7 @@ export class TURoom extends Room<State> {
         this.onMessage(MessageType.DOOR, (client, message) => {
 
             if (this.state.doorStates[message] !== null) {
-                
+
                 this.state.doorStates[message] = new doorState();
                 this.state.doorStates[message].isClosed = false;
                 this.state.doorStates[message].playerId = "";
@@ -293,12 +226,18 @@ export class TURoom extends Room<State> {
         return;
     }
 }
-function isStringEmpty(entry: string): boolean{
-    if(!entry) {
-        return true;
+
+function getPaths(startPath, newState: State) {
+    if (!fs.existsSync(startPath)) {
+        return;
     }
-    if(entry = ""){
-        return true;
-    }
-    return false;
+    fs.readdirSync(startPath).forEach(file => {
+        const filename: string = path.join(startPath, file);
+        const stat = fs.lstatSync(filename);
+        if (stat.isDirectory()) {
+            getPaths(filename, newState);
+        } else if (filename.indexOf("png") >= 0) {
+            newState.templatePaths.push(filename);
+        }
+    });
 }
