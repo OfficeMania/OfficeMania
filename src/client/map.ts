@@ -321,7 +321,7 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
 //saves the paths from the templates
 let paths: string[];
 
-async function convertMapData(mapdata: string, room: Room, canvas: HTMLCanvasElement) {
+async function convertMapData(map: any, room: Room, canvas: HTMLCanvasElement) {
 
     //saves the layers from the map
     let layerArray: layer[];
@@ -351,8 +351,6 @@ async function convertMapData(mapdata: string, room: Room, canvas: HTMLCanvasEle
 
     textures = new Map<string, HTMLImageElement>();
     let image: HTMLImageElement;
-
-    let map = JSON.parse(mapdata);
 
     // if (map.infinite === "true") {
     //     isInfinite = true;
