@@ -208,9 +208,11 @@ function fillSolidInfos(map: mapInfo) {
             for (let y = 0; y < 16; y++) {
                 for (let x = 0; x < 16; x++) {
                     const chunkElement = chunk.element[x][y];
+                    const basePosX = (x + chunk.posX - mapStartX) * 2;
+                    const basePosY = (y + chunk.posY - mapStartY) * 2;
                     if (chunkElement === 0) {
                         if (isRoomsLayer) {
-                            setSolidInfoMap(solidInfoMap, x, y, (solidInfo) => solidInfo.setRoomId(0));
+                            setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setRoomId(0));
                         }
                         continue;
                     }
@@ -231,8 +233,6 @@ function fillSolidInfos(map: mapInfo) {
 
                             value = chunkElement - newTileset.firstGridId + 1;
 
-                            const basePosX = (x + chunk.posX - mapStartX) * 2;
-                            const basePosY = (y + chunk.posY - mapStartY) * 2;
                             if (isSolidLayer && value !== 0 && value < 16) {
 
                                 let numbBin: string = value.toString(2);
@@ -261,10 +261,10 @@ function fillSolidInfos(map: mapInfo) {
                                 }
                             } else if (isContentLayer && value !== 0) {
                                 const interactive: Interactive = getInteractive(value, basePosX, basePosY, room);
-                                setSolidInfoMap(solidInfoMap, x, y, (solidInfo) => solidInfo.setContent(interactive));
+                                setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setContent(interactive));
 
                             } else if (isRoomsLayer) {
-                                setSolidInfoMap(solidInfoMap, x, y, (solidInfo) => solidInfo.setRoomId(value));
+                                setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setRoomId(value));
                             }
                         }
                     }
