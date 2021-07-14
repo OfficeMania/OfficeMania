@@ -156,11 +156,11 @@ body {
 }
 
 #help-body img {
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-    object-position: 0 100%;
-    margin-right: 10px;
+    /*width: 40px;*/
+    /*height: 40px;*/
+    /*object-fit: cover;*/
+    /*object-position: 0 100%;*/
+    /*margin-right: 10px;*/
 }
 
 #help-body .wide-button {
@@ -176,6 +176,27 @@ body {
     display: inline-block;
 }
 
+.key {
+    background-image: url('../assets/keys/KeySample.png');
+}
+
+.key-small {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+}
+
+.key-medium {
+    width: 48px;
+    height: 32px;
+    margin-right: 10px;
+}
+
+.key-long {
+    width: 64px;
+    height: 32px;
+    margin-right: 10px;
+}
 
 #stats-bar {
     display: flex;
