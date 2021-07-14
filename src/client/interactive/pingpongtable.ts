@@ -35,8 +35,11 @@ export class PingPongTable extends Interactive{
             
             this.ourGame = new Pong(this.canvas, this.room, this.players, this.ourPlayer.id);
             this.ourGame.canvas.style.visibility = "visible";
-            
-            
+            const button = document.createElement("BUTTON");
+            button.addEventListener("click", () => this.leave())
+            button.innerHTML= "<em class = \"fa fa-times\"></em>";
+            button.id = "close";
+            this.buttonBar.appendChild(button)
             checkInputMode();
             this.room.onMessage(MessageType.INTERACTION, (message) => {
                 console.log("interatction message recieved in client" + message)
@@ -107,6 +110,14 @@ export class PingPongTable extends Interactive{
             }
             this.ourGame.loop();
         }
+    }
+    leave() {
+        this.ourGame.canvas.style.visibility = "hidden";
+        document.getElementById("close").remove();
+        this.room.send(MessageType.INTERACTION, "pong-end");
+        this.ourGame = new Pong(this.canvas, this.room, this.players, this.ourPlayer.id);
+        this.pongs = [];
+        checkInputMode();
     }
 
 }
