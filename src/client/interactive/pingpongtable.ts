@@ -103,7 +103,7 @@ export class PingPongTable extends Interactive{
     getGame(clientId: string): number{
         for(let i = 0; i < this.room.state.pongStates.size; i++) {
             //console.log(this.room.state.pongStates["0"].playerIds[0]);
-            if (this.room.state.pongStates[i.toString()].playerIds.at(0) || this.room.state.pongStates[i.toString()].playerIds.at(1)){
+            if (this.room.state.pongStates[i.toString()].playerIds.at(0) === clientId|| this.room.state.pongStates[i.toString()].playerIds.at(1) === clientId){
                 console.log("checking game: " + i)
                 return i;
             }

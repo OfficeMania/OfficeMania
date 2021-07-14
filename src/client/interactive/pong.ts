@@ -70,10 +70,10 @@ export class Pong{
         this.ctx.fillStyle ="black";
         this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle ="black";
-        this.ctx.fillRect(5, this.playerA.pos, 15, this.sizeBat);
+        this.ctx.fillRect(5, this.playerA.pos, 10, this.sizeBat);
         if (this.playerB) {
             this.ctx.fillStyle ="black";
-            this.ctx.fillRect(this.canvas.width-20, this.playerB.pos, 10, this.sizeBat);
+            this.ctx.fillRect(this.canvas.width-15, this.playerB.pos, 10, this.sizeBat);
         }
 
     }

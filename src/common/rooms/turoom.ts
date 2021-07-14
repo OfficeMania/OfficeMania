@@ -268,11 +268,11 @@ export class TURoom extends Room<State> {
     getEmptyPongGame(): number {
         if(!this.state.pongStates.size) { return -1; }
         for(let i = 0; i < this.state.pongStates.size; i++) {
-            if (!this.state.pongStates[i.toString()].playerIds[0] || !this.state.pongStates[i.toString()].playerIds[1]){
+            if (!this.state.pongStates[i.toString()].playerIds.at(0) || !this.state.pongStates[i.toString()].playerIds.at(1)){
                 return i;
             }
-        return -1;
         }
+        return -1;
     }
 
     getNextPongSlot(): number {
