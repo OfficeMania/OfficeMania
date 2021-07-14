@@ -1,9 +1,9 @@
-import {loadImage, getRoom} from "./util";
+import {getRoom, loadImage} from "./util";
 import {Room} from "colyseus.js";
 import {Interactive} from "./interactive/interactive"
 import {Door, DoorDirection} from "./interactive/door";
 import {PingPongTable} from "./interactive/pingpongtable";
-import { Whiteboard } from "./whiteboard";
+import {State} from "../common";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -16,7 +16,6 @@ class solidInfo {
     roomId: number;
 
     constructor() {
-
         this.isSolid = false
         this.content = null;
         this.roomId = 0;
@@ -37,6 +36,7 @@ class solidInfo {
     getRoomId() {
         return this.roomId;
     }
+
 }
 
 //only important for infinite maps
@@ -50,7 +50,6 @@ class chunk {
     posY: number;
 
     constructor(entries: number[], xPos: number, yPos: number) {
-
         this.tilesetForElement = [];
         for (let a = 0; a < 16; a++) {
             this.tilesetForElement[a] = [];
@@ -86,10 +85,10 @@ class chunk {
         this.posX = xPos;
         this.posY = yPos;
     }
+
 }
 
 class mapInfo {
-
     lowestX: number;
     lowestY: number;
     highestY: number;
@@ -104,7 +103,6 @@ class mapInfo {
     canvas: HTMLCanvasElement;
 
     constructor(layers: layer[], tilesets: tileset[], canvas: HTMLCanvasElement, resolution: number, textures: Map<string, HTMLImageElement>, lowestX: number, lowestY: number, highestY: number, highestX: number) {
-
         this.lowestX = lowestX;
         this.lowestY = lowestY;
         this.highestY = highestY;
@@ -118,6 +116,7 @@ class mapInfo {
         this.resolution = resolution;
         this.canvas = canvas;
     }
+
 }
 
 class layer {
@@ -126,22 +125,19 @@ class layer {
     chunks: chunk[];
 
     constructor(x: number[], y: number[], data: saveArray[], layerName: string) {
-
         this.chunks = [];
         this.name = layerName;
 
-        let tempData: number[] = [];
+        const tempData: number[] = [];
 
         for (let i = 0; i < x.length; i++) {
-
             for (let a = 0; a < 256; a++) {
-
                 tempData[a] = data[i].array[a];
             }
-
             this.chunks.push(new chunk(tempData, x[i], y[i]));
         }
     }
+
 }
 
 class saveArray {
@@ -149,14 +145,10 @@ class saveArray {
     array: number[];
 
     constructor(a: number[]) {
-
         this.array = [];
-
-        for (let i = 0; i < a.length; i++) {
-
-            this.array.push(a[i]);
-        }
+        a.forEach(item => this.array.push(item));
     }
+
 }
 
 class tileset {
@@ -166,38 +158,36 @@ class tileset {
     tileWidth: number;
 
     constructor(firstId: number, source: string) {
-
         this.firstGridId = firstId;
         source = source.replace(".tsx", ".png");
         source = source.replace("Map/", "");
-
         this.path = this.getPath(source);
         this.tileWidth = 0;
     }
 
     getPath(source: string) {
-
-        for (let i = 0; i < paths.length; i++) {
-
-            if (paths[i].includes(source)) {
-
-                return paths[i];
+        for (const path of paths) {
+            if (path.includes(source)) {
+                return path;
             }
         }
     }
+
 }
+
+const LAYER_NAME_SOLID: string = "Solid";
+const LAYER_NAME_CONTENT: string = "Content";
+const LAYER_NAME_ROOMS: string = "Rooms";
+const LAYER_NAME_ANIMATED: string = "animated";
 
 function fillSolidInfos(map: mapInfo) {
 
     let solidInfoMap: solidInfo[][];
-    let height = Math.abs(map.lowestY - map.highestY);
-    let width = Math.abs(map.lowestX - map.highestX);
-    let mapStartX = map.lowestX;
-    let mapStartY = map.lowestY;
-    let room = getRoom();
-
-    height += 32;
-    width += 32;
+    const height = Math.abs(map.lowestY - map.highestY) + 32;
+    const width = Math.abs(map.lowestX - map.highestX) + 32;
+    const mapStartX = map.lowestX;
+    const mapStartY = map.lowestY;
+    const room = getRoom();
 
     solidInfoMap = [];
     for (let i = 0; i < height * 2; i++) {
@@ -207,130 +197,75 @@ function fillSolidInfos(map: mapInfo) {
         }
     }
 
-    for (let l = 0; l < map.layers.length; l++) {
+    for (const layer of map.layers) {
+        const isSolidLayer = layer.name.search(LAYER_NAME_SOLID) !== -1;
+        const isContentLayer = layer.name.search(LAYER_NAME_CONTENT) !== -1;
+        const isRoomsLayer = layer.name.search(LAYER_NAME_ROOMS) !== -1;
+        if (!(isSolidLayer || isContentLayer || isRoomsLayer)) {
+            continue;
+        }
+        for (const chunk of layer.chunks) {
+            for (let y = 0; y < 16; y++) {
+                for (let x = 0; x < 16; x++) {
+                    const chunkElement = chunk.element[x][y];
+                    if (chunkElement === 0) {
+                        if (isRoomsLayer) {
+                            setSolidInfoMap(solidInfoMap, x, y, (solidInfo) => solidInfo.setRoomId(0));
+                        }
+                        continue;
+                    }
+                    let newFirstGridId: number;
+                    let newTileset: tileset;
+                    const lastTileSet = map.tilesets[map.tilesets.length - 1];
+                    for (const tileSet of map.tilesets) {
 
-        if (map.layers[l].name.search("Solid") !== -1 || map.layers[l].name.search("Content") !== -1 || map.layers[l].name.search("Rooms") !== -1) {
+                        if (chunkElement >= tileSet.firstGridId || map.tilesets.length === 1) {
 
-            for (let c = 0; c < map.layers[l].chunks.length; c++) {
+                            newFirstGridId = tileSet.firstGridId;
+                            newTileset = tileSet;
+                        }
 
-                for (let y = 0; y < 16; y++) {
+                        let value: number;
+                        //if this is true we found the right tileset with help of the firstGridId
+                        if (newFirstGridId < tileSet.firstGridId || tileSet === lastTileSet) {
 
-                    for (let x = 0; x < 16; x++) {
+                            value = chunkElement - newTileset.firstGridId + 1;
 
-                        if (map.layers[l].chunks[c].element[x][y] !== 0) {
+                            const basePosX = (x + chunk.posX - mapStartX) * 2;
+                            const basePosY = (y + chunk.posY - mapStartY) * 2;
+                            if (isSolidLayer && value !== 0 && value < 16) {
 
-                            let newFirstGridId: number;
-                            let newTileset: tileset;
-                            let entry = map.layers[l].chunks[c].element[x][y];
+                                let numbBin: string = value.toString(2);
+                                let fillerString: string = "";
 
-                            for (let i = 0; i < map.tilesets.length; i++) {
+                                if (numbBin.length < 4) {
 
-                                if (entry >= map.tilesets[i].firstGridId || map.tilesets.length === 1) {
-
-                                    newFirstGridId = map.tilesets[i].firstGridId;
-                                    newTileset = map.tilesets[i];
-                                }
-
-                                let value: number;
-                                //if this is true we found the right tileset with help of the firstGridId
-                                if (newFirstGridId < map.tilesets[i].firstGridId || i === (map.tilesets.length - 1)) {
-
-                                    value = map.layers[l].chunks[c].element[x][y] - newTileset.firstGridId + 1;
-
-                                    if (map.layers[l].name.search("Solid") !== -1 && value !== 0 && value < 16) {
-
-                                        let numbBin: string = value.toString(2);
-                                        let fillerString: string = "";
-
-                                        if (numbBin.length < 4) {
-
-                                            for (let j = 0; j < 4 - numbBin.length; j++) {
-                                                fillerString = fillerString.concat("0");
-                                            }
-                                            numbBin = fillerString.concat(numbBin);
-                                        }
-
-                                        //makes different quarters of a block solid
-                                        if (numbBin.charAt(0) === "1") {
-                                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setIsSolid();
-                                        }
-                                        if (numbBin.charAt(1) === "1") {
-                                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setIsSolid();
-                                        }
-                                        if (numbBin.charAt(2) === "1") {
-                                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setIsSolid();
-                                        }
-                                        if (numbBin.charAt(3) === "1") {
-                                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setIsSolid();
-                                        }
-                                    } else if (map.layers[l].name.search("Content") !== -1 && value !== 0) {
-
-                                        let object: Interactive;
-
-                                        switch(value) {
-
-                                            //door
-                                            case 1: {
-
-                                                object = new Door(DoorDirection.NORTH, (x + map.layers[l].chunks[c].posX - mapStartX) * 2, (y + map.layers[l].chunks[c].posY - mapStartY) * 2);
-                                                room.send("newDoor", ((x + map.layers[l].chunks[c].posX - mapStartX) * 2) + "." + ((y + map.layers[l].chunks[c].posY - mapStartY) * 2));
-                                                break;
-                                            }
-                                            case 2: {
-
-                                                object = new Door(DoorDirection.EAST, (x + map.layers[l].chunks[c].posX - mapStartX) * 2, (y + map.layers[l].chunks[c].posY - mapStartY) * 2);
-                                                room.send("newDoor", ((x + map.layers[l].chunks[c].posX - mapStartX) * 2) + "." + ((y + map.layers[l].chunks[c].posY - mapStartY) * 2));
-                                                break;
-                                            }
-                                            case 3: {
-
-                                                object = new Door(DoorDirection.SOUTH, (x + map.layers[l].chunks[c].posX - mapStartX) * 2, (y + map.layers[l].chunks[c].posY - mapStartY) * 2);
-                                                room.send("newDoor", ((x + map.layers[l].chunks[c].posX - mapStartX) * 2) + "." + ((y + map.layers[l].chunks[c].posY - mapStartY) * 2));
-                                                break;
-                                            }
-                                            case 4: {
-
-                                                object = new Door(DoorDirection.WEST, (x + map.layers[l].chunks[c].posX - mapStartX) * 2, (y + map.layers[l].chunks[c].posY - mapStartY) * 2);
-                                                room.send("newDoor", ((x + map.layers[l].chunks[c].posX - mapStartX) * 2) + "." + ((y + map.layers[l].chunks[c].posY - mapStartY) * 2));
-                                                break;
-                                            }
-                                            case 5: {
-
-                                                object = new Door(DoorDirection.ALWAYS_OPEN, (x + map.layers[l].chunks[c].posX - mapStartX) * 2, (y + map.layers[l].chunks[c].posY - mapStartY) * 2);
-                                                room.send("newDoor", ((x + map.layers[l].chunks[c].posX - mapStartX) * 2) + "." + ((y + map.layers[l].chunks[c].posY - mapStartY) * 2));
-                                                break;
-                                            }
-                                            //pongtable
-                                            case 6: {
-                                                object = new PingPongTable();
-                                                break;
-                                            }
-                                            //whiteboard
-                                            case 7: {
-
-                                                //object = new Whiteboard();
-                                                break;
-                                            }
-                                        }
-                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setContent(object);
-                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setContent(object);
-                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setContent(object);
-                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setContent(object);
-
-                                    } else if (map.layers[l].name.search("Rooms") !== -1) {
-
-                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setRoomId(value);
-                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setRoomId(value);
-                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setRoomId(value);
-                                        solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setRoomId(value);
+                                    for (let j = 0; j < 4 - numbBin.length; j++) {
+                                        fillerString = fillerString.concat("0");
                                     }
+                                    numbBin = fillerString.concat(numbBin);
                                 }
+
+                                //makes different quarters of a block solid
+                                if (numbBin.charAt(0) === "1") {
+                                    solidInfoMap[basePosX][basePosY].setIsSolid();
+                                }
+                                if (numbBin.charAt(1) === "1") {
+                                    solidInfoMap[basePosX + 1][basePosY].setIsSolid();
+                                }
+                                if (numbBin.charAt(2) === "1") {
+                                    solidInfoMap[basePosX][basePosY + 1].setIsSolid();
+                                }
+                                if (numbBin.charAt(3) === "1") {
+                                    solidInfoMap[basePosX + 1][basePosY + 1].setIsSolid();
+                                }
+                            } else if (isContentLayer && value !== 0) {
+                                const interactive: Interactive = getInteractive(value, basePosX, basePosY, room);
+                                setSolidInfoMap(solidInfoMap, x, y, (solidInfo) => solidInfo.setContent(interactive));
+
+                            } else if (isRoomsLayer) {
+                                setSolidInfoMap(solidInfoMap, x, y, (solidInfo) => solidInfo.setRoomId(value));
                             }
-                        } else if(map.layers[l].chunks[c].element[x][y] === 0 && map.layers[l].name.search("Rooms") !== -1) {
-                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setRoomId(0);
-                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2].setRoomId(0);
-                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setRoomId(0);
-                            solidInfoMap[(x + map.layers[l].chunks[c].posX - mapStartX) * 2 + 1][(y + map.layers[l].chunks[c].posY - mapStartY) * 2 + 1].setRoomId(0);
                         }
                     }
                 }
@@ -340,10 +275,53 @@ function fillSolidInfos(map: mapInfo) {
     return solidInfoMap;
 }
 
+function setSolidInfoMap(solidInfoMap: solidInfo[][], basePosX: number, basePosY: number, callback: (solidInfo: solidInfo) => void) {
+    callback(solidInfoMap[basePosX][basePosY]);
+    callback(solidInfoMap[basePosX + 1][basePosY]);
+    callback(solidInfoMap[basePosX][basePosY + 1]);
+    callback(solidInfoMap[basePosX + 1][basePosY + 1]);
+}
+
+function getInteractive(value: number, basePosX: number, basePosY: number, room: Room<State>) {
+    switch (value) {
+        //doors
+        case 1: {
+            room.send("newDoor", basePosX + "." + basePosY);
+            return new Door(DoorDirection.NORTH, basePosX, basePosY);
+        }
+        case 2: {
+            room.send("newDoor", basePosX + "." + basePosY);
+            return new Door(DoorDirection.EAST, basePosX, basePosY);
+        }
+        case 3: {
+            room.send("newDoor", basePosX + "." + basePosY);
+            return new Door(DoorDirection.SOUTH, basePosX, basePosY);
+        }
+        case 4: {
+            room.send("newDoor", basePosX + "." + basePosY);
+            return new Door(DoorDirection.WEST, basePosX, basePosY);
+        }
+        case 5: {
+            room.send("newDoor", basePosX + "." + basePosY);
+            return new Door(DoorDirection.ALWAYS_OPEN, basePosX, basePosY);
+        }
+        //pongtable
+        case 6: {
+            return new PingPongTable();
+        }
+        //whiteboard
+        case 7: {
+            //return new Whiteboard();
+            break;
+        }
+    }
+    return null;
+}
+
 //saves the paths from the templates
 let paths: string[];
 
-async function convertMapData(mapdata: string, room: Room, canvas: HTMLCanvasElement) {
+async function convertMapData(map: any, room: Room, canvas: HTMLCanvasElement) {
 
     //saves the layers from the map
     let layerArray: layer[];
@@ -374,8 +352,6 @@ async function convertMapData(mapdata: string, room: Room, canvas: HTMLCanvasEle
     textures = new Map<string, HTMLImageElement>();
     let image: HTMLImageElement;
 
-    let map = JSON.parse(mapdata);
-
     // if (map.infinite === "true") {
     //     isInfinite = true;
     // } else {
@@ -405,49 +381,38 @@ async function convertMapData(mapdata: string, room: Room, canvas: HTMLCanvasEle
     let highestX: number;
     let isSet: boolean = false;
 
-    for (let l = 0; l < map.layers.length; l++) {
-
-        for (let c = 0; c < map.layers[l].chunks.length; c++) {
-
-            x = map.layers[l].chunks[c].x;
-            y = map.layers[l].chunks[c].y;
-
+    for (const layer_ of map.layers) {
+        for (const chunk of layer_.chunks) {
+            x = chunk.x;
+            y = chunk.y;
             xPos.push(parseInt(x));
             yPos.push(parseInt(y));
-
-            dataArray.push(new saveArray(map.layers[l].chunks[c].data));
-
+            dataArray.push(new saveArray(chunk.data));
             if (!isSet) {
-                lowestX = map.layers[l].chunks[c].x;
-                lowestY = map.layers[l].chunks[c].y;
-                highestY = map.layers[l].chunks[c].y + 15;
-                highestX = map.layers[l].chunks[c].x + 15;
-
+                lowestX = chunk.x;
+                lowestY = chunk.y;
+                highestY = chunk.y + 15;
+                highestX = chunk.x + 15;
                 isSet = true;
             }
-            if (map.layers[l].chunks[c].x < lowestX) {
-                lowestX = map.layers[l].chunks[c].x;
+            if (chunk.x < lowestX) {
+                lowestX = chunk.x;
             }
-            if (map.layers[l].chunks[c].y < lowestY) {
-                lowestY = map.layers[l].chunks[c].y;
+            if (chunk.y < lowestY) {
+                lowestY = chunk.y;
             }
-            if (map.layers[l].chunks[c].y + 15 > highestY) {
-                highestY = map.layers[l].chunks[c].y + 15;
+            if (chunk.y + 15 > highestY) {
+                highestY = chunk.y + 15;
             }
-            if (map.layers[l].chunks[c].x + 15 > highestX) {
-                highestY = map.layers[l].chunks[c].x + 15;
+            if (chunk.x + 15 > highestX) {
+                highestY = chunk.x + 15;
             }
         }
-
-        layerArray.push(new layer(xPos, yPos, dataArray, map.layers[l].name))
+        layerArray.push(new layer(xPos, yPos, dataArray, layer_.name));
     }
-
     for (let t = 0; t < map.tilesets.length; t++) {
-
         tilesetArray.push(new tileset(parseInt(map.tilesets[t].firstgid), map.tilesets[t].source));
-
         image = await loadImage(tilesetArray[t].path);
-
         tilesetArray[t].tileWidth = image.naturalWidth;
         textures.set(tilesetArray[t].path, image);
     }
@@ -547,71 +512,59 @@ function drawMapWithChunks (mapData: mapInfo) {
 */
 
 function drawMap(mapData: mapInfo) {
-    mapData.layers.forEach(function (l: layer) {
-        l.chunks.forEach(function (c: chunk) {
-
+    for (const layer of mapData.layers) {
+        for (const chunk of layer.chunks) {
             //if the chunk is not animated
-            if (l.name.search("animated") === -1 && l.name.search("Content") === -1 && l.name.search("Rooms") === -1 && l.name.search("Solid") === -1) {
-
-                for (let x = 0; x < 16; x++) {
-                    for (let y = 0; y < 16; y++) {
-
-                        //dont paint if there is nothing
-                        if (c.element[x][y] !== 0) {
-                            let positionX: number;
-                            let positionY: number;
-
-                            //calculates the position on the canvas
-                            positionX = x + c.posX + Math.floor(mapData.widthOfMap / 2);
-                            positionY = y + c.posY + Math.floor(mapData.heightOfMap / 2);
-
-                            //if this Element was never painted before
-                            if (c.tilesetForElement[x][y] === null) {
-                                //saves a tileset, we need this to find the right one
-                                let newFirstGridId: number;
-                                let newTileset: tileset;
-                                let entry = c.element[x][y];
-
-                                for (let i = 0; i < mapData.tilesets.length; i++) {
-
-                                    if (entry >= mapData.tilesets[i].firstGridId || mapData.tilesets.length === 1) {
-
-                                        newFirstGridId = mapData.tilesets[i].firstGridId;
-                                        newTileset = mapData.tilesets[i];
-                                    }
-
-                                    let value: number;
-                                    let sourceX: number;
-                                    let sourceY: number;
-                                    //if this is true we found the right tileset with help of the firstGridId
-                                    if (newFirstGridId < mapData.tilesets[i].firstGridId || i === (mapData.tilesets.length - 1)) {
-
-                                        c.tilesetForElement[x][y] = newTileset;
-                                        value = c.element[x][y] - newTileset.firstGridId;
-
-                                        //calculates the right position from the required texture
-                                        sourceX = (value % (newTileset.tileWidth / mapData.resolution)) * mapData.resolution
-                                        c.tilesetX[x][y] = sourceX;
-                                        sourceY = Math.floor(value / (newTileset.tileWidth / mapData.resolution)) * mapData.resolution;
-                                        c.tilesetY[x][y] = sourceY;
-
-                                        //Create an array with used templates to boost performance
-                                        mapData.ctx.drawImage(mapData.textures.get(newTileset.path), sourceX, sourceY, mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
-                                        i = mapData.tilesets.length;
-                                    }
-                                }
-                            } else {
-                                //draw the image without searching
-                                mapData.ctx.drawImage(mapData.textures.get(c.tilesetForElement[x][y].path), c.tilesetX[x][y], c.tilesetY[x][y], mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
-                            }
-                        }
-                    }
-                }
-            } else {
+            if (!(layer.name.search(LAYER_NAME_ANIMATED) === -1 && layer.name.search(LAYER_NAME_CONTENT) === -1 && layer.name.search(LAYER_NAME_ROOMS) === -1 && layer.name.search(LAYER_NAME_SOLID) === -1)) {
                 //draw gif
                 //https://stackoverflow.com/questions/48234696/how-to-put-a-gif-with-canvas
+                continue;
             }
-        })
-    })
+            for (let x = 0; x < 16; x++) {
+                for (let y = 0; y < 16; y++) {
+                    const chunkElement = chunk.element[x][y];
+                    if (chunkElement === 0) {
+                        //dont paint if there is nothing
+                        continue;
+                    }
+                    let positionX: number;
+                    let positionY: number;
+                    positionX = x + chunk.posX + Math.floor(mapData.widthOfMap / 2);
+                    positionY = y + chunk.posY + Math.floor(mapData.heightOfMap / 2);
+                    const tileSetElement = chunk.tilesetForElement[x][y];
+                    if (tileSetElement !== null) {
+                        //draw the image without searching
+                        mapData.ctx.drawImage(mapData.textures.get(tileSetElement.path), chunk.tilesetX[x][y], chunk.tilesetY[x][y], mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
+                        continue;
+                    }
+                    //saves a tileset, we need this to find the right one
+                    let newFirstGridId: number;
+                    let newTileset: tileset;
+                    const lastTileSet: tileset = mapData.tilesets[mapData.tilesets.length - 1];
+                    for (const tileSet of mapData.tilesets) {
+                        if (chunkElement >= tileSet.firstGridId || mapData.tilesets.length === 1) {
+                            newFirstGridId = tileSet.firstGridId;
+                            newTileset = tileSet;
+                        }
+                        let value: number;
+                        let sourceX: number;
+                        let sourceY: number;
+                        //if this is true we found the right tileset with help of the firstGridId
+                        if (!(newFirstGridId < tileSet.firstGridId || tileSet === lastTileSet)) {
+                            continue;
+                        }
+                        chunk.tilesetForElement[x][y] = newTileset;
+                        value = chunkElement - newTileset.firstGridId;
+                        sourceX = (value % (newTileset.tileWidth / mapData.resolution)) * mapData.resolution
+                        chunk.tilesetX[x][y] = sourceX;
+                        sourceY = Math.floor(value / (newTileset.tileWidth / mapData.resolution)) * mapData.resolution;
+                        chunk.tilesetY[x][y] = sourceY;
+                        mapData.ctx.drawImage(mapData.textures.get(newTileset.path), sourceX, sourceY, mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
 

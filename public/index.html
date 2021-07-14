@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="de">
     <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="This is a proximity based video chat application.">
         <meta name="viewport" content="width=device-width"/>
         <title>OfficeMania</title>
         <link rel="shortcut icon" href="../assets/img/favicon.ico" />
@@ -12,7 +14,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
-        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<!--        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>-->
         <script src="https://meet.jit.si/libs/lib-jitsi-meet.min.js"></script>
 
         <script src="/js/vendors-bundle.js" defer></script>
@@ -20,14 +22,15 @@
     <body>
         <div id="panel-buttons">
             <div id="group-left">
-                <button id="button-mute-audio" disabled><em class="fa fa-microphone"></em><span></span></button>
-                <button id="button-mute-video" disabled><em class="fa fa-video"></em><span></span></button>
-                <button id="button-share-video" disabled><em class="fa fa-desktop"></em><span></span></button>
+                <button id="button-mute-audio" aria-label="Mute Audio" disabled><em class="fa fa-microphone"></em><span></span></button>
+                <button id="button-mute-video" aria-label="Mute Video" disabled><em class="fa fa-video"></em><span></span></button>
+                <button id="button-share-video" aria-label="Share Desktop" disabled><em class="fa fa-desktop"></em><span></span></button>
             </div>
             <div id="panel-buttons-interaction"></div>
             <div id="group-right">
-                <button id="button-settings" data-toggle="modal" data-target="#settings-modal"><em class="fa fa-cog"></em><span></span></button>
-                <button id="button-users"><em class="fa fa-user-friends"></em><span></span></button>
+                <button id="button-settings" aria-label="Open Settings" data-toggle="modal" data-target="#settings-modal"><em class="fa fa-cog"></em><span></span></button>
+                <button id="button-users" aria-label="Show Users"><em class="fa fa-user-friends"></em><span></span></button>
+                <button id="button-help"data-toggle="modal" data-target="#help-modal"><em class="fa fa-question-circle"></em><span></span></button>
             </div>
         </div>
 
@@ -35,7 +38,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Exit Settings">&times;</button>
                         <h4 class="modal-title">Settings</h4>
                     </div>
                     <div class="modal-body">
@@ -61,9 +64,37 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button id="button-settings-ok" type="button" class="btn btn-default" data-dismiss="modal">OK</button>
-                        <button id="button-settings-cancel" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button id="button-settings-apply" type="button" class="btn btn-default">Apply</button>
+                        <button id="button-settings-ok" aria-label="Apply and Exit Settings" type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                        <button id="button-settings-cancel" aria-label="Exit Settings" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button id="button-settings-apply" aria-label="Apply Settings" type="button" class="btn btn-default">Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="help-modal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Help</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="help-body">
+                           <img src="../assets/img/transparent_32x32.png" alt="C-Key" class="key key-small" style="background-position: calc(4 * -32px) calc(-32px);"><p>  cycle character skin</p>
+                           <br><br>
+                           <img src="../assets/img/transparent_32x32.png" alt="R-Key" class="key key-small" style="background-position: calc(5 * -32px) calc(3 * -32px);"><p>  change name</p>
+                           <br><br>
+                           <img src="../assets/img/transparent_32x32.png" alt="U-Key" class="key key-small" style="background-position: calc(-32px) calc(4 * -32px);"><p>  show user list</p>
+                           <br><br>
+                           <img src="../assets/img/transparent_32x32.png" alt="Space-Key" class="key key-long" style="background-position: calc(2 * -32px) calc(5 * -32px);"><p>  interact</p>
+                           <br><br>
+                           <img src="../assets/img/transparent_32x32.png" alt="F-Key" class="key key-small" style="background-position: 0 calc(2 * -32px);"><p>  pay respect</p>
+                           <br>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="button-help-ok" type="button" class="btn btn-default" data-dismiss="modal">OK</button>
                     </div>
                 </div>
             </div>
@@ -86,7 +117,7 @@
         <div id="interactive-bar">
             <canvas id="interactive" tabindex='0' width="1000" height="1000"></canvas>
         </div>
-        
+
         </canvas>
         <!-- 'canvas' is the main canvas for the map-->
         <canvas id="canvas" width="600" height="600">
@@ -95,7 +126,7 @@
 
         <div id="whiteboard-bar">
             <canvas id="whiteboard" tabindex='0' width="1920" height="1080"></canvas>
-            <button id="button-clear-whiteboard"><em class="fa fa-trash"></em><span></span></button>
+            <button id="button-clear-whiteboard" aria-label="Clear Whiteboard"><em class="fa fa-trash"></em><span></span></button>
         </div>
 
         <script src="/js/main-bundle.js" defer></script>

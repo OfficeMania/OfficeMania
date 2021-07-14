@@ -3,9 +3,6 @@ import {TILE_SIZE} from "./player";
 import {
     createPlayerAvatar,
     getCharacter,
-    getOurPlayer,
-    getPlayers,
-    getRoom,
     getUsername,
     InitState,
     InputMode,
@@ -36,8 +33,6 @@ import {playerLoop} from "./movement";
 import {checkInteraction, getInputMode, loadInputFunctions, setInputMode} from "./input";
 import {drawPlayer} from "./drawplayer"
 import {Whiteboard} from "./whiteboard"
-import { Room } from "colyseus";
-import { MessageType } from "../common/util";
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
@@ -273,11 +268,8 @@ async function main() {
     let ctx = canvas.getContext("2d");
 
     //load map from server
-    let xml = new XMLHttpRequest();
-    xml.open("GET", "/map/Map.json", false);
-    xml.send(null);
-
-    let map: Promise<mapInfo> = convertMapData(xml.responseText, room, background);
+    const mapJson = await fetch("/map/Map.json").then((response) => response.json());
+    const map: Promise<mapInfo> = convertMapData(mapJson, room, background);
 
     let currentMap = new mapInfo((await map).layers, (await map).tilesets, (await map).canvas, (await map).resolution, (await map).textures, (await map).lowestX, (await map).lowestY, (await map).highestY, (await map).highestX);
     let collisionInfo: solidInfo[][] = fillSolidInfos(currentMap);

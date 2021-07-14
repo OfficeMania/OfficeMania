@@ -28,9 +28,9 @@ body {
 
 /* main canvas for the map*/
 #canvas {
-    position: absolute; 
-    left: 0; 
-    top: 0; 
+    position: absolute;
+    left: 0;
+    top: 0;
     z-index: -1;
 }
 
@@ -115,6 +115,10 @@ body {
     content: '  Users';
 }
 
+#button-help:hover span:after {
+    content: '  Help';
+}
+
 #panel-buttons button:hover span:after {
     opacity: 1;
     transition: 0.5s;
@@ -149,6 +153,33 @@ body {
 
 #character-preview {
     margin: 0 auto;
+}
+
+#help-body p {
+    font-size: large;
+    display: inline-block;
+}
+
+.key {
+    background-image: url('../assets/keys/KeySample.png');
+}
+
+.key-small {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+}
+
+.key-medium {
+    width: 48px;
+    height: 32px;
+    margin-right: 10px;
+}
+
+.key-long {
+    width: 64px;
+    height: 32px;
+    margin-right: 10px;
 }
 
 #stats-bar {
@@ -214,12 +245,12 @@ body {
 }
 
 #interactive {
-    position: absolute; 
-    left: 20%; 
-    top: 20%; 
+    position: absolute;
+    left: 20%;
+    top: 20%;
     z-index: 1;
-    width: 60%; 
-    height: 60%; 
+    width: 60%;
+    height: 60%;
     visibility: hidden;
     border: 5px black;
 }
@@ -237,19 +268,19 @@ body {
     border: solid;
     border-width: 2px;
     border-radius: 10px;
-    /*position: absolute;*/ 
-    top:0; 
-    left:0; 
-    z-index: 1; 
+    /*position: absolute;*/
+    top: 0;
+    left: 0;
+    z-index: 1;
     visibility: hidden;
 }
 
 #whiteboard {
-    position: absolute; 
-    left: 0; 
-    top: 0; 
-    z-index: 1; 
-    visibility: hidden; 
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    visibility: hidden;
     height: 80%;
 }
 
@@ -265,10 +296,10 @@ body {
     border: solid;
     border-width: 2px;
     border-radius: 10px;
-    position: absolute; 
-    top:0; 
-    left:0; 
-    z-index: 1; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
     visibility: hidden;
 }
 
@@ -301,7 +332,7 @@ body {
 #player-online-container {
     position: fixed;
     background-color: var(--bg-primary-op);
-    
+
     transition: width 600ms ease, height 500ms ease;
     overflow: hidden;
 }
