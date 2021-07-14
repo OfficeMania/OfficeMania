@@ -239,6 +239,10 @@ export function getUsername(): string {
     return localStorage.getItem(KEY_USERNAME);
 }
 
+export function payRespect() {
+    console.log("F's in chat")
+}
+
 export async function loadCharacter() {
     //load or ask for name
     const username = getUsername();

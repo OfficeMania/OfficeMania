@@ -3,6 +3,7 @@ import {
     getCorrectedPlayerFacingCoordinates,
     getOurPlayer,
     InputMode,
+    payRespect,
     setCharacter,
     setUsername
 } from "./util";
@@ -114,6 +115,7 @@ export function loadInputFunctions() {
         //rename players name
         onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")));
         onPureKey(e, "u", () => toggleShowParticipantsTab());
+        onPureKey(e, "f", () => payRespect())
     }
 
     function onKeyUp(e: KeyboardEvent) {
