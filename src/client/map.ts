@@ -228,44 +228,43 @@ function fillSolidInfos(map: mapInfo) {
                         }
 
                         let value: number;
+                        if (!(newFirstGridId < tileSet.firstGridId || tileSet === lastTileSet)) {
+                            continue;
+                        }
                         //if this is true we found the right tileset with help of the firstGridId
-                        if (newFirstGridId < tileSet.firstGridId || tileSet === lastTileSet) {
+                        value = chunkElement - newTileset.firstGridId + 1;
+                        if (isSolidLayer && value !== 0 && value < 16) {
 
-                            value = chunkElement - newTileset.firstGridId + 1;
+                            let numbBin: string = value.toString(2);
+                            let fillerString: string = "";
 
-                            if (isSolidLayer && value !== 0 && value < 16) {
+                            if (numbBin.length < 4) {
 
-                                let numbBin: string = value.toString(2);
-                                let fillerString: string = "";
-
-                                if (numbBin.length < 4) {
-
-                                    for (let j = 0; j < 4 - numbBin.length; j++) {
-                                        fillerString = fillerString.concat("0");
-                                    }
-                                    numbBin = fillerString.concat(numbBin);
+                                for (let j = 0; j < 4 - numbBin.length; j++) {
+                                    fillerString = fillerString.concat("0");
                                 }
-
-                                //makes different quarters of a block solid
-                                if (numbBin.charAt(0) === "1") {
-                                    solidInfoMap[basePosX][basePosY].setIsSolid();
-                                }
-                                if (numbBin.charAt(1) === "1") {
-                                    solidInfoMap[basePosX + 1][basePosY].setIsSolid();
-                                }
-                                if (numbBin.charAt(2) === "1") {
-                                    solidInfoMap[basePosX][basePosY + 1].setIsSolid();
-                                }
-                                if (numbBin.charAt(3) === "1") {
-                                    solidInfoMap[basePosX + 1][basePosY + 1].setIsSolid();
-                                }
-                            } else if (isContentLayer && value !== 0) {
-                                const interactive: Interactive = getInteractive(value, basePosX, basePosY, room);
-                                setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setContent(interactive));
-
-                            } else if (isRoomsLayer) {
-                                setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setRoomId(value));
+                                numbBin = fillerString.concat(numbBin);
                             }
+
+                            //makes different quarters of a block solid
+                            if (numbBin.charAt(0) === "1") {
+                                solidInfoMap[basePosX][basePosY].setIsSolid();
+                            }
+                            if (numbBin.charAt(1) === "1") {
+                                solidInfoMap[basePosX + 1][basePosY].setIsSolid();
+                            }
+                            if (numbBin.charAt(2) === "1") {
+                                solidInfoMap[basePosX][basePosY + 1].setIsSolid();
+                            }
+                            if (numbBin.charAt(3) === "1") {
+                                solidInfoMap[basePosX + 1][basePosY + 1].setIsSolid();
+                            }
+                        } else if (isContentLayer && value !== 0) {
+                            const interactive: Interactive = getInteractive(value, basePosX, basePosY, room);
+                            setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setContent(interactive));
+
+                        } else if (isRoomsLayer) {
+                            setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setRoomId(value));
                         }
                     }
                 }
