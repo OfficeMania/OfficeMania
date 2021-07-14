@@ -83,7 +83,7 @@ export class TURoom extends Room<State> {
             //console.log("move_pong recieved" + message);
             const gameState: PongState = this.state.pongStates[this.getPongGame(client).toString()]
             //console.log(gameState);
-            if (gameState && gameState.playerIds.at(0) === client.sessionId) {
+            if (gameState && gameState.playerA === client.sessionId) {
                 switch (message) {
                     case Direction.UP: {
                         if(gameState.posPlayerA > 0){
@@ -106,7 +106,7 @@ export class TURoom extends Room<State> {
                 }
                 //console.log(gameState.posPlayerA + " is pos of player a");
             }
-            else if (gameState && gameState.playerIds.at(1) === client.sessionId) {
+            else if (gameState && gameState.playerB === client.sessionId) {
                 switch (message) {
                     case Direction.UP: {
                         if(gameState.posPlayerB > 0){
@@ -141,8 +141,12 @@ export class TURoom extends Room<State> {
                         if (emptyGame !== -1) {
                             let emptyState: PongState = this.state.pongStates[emptyGame.toString()];
                             if (emptyState){
-                                if (!emptyState.playerIds.at(1)){
-                                    emptyState.playerIds.push(client.sessionId);
+                                if (!emptyState.playerA){
+                                    emptyState.playerA = client.sessionId;
+                                    emptyState.posPlayerB = 500 - (emptyState.sizes.at(1)/2)
+                                }
+                                if (!emptyState.playerB){
+                                    emptyState.playerB = client.sessionId;
                                     emptyState.posPlayerB = 500 - (emptyState.sizes.at(1)/2)
                                 }
                             }
@@ -152,7 +156,7 @@ export class TURoom extends Room<State> {
                             console.log(this.getNextPongSlot());
                             let ar = this.getNextPongSlot();
                             let newState = new PongState();
-                            newState.playerIds.push(client.sessionId);
+                            newState.playerA = client.sessionId;
                             newState.velocities.push(10,10);
                             newState.sizes.push(10, 100)
                             newState.posPlayerA = 500 - (newState.sizes.at(1)/2);
@@ -169,6 +173,14 @@ export class TURoom extends Room<State> {
                     let inGame: number = this.getPongGame(client);
                     if(inGame !== -1) {
                         this.state.pongStates.delete(inGame.toString());
+                    }
+                    break;
+                }
+                case "pong-leave": {
+                    let inGame: number = this.getPongGame(client);
+                    if(inGame !== -1) {
+                        let game = this.state.pongStates[inGame.toString()];
+                        game.playerA? game.playerA = null: game.playerB = null;
                     }
                     break;
                 }
@@ -239,11 +251,6 @@ export class TURoom extends Room<State> {
     }
 
     onLeave(client: Client, consented: boolean) {
-        console.log("getPongGame: " + this.getPongGame(client));
-        if(this.getPongGame(client) !== -1) {
-            delete this.state.pongStates[this.getPongGame(client)];
-            console.log("closing it")
-        }
         delete this.state.players[client.sessionId];
     }
 
@@ -258,7 +265,7 @@ export class TURoom extends Room<State> {
 
     getPongGame(client): number{
         for(let i = 0; i < this.state.pongStates.size; i++) {
-            if (this.state.pongStates[i.toString()].playerIds.at(0) === client.sessionId || this.state.pongStates[i.toString()].playerIds.at(1) === client.sessionId){
+            if (this.state.pongStates[i.toString()].playerA === client.sessionId || this.state.pongStates[i.toString()].playerB === client.sessionId){
                 return i;
             }
         }
@@ -268,7 +275,8 @@ export class TURoom extends Room<State> {
     getEmptyPongGame(): number {
         if(!this.state.pongStates.size) { return -1; }
         for(let i = 0; i < this.state.pongStates.size; i++) {
-            if (!this.state.pongStates[i.toString()].playerIds.at(0) || !this.state.pongStates[i.toString()].playerIds.at(1)){
+            console.log(this.state.pongStates[i.toString()].playerA);
+            if (!this.state.pongStates[i.toString()].playerA || !this.state.pongStates[i.toString()].playerB){
                 return i;
             }
         }

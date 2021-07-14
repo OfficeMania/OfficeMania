@@ -48,11 +48,12 @@ export class WhiteboardPlayer extends Schema{
  *state of pong game
  */
 export class PongState extends Schema {
-    
-    //0: playerA, 1: playerB
-    @type({array: "string"})
-    playerIds = new ArraySchema<string>();
 
+    @type("string")
+    playerA: string;
+
+    @type("string")
+    playerB: string;
     //0: posxBall, 1: posyBall
     @type({array: "number"})
     posBall = new ArraySchema<number>();
