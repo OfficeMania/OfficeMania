@@ -151,6 +151,24 @@ body {
     margin: 0 auto;
 }
 
+#help-body {
+    
+}
+
+#help-body img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    object-position: 0 100%;
+    margin-right: 10px;
+}
+
+#help-body p {
+    font-size: large;
+    display: inline-block;
+}
+
+
 #stats-bar {
     display: flex;
     text-align: center;
