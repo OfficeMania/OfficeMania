@@ -1,7 +1,23 @@
 import {Direction, MessageType} from "../util";
 import {PongState} from "../rooms/schema/state";
 
-function onPongMove(message: string, gameState: PongState, pos: number, callback: (newPos: number) => void) {
+export function registerPongHandler() {
+    this.onMessage(MessageType.MOVE_PONG, (client, message) => onPongMove.call(this, client, message));
+}
+
+function onPongMove(client, message) {
+    const gameState: PongState = this.state.pongStates[this.getPongGame(client).toString()]
+    if (!gameState) {
+        return;
+    }
+    if (gameState.playerIds.at(0) === client.sessionId) {
+        onPongMovePlayer(message, gameState, gameState.posPlayerA, (newPos: number) => gameState.posPlayerA = newPos);
+    } else if (gameState.playerIds.at(1) === client.sessionId) {
+        onPongMovePlayer(message, gameState, gameState.posPlayerB, (newPos: number) => gameState.posPlayerB = newPos);
+    }
+}
+
+function onPongMovePlayer(message: string, gameState: PongState, pos: number, callback: (newPos: number) => void) {
     switch (message) {
         case Direction.UP: {
             if (pos > 0) {
@@ -20,18 +36,4 @@ function onPongMove(message: string, gameState: PongState, pos: number, callback
             break;
         }
     }
-}
-
-export function onPongMessage() {
-    this.onMessage(MessageType.MOVE_PONG, (client, message) => {
-        const gameState: PongState = this.state.pongStates[this.getPongGame(client).toString()]
-        if (!gameState) {
-            return;
-        }
-        if (gameState.playerIds.at(0) === client.sessionId) {
-            onPongMove(message, gameState, gameState.posPlayerA, (newPos: number) => gameState.posPlayerA = newPos);
-        } else if (gameState.playerIds.at(1) === client.sessionId) {
-            onPongMove(message, gameState, gameState.posPlayerB, (newPos: number) => gameState.posPlayerB = newPos);
-        }
-    });
 }

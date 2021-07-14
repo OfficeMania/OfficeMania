@@ -3,7 +3,7 @@ import {doorState, PlayerData, PongState, State, WhiteboardPlayer} from "./schem
 import fs from 'fs';
 import {Direction, generateUUIDv4, MessageType} from "../util";
 import {ArraySchema} from "@colyseus/schema";
-import {onPongMessage} from "../handler/ponghandler";
+import {registerPongHandler} from "../handler/ponghandler";
 
 const path = require('path');
 
@@ -79,7 +79,7 @@ export class TURoom extends Room<State> {
             }
         });
 
-        onPongMessage.call(this);
+        registerPongHandler.call(this);
 
         this.onMessage(MessageType.INTERACTION, (client, message) => {
             switch (message) {
