@@ -33,27 +33,11 @@ export class TURoom extends Room<State> {
         //sets the interval in which update gets called
         this.setSimulationInterval((deltaTime) => this.update(deltaTime));
 
-
         //loads paths from assets
         fs.readdirSync('./assets/img/characters').filter(file => file.includes(".png")).forEach(file => this.state.playerSpritePaths.push(file));
 
         //loads paths from templates
         getPaths("./assets/templates", this.state);
-
-        function getPaths(startPath, newState: State) {
-            if (!fs.existsSync(startPath)) {
-                return;
-            }
-            fs.readdirSync(startPath).forEach(file => {
-                const filename: string = path.join(startPath, file);
-                const stat = fs.lstatSync(filename);
-                if (stat.isDirectory()) {
-                    getPaths(filename, newState);
-                } else if (filename.indexOf("png") >= 0) {
-                    newState.templatePaths.push(filename);
-                }
-            })
-        }
 
         //receives movement from all the clients
         this.onMessage(MessageType.MOVE, (client, message) => {
@@ -234,12 +218,18 @@ export class TURoom extends Room<State> {
         return;
     }
 }
-function isStringEmpty(entry: string): boolean{
-    if(!entry) {
-        return true;
+
+function getPaths(startPath, newState: State) {
+    if (!fs.existsSync(startPath)) {
+        return;
     }
-    if(entry = ""){
-        return true;
-    }
-    return false;
+    fs.readdirSync(startPath).forEach(file => {
+        const filename: string = path.join(startPath, file);
+        const stat = fs.lstatSync(filename);
+        if (stat.isDirectory()) {
+            getPaths(filename, newState);
+        } else if (filename.indexOf("png") >= 0) {
+            newState.templatePaths.push(filename);
+        }
+    });
 }
