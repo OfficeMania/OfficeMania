@@ -29,7 +29,7 @@ export class PingPongTable extends Interactive{
         this.players = getPlayers();
         this.room.send(MessageType.INTERACTION, "pong");
         console.log("Pong game interaction...");
-        this.getPongs();
+        //this.getPongs();
         
         
         this.ourGame = new Pong(this.canvas, this.room, this.players, this.ourPlayer.id);
@@ -38,6 +38,7 @@ export class PingPongTable extends Interactive{
         
         checkInputMode();
         this.room.onMessage(MessageType.INTERACTION, (message) => {
+            console.log("interatction message recieved in client" + message)
             if (message === "pong-init") {
                 this.getPongs();
                 console.log(this);
@@ -51,7 +52,7 @@ export class PingPongTable extends Interactive{
     }
     getPongs() {
         let i = 0;
-        //console.log(this.room.state.pongStates[i.toString()].playerIds);
+        console.log(this.room.state.pongStates[i.toString()].playerIds[0]);
         console.log(this.room.state.pongStates[0]);
         while (this.room.state.pongStates[i.toString()]) {
             console.log("state " + i);
@@ -72,6 +73,7 @@ export class PingPongTable extends Interactive{
     }
     getGame(clientId: string): number{
         for(let i = 0; i < this.room.state.pongStates.size; i++) {
+            console.log(this.room.state.pongStates["0"].playerIds[0]);
             if (this.room.state.pongStates[i.toString()].playerIds.forEach(id => { id === clientId; })){
                 return i;
             }

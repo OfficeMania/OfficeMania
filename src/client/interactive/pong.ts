@@ -48,7 +48,7 @@ export class Pong{
 
             }
         }
-        this.room.send(MessageType.INTERACTION, "pong-stop");
+        //this.room.send(MessageType.INTERACTION, "pong-end");
     }
     updatePos() {
         let currentState = this.room.state.pongStates.get(this.selfGameId);

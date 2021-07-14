@@ -151,6 +151,7 @@ export class TURoom extends Room<State> {
                             let ar = this.getNextPongSlot();
                             this.state.pongStates[ar.toString()] = newPong;
                             console.log(this.state.pongStates[ar.toString()].playerIds[0])
+                            setTimeout(() => client.send(MessageType.INTERACTION, "pong-init"), 500);
                         }
                     }
                     this.clients.forEach((client) => client.send(MessageType.INTERACTION, "pong-update"));
@@ -166,7 +167,7 @@ export class TURoom extends Room<State> {
                 case "pong-init":
                 case "pong-update": break;
                 default: {
-                    console.log("type of interaction not defined in the turoom onMessage(MessageType.INTERACTION)");
+                    console.log("type of interaction not defined in the turoom onMessage(MessageType.INTERACTION): " + message);
                 }
             }
         })
