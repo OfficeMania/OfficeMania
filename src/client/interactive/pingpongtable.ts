@@ -9,9 +9,10 @@ import { getOurPlayer, getPlayers, getRoom, InputMode, PlayerRecord } from "../u
 import { Interactive } from "./interactive";
 import { Pong, PongPlayer } from "./pong";
 
+let ourGame: Pong;
 export class PingPongTable extends Interactive{
     pongs: Pong[];
-    ourGame: Pong;
+
     room: Room<State>;
     ourPlayer: Player;
     players: PlayerRecord;
@@ -29,14 +30,14 @@ export class PingPongTable extends Interactive{
     onInteraction() {
         this.ourPlayer = getOurPlayer();
         this.players = getPlayers();
-        if(!this.ourGame) {
+        if(!ourGame) {
             this.room.send(MessageType.INTERACTION, "pong");
             console.log("Pong game interaction...");
             //this.getPongs();
             
             
-            this.ourGame = new Pong(this.canvas, this.room, this.players, this.ourPlayer.id);
-            this.ourGame.canvas.style.visibility = "visible";
+            ourGame = new Pong(this.canvas, this.room, this.players, this.ourPlayer.id);
+            ourGame.canvas.style.visibility = "visible";
             const button = document.createElement("BUTTON");
             button.addEventListener("click", () => this.leave())
             button.innerHTML= "<em class = \"fa fa-times\"></em>";
@@ -47,18 +48,18 @@ export class PingPongTable extends Interactive{
                 console.log("interatction message recieved in client" + message)
                 if (message === "pong-init") {
                     this.getPongs();
-                    console.log(this.ourGame);
+                    console.log(ourGame);
                     console.log(this.pongs);
-                    this.ourGame = this.pongs[this.getGame(this.ourPlayer.id)];
-                    console.log(this.ourGame);
+                    ourGame = this.pongs[this.getGame(this.ourPlayer.id)];
+                    console.log(ourGame);
                     
                 }
                 if (message === "pong-update") {
-                    if (this.ourGame){
-                        this.ourGame.selfGameId = this.getGame(this.ourPlayer.id);
-                        if(!this.ourGame.playerB){this.updateState()};
-                        console.log(this.ourGame)
-                        this.ourGame.paint();
+                    if (ourGame){
+                        ourGame.selfGameId = this.getGame(this.ourPlayer.id);
+                        if(!ourGame.playerB){this.updateState()};
+                        console.log(ourGame)
+                        ourGame.paint();
                     }
                     
                 }
@@ -112,25 +113,25 @@ export class PingPongTable extends Interactive{
         return -1;
     }
     loop() {
-        if(this.ourGame) {
+        if(ourGame) {
             
-            this.ourGame.loop();
+            ourGame.loop();
             this.updateInput();
         }
     }
     leave() {
-        this.ourGame.canvas.style.visibility = "hidden";
+        ourGame.canvas.style.visibility = "hidden";
         document.getElementById("close").remove();
         this.room.send(MessageType.INTERACTION, "pong-end");
-        this.ourGame = new Pong(this.canvas, this.room, this.players, this.ourPlayer.id);
+        ourGame = null;
         this.pongs = [];
         checkInputMode();
     }
     updateState() {
-        if(this.room.state.pongStates[this.ourGame.selfGameId.toString()].playerIds.at(1) && !this.ourGame.playerB) {
+        if(this.room.state.pongStates[ourGame.selfGameId.toString()].playerIds.at(1) && !ourGame.playerB) {
             console.log("inserting player b");
-            this.ourGame.playerB = new PongPlayer(this.room.state.pongStates[this.getGame(this.ourPlayer.id).toString()].playerIds.at(1));
-            console.log(this.ourGame);
+            ourGame.playerB = new PongPlayer(this.room.state.pongStates[this.getGame(this.ourPlayer.id).toString()].playerIds.at(1));
+            console.log(ourGame);
         }
     }
     updateInput() {
