@@ -1,6 +1,7 @@
 import http from "http";
 import express from "express";
 import cors from "cors";
+import compression from "compression";
 import path from 'path';
 import {Server} from "colyseus";
 
@@ -13,7 +14,10 @@ const app = express();
 app.use(cors());
 
 // Enable JSON-parsing / processing
-app.use(express.json())
+app.use(express.json());
+
+// compress all responses
+app.use(compression());
 
 // Create game server
 const gameServer = new Server({
