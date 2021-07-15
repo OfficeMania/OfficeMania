@@ -4,6 +4,7 @@ import {Interactive} from "./interactive/interactive"
 import {Door, DoorDirection} from "./interactive/door";
 import {PingPongTable} from "./interactive/pingpongtable";
 import {State} from "../common";
+import {MessageType} from "../common/util";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -285,24 +286,19 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
     switch (value) {
         //doors
         case 1: {
-            room.send("newDoor", basePosX + "." + basePosY);
-            return new Door(DoorDirection.NORTH, basePosX, basePosY);
+            return createDoor(DoorDirection.NORTH, basePosX, basePosY, room);
         }
         case 2: {
-            room.send("newDoor", basePosX + "." + basePosY);
-            return new Door(DoorDirection.EAST, basePosX, basePosY);
+            return createDoor(DoorDirection.EAST, basePosX, basePosY, room);
         }
         case 3: {
-            room.send("newDoor", basePosX + "." + basePosY);
-            return new Door(DoorDirection.SOUTH, basePosX, basePosY);
+            return createDoor(DoorDirection.SOUTH, basePosX, basePosY, room);
         }
         case 4: {
-            room.send("newDoor", basePosX + "." + basePosY);
-            return new Door(DoorDirection.WEST, basePosX, basePosY);
+            return createDoor(DoorDirection.WEST, basePosX, basePosY, room);
         }
         case 5: {
-            room.send("newDoor", basePosX + "." + basePosY);
-            return new Door(DoorDirection.ALWAYS_OPEN, basePosX, basePosY);
+            return createDoor(DoorDirection.ALWAYS_OPEN, basePosX, basePosY, room);
         }
         //pongtable
         case 6: {
@@ -315,6 +311,11 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         }
     }
     return null;
+}
+
+function createDoor(direction: DoorDirection, basePosX: number, basePosY: number, room: Room<State>): Door {
+    room.send(MessageType.NEW_DOOR, basePosX + "." + basePosY);
+    return new Door(direction, basePosX, basePosY);
 }
 
 //saves the paths from the templates

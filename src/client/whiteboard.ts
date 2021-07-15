@@ -28,13 +28,9 @@ export class Whiteboard {
 
         this.clearButton.addEventListener("click", () => this.clearPressed(this));
 
-        room.onMessage(MessageType.REDRAW, (client) => {
-            this.drawOthers(client.sessionId, this)
-        })
-        room.onMessage(MessageType.CLEAR_WHITEBOARD, (message) => {
-            this.clear(this)
-        })
+        room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
 
+        room.onMessage(MessageType.WHITEBOARD_CLEAR, () => this.clear(this));
 
         canvas.addEventListener('mousemove', (e) => {
             this.draw(e, this)
@@ -72,7 +68,7 @@ export class Whiteboard {
     }
 
     clearPressed(whiteboard: Whiteboard) {
-        whiteboard.room.send(MessageType.CLEAR_WHITEBOARD)
+        whiteboard.room.send(MessageType.WHITEBOARD_CLEAR);
         whiteboard.clear(whiteboard);
     }
 
@@ -130,7 +126,7 @@ export class Whiteboard {
 
         this.drawLine(oldX, oldY, whiteboard.x, whiteboard.y, whiteboard)
 
-        whiteboard.room.send(MessageType.PATH, [oldX, oldY])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [oldX, oldY])
     }
 
     drawOthers(clientID: string, whiteboard: Whiteboard) {
@@ -196,8 +192,8 @@ export class Whiteboard {
 
 
     private mouseup(e, whiteboard: Whiteboard) {
-        whiteboard.room.send(MessageType.PATH, [whiteboard.x, whiteboard.y])
-        whiteboard.room.send(MessageType.PATH, -1)
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.x, whiteboard.y])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, -1)
     }
 
 

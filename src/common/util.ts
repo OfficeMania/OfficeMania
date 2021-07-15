@@ -13,17 +13,21 @@ export enum Direction {
 }
 
 export enum MessageType {
+    // DoorHandler
+    NEW_DOOR = "newDoor",
+    // PlayerHandler
     MOVE = "move",
-    MOVE_PONG = "moveInteraction",
-    PATH = "path",
-    REDRAW = "redraw",
     UPDATE_CHARACTER = "updateCharacter",
     UPDATE_USERNAME = "updateUsername",
     UPDATE_PARTICIPANT_ID = "updateParticipantId",
-    CLEAR_WHITEBOARD = "clearWhiteboard",
-    INTERACTION = "interaction",
-    UPDATE_INTERACTION = "updateInteraction",
-    DOOR = "newDoor"
+    // PongHandler
+    PONG_MOVE = "pongMove",
+    PONG_INTERACTION = "pongInteraction",
+    PONG_UPDATE = "updatePng",
+    // WhiteboardHandler
+    WHITEBOARD_CLEAR = "whiteboardClear",
+    WHITEBOARD_PATH = "whiteboardPath",
+    WHITEBOARD_REDRAW = "whiteboardRedraw"
 }
 export enum GameMode {
     SINGLE = 1,

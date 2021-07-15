@@ -1,11 +1,9 @@
 import {Room} from "colyseus.js";
 import {PlayerRecord} from "../util";
 import {State} from "../../common";
-import {Interactive} from "./interactive";
-import {Direction, MessageType} from "../../common/util";
-import { PongState } from "../../common/rooms/schema/state";
+import {PongState} from "../../common/rooms/schema/state";
 
-export class Pong{
+export class Pong {
 
     selfGameId: number = -1;
     inGame = false;
@@ -21,6 +19,7 @@ export class Pong{
 
     sizeBat: number = 100;
     room: Room<State>
+
     constructor(canvas: HTMLCanvasElement, room: Room<State>, players: PlayerRecord, id: string) {
         this.playerA = new PongPlayer(id);
         this.canvas = canvas;
@@ -30,25 +29,26 @@ export class Pong{
         this.ctx.fillStyle = "white"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle ="black";
+        this.ctx.fillStyle = "black";
         this.ctx.fillRect(5, 5, 10, this.sizeBat)
-        this.ctx.fillStyle ="black";
-        this.ctx.fillRect(this.canvas.width-15, this.canvas.height-5-this.sizeBat, 10, this.sizeBat)
+        this.ctx.fillStyle = "black";
+        this.ctx.fillRect(this.canvas.width - 15, this.canvas.height - 5 - this.sizeBat, 10, this.sizeBat)
         this.loop();
-
     }
-    loop(){
+
+    loop() {
         this.updatePos();
         this.paint();
-        
-        //this.room.send(MessageType.INTERACTION, "pong-end");
+        //this.room.send(MessageType.INTERACTION, PongMessage.END);
     }
+
     updatePos() {
         let currentState: PongState;
-        if(this.selfGameId !== -1) {
+        if (this.selfGameId !== -1) {
             currentState = this.room.state.pongStates[this.selfGameId.toString()]
+        } else {
+            console.log("still no");
         }
-        else {console.log("still no")};
         if(currentState) {
             if (currentState.playerB && this.playerB && this.playerB !== null){
                 this.playerB.pos = currentState.posPlayerB;
@@ -62,8 +62,8 @@ export class Pong{
             this.posBallY = currentState.posBallY;
         }
     }
-    
-    paint(){
+
+    paint() {
         this.ctx.fillStyle = "white"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle ="black";
@@ -81,33 +81,42 @@ export class Pong{
             console.log(this.playerB);
         }
     }
+
 }
+
 export class PongPlayer {
+
     private _id: string;
     private _score: number;
     private _pos: number;
 
-    constructor(id: string){
+    constructor(id: string) {
         this._id = id;
         this._score = 0;
         this._pos = 0;
     }
-    get id(): string{
+
+    get id(): string {
         return this._id;
     }
+
     set id(id: string) {
         this._id = id;
     }
-    get score(): number{
+
+    get score(): number {
         return this._score;
     }
+
     set score(score: number) {
         this._score = score;
     }
+
     get pos(): number {
         return this._pos;
     }
-    set pos(pos: number){
+
+    set pos(pos: number) {
         this._pos = pos;
     }
 }
