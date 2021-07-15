@@ -269,9 +269,9 @@ async function main() {
 
     //load map from server
     const mapJson = await fetch("/map/Map.json").then((response) => response.json());
-    const map: Promise<mapInfo> = convertMapData(mapJson, room, background);
+    const map: mapInfo = await convertMapData(mapJson, room, background);
 
-    let currentMap = new mapInfo((await map).layers, (await map).tilesets, (await map).canvas, (await map).resolution, (await map).textures, (await map).lowestX, (await map).lowestY, (await map).highestY, (await map).highestX);
+    let currentMap = new mapInfo(map.layers, map.tilesets, map.canvas, map.resolution, map.textures, map.lowestX, map.lowestY, map.highestY, map.highestX);
     let collisionInfo: solidInfo[][] = fillSolidInfos(currentMap);
     setCollisionInfo(collisionInfo);
     console.log(collisionInfo)
