@@ -98,6 +98,10 @@ export function loadInputFunctions() {
         onDirectionKeyDown(e, "w", Direction.UP);
         onDirectionKeyDown(e, "a", Direction.LEFT);
         onDirectionKeyDown(e, "d", Direction.RIGHT);
+        onDirectionKeyDown(e, "ArrowDown", Direction.DOWN);
+        onDirectionKeyDown(e, "ArrowUp", Direction.UP);
+        onDirectionKeyDown(e, "ArrowLeft", Direction.LEFT);
+        onDirectionKeyDown(e, "ArrowRight", Direction.RIGHT);
         //player interacts with object in front of him
         onPureKey(e, " ", checkInteraction);
         if (inputMode === InputMode.INTERACTION) {
