@@ -49,11 +49,11 @@ function onPongInteraction(room: Room<State>, client, message: PongMessage) {
                 if (emptyGame !== -1) {
                     let emptyState: PongState = room.state.pongStates[emptyGame.toString()];
                     if (emptyState) {
-                        if (!emptyState.playerA || emptyState.playerA === null) {
+                        if (!emptyState.playerA) {
                             emptyState.playerA = client.sessionId;
                             emptyState.posPlayerA = 500 - (emptyState.sizes.at(1) / 2)
                         }
-                        if (!emptyState.playerB || emptyState.playerB === null) {
+                        if (!emptyState.playerB) {
                             emptyState.playerB = client.sessionId;
                             emptyState.posPlayerB = 500 - (emptyState.sizes.at(1) / 2)
                         }
@@ -167,8 +167,11 @@ function getEmptyPongGame(room: Room<State>): number {
         return -1;
     }
     for (let i = 0; i < room.state.pongStates.size; i++) {
-        console.log(room.state.pongStates[i.toString()].playerA);
-        if (!room.state.pongStates[i.toString()].playerA || room.state.pongStates[i.toString()].playerA === null || !room.state.pongStates[i.toString()].playerB || room.state.pongStates[i.toString()].playerB === null){
+        const playerA = room.state.pongStates[i.toString()].playerA;
+        const playerB = room.state.pongStates[i.toString()].playerB;
+        console.debug("playerA=", playerA);
+        console.debug("playerB=", playerB);
+        if (!playerA || !playerB){
             return i;
         }
     }

@@ -31,7 +31,7 @@ export class PingPongTable extends Interactive {
     onInteraction() {
         this.ourPlayer = getOurPlayer();
         this.players = getPlayers();
-        if(!ourGame || ourGame === null) {
+        if(!ourGame) {
             this.room.send(MessageType.PONG_INTERACTION, PongMessage.ON_INTERACTION);
             console.log("Pong game interaction...");
             //this.getPongs();
@@ -55,7 +55,7 @@ export class PingPongTable extends Interactive {
                         break;
                     }
                     case "pong-update": {
-                        if (ourGame && ourGame !== null){
+                        if (ourGame){
                             ourGame.selfGameId = this.getGame(this.ourPlayer.id);
                             this.updateState();
                             console.log(ourGame)
@@ -138,7 +138,8 @@ export class PingPongTable extends Interactive {
 
     updateState() {
         //check for player A in state
-        if(this.room.state.pongStates[ourGame.selfGameId.toString()].playerA && this.room.state.pongStates[ourGame.selfGameId.toString()].playerA !== null) {
+        const playerA = this.room.state.pongStates[ourGame.selfGameId.toString()].playerA;
+        if(playerA) {
             if(!ourGame.playerA) {
                 console.log("inserting player A");
             ourGame.playerA = new PongPlayer(this.room.state.pongStates[this.getGame(this.ourPlayer.id).toString()].playerA);
@@ -152,7 +153,8 @@ export class PingPongTable extends Interactive {
             }
         }
         //check for playerB in state
-        if(this.room.state.pongStates[ourGame.selfGameId.toString()].playerB && this.room.state.pongStates[ourGame.selfGameId.toString()].playerB !== null){
+        const playerB = this.room.state.pongStates[ourGame.selfGameId.toString()].playerB;
+        if(playerB){
             if(!ourGame.playerB) {
                 console.log("inserting player b");
             ourGame.playerB = new PongPlayer(this.room.state.pongStates[this.getGame(this.ourPlayer.id).toString()].playerB);

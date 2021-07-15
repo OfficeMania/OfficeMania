@@ -50,11 +50,11 @@ export class Pong {
             console.log("still no");
         }
         if(currentState) {
-            if (currentState.playerB && this.playerB && this.playerB !== null){
+            if (currentState.playerB && this.playerB){
                 this.playerB.pos = currentState.posPlayerB;
                 //console.log(this.playerB.pos + " playerB");
             }
-            if (currentState.playerA && this.playerA && this.playerA !== null){
+            if (currentState.playerA && this.playerA){
                 this.playerA.pos = currentState.posPlayerA;
                 //console.log(this.playerA.pos + "PlayerA");
             }
@@ -68,13 +68,13 @@ export class Pong {
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle ="black";
         this.ctx.strokeRect(5, 5, this.canvas.width-5, this.canvas.height-5);
-        if(this.playerA && this.playerA !== null){
+        if(this.playerA){
             this.ctx.fillStyle ="black";
             this.ctx.fillRect(5, this.playerA.pos, 10, this.sizeBat);
             //console.log("painting a");
             //console.log(this.playerA);
         }
-        if (this.playerB && this.playerB !== null) {
+        if (this.playerB) {
             this.ctx.fillStyle ="black";
             this.ctx.fillRect(this.canvas.width-15, this.playerB.pos, 10, this.sizeBat);
             //console.log("painting b");
