@@ -107,6 +107,10 @@ body {
     content: '  Screenshare';
 }
 
+#button-interact:hover span:after {
+    content: '  Interact';
+}
+
 #button-settings:hover span:after {
     content: '  Settings';
 }

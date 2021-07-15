@@ -328,6 +328,7 @@ async function main() {
      */
 
     let playerNearbyTimer = 0;
+    let interactionShown = false;
 
     function loop(now: number) {
 
@@ -359,6 +360,21 @@ async function main() {
         } else if (playerNearbyTimer % 20 === 10) {
             updateUsers();
             updateChat();
+        }
+
+        //check if interaction is nearby
+        if (checkInteraction(false).content) {
+            if (!interactionShown) {
+                interactionShown = true;
+                let interactionNearbyButton = document.createElement("button");
+                interactionNearbyButton.id = "button-interact";
+                interactionNearbyButton.addEventListener("click", () => checkInteraction(true))
+                interactionNearbyButton.innerHTML = "<em class=\"fa fa-sign-in-alt\"></em>";
+                $<HTMLDivElement>("panel-buttons-interaction").append(interactionNearbyButton);
+            }
+        } else if (interactionShown) {
+            interactionShown = false;
+            $<HTMLButtonElement>("button-interact")?.remove();
         }
 
         //DESIGN TODO: when something on the map changes: drawMap
