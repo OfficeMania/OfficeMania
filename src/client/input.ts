@@ -11,6 +11,7 @@ import {toggleShowParticipantsTab} from "./conference/conference";
 import {Direction} from "../common/util";
 import {solidInfo} from "./map";
 import {characters} from "./main";
+import { Whiteboard } from "./interactive/whiteboard";
 
 let inputMode: InputMode = InputMode.NORMAL;
 
@@ -95,7 +96,7 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
     }
 }
 
-export function loadInputFunctions() {
+export function loadInputFunctions(whiteboard: Whiteboard, whiteboard2: Whiteboard) {
     function onKeyDown(e: KeyboardEvent) {
         if (inputMode === InputMode.SETTINGS) {
             return;
@@ -122,6 +123,12 @@ export function loadInputFunctions() {
                 nextIndex = 0;
             }
             setCharacter(filenames[nextIndex]);
+        });
+        onPureKey(e, "i", () => {
+            whiteboard.toggelIsVisible();
+        });
+        onPureKey(e, "j", () => {
+            whiteboard2.toggelIsVisible();
         });
         //rename players name
         onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")));

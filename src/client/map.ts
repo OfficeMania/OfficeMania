@@ -5,6 +5,7 @@ import {Door, DoorDirection} from "./interactive/door";
 import {PingPongTable} from "./interactive/pingpongtable";
 import {State} from "../common";
 import {MessageType} from "../common/util";
+import { Whiteboard } from "./interactive/whiteboard";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -307,7 +308,6 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         //whiteboard
         case 7: {
             //return new Whiteboard();
-            break;
         }
     }
     return null;

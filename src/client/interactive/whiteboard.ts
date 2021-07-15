@@ -1,58 +1,77 @@
 import {Room} from "colyseus.js";
-import {State} from "../common";
-import {loadImage, PlayerRecord} from "./util";
+import {State} from "../../common";
+import {getRoom, loadImage, PlayerRecord, getPlayers} from "../util";
 import {ArraySchema} from "@colyseus/schema";
-import {MessageType} from "../common/util";
+import {MessageType} from "../../common/util";
+import { Interactive } from "./interactive";
 
 
-export class Whiteboard {
+export class Whiteboard extends Interactive{
 
     private isVisible: boolean = false;
-    private canvas: HTMLCanvasElement;
     private x: number = 0;
     private y: number = 0;
     private offsetX: number = 100;
     private offsetY: number = 100;
+    stretchX: number = 1;
+    stretchY: number = 1;
     private room: Room<State>;
     private players: PlayerRecord;
     private whiteboardPlayer: { [key: string]: number } = {};
+    wID: number = 0;
+    static whiteboardCount: number = 0;
+    static currentWhiteboard: number = 0;
 
     private clearButton = <HTMLButtonElement>document.getElementById("button-clear-whiteboard");
 
 
-    constructor(canvas: HTMLCanvasElement, room: Room<State>, players: PlayerRecord) {
-        this.room = room;
-        this.players = players;
-        this.canvas = canvas;
-        //let ctx = canvas.getContext("2d"); // What happens to this, is it even needed any more?
+    constructor() {
+
+        super("whiteboard", false, 1)
+
+        this.wID = Whiteboard.whiteboardCount;
+        Whiteboard.whiteboardCount++;
+
+        this.room = getRoom();
+        this.players = getPlayers();
 
         this.clearButton.addEventListener("click", () => this.clearPressed(this));
 
-        room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
+        this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
 
-        room.onMessage(MessageType.WHITEBOARD_CLEAR, () => this.clear(this));
+        this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
 
-        canvas.addEventListener('mousemove', (e) => {
+        this.canvas.addEventListener('mousemove', (e) => {
             this.draw(e, this)
         });
-        canvas.addEventListener('mousedown', (e) => {
+        this.canvas.addEventListener('mousedown', (e) => {
             this.setPosition(e, this)
         });
-        canvas.addEventListener('mouseup', (e) => {
+        this.canvas.addEventListener('mouseup', (e) => {
             this.mouseup(e, this)
         });
-        canvas.addEventListener('mouseenter', (e) => {
+        this.canvas.addEventListener('mouseenter', (e) => {
             this.setPosition(e, this)
         });
+        window.addEventListener('resize', () => this.resize(window.innerWidth, window.innerHeight, this))
 
-        canvas.width = 1280;
-        canvas.height = 720;
-
-
-        this.setup(canvas);
+        this.canvas.width = 1280;
+        this.canvas.height = 720;
     }
 
-    private setup(canvas) {
+    rect(e, whiteboard: Whiteboard){
+        var canvas = whiteboard.canvas
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle = "white"
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    onInteraction(){
+        this.setup(this.canvas);
+        this.redraw(this);
+    }
+
+    setup(canvas) {
         var ctx = canvas.getContext("2d");
         ctx.fillStyle = "white"
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -63,16 +82,30 @@ export class Whiteboard {
         ctx.stroke();
     }
 
+    redraw(whiteboard: Whiteboard){
+        whiteboard.setup(whiteboard.canvas)
+        for (const [player] of whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer) {
+            whiteboard.addPlayer(player);
+            whiteboard.drawOthers(player, whiteboard);
+        }
+    }
+
     addPlayer(player: string) {
         this.whiteboardPlayer[player] = 0;
     }
 
     clearPressed(whiteboard: Whiteboard) {
-        whiteboard.room.send(MessageType.WHITEBOARD_CLEAR);
-        whiteboard.clear(whiteboard);
+        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
+            return;
+        }
+        whiteboard.room.send(MessageType.WHITEBOARD_CLEAR, whiteboard.wID);
+        whiteboard.clear(whiteboard, whiteboard.wID);
     }
 
-    clear(whiteboard: Whiteboard) {
+    clear(whiteboard: Whiteboard, message: number) {
+        if(whiteboard.wID !== message){
+            return;
+        }
         for (var id in whiteboard.whiteboardPlayer) {
             whiteboard.whiteboardPlayer[id] = 0;
         }
@@ -88,10 +121,17 @@ export class Whiteboard {
             this.isVisible = false;
             this.canvas.style.visibility = "hidden";
             this.clearButton.style.visibility = "hidden";
+
+            if(Whiteboard.currentWhiteboard === this.wID){
+                Whiteboard.currentWhiteboard = -1;
+            }
         } else {
             this.isVisible = true;
             this.canvas.style.visibility = "visible";
             this.clearButton.style.visibility = "visible";
+
+            Whiteboard.currentWhiteboard = this.wID
+            this.onInteraction();
         }
     }
 
@@ -99,24 +139,40 @@ export class Whiteboard {
         return this.canvas
     }
 
-    resize(width: number, height: number) {
-        this.offsetX = Math.round(width / 2) - Math.round(this.canvas.width / 2);
-        this.offsetY = Math.round(height / 2) - Math.round(this.canvas.height / 2);
+    resize(width: number, height: number, whiteboard: Whiteboard) {
+        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
+            return;
+        }
+        whiteboard.offsetX = Math.round(width / 2) - Math.round(this.canvas.width / 2);
+        whiteboard.offsetY = Math.round(height / 2) - Math.round(this.canvas.height / 2);
 
-        this.canvas.style.left = this.offsetX + "px";
-        this.canvas.style.top = this.offsetY + "px";
+        whiteboard.stretchX = whiteboard.canvas.width / 1280 
+        whiteboard.stretchY = whiteboard.canvas.height / 720
+        
 
-        this.clearButton.style.left = this.offsetX + 4 + "px";
-        this.clearButton.style.top = this.offsetY + 4 + "px";
+        whiteboard.canvas.style.left = this.offsetX + "px";
+        whiteboard.canvas.style.top = this.offsetY + "px";
+
+        whiteboard.clearButton.style.left = this.offsetX + 4 + "px";
+        whiteboard.clearButton.style.top = this.offsetY + 4 + "px";
     }
 
     // new position from mouse event
     private setPosition(e, whiteboard: Whiteboard) {
-        whiteboard.x = e.clientX - whiteboard.offsetX;
-        whiteboard.y = e.clientY - whiteboard.offsetY;
+        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
+            return;
+        }
+        whiteboard.x = (e.clientX - whiteboard.offsetX) * whiteboard.stretchX;
+        whiteboard.y = (e.clientY - whiteboard.offsetY) * whiteboard.stretchY;
+        //console.log(e.clientX - whiteboard.offsetX, e.clientY - whiteboard.offsetY)
+        //console.log(whiteboard.canvas.width, whiteboard.canvas.height, "canvas")
+        //console.log(whiteboard.interactiveBar.clientWidth, whiteboard.interactiveBar.clientHeight, "div")
     }
 
     private draw(e, whiteboard: Whiteboard) {
+        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
+            return;
+        }
         // mouse left button must be pressed
         if (e.buttons !== 1) return;
 
@@ -126,14 +182,16 @@ export class Whiteboard {
 
         this.drawLine(oldX, oldY, whiteboard.x, whiteboard.y, whiteboard)
 
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [oldX, oldY])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, oldX, oldY])
     }
 
     drawOthers(clientID: string, whiteboard: Whiteboard) {
-        var max: number = whiteboard.room.state.whiteboardPlayer[clientID].paths.length;
+        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
+            return;
+        }
+        var max: number = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths.length;
         var start: number = whiteboard.whiteboardPlayer[clientID]
-        var paths: ArraySchema<number> = whiteboard.room.state.whiteboardPlayer[clientID].paths;
-        console.log(paths);
+        var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths;
         var j = 0;
         var ctx = whiteboard.canvas.getContext("2d");
 
@@ -192,8 +250,11 @@ export class Whiteboard {
 
 
     private mouseup(e, whiteboard: Whiteboard) {
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.x, whiteboard.y])
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, -1)
+        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
+            return;
+        }
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
     }
 
 

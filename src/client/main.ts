@@ -32,7 +32,7 @@ import {
 import {playerLoop} from "./movement";
 import {checkInteraction, getInputMode, loadInputFunctions, setInputMode} from "./input";
 import {drawPlayer} from "./drawplayer"
-import {Whiteboard} from "./whiteboard"
+import {Whiteboard} from "./interactive/whiteboard"
 
 
 export var characters: { [key: string]: HTMLImageElement } = {}
@@ -288,13 +288,21 @@ async function main() {
     drawMap(currentMap);
 
     //create whiteboard
-    let whiteboardCanvas = $<HTMLCanvasElement>("whiteboard");
-    let whiteboard: Whiteboard = new Whiteboard(whiteboardCanvas, room, players);
-    whiteboard.resize(width, height);
-    for (const [player] of room.state.whiteboardPlayer) {
+    let whiteboard: Whiteboard = new Whiteboard();
+    whiteboard.resize(width, height, whiteboard);
+    for (const [player] of room.state.whiteboard.at(0).whiteboardPlayer) {
         whiteboard.addPlayer(player);
         if (player !== ourPlayer.id) {
             whiteboard.drawOthers(player, whiteboard);
+        }
+    }
+
+    let whiteboard2: Whiteboard = new Whiteboard();
+    whiteboard2.resize(width, height, whiteboard2);
+    for (const [player] of room.state.whiteboard.at(1).whiteboardPlayer) {
+        whiteboard2.addPlayer(player);
+        if (player !== ourPlayer.id) {
+            whiteboard2.drawOthers(player, whiteboard2);
         }
     }
 
@@ -308,9 +316,7 @@ async function main() {
      */
 
     //loads all the input functions
-    loadInputFunctions();
-
-    window.addEventListener('resize', () => whiteboard.resize(window.innerWidth, window.innerHeight))
+    loadInputFunctions(whiteboard, whiteboard2);
 
     // message recieve test
 

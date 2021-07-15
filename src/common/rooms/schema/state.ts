@@ -41,11 +41,19 @@ export class PlayerData extends Schema {
 /*
  * state of whiteboard players
  */
-export class WhiteboardPlayer extends Schema {
+export class WhiteboardPlayerState extends Schema {
 
     @type({array: "number"})
     paths: ArraySchema<number> = new ArraySchema<number>();
 
+}
+
+/*
+ * state of whiteboard
+ */
+export class WhiteboardState extends Schema {
+    @type({map: WhiteboardPlayerState})
+    whiteboardPlayer: MapSchema<WhiteboardPlayerState> = new MapSchema<WhiteboardPlayerState>();
 }
 
 /*
@@ -121,8 +129,8 @@ export class State extends Schema {
     @type(ConferenceData)
     conference: ConferenceData = new ConferenceData();
 
-    @type({map: WhiteboardPlayer})
-    whiteboardPlayer: MapSchema<WhiteboardPlayer> = new MapSchema<WhiteboardPlayer>();
+    @type({array: WhiteboardState})
+    whiteboard: ArraySchema<WhiteboardState> = new ArraySchema<WhiteboardState>();
 
     @type({map: PongState})
     pongStates: MapSchema<PongState> = new MapSchema<PongState>();

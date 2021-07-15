@@ -1,6 +1,6 @@
 import {Handler} from "./handler";
 import {Client, Room} from "colyseus";
-import {PlayerData, State, WhiteboardPlayer} from "../rooms/schema/state";
+import {PlayerData, State, WhiteboardPlayerState} from "../rooms/schema/state";
 import {Direction, MessageType} from "../util";
 
 export class PlayerHandler implements Handler {
@@ -31,7 +31,6 @@ export class PlayerHandler implements Handler {
         this.room.state.players[client.sessionId].y = 0;
         this.room.state.players[client.sessionId].cooldown = 0;
         this.room.state.players[client.sessionId].participantId = null;
-        this.room.state.whiteboardPlayer[client.sessionId] = new WhiteboardPlayer();
         this.room.broadcast("newPlayer", client); //Does this get used any where?
     }
 
