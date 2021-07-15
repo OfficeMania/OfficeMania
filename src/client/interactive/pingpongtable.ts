@@ -120,6 +120,7 @@ export class PingPongTable extends Interactive {
 
     loop() {
         if (ourGame) {
+            this.room.send(MessageType.PONG_UPDATE);
             ourGame.loop();
             this.updateInput();
         }

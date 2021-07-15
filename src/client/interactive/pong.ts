@@ -71,15 +71,17 @@ export class Pong {
         if(this.playerA && this.playerA !== null){
             this.ctx.fillStyle ="black";
             this.ctx.fillRect(5, this.playerA.pos, 10, this.sizeBat);
-            console.log("painting a");
-            console.log(this.playerA);
+            //console.log("painting a");
+            //console.log(this.playerA);
         }
         if (this.playerB && this.playerB !== null) {
             this.ctx.fillStyle ="black";
             this.ctx.fillRect(this.canvas.width-15, this.playerB.pos, 10, this.sizeBat);
-            console.log("painting b");
-            console.log(this.playerB);
+            //console.log("painting b");
+            //console.log(this.playerB);
         }
+        this.ctx.fillStyle = "black";
+        this.ctx.fillRect(this.posBallX - (this.sizeBall/2), this.posBallY -(this.sizeBall/2), this.sizeBall, this.sizeBall);
     }
 
 }

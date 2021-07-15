@@ -23,7 +23,7 @@ export enum MessageType {
     // PongHandler
     PONG_MOVE = "pongMove",
     PONG_INTERACTION = "pongInteraction",
-    PONG_UPDATE = "updatePng",
+    PONG_UPDATE = "updatePong",
     // WhiteboardHandler
     WHITEBOARD_CLEAR = "whiteboardClear",
     WHITEBOARD_PATH = "whiteboardPath",

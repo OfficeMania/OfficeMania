@@ -22,7 +22,7 @@ export class PongHandler implements Handler {
     onCreate(options: any) {
         this.room.onMessage(MessageType.PONG_INTERACTION, (client, message) => onPongInteraction(this.room, client, message));
         this.room.onMessage(MessageType.PONG_MOVE, (client, message) => onPongMove(this.room, client, message));
-        this.room.onMessage(MessageType.PONG_UPDATE, (client, message) => onPongUpdate(message, this.room))
+        this.room.onMessage(MessageType.PONG_UPDATE, (client) => onPongUpdate(client, this.room))
     }
 
     onJoin(client: Client) {
@@ -59,18 +59,7 @@ function onPongInteraction(room: Room<State>, client, message: PongMessage) {
                         }
                     }
                 } else {
-                    console.log("creating new pongstate");
-                    console.log(getNextPongSlot(room));
-                    let ar = getNextPongSlot(room);
-                    let newState = new PongState();
-                    newState.playerA = client.sessionId;
-                    newState.velocities.push(10, 10);
-                    newState.sizes.push(10, 100)
-                    newState.posPlayerA = 500 - (newState.sizes.at(1) / 2);
-                    newState.velBallX = 1;
-                    newState.velBallY = 0;
-                    room.state.pongStates[ar.toString()] = newState;
-                    console.log(room.state.pongStates[ar.toString()].posPlayerA);
+                    initNewState(room, client);
                 }
             }
             setTimeout(() => client.send(MessageType.PONG_INTERACTION, PongMessage.INIT), 1000);
@@ -130,6 +119,23 @@ function onPongMovePlayer(message: string, gameState: PongState, pos: number, ca
     }
 }
 
+function initNewState(room: Room<State>, client: Client) {
+    console.log("creating new pongstate");
+                    console.log(getNextPongSlot(room));
+                    let ar = getNextPongSlot(room);
+                    let newState = new PongState();
+                    newState.playerA = client.sessionId;
+                    newState.velocities.push(10, 10);
+                    newState.sizes.push(10, 100)
+                    newState.posPlayerA = 500 - (newState.sizes.at(1) / 2);
+                    newState.velBallX = 0.8;
+                    newState.velBallY = 0.2;
+                    newState.posBallX = 500 - (newState.sizes.at(0) / 2);
+                    newState.posBallY = 500 - (newState.sizes.at(0) / 2);
+                    room.state.pongStates[ar.toString()] = newState;
+                    console.log(room.state.pongStates[ar.toString()].posPlayerA);
+}
+
 function leavePongGame(room: Room<State>, client: Client) {
     const n = getPongGame(room, client);
     if (n === -1) {
@@ -180,8 +186,20 @@ function getNextPongSlot(room: Room<State>): number {
     }
     return -1;
 }
-function onPongUpdate(message: string, room: Room<State>) {
-    if(message === "pong") {
-        //gameState.posBallX
+function onPongUpdate(client, room: Room<State>) {
+    const gameState: PongState = room.state.pongStates[getPongGame(room, client).toString()];
+    let posX = gameState.posBallX;
+    let posY = gameState.posBallY;
+    posX += gameState.velBallX * gameState.velocities.at(0);
+    console.log(posX);
+    posY += gameState.velBallY * gameState.velocities.at(0);
+    if (posY > 1000 - gameState.sizes.at(0)/2 || posY < 0 + gameState.sizes.at(0)/2) {
+        gameState.velBallY *= -1;
     }
+    gameState.posBallY = posY;
+    if (posX > 1000 - gameState.sizes.at(0)/2 || posX < 0 + gameState.sizes.at(0)/2) {
+        gameState.velBallX *= -1;   
+    }
+    gameState.posBallX = posX;
+    console.log(gameState.posBallX +" " + gameState.posBallY)
 }
