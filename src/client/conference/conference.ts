@@ -487,41 +487,49 @@ export function toggleSharing(done: (enabled: boolean) => void) {
     enableSharing(done);
 }
 
+const minDistance: number = 300;
+const minDistanceSquared: number = minDistance * minDistance;
+const openRooms: number[] = [7, 16, 28]; //FIXME This should be read from the Map and not be hardcoded here
+
 export function nearbyPlayerCheck() {
     const players: PlayerRecord = getPlayers();
     const ourPlayer: Player = getOurPlayer();
     const collisionInfo: solidInfo[][] = getCollisionInfo();
     //array with nearby players. use this vor videochat.
-    const playersNearby: Player[] = [];
     const playersAway: string[] = [];
-    for (const value of Object.values(players)) {
-        if (value.id === ourPlayer.id) {
-            continue;
-        }
-        if (Math.pow(value.positionX - ourPlayer.positionX, 2) + Math.pow(value.positionY - ourPlayer.positionY, 2) < 50000) {
-            playersNearby.push(value);
-        } else {
-            playersAway.push(value.participantId);
-        }
-    }
-    playersAway.forEach((participantId) => getUser(participantId).setDisabled(true));
+    const playersNearby: string[] = [];
     //TODO Check if they are on the same map
     const [ourX, ourY] = getCorrectedPlayerCoordinates(ourPlayer);
-    const ourRoomId = collisionInfo[ourX]?.[ourY]?.roomId;
-    playersNearby.forEach((player) => {
-        const user = getUser(player.participantId);
-        if (!ourRoomId) {
-            user.setDisabled(false);
-            return;
+    const ourRoomId: number = collisionInfo[ourX]?.[ourY]?.roomId;
+    const isOurRoomOpen: boolean = ourRoomId && openRooms.includes(ourRoomId);
+    for (const player of Object.values(players)) {
+        if (player.id === ourPlayer.id) {
+            continue;
+        }
+        if (!ourRoomId && ourRoomId !== 0) {
+            playersAway.push(player.participantId);
+            continue;
         }
         const [x, y] = getCorrectedPlayerCoordinates(player);
         const roomId = collisionInfo[x]?.[y]?.roomId;
-        if (!roomId) {
-            user.setDisabled(false);
-            return;
+        if (!roomId && roomId !== 0) {
+            playersAway.push(player.participantId);
+            continue;
         }
-        user.setDisabled(!(ourRoomId === roomId || canSeeEachOther(ourPlayer, player, collisionInfo)));
-    });
+        const sameRoom = ourRoomId === roomId;
+        if (!(sameRoom || canSeeEachOther(ourPlayer, player, collisionInfo))) {
+            playersAway.push(player.participantId);
+            continue;
+        }
+        const distanceSquared = Math.pow(player.positionX - ourPlayer.positionX, 2) + Math.pow(player.positionY - ourPlayer.positionY, 2);
+        if (distanceSquared <= minDistanceSquared || (isOurRoomOpen && sameRoom)) {
+            playersNearby.push(player.participantId);
+            continue;
+        }
+        playersAway.push(player.participantId);
+    }
+    playersAway.forEach((participantId) => getUser(participantId).setDisabled(true));
+    playersNearby.forEach((participantId) => getUser(participantId).setDisabled(false));
 }
 
 export function createPlayerState<Type extends HTMLElement>(player: Player, element: Type, showCharacter: boolean = false, showMuteState: boolean = true): Type {
