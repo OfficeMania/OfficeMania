@@ -24,12 +24,12 @@ export class DoorHandler implements Handler {
     }
 
     onDispose() {
-        //Nothing
+        //Nothing?
     }
 
 }
 
-function onNewDoor(room: Room<State>, client: Client, message: string) {
+function onNewDoor(room: Room<State>, client: Client, message) {
     if (room.state.doorStates[message] !== null) {
         room.state.doorStates[message] = new DoorState();
         room.state.doorStates[message].isClosed = false;
