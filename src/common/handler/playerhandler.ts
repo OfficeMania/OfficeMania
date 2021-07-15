@@ -3,29 +3,6 @@ import {Client, Room} from "colyseus";
 import {PlayerData, State, WhiteboardPlayer} from "../rooms/schema/state";
 import {Direction, MessageType} from "../util";
 
-function onMove(room: Room<State>, client: Client, message) {
-    if (room.state.players[client.sessionId].cooldown <= 0) {
-        switch (message) {
-            case Direction.DOWN: {
-                room.state.players[client.sessionId].y++;
-                break;
-            }
-            case Direction.UP: {
-                room.state.players[client.sessionId].y--;
-                break;
-            }
-            case Direction.LEFT: {
-                room.state.players[client.sessionId].x--;
-                break;
-            }
-            case Direction.RIGHT: {
-                room.state.players[client.sessionId].x++;
-                break;
-            }
-        }
-    }
-}
-
 export class PlayerHandler implements Handler {
 
     room: Room<State>;
@@ -66,4 +43,27 @@ export class PlayerHandler implements Handler {
         //Nothing?
     }
 
+}
+
+function onMove(room: Room<State>, client: Client, message: Direction) {
+    if (room.state.players[client.sessionId].cooldown <= 0) {
+        switch (message) {
+            case Direction.DOWN: {
+                room.state.players[client.sessionId].y++;
+                break;
+            }
+            case Direction.UP: {
+                room.state.players[client.sessionId].y--;
+                break;
+            }
+            case Direction.LEFT: {
+                room.state.players[client.sessionId].x--;
+                break;
+            }
+            case Direction.RIGHT: {
+                room.state.players[client.sessionId].x++;
+                break;
+            }
+        }
+    }
 }
