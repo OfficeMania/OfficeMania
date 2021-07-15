@@ -363,12 +363,13 @@ async function main() {
         }
 
         //check if interaction is nearby
-        if (checkInteraction(false).content) {
+        const solidInfo = checkInteraction();
+        if (solidInfo?.content) {
             if (!interactionShown) {
                 interactionShown = true;
                 let interactionNearbyButton = document.createElement("button");
                 interactionNearbyButton.id = "button-interact";
-                interactionNearbyButton.addEventListener("click", () => checkInteraction(true))
+                interactionNearbyButton.addEventListener("click", () => checkInteraction(true));
                 interactionNearbyButton.innerHTML = "<em class=\"fa fa-sign-in-alt\"></em>";
                 $<HTMLDivElement>("panel-buttons-interaction").append(interactionNearbyButton);
             }
@@ -391,7 +392,7 @@ async function main() {
 
         //drawWhiteboard(canvas, whiteboard.getCanvas())
         if (getInputMode() === InputMode.INTERACTION) {
-            checkInteraction(false).content?.loop();
+            checkInteraction()?.content?.loop();
         }
 
         // Repeat game loop
