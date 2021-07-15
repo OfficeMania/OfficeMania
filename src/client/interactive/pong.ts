@@ -50,16 +50,16 @@ export class Pong{
         }
         else {console.log("still no")};
         if(currentState) {
-            if (currentState.playerB && this.playerB){
+            if (currentState.playerB && this.playerB && this.playerB !== null){
                 this.playerB.pos = currentState.posPlayerB;
-                console.log(this.playerB.pos + " playerB");
+                //console.log(this.playerB.pos + " playerB");
             }
-            if (currentState.playerA && this.playerA){
+            if (currentState.playerA && this.playerA && this.playerA !== null){
                 this.playerA.pos = currentState.posPlayerA;
-                console.log(this.playerA.pos + "PlayerA");
+                //console.log(this.playerA.pos + "PlayerA");
             }
-            this.posBallX = currentState.posBall.at(0);
-            this.posBallY = currentState.posBall.at(1);
+            this.posBallX = currentState.posBallX;
+            this.posBallY = currentState.posBallY;
         }
     }
     
@@ -68,13 +68,18 @@ export class Pong{
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle ="black";
         this.ctx.strokeRect(5, 5, this.canvas.width-5, this.canvas.height-5);
-        this.ctx.fillStyle ="black";
-        this.ctx.fillRect(5, this.playerA.pos, 10, this.sizeBat);
-        if (this.playerB) {
+        if(this.playerA && this.playerA !== null){
+            this.ctx.fillStyle ="black";
+            this.ctx.fillRect(5, this.playerA.pos, 10, this.sizeBat);
+            console.log("painting a");
+            console.log(this.playerA);
+        }
+        if (this.playerB && this.playerB !== null) {
             this.ctx.fillStyle ="black";
             this.ctx.fillRect(this.canvas.width-15, this.playerB.pos, 10, this.sizeBat);
+            console.log("painting b");
+            console.log(this.playerB);
         }
-
     }
 }
 export class PongPlayer {
@@ -105,5 +110,4 @@ export class PongPlayer {
     set pos(pos: number){
         this._pos = pos;
     }
-
 }

@@ -94,7 +94,8 @@ export class TURoom extends Room<State> {
                             newState.velocities.push(10,10);
                             newState.sizes.push(10, 100)
                             newState.posPlayerA = 500 - (newState.sizes.at(1)/2);
-
+                            newState.velBallX = 1;
+                            newState.velBallY = 0;
                             this.state.pongStates[ar.toString()] = newState;
                             console.log(this.state.pongStates[ar.toString()].posPlayerA);
                         }
@@ -116,6 +117,7 @@ export class TURoom extends Room<State> {
                         let game: PongState = this.state.pongStates[n.toString()];
                         game.playerA === client.sessionId? game.playerA = null: game.playerB = null;
                         game.playerA === null && game.playerB === null? this.state.pongStates.delete(n.toString()): {};
+                        setTimeout(() => this.clients.forEach((client) => client.send(MessageType.INTERACTION, "pong-update")), 1000)
                     }
                     
                     break;
@@ -186,11 +188,16 @@ export class TURoom extends Room<State> {
     }
 
     onLeave(client: Client, consented: boolean) {
+        /**
+         * any way to handle this neater? (duplicate of line 114 onwards)
+         */
         let n = this.getPongGame(client);
         if(n !== -1) {
             let game: PongState = this.state.pongStates[n.toString()];
-            game.playerA === client.sessionId? game.playerA = null: game.playerB = null;
-            game.playerA === null && game.playerB === null? this.state.pongStates.delete(n.toString()): {};
+            game.playerA === client.sessionId? () => {game.playerA = null; game.posPlayerA = null}: () => {game.playerB = null; game.posPlayerB = null};
+            game.playerA === null && game.playerB === null? () => {this.state.pongStates.delete(n.toString()); console.log("deleting empty gamestate")}: {};
+            
+            setTimeout(() => this.clients.forEach((client) => client.send(MessageType.INTERACTION, "pong-update")), 1000)
         }
         delete this.state.players[client.sessionId];
     }
@@ -217,7 +224,8 @@ export class TURoom extends Room<State> {
         if(!this.state.pongStates.size) { return -1; }
         for(let i = 0; i < this.state.pongStates.size; i++) {
             console.log(this.state.pongStates[i.toString()].playerA);
-            if (!this.state.pongStates[i.toString()].playerA || !this.state.pongStates[i.toString()].playerB){
+            console.log(this.state.pongStates[i.toString()].playerB);
+            if (!this.state.pongStates[i.toString()].playerA || this.state.pongStates[i.toString()].playerA === null || !this.state.pongStates[i.toString()].playerB || this.state.pongStates[i.toString()].playerB === null){
                 return i;
             }
         }

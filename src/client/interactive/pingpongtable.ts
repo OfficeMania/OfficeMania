@@ -30,7 +30,7 @@ export class PingPongTable extends Interactive{
     onInteraction() {
         this.ourPlayer = getOurPlayer();
         this.players = getPlayers();
-        if(!ourGame) {
+        if(!ourGame || ourGame === null) {
             this.room.send(MessageType.INTERACTION, "pong");
             console.log("Pong game interaction...");
             //this.getPongs();
@@ -45,23 +45,26 @@ export class PingPongTable extends Interactive{
             this.buttonBar.appendChild(button)
             checkInputMode();
             this.room.onMessage(MessageType.INTERACTION, (message) => {
-                console.log("interatction message recieved in client" + message)
-                if (message === "pong-init") {
-                    this.getPongs();
-                    console.log(ourGame);
-                    console.log(this.pongs);
-                    ourGame = this.pongs[this.getGame(this.ourPlayer.id)];
-                    console.log(ourGame);
-                    
-                }
-                if (message === "pong-update") {
-                    if (ourGame){
-                        ourGame.selfGameId = this.getGame(this.ourPlayer.id);
-                        if(!ourGame.playerB){this.updateState()};
-                        console.log(ourGame)
-                        ourGame.paint();
+                console.log("interatction message recieved in client " + message)
+                switch (message) {
+                    case "pong-init": {
+                        this.getPongs();
+                        console.log(ourGame);
+                        console.log(this.pongs);
+                        ourGame = this.pongs[this.getGame(this.ourPlayer.id)];
+                        console.log(ourGame);
+                        break;
                     }
-                    
+                    case "pong-update": {
+                        if (ourGame && ourGame !== null){
+                            ourGame.selfGameId = this.getGame(this.ourPlayer.id);
+                            this.updateState();
+                            console.log(ourGame)
+                            ourGame.paint();
+                        }
+                        break;
+                    }
+                    default: break;
                 }
             });
         }
@@ -105,7 +108,7 @@ export class PingPongTable extends Interactive{
         for(let i = 0; i < this.room.state.pongStates.size; i++) {
             //console.log(this.room.state.pongStates["0"].playerA);
             if (this.room.state.pongStates[i.toString()].playerA === clientId|| this.room.state.pongStates[i.toString()].playerB === clientId){
-                console.log("checking game: " + i)
+                console.log("found game: " + i)
                 return i;
             }
         }
@@ -119,6 +122,8 @@ export class PingPongTable extends Interactive{
             this.updateInput();
         }
     }
+
+
     leave() {
         ourGame.canvas.style.visibility = "hidden";
         document.getElementById("close").remove();
@@ -127,13 +132,40 @@ export class PingPongTable extends Interactive{
         this.pongs = [];
         checkInputMode();
     }
+
+
     updateState() {
-        if(this.room.state.pongStates[ourGame.selfGameId.toString()].playerB && !ourGame.playerB) {
-            console.log("inserting player b");
+        //check for player A in state
+        if(this.room.state.pongStates[ourGame.selfGameId.toString()].playerA && this.room.state.pongStates[ourGame.selfGameId.toString()].playerA !== null) {
+            if(!ourGame.playerA) {
+                console.log("inserting player A");
+            ourGame.playerA = new PongPlayer(this.room.state.pongStates[this.getGame(this.ourPlayer.id).toString()].playerA);
+            console.log(ourGame);
+            }
+        }
+        else {
+            if(ourGame.playerA) {
+                console.log("removed player A")
+                ourGame.playerA = null;
+            }
+        }
+        //check for playerB in state
+        if(this.room.state.pongStates[ourGame.selfGameId.toString()].playerB && this.room.state.pongStates[ourGame.selfGameId.toString()].playerB !== null){
+            if(!ourGame.playerB) {
+                console.log("inserting player b");
             ourGame.playerB = new PongPlayer(this.room.state.pongStates[this.getGame(this.ourPlayer.id).toString()].playerB);
             console.log(ourGame);
+            }
+        }
+        else {
+            if(ourGame.playerB) {
+                console.log("removed player B");
+                ourGame.playerB = null;
+            }
         }
     }
+
+
     updateInput() {
         //console.log(this.input);
         switch (this.input[0]) {

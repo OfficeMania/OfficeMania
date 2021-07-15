@@ -54,9 +54,17 @@ export class PongState extends Schema {
 
     @type("string")
     playerB: string;
-    //0: posxBall, 1: posyBall
-    @type({array: "number"})
-    posBall = new ArraySchema<number>();
+    
+    @type("number")
+    posBallX: number;
+    @type("number")
+    posBallY: number;
+
+    //proportional velocities
+    @type("number")
+    velBallX:number;
+    @type("number")
+    velBallY: number;
 
     @type("number")
     posPlayerA: number;
@@ -67,7 +75,7 @@ export class PongState extends Schema {
     //0: sizeBall, 1: sizeBat
     @type({array: "number"})
     sizes = new ArraySchema<number>();
-    //0: ball, 1: bat
+    //maximum velocities per frame: 0: ball, 1: bat
     @type({array: "number"})
     velocities = new ArraySchema<number>();
 }
