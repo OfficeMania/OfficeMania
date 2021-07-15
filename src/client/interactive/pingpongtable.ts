@@ -83,7 +83,7 @@ export class PingPongTable extends Interactive {
                 this.pongs[i] = this.getPongFromState(this.room.state.pongStates[i.toString()]);
                 console.log(this.pongs[i])
             }
-            this.pongs[i].updatePos();
+            this.pongs[i].updatePong();
             i++;
         }
     }
@@ -102,7 +102,7 @@ export class PingPongTable extends Interactive {
         }
         //console.log("created a pong game");
         //console.log(pong.playerA);
-        pong.updatePos();
+        pong.updatePong();
         return pong;
     }
 

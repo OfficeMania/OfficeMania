@@ -76,6 +76,12 @@ export class PongState extends Schema {
     @type("number")
     posPlayerB: number;
 
+    @type("number")
+    scoreA: number;
+
+    @type("number")
+    scoreB: number;
+    
     //0: sizeBall, 1: sizeBat
     @type({array: "number"})
     sizes = new ArraySchema<number>();

@@ -37,12 +37,12 @@ export class Pong {
     }
 
     loop() {
-        this.updatePos();
+        this.updatePong();
         this.paint();
         //this.room.send(MessageType.INTERACTION, PongMessage.END);
     }
 
-    updatePos() {
+    updatePong() {
         let currentState: PongState;
         if (this.selfGameId !== -1) {
             currentState = this.room.state.pongStates[this.selfGameId.toString()]
@@ -52,10 +52,12 @@ export class Pong {
         if(currentState) {
             if (currentState.playerB && this.playerB){
                 this.playerB.pos = currentState.posPlayerB;
+                this.playerB.score = currentState.scoreB;
                 //console.log(this.playerB.pos + " playerB");
             }
             if (currentState.playerA && this.playerA){
                 this.playerA.pos = currentState.posPlayerA;
+                this.playerA.score = currentState.scoreB;
                 //console.log(this.playerA.pos + "PlayerA");
             }
             this.posBallX = currentState.posBallX;
@@ -67,21 +69,21 @@ export class Pong {
         this.ctx.fillStyle = "white"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle ="black";
-        this.ctx.strokeRect(5, 5, this.canvas.width-5, this.canvas.height-5);
+        this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
         if(this.playerA){
             this.ctx.fillStyle ="black";
-            this.ctx.fillRect(5, this.playerA.pos, 10, this.sizeBat);
+            this.ctx.fillRect(5, this.playerA.pos, 15, this.sizeBat);
             //console.log("painting a");
             //console.log(this.playerA);
         }
         if (this.playerB) {
             this.ctx.fillStyle ="black";
-            this.ctx.fillRect(this.canvas.width-15, this.playerB.pos, 10, this.sizeBat);
+            this.ctx.fillRect(this.canvas.width-20, this.playerB.pos, 15, this.sizeBat);
             //console.log("painting b");
             //console.log(this.playerB);
         }
         this.ctx.fillStyle = "black";
-        this.ctx.fillRect(this.posBallX - (this.sizeBall/2), this.posBallY -(this.sizeBall/2), this.sizeBall, this.sizeBall);
+        this.ctx.fillRect(this.posBallX - (this.sizeBall/2), this.posBallY -(this.sizeBall/2), this.sizeBall/2, this.sizeBall);
     }
 
 }
