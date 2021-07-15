@@ -11,6 +11,27 @@ export enum PongMessage {
     END = "pong-end"
 }
 
+export class PongHandler implements Handler {
+
+    init(options: any) {
+        //TODO
+    }
+
+    onJoin(client: Client) {
+        //TODO
+    }
+
+    onLeave(client: Client, consented: boolean) {
+        //TODO
+    }
+
+    onDispose() {
+        //Nothing
+    }
+
+}
+
+
 export function registerPongHandler() {
     this.onMessage(MessageType.MOVE_PONG, (client, message) => onPongMove.call(this, client, message));
 }

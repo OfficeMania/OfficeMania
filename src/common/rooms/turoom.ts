@@ -8,6 +8,10 @@ import {Handler} from "../handler/handler";
 
 const path = require('path');
 
+const pongHandler: PongHandler = new PongHandler();
+
+const handlers: Handler[] = [pongHandler];
+
 /*
  * See: https://docs.colyseus.io/server/room/
  */
@@ -168,6 +172,7 @@ export class TURoom extends Room<State> {
                 this.state.doorStates[message].playerId = "";
             }
         })
+        handlers.forEach((handler) => handler.init(options));
     }
 
     onAuth(client: Client, options: any, req: any) {
