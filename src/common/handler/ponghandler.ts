@@ -20,8 +20,8 @@ export class PongHandler implements Handler {
     }
 
     onCreate(options: any) {
-        this.room.onMessage(MessageType.MOVE_PONG, (client, message) => onPongMove(this.room, client, message));
         this.room.onMessage(MessageType.INTERACTION_PONG, (client, message) => onPongInteraction(this.room, client, message));
+        this.room.onMessage(MessageType.MOVE_PONG, (client, message) => onPongMove(this.room, client, message));
     }
 
     onJoin(client: Client) {
@@ -36,18 +36,6 @@ export class PongHandler implements Handler {
         //Nothing
     }
 
-}
-
-function onPongMove(room: Room<State>, client, message) {
-    const gameState: PongState = room.state.pongStates[getPongGame(room, client).toString()]
-    if (!gameState) {
-        return;
-    }
-    if (gameState.playerA === client.sessionId) {
-        onPongMovePlayer(message, gameState, gameState.posPlayerA, (newPos: number) => gameState.posPlayerA = newPos);
-    } else if (gameState.playerB === client.sessionId) {
-        onPongMovePlayer(message, gameState, gameState.posPlayerB, (newPos: number) => gameState.posPlayerB = newPos);
-    }
 }
 
 function onPongInteraction(room: Room<State>, client, message) {
@@ -107,6 +95,18 @@ function onPongInteraction(room: Room<State>, client, message) {
     }
 }
 
+function onPongMove(room: Room<State>, client, message) {
+    const gameState: PongState = room.state.pongStates[getPongGame(room, client).toString()]
+    if (!gameState) {
+        return;
+    }
+    if (gameState.playerA === client.sessionId) {
+        onPongMovePlayer(message, gameState, gameState.posPlayerA, (newPos: number) => gameState.posPlayerA = newPos);
+    } else if (gameState.playerB === client.sessionId) {
+        onPongMovePlayer(message, gameState, gameState.posPlayerB, (newPos: number) => gameState.posPlayerB = newPos);
+    }
+}
+
 function onPongMovePlayer(message: string, gameState: PongState, pos: number, callback: (newPos: number) => void) {
     switch (message) {
         case Direction.UP: {
@@ -134,8 +134,14 @@ function leavePongGame(room: Room<State>, client: Client) {
         return;
     }
     const game: PongState = room.state.pongStates[n.toString()];
-    game.playerA === client.sessionId ? game.playerA = null : game.playerB = null;
-    game.playerA === null && game.playerB === null ? room.state.pongStates.delete(n.toString()) : {};
+    if (game.playerA === client.sessionId) {
+        game.playerA = null;
+    } else {
+        game.playerB = null;
+    }
+    if (game.playerA === null && game.playerB === null) {
+        room.state.pongStates.delete(n.toString());
+    }
 }
 
 function getPongGame(room: Room<State>, client): number {
