@@ -47,6 +47,11 @@ app.use('/img', express.static(path.join(process.cwd(), "assets", "img"), {maxAg
 app.use('/map', express.static(path.join(process.cwd(), "assets", "map")));
 
 /*
+ * "Mount" the assets/lib directory under "[host]/lib"
+ */
+app.use('/lib', express.static(path.join(process.cwd(), "assets", "lib"), {maxAge: 86400000}));
+
+/*
  * "Mount" the assets/templates directory under "[host]/templates"
  */
 app.use('/templates', express.static(path.join(process.cwd(), "assets", "templates"), {maxAge: 31536000000}));
