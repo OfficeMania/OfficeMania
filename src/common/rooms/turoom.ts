@@ -104,7 +104,7 @@ export class TURoom extends Room<State> {
             this.state.players[client.sessionId].participantId = message; //TODO Maybe let the server join the jitsi conference too (without mic/cam) and then authenticate via the jitsi chat, that a player is linked to a participantId, so that one cannot impersonate another one.
         });
 
-        this.onMessage(MessageType.DOOR, (client, message) => {
+        this.onMessage(MessageType.NEW_DOOR, (client, message) => {
 
             if (this.state.doorStates[message] !== null) {
 

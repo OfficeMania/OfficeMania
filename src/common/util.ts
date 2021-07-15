@@ -23,7 +23,7 @@ export enum MessageType {
     CLEAR_WHITEBOARD = "clearWhiteboard",
     INTERACTION = "interaction",
     INTERACTION_PONG = "interactionPong",
-    DOOR = "newDoor"
+    NEW_DOOR = "newDoor"
 }
 
 export function generateUUIDv4() {

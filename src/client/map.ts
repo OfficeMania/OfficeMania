@@ -4,6 +4,7 @@ import {Interactive} from "./interactive/interactive"
 import {Door, DoorDirection} from "./interactive/door";
 import {PingPongTable} from "./interactive/pingpongtable";
 import {State} from "../common";
+import {MessageType} from "../common/util";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -285,23 +286,23 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
     switch (value) {
         //doors
         case 1: {
-            room.send("newDoor", basePosX + "." + basePosY);
+            room.send(MessageType.NEW_DOOR, basePosX + "." + basePosY);
             return new Door(DoorDirection.NORTH, basePosX, basePosY);
         }
         case 2: {
-            room.send("newDoor", basePosX + "." + basePosY);
+            room.send(MessageType.NEW_DOOR, basePosX + "." + basePosY);
             return new Door(DoorDirection.EAST, basePosX, basePosY);
         }
         case 3: {
-            room.send("newDoor", basePosX + "." + basePosY);
+            room.send(MessageType.NEW_DOOR, basePosX + "." + basePosY);
             return new Door(DoorDirection.SOUTH, basePosX, basePosY);
         }
         case 4: {
-            room.send("newDoor", basePosX + "." + basePosY);
+            room.send(MessageType.NEW_DOOR, basePosX + "." + basePosY);
             return new Door(DoorDirection.WEST, basePosX, basePosY);
         }
         case 5: {
-            room.send("newDoor", basePosX + "." + basePosY);
+            room.send(MessageType.NEW_DOOR, basePosX + "." + basePosY);
             return new Door(DoorDirection.ALWAYS_OPEN, basePosX, basePosY);
         }
         //pongtable
