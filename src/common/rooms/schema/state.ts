@@ -1,6 +1,7 @@
 import {ArraySchema, MapSchema, Schema, type} from "@colyseus/schema";
 
 export class ConferenceData extends Schema {
+
     @type("string")
     id: string;
 
@@ -9,14 +10,14 @@ export class ConferenceData extends Schema {
 
     @type("string")
     serverParticipantId: string;
+
 }
-
-
 
 /*
  * Class to sync the playerdata with the server
  */
 export class PlayerData extends Schema {
+
     @type("string")
     name: string;
 
@@ -34,14 +35,17 @@ export class PlayerData extends Schema {
 
     @type("string")
     participantId: string;
+
 }
 
 /*
  * state of whiteboard players
  */
-export class WhiteboardPlayer extends Schema{
+export class WhiteboardPlayer extends Schema {
+
     @type({array: "number"})
     paths: ArraySchema<number> = new ArraySchema<number>();
+
 }
 
 /*
@@ -54,6 +58,7 @@ export class PongState extends Schema {
 
     @type("string")
     playerB: string;
+
     //0: posxBall, 1: posyBall
     @type({array: "number"})
     posBall = new ArraySchema<number>();
@@ -67,9 +72,11 @@ export class PongState extends Schema {
     //0: sizeBall, 1: sizeBat
     @type({array: "number"})
     sizes = new ArraySchema<number>();
+
     //0: ball, 1: bat
     @type({array: "number"})
     velocities = new ArraySchema<number>();
+
 }
 
 export class doorState extends Schema {
@@ -79,6 +86,7 @@ export class doorState extends Schema {
 
     @type("boolean")
     isClosed: boolean;
+
 }
 
 /*
@@ -94,6 +102,7 @@ export class doorState extends Schema {
  * to every schema.
  */
 export class State extends Schema {
+
     @type({map: PlayerData})
     players: MapSchema<PlayerData> = new MapSchema<PlayerData>();
 
