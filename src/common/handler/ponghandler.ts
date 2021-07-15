@@ -20,8 +20,8 @@ export class PongHandler implements Handler {
     }
 
     onCreate(options: any) {
-        this.room.onMessage(MessageType.INTERACTION_PONG, (client, message) => onPongInteraction(this.room, client, message));
-        this.room.onMessage(MessageType.MOVE_PONG, (client, message) => onPongMove(this.room, client, message));
+        this.room.onMessage(MessageType.PONG_INTERACTION, (client, message) => onPongInteraction(this.room, client, message));
+        this.room.onMessage(MessageType.PONG_MOVE, (client, message) => onPongMove(this.room, client, message));
     }
 
     onJoin(client: Client) {
@@ -38,7 +38,7 @@ export class PongHandler implements Handler {
 
 }
 
-function onPongInteraction(room: Room<State>, client, message) {
+function onPongInteraction(room: Room<State>, client, message: PongMessage) {
     switch (message) {
         case PongMessage.ON_INTERACTION: {
             let inGame: number = getPongGame(room, client);
@@ -71,8 +71,8 @@ function onPongInteraction(room: Room<State>, client, message) {
                     console.log(room.state.pongStates[ar.toString()].posPlayerA);
                 }
             }
-            setTimeout(() => client.send(MessageType.INTERACTION_PONG, PongMessage.INIT), 1000);
-            setTimeout(() => room.clients.forEach((client) => client.send(MessageType.INTERACTION_PONG, PongMessage.UPDATE)), 1000);
+            setTimeout(() => client.send(MessageType.PONG_INTERACTION, PongMessage.INIT), 1000);
+            setTimeout(() => room.clients.forEach((client) => client.send(MessageType.PONG_INTERACTION, PongMessage.UPDATE)), 1000);
             break;
         }
         case PongMessage.END: {
