@@ -27,18 +27,10 @@ export class TURoom extends Room<State> {
     }
 
     onCreate(options: any) {
-        const state = new State();
-        this.setState(state);
+        this.setState(new State());
         this.autoDispose = false;
         //generate jitsi conference id and password
-        const conferenceId = generateUUIDv4();
-        const conferencePassword = generateUUIDv4();
-        console.debug(`conferenceId:       ${conferencePassword}`);
-        console.debug(`conferencePassword: ${conferencePassword}`);
-        //TODO rework the conference so that the server can join a conference too, before anyone else, and become moderator to lock the room down with a password
-        state.conference.id = conferenceId;
-        //state.conference.password = conferencePassword;
-        state.conference.password = undefined;
+        setupConferenceData(this.state);
         //sets the interval in which update gets called
         this.setSimulationInterval((deltaTime) => this.update(deltaTime));
         //loads paths from assets
@@ -69,6 +61,17 @@ export class TURoom extends Room<State> {
         //Nothing?
     }
 
+}
+
+function setupConferenceData(state: State) {
+    const conferenceId = generateUUIDv4();
+    const conferencePassword = generateUUIDv4();
+    console.debug(`conferenceId:       ${conferencePassword}`);
+    console.debug(`conferencePassword: ${conferencePassword}`);
+    //TODO rework the conference so that the server can join a conference too, before anyone else, and become moderator to lock the room down with a password
+    state.conference.id = conferenceId;
+    //state.conference.password = conferencePassword;
+    state.conference.password = undefined;
 }
 
 function getPaths(startPath, newState: State) {
