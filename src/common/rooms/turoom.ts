@@ -105,9 +105,7 @@ export class TURoom extends Room<State> {
         });
 
         this.onMessage(MessageType.NEW_DOOR, (client, message) => {
-
             if (this.state.doorStates[message] !== null) {
-
                 this.state.doorStates[message] = new doorState();
                 this.state.doorStates[message].isClosed = false;
                 this.state.doorStates[message].playerId = "";
