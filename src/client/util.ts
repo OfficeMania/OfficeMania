@@ -317,10 +317,12 @@ export function createPlayerAvatar(character: string): HTMLDivElement {
 
 export function getPlayerByParticipantId(participantId: string): Player {
     if (!participantId) {
+        console.log("no pid");
         return null;
     }
     const players = getPlayers();
     if (!players) {
+        console.log("no players")
         return null;
     }
     for (const player of Object.values(players)) {
@@ -328,5 +330,24 @@ export function getPlayerByParticipantId(participantId: string): Player {
             return player;
         }
     }
+    console.log("not in players")
+    return null;
+}
+export function getPlayerByRoomId(playerId: string): Player {
+    if (!playerId) {
+        console.log("no pid");
+        return null;
+    }
+    const players = getPlayers();
+    if (!players) {
+        console.log("no players")
+        return null;
+    }
+    for (const player of Object.values(players)) {
+        if (player?.id === playerId) {
+            return player;
+        }
+    }
+    console.log("not in players")
     return null;
 }

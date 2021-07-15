@@ -52,11 +52,11 @@ function onPongInteraction(room: Room<State>, client, message: PongMessage) {
                     if (emptyState) {
                         if (!emptyState.playerA) {
                             emptyState.playerA = client.sessionId;
-                            emptyState.posPlayerA = 500 - (emptyState.sizes.at(1) / 2)
+                            emptyState.posPlayerA = 360 - (emptyState.sizes.at(1) / 2)
                         }
                         if (!emptyState.playerB) {
                             emptyState.playerB = client.sessionId;
-                            emptyState.posPlayerB = 500 - (emptyState.sizes.at(1) / 2)
+                            emptyState.posPlayerB = 360 - (emptyState.sizes.at(1) / 2)
                         }
                     }
                 } else {
@@ -110,10 +110,10 @@ function onPongMovePlayer(message: string, gameState: PongState, pos: number, ca
             break;
         }
         case Direction.DOWN: {
-            if (pos + gameState.sizes.at(1) < 1000) {
+            if (pos + gameState.sizes.at(1) < 720) {
                 callback(pos + gameState.velocities.at(1));
             } else {
-                callback(1000 - gameState.sizes.at(1));
+                callback(720 - gameState.sizes.at(1));
             }
             break;
         }
@@ -128,11 +128,11 @@ function initNewState(room: Room<State>, client: Client) {
                     newState.playerA = client.sessionId;
                     newState.velocities.push(10, 10);
                     newState.sizes.push(30, 150)
-                    newState.posPlayerA = 500 - (newState.sizes.at(1) / 2);
+                    newState.posPlayerA = 360 - (newState.sizes.at(1) / 2);
                     newState.velBallX = 0.8;
                     newState.velBallY = 0.2;
-                    newState.posBallX = 500 - (newState.sizes.at(0) / 4);
-                    newState.posBallY = 500 - (newState.sizes.at(0) / 2);
+                    newState.posBallX = 640-(newState.sizes.at(0)/2);
+                    newState.posBallY = 320-(newState.sizes.at(0)/2);
                     newState.scoreA = 0;
                     newState.scoreB = 0;
                     room.state.pongStates[ar.toString()] = newState;
@@ -201,14 +201,14 @@ function onPongUpdate(client: Client, room: Room<State>) {
     posX += gameState.velBallX * gameState.velocities.at(0);
     //console.log(posX);
     posY += gameState.velBallY * gameState.velocities.at(0);
-    if (posY > 1000 - gameState.sizes.at(0)/2 || posY < 0 + gameState.sizes.at(0)/2) {
+    if (posY > 720 - gameState.sizes.at(0)/2 || posY < 0 + gameState.sizes.at(0)/2) {
         gameState.velBallY *= -1;
     }
     gameState.posBallY = posY;
     if(hasScored) {
         return;
     }
-    if (posX > 1100 - gameState.sizes.at(0)/2) { 
+    if (posX > 1380 - gameState.sizes.at(0)/2) { 
         if(gameState.playerB){
             gameState.scoreB++;
             hasScored = true;
@@ -231,7 +231,7 @@ function onPongUpdate(client: Client, room: Room<State>) {
     //console.log(gameState.posBallX +" " + gameState.posBallY)
 }
 function checkCollision(client: Client, gameState: PongState) {
-    if(gameState.posBallX <= 20 && gameState.posBallX >= 5 && gameState.velBallX < 0) {
+    if(gameState.posBallX <= 20 && gameState.posBallX >= 0 && gameState.velBallX < 0) {
         //console.log("at the threshhold, left side");
         if(gameState.posPlayerA <= gameState.posBallY && gameState.posPlayerA + gameState.sizes.at(1) >= gameState.posBallY) {
             //console.log("hit bat");
@@ -239,7 +239,7 @@ function checkCollision(client: Client, gameState: PongState) {
         }
         
     }
-    if(gameState.posBallX <= 995 && gameState.posBallX >= 980 && gameState.velBallX > 0) {
+    if(gameState.posBallX <= 1280 && gameState.posBallX >= 1260 && gameState.velBallX > 0) {
         //console.log("at the threshhold, right side");
         if(gameState.posPlayerB <= gameState.posBallY && gameState.posPlayerB + gameState.sizes.at(1) >= gameState.posBallY) {
             //console.log("hit bat");
@@ -267,8 +267,8 @@ function calcNewAngle(playerPos: number, gameState: PongState) {
     }
 }
 function startNewRound(game:PongState){
-    game.posBallX = 500-(game.sizes.at(0)/4);
-    game.posBallY = 500-(game.sizes.at(0)/2);
+    game.posBallX = 640-(game.sizes.at(0)/2);
+    game.posBallY = 320-(game.sizes.at(0)/2);
     game.velBallX = Math.random();
     if(game.velBallX < 0.2) {
         game.velBallX = 0.2;
@@ -277,7 +277,7 @@ function startNewRound(game:PongState){
     hasScored = false;
 }
 function startNextRound(game:PongState){
-    game.posBallX = 0;
+    game.posBallX = 444;
     game.posBallY = 1100;
     setTimeout(() => startNewRound(game), 1000);
 }

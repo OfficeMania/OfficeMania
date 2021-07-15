@@ -1,5 +1,5 @@
 import {Room} from "colyseus.js";
-import {PlayerRecord} from "../util";
+import {getPlayerByRoomId, PlayerRecord} from "../util";
 import {State} from "../../common";
 import {PongState} from "../../common/rooms/schema/state";
 
@@ -84,11 +84,10 @@ export class Pong {
             //console.log(this.playerB);
         }
         this.ctx.fillStyle = "white";
-        this.ctx.fillRect(this.posBallX - (this.sizeBall/2), this.posBallY -(this.sizeBall/2), this.sizeBall/2, this.sizeBall);
+        this.ctx.fillRect(this.posBallX - (this.sizeBall/2), this.posBallY -(this.sizeBall/2), this.sizeBall, this.sizeBall);
         if (this.p && this.playerA && this.playerB) {
-            let scoreTab: string = this.playerA.score.toString();
-            scoreTab += " : ";
-            scoreTab += this.playerB.score.toString();
+            let scoreTab: string = getPlayerByRoomId(this.playerA.id).name + ": " + this.playerA.score.toString() + " : " + this.playerB.score.toString() + " :" + getPlayerByRoomId(this.playerB.id).name
+            let num = scoreTab.length;
             this.p.innerText = scoreTab;
         }
     }
