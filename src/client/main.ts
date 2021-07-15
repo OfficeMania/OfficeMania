@@ -364,7 +364,7 @@ async function main() {
 
         //check if interaction is nearby
         const solidInfo = checkInteraction();
-        if (solidInfo?.content) {
+        if (solidInfo?.content && getInputMode() !== InputMode.INTERACTION) {
             if (!interactionShown) {
                 interactionShown = true;
                 let interactionNearbyButton = document.createElement("button");

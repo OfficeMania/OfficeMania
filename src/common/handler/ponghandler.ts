@@ -11,6 +11,7 @@ export enum PongMessage {
     END = "pong-end"
 }
 const batSections: number[] = [-0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1,  0.2, 0.3, 0.4, 0.5]
+let hasScored: boolean = false;
 export class PongHandler implements Handler {
 
     room: Room<State>;
@@ -204,9 +205,13 @@ function onPongUpdate(client: Client, room: Room<State>) {
         gameState.velBallY *= -1;
     }
     gameState.posBallY = posY;
+    if(hasScored) {
+        return;
+    }
     if (posX > 1100 - gameState.sizes.at(0)/2) { 
         if(gameState.playerB){
             gameState.scoreB++;
+            hasScored = true;
             startNextRound(gameState);
         }
         else gameState.velBallX *= -1;
@@ -216,6 +221,7 @@ function onPongUpdate(client: Client, room: Room<State>) {
     else if(posX < -100 + gameState.sizes.at(0)/2) {
         if(gameState.playerA){
             gameState.scoreA++;
+            hasScored = true;
             startNextRound(gameState);
         }
         else gameState.velBallX *= -1;
@@ -226,32 +232,36 @@ function onPongUpdate(client: Client, room: Room<State>) {
 }
 function checkCollision(client: Client, gameState: PongState) {
     if(gameState.posBallX <= 20 && gameState.posBallX >= 5 && gameState.velBallX < 0) {
-        console.log("at the threshhold, left side");
+        //console.log("at the threshhold, left side");
         if(gameState.posPlayerA <= gameState.posBallY && gameState.posPlayerA + gameState.sizes.at(1) >= gameState.posBallY) {
-            console.log("hit bat");
+            //console.log("hit bat");
             calcNewAngle(gameState.posPlayerA, gameState)
         }
-        else console.log("missed");
+        
     }
-    else if(gameState.posBallX <= 995 && gameState.posBallX >= 980 && gameState.velBallX > 0) {
-        console.log("at the threshhold, right side");
+    if(gameState.posBallX <= 995 && gameState.posBallX >= 980 && gameState.velBallX > 0) {
+        //console.log("at the threshhold, right side");
         if(gameState.posPlayerB <= gameState.posBallY && gameState.posPlayerB + gameState.sizes.at(1) >= gameState.posBallY) {
-            console.log("hit bat");
+            //console.log("hit bat");
             calcNewAngle(gameState.posPlayerB, gameState)
         }
-        else console.log("missed");
     }
 }
 function calcNewAngle(playerPos: number, gameState: PongState) {
     const sectionLength = gameState.sizes.at(1)/ batSections.length;
     for(let i = 0; i < batSections.length; i++) {
         if (gameState.posBallY  <= playerPos + sectionLength * (i+1)) {
-            console.log(batSections[i] + " " + i);
+            //console.log(batSections[i] + " " + i);
             gameState.velBallY = gameState.velBallY + batSections[i];
             if(Math.abs(gameState.velBallY)>= 0.8) {
                 gameState.velBallY > 0? gameState.velBallY = 0.8: gameState.velBallY = -0.8;
             }
-            gameState.velBallX < 0? gameState.velBallX = 1 - Math.abs(gameState.velBallY): -(1-Math.abs(gameState.velBallY));            
+            if (gameState.velBallX < 0){ //nahc rechts
+                gameState.velBallX = 1 - Math.abs(gameState.velBallY);
+            }
+            else {
+                gameState.velBallX = -(1-Math.abs(gameState.velBallY));
+            }           
             return;
         }
     }
@@ -264,9 +274,10 @@ function startNewRound(game:PongState){
         game.velBallX = 0.2;
     }
     game.velBallY = 1 - Math.abs(game.velBallX);
+    hasScored = false;
 }
 function startNextRound(game:PongState){
-    game.posBallX = 1100;
+    game.posBallX = 0;
     game.posBallY = 1100;
     setTimeout(() => startNewRound(game), 1000);
 }

@@ -9,6 +9,7 @@ export class Pong {
     inGame = false;
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
+    p: HTMLParagraphElement;
     //PlayerIDs
     playerA: PongPlayer;
     playerB: PongPlayer;
@@ -57,7 +58,7 @@ export class Pong {
             }
             if (currentState.playerA && this.playerA){
                 this.playerA.pos = currentState.posPlayerA;
-                this.playerA.score = currentState.scoreB;
+                this.playerA.score = currentState.scoreA;
                 //console.log(this.playerA.pos + "PlayerA");
             }
             this.posBallX = currentState.posBallX;
@@ -66,24 +67,30 @@ export class Pong {
     }
 
     paint() {
-        this.ctx.fillStyle = "white"
+        this.ctx.fillStyle = "black"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle ="black";
+        this.ctx.fillStyle ="white";
         this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
         if(this.playerA){
-            this.ctx.fillStyle ="black";
-            this.ctx.fillRect(5, this.playerA.pos, 15, this.sizeBat);
+            this.ctx.fillStyle ="white";
+            this.ctx.fillRect(0, this.playerA.pos, 15, this.sizeBat);
             //console.log("painting a");
             //console.log(this.playerA);
         }
         if (this.playerB) {
-            this.ctx.fillStyle ="black";
-            this.ctx.fillRect(this.canvas.width-20, this.playerB.pos, 15, this.sizeBat);
+            this.ctx.fillStyle ="white";
+            this.ctx.fillRect(this.canvas.width-15, this.playerB.pos, 20, this.sizeBat);
             //console.log("painting b");
             //console.log(this.playerB);
         }
-        this.ctx.fillStyle = "black";
+        this.ctx.fillStyle = "white";
         this.ctx.fillRect(this.posBallX - (this.sizeBall/2), this.posBallY -(this.sizeBall/2), this.sizeBall/2, this.sizeBall);
+        if (this.p && this.playerA && this.playerB) {
+            let scoreTab: string = this.playerA.score.toString();
+            scoreTab += " : ";
+            scoreTab += this.playerB.score.toString();
+            this.p.innerText = scoreTab;
+        }
     }
 
 }
