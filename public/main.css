@@ -123,6 +123,10 @@ body {
     content: '  Help';
 }
 
+#close:hover span:after {
+    content: '  Close'
+}
+
 #panel-buttons button:hover span:after {
     opacity: 1;
     transition: 0.5s;
@@ -251,7 +255,7 @@ body {
 #interactive {
     position: absolute;
     left: 20%;
-    top: 20%;
+    top: 25%;
     z-index: 1;
     width: 60%;
     height: 60%;

@@ -10,7 +10,8 @@ export enum PongMessage {
     LEAVE = "pong-leave",
     END = "pong-end"
 }
-
+const batSections: number[] = [-0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1,  0.2, 0.3, 0.4, 0.5]
+let hasScored: boolean = false;
 export class PongHandler implements Handler {
 
     room: Room<State>;
@@ -126,12 +127,14 @@ function initNewState(room: Room<State>, client: Client) {
                     let newState = new PongState();
                     newState.playerA = client.sessionId;
                     newState.velocities.push(10, 10);
-                    newState.sizes.push(10, 100)
+                    newState.sizes.push(30, 150)
                     newState.posPlayerA = 500 - (newState.sizes.at(1) / 2);
                     newState.velBallX = 0.8;
                     newState.velBallY = 0.2;
-                    newState.posBallX = 500 - (newState.sizes.at(0) / 2);
+                    newState.posBallX = 500 - (newState.sizes.at(0) / 4);
                     newState.posBallY = 500 - (newState.sizes.at(0) / 2);
+                    newState.scoreA = 0;
+                    newState.scoreB = 0;
                     room.state.pongStates[ar.toString()] = newState;
                     console.log(room.state.pongStates[ar.toString()].posPlayerA);
 }
@@ -152,6 +155,8 @@ function leavePongGame(room: Room<State>, client: Client) {
     }
     setTimeout(() => room.clients.forEach((client) => client.send(MessageType.PONG_UPDATE, "pong-update")), 1000)
 }
+
+
 
 function getPongGame(room: Room<State>, client): number {
     for (let i = 0; i < room.state.pongStates.size; i++) {
@@ -189,7 +194,7 @@ function getNextPongSlot(room: Room<State>): number {
     }
     return -1;
 }
-function onPongUpdate(client, room: Room<State>) {
+function onPongUpdate(client: Client, room: Room<State>) {
     const gameState: PongState = room.state.pongStates[getPongGame(room, client).toString()];
     let posX = gameState.posBallX;
     let posY = gameState.posBallY;
@@ -200,9 +205,80 @@ function onPongUpdate(client, room: Room<State>) {
         gameState.velBallY *= -1;
     }
     gameState.posBallY = posY;
-    if (posX > 1000 - gameState.sizes.at(0)/2 || posX < 0 + gameState.sizes.at(0)/2) {
-        gameState.velBallX *= -1;   
+    if(hasScored) {
+        return;
     }
+    if (posX > 1100 - gameState.sizes.at(0)/2) { 
+        if(gameState.playerB){
+            gameState.scoreB++;
+            hasScored = true;
+            startNextRound(gameState);
+        }
+        else gameState.velBallX *= -1;
+        
+        //console.log("hit the wall")
+    }
+    else if(posX < -100 + gameState.sizes.at(0)/2) {
+        if(gameState.playerA){
+            gameState.scoreA++;
+            hasScored = true;
+            startNextRound(gameState);
+        }
+        else gameState.velBallX *= -1;
+    }
+    checkCollision(client, gameState);
     gameState.posBallX = posX;
     //console.log(gameState.posBallX +" " + gameState.posBallY)
 }
+function checkCollision(client: Client, gameState: PongState) {
+    if(gameState.posBallX <= 20 && gameState.posBallX >= 5 && gameState.velBallX < 0) {
+        //console.log("at the threshhold, left side");
+        if(gameState.posPlayerA <= gameState.posBallY && gameState.posPlayerA + gameState.sizes.at(1) >= gameState.posBallY) {
+            //console.log("hit bat");
+            calcNewAngle(gameState.posPlayerA, gameState)
+        }
+        
+    }
+    if(gameState.posBallX <= 995 && gameState.posBallX >= 980 && gameState.velBallX > 0) {
+        //console.log("at the threshhold, right side");
+        if(gameState.posPlayerB <= gameState.posBallY && gameState.posPlayerB + gameState.sizes.at(1) >= gameState.posBallY) {
+            //console.log("hit bat");
+            calcNewAngle(gameState.posPlayerB, gameState)
+        }
+    }
+}
+function calcNewAngle(playerPos: number, gameState: PongState) {
+    const sectionLength = gameState.sizes.at(1)/ batSections.length;
+    for(let i = 0; i < batSections.length; i++) {
+        if (gameState.posBallY  <= playerPos + sectionLength * (i+1)) {
+            //console.log(batSections[i] + " " + i);
+            gameState.velBallY = gameState.velBallY + batSections[i];
+            if(Math.abs(gameState.velBallY)>= 0.8) {
+                gameState.velBallY > 0? gameState.velBallY = 0.8: gameState.velBallY = -0.8;
+            }
+            if (gameState.velBallX < 0){ //nahc rechts
+                gameState.velBallX = 1 - Math.abs(gameState.velBallY);
+            }
+            else {
+                gameState.velBallX = -(1-Math.abs(gameState.velBallY));
+            }           
+            return;
+        }
+    }
+}
+function startNewRound(game:PongState){
+    game.posBallX = 500-(game.sizes.at(0)/4);
+    game.posBallY = 500-(game.sizes.at(0)/2);
+    game.velBallX = Math.random();
+    if(game.velBallX < 0.2) {
+        game.velBallX = 0.2;
+    }
+    game.velBallY = 1 - Math.abs(game.velBallX);
+    hasScored = false;
+}
+function startNextRound(game:PongState){
+    game.posBallX = 0;
+    game.posBallY = 1100;
+    setTimeout(() => startNewRound(game), 1000);
+}
+
