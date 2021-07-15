@@ -1,13 +1,13 @@
-import { Room } from "colyseus.js";
-import { State } from "../../common";
-import { PongState } from "../../common/rooms/schema/state";
-import { Direction, MessageType } from "../../common/util";
-import { setInputMode } from "../input";
-import { checkInputMode } from "../main";
-import { Player } from "../player";
-import { getOurPlayer, getPlayers, getRoom, InputMode, PlayerRecord } from "../util";
-import { Interactive } from "./interactive";
-import { Pong, PongPlayer } from "./pong";
+import {Room} from "colyseus.js";
+import {State} from "../../common";
+import {PongState} from "../../common/rooms/schema/state";
+import {Direction, MessageType} from "../../common/util";
+import {checkInputMode} from "../main";
+import {Player} from "../player";
+import {getOurPlayer, getPlayers, getRoom, PlayerRecord} from "../util";
+import {Interactive} from "./interactive";
+import {Pong, PongPlayer} from "./pong";
+import {PongMessage} from "../../common/handler/ponghandler";
 
 let ourGame: Pong;
 export class PingPongTable extends Interactive{
@@ -17,7 +17,7 @@ export class PingPongTable extends Interactive{
     ourPlayer: Player;
     players: PlayerRecord;
     previousInput: Direction[];
-    
+
     constructor() {
         super("pingpongtable", false, 2)
         this.room = getRoom();
@@ -26,16 +26,16 @@ export class PingPongTable extends Interactive{
         this.input = [null];
         this.previousInput = this.input;
     }
-    
+
     onInteraction() {
         this.ourPlayer = getOurPlayer();
         this.players = getPlayers();
         if(!ourGame) {
-            this.room.send(MessageType.INTERACTION, "pong");
+            this.room.send(MessageType.INTERACTION, PongMessage.ON_INTERACTION);
             console.log("Pong game interaction...");
             //this.getPongs();
-            
-            
+
+
             ourGame = new Pong(this.canvas, this.room, this.players, this.ourPlayer.id);
             ourGame.canvas.style.visibility = "visible";
             const button = document.createElement("BUTTON");
@@ -46,22 +46,22 @@ export class PingPongTable extends Interactive{
             checkInputMode();
             this.room.onMessage(MessageType.INTERACTION, (message) => {
                 console.log("interatction message recieved in client" + message)
-                if (message === "pong-init") {
+                if (message === PongMessage.INIT) {
                     this.getPongs();
                     console.log(ourGame);
                     console.log(this.pongs);
                     ourGame = this.pongs[this.getGame(this.ourPlayer.id)];
                     console.log(ourGame);
-                    
+
                 }
-                if (message === "pong-update") {
+                if (message === PongMessage.UPDATE) {
                     if (ourGame){
                         ourGame.selfGameId = this.getGame(this.ourPlayer.id);
                         if(!ourGame.playerB){this.updateState()};
                         console.log(ourGame)
                         ourGame.paint();
                     }
-                    
+
                 }
             });
         }
@@ -114,7 +114,7 @@ export class PingPongTable extends Interactive{
     }
     loop() {
         if(ourGame) {
-            
+
             ourGame.loop();
             this.updateInput();
         }
@@ -122,7 +122,7 @@ export class PingPongTable extends Interactive{
     leave() {
         ourGame.canvas.style.visibility = "hidden";
         document.getElementById("close").remove();
-        this.room.send(MessageType.INTERACTION, "pong-leave");
+        this.room.send(MessageType.INTERACTION, PongMessage.LEAVE);
         ourGame = null;
         this.pongs = [];
         checkInputMode();
@@ -150,7 +150,7 @@ export class PingPongTable extends Interactive{
                 break;
             }
         }
-        
+
     }
 
 }

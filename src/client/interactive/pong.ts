@@ -1,9 +1,7 @@
 import {Room} from "colyseus.js";
 import {PlayerRecord} from "../util";
 import {State} from "../../common";
-import {Interactive} from "./interactive";
-import {Direction, MessageType} from "../../common/util";
-import { PongState } from "../../common/rooms/schema/state";
+import {PongState} from "../../common/rooms/schema/state";
 
 export class Pong{
 
@@ -40,8 +38,8 @@ export class Pong{
     loop(){
         this.updatePos();
         this.paint();
-        
-        //this.room.send(MessageType.INTERACTION, "pong-end");
+
+        //this.room.send(MessageType.INTERACTION, PongMessage.END);
     }
     updatePos() {
         let currentState: PongState;
@@ -62,7 +60,7 @@ export class Pong{
             this.posBallY = currentState.posBall.at(1);
         }
     }
-    
+
     paint(){
         this.ctx.fillStyle = "white"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);

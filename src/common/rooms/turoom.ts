@@ -3,7 +3,8 @@ import {doorState, PlayerData, PongState, State, WhiteboardPlayer} from "./schem
 import fs from 'fs';
 import {Direction, generateUUIDv4, MessageType} from "../util";
 import {ArraySchema} from "@colyseus/schema";
-import {registerPongHandler} from "../handler/ponghandler";
+import {PongHandler, PongMessage, registerPongHandler} from "../handler/ponghandler";
+import {Handler} from "../handler/handler";
 
 const path = require('path');
 
@@ -67,7 +68,7 @@ export class TURoom extends Room<State> {
 
         this.onMessage(MessageType.INTERACTION, (client, message) => {
             switch (message) {
-                case "pong": {
+                case PongMessage.ON_INTERACTION: {
                     let inGame: number = this.getPongGame(client);
                     if(inGame === -1) {
                         let emptyGame = this.getEmptyPongGame();
@@ -99,29 +100,29 @@ export class TURoom extends Room<State> {
                             console.log(this.state.pongStates[ar.toString()].posPlayerA);
                         }
                     }
-                    setTimeout(() => client.send(MessageType.INTERACTION, "pong-init"), 1000);
-                    setTimeout(() => this.clients.forEach((client) => client.send(MessageType.INTERACTION, "pong-update")), 1000);
+                    setTimeout(() => client.send(MessageType.INTERACTION, PongMessage.INIT), 1000);
+                    setTimeout(() => this.clients.forEach((client) => client.send(MessageType.INTERACTION, PongMessage.UPDATE)), 1000);
                     break;
                 }
-                case "pong-end": {
+                case PongMessage.END: {
                     let inGame: number = this.getPongGame(client);
                     if(inGame !== -1) {
                         this.state.pongStates.delete(inGame.toString());
                     }
                     break;
                 }
-                case "pong-leave": {
+                case PongMessage.LEAVE: {
                     let n = this.getPongGame(client);
                     if(n !== -1) {
                         let game: PongState = this.state.pongStates[n.toString()];
                         game.playerA === client.sessionId? game.playerA = null: game.playerB = null;
                         game.playerA === null && game.playerB === null? this.state.pongStates.delete(n.toString()): {};
                     }
-                    
+
                     break;
                 }
-                case "pong-init":
-                case "pong-update": break;
+                case PongMessage.INIT:
+                case PongMessage.UPDATE: break;
                 default: {
                     console.log("type of interaction not defined in the turoom onMessage(MessageType.INTERACTION): " + message);
                 }

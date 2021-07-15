@@ -1,5 +1,15 @@
 import {Direction, MessageType} from "../util";
 import {PongState} from "../rooms/schema/state";
+import {Client} from "colyseus";
+import {Handler} from "./handler";
+
+export enum PongMessage {
+    ON_INTERACTION = "pong",
+    INIT = "pong-init",
+    UPDATE = "pong-update",
+    LEAVE = "pong-leave",
+    END = "pong-end"
+}
 
 export function registerPongHandler() {
     this.onMessage(MessageType.MOVE_PONG, (client, message) => onPongMove.call(this, client, message));
