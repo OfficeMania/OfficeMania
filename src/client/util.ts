@@ -199,13 +199,11 @@ export function getCorrectedPlayerFacingCoordinates(player: Player): [number, nu
             deltaY += 2;
             break;
     }
-    return [player.scaledX - xCorrection + deltaX, player.scaledY - yCorrection + deltaY];
+    return [Math.round(player.positionX / STEP_SIZE - xCorrection + deltaX), Math.round(player.positionY / STEP_SIZE - yCorrection + deltaY)];
 }
 
 export function getCorrectedPlayerCoordinates(player: Player): [number, number] {
-    const saved: [number, number] = [player.scaledX - xCorrection, player.scaledY - yCorrection];
-    const calculated: [number, number] = [player.positionX / STEP_SIZE - xCorrection, player.positionY / STEP_SIZE - yCorrection];
-    return calculated;
+    return [Math.round(player.positionX / STEP_SIZE - xCorrection), Math.round(player.positionY / STEP_SIZE - yCorrection)];
 }
 
 export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionInfo: solidInfo[][]): boolean {
