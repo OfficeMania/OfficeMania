@@ -191,7 +191,7 @@ function onPongUpdate(client, room: Room<State>) {
     let posX = gameState.posBallX;
     let posY = gameState.posBallY;
     posX += gameState.velBallX * gameState.velocities.at(0);
-    console.log(posX);
+    //console.log(posX);
     posY += gameState.velBallY * gameState.velocities.at(0);
     if (posY > 1000 - gameState.sizes.at(0)/2 || posY < 0 + gameState.sizes.at(0)/2) {
         gameState.velBallY *= -1;
@@ -201,5 +201,5 @@ function onPongUpdate(client, room: Room<State>) {
         gameState.velBallX *= -1;   
     }
     gameState.posBallX = posX;
-    console.log(gameState.posBallX +" " + gameState.posBallY)
+    //console.log(gameState.posBallX +" " + gameState.posBallY)
 }
