@@ -1,5 +1,5 @@
 import {Client, Presence, Room} from "colyseus";
-import {doorState, PlayerData, State, WhiteboardPlayer} from "./schema/state";
+import {DoorState, PlayerData, State, WhiteboardPlayer} from "./schema/state";
 import fs from 'fs';
 import {Direction, generateUUIDv4, MessageType} from "../util";
 import {ArraySchema} from "@colyseus/schema";
@@ -106,7 +106,7 @@ export class TURoom extends Room<State> {
 
         this.onMessage(MessageType.NEW_DOOR, (client, message) => {
             if (this.state.doorStates[message] !== null) {
-                this.state.doorStates[message] = new doorState();
+                this.state.doorStates[message] = new DoorState();
                 this.state.doorStates[message].isClosed = false;
                 this.state.doorStates[message].playerId = "";
             }

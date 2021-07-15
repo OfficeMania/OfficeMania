@@ -79,7 +79,7 @@ export class PongState extends Schema {
 
 }
 
-export class doorState extends Schema {
+export class DoorState extends Schema {
 
     @type("string")
     playerId: string;
@@ -121,6 +121,7 @@ export class State extends Schema {
     @type({map: PongState})
     pongStates: MapSchema<PongState> = new MapSchema<PongState>();
 
-    @type({map: doorState})
-    doorStates: MapSchema<doorState> = new MapSchema<doorState>();
+    @type({map: DoorState})
+    doorStates: MapSchema<DoorState> = new MapSchema<DoorState>();
+
 }
