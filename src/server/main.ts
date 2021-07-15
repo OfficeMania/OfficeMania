@@ -39,7 +39,7 @@ app.use('/', express.static(path.join(process.cwd(), "public")));
  * In an HTML-document you can load the images via:
  *   <img src="/img/[image-name]" />
  */
-app.use('/img', express.static(path.join(process.cwd(), "assets", "img")));
+app.use('/img', express.static(path.join(process.cwd(), "assets", "img"), {maxAge: 31536000000}));
 
 /*
  * "Mount" the assets/map directory under "[host]/map"
@@ -47,9 +47,14 @@ app.use('/img', express.static(path.join(process.cwd(), "assets", "img")));
 app.use('/map', express.static(path.join(process.cwd(), "assets", "map")));
 
 /*
+ * "Mount" the assets/lib directory under "[host]/lib"
+ */
+app.use('/lib', express.static(path.join(process.cwd(), "assets", "lib"), {maxAge: 86400000}));
+
+/*
  * "Mount" the assets/templates directory under "[host]/templates"
  */
-app.use('/templates', express.static(path.join(process.cwd(), "assets", "templates")));
+app.use('/templates', express.static(path.join(process.cwd(), "assets", "templates"), {maxAge: 31536000000}));
 
 /*
  * "Mount" the assets directory under "[host]/assets"

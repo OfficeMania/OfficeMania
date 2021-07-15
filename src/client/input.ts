@@ -33,11 +33,11 @@ function isPureKey(event: KeyboardEvent): boolean {
     return event && !event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey;
 }
 
-function onPureKey(event: KeyboardEvent, key: string, runnable: (boolean) => void) {
+function onPureKey(event: KeyboardEvent, key: string, runnable: () => void) {
     if (!isPureKey(event) || event.key.toLowerCase() !== key.toLowerCase()) {
         return;
     }
-    runnable(true);
+    runnable();
 }
 
 function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direction) {
@@ -52,14 +52,17 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direct
             }
             break;
         case InputMode.INTERACTION:
-            let content = checkInteraction(false).content;
+            const solidInfo = checkInteraction();
+            if (!solidInfo) {
+                break;
+            }
+            const content = solidInfo.content;
             if(!content.input.includes(direction)){
                 if (content.input[0]) {
                     content.input[1] = content.input[0];
                 }
                 content.input[0] = direction;
             }
-            
             break;
 
     }
@@ -75,7 +78,11 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
             ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(direction), 1);
             break;
         case InputMode.INTERACTION:
-            let content = checkInteraction(false).content;
+            const solidInfo = checkInteraction();
+            if (!solidInfo) {
+                break;
+            }
+            const content = solidInfo.content;
             if(content.input.indexOf(direction) === 0) {
                 if(content.input[1]){
                     content.input[0] = content.input.pop();
@@ -98,8 +105,12 @@ export function loadInputFunctions() {
         onDirectionKeyDown(e, "w", Direction.UP);
         onDirectionKeyDown(e, "a", Direction.LEFT);
         onDirectionKeyDown(e, "d", Direction.RIGHT);
+        onDirectionKeyDown(e, "ArrowDown", Direction.DOWN);
+        onDirectionKeyDown(e, "ArrowUp", Direction.UP);
+        onDirectionKeyDown(e, "ArrowLeft", Direction.LEFT);
+        onDirectionKeyDown(e, "ArrowRight", Direction.RIGHT);
         //player interacts with object in front of him
-        onPureKey(e, " ", checkInteraction);
+        onPureKey(e, " ", () => checkInteraction(true));
         if (inputMode === InputMode.INTERACTION) {
             return;
         }
@@ -126,6 +137,10 @@ export function loadInputFunctions() {
         onDirectionKeyUp(e, "w", Direction.UP);
         onDirectionKeyUp(e, "a", Direction.LEFT);
         onDirectionKeyUp(e, "d", Direction.RIGHT);
+        onDirectionKeyUp(e, "ArrowDown", Direction.DOWN);
+        onDirectionKeyUp(e, "ArrowUp", Direction.UP);
+        onDirectionKeyUp(e, "ArrowLeft", Direction.LEFT);
+        onDirectionKeyUp(e, "ArrowRight", Direction.RIGHT);
         if (inputMode === InputMode.INTERACTION) {
             return;
         }
@@ -141,16 +156,15 @@ export function loadInputFunctions() {
     window.addEventListener("blur", onBlur);
 }
 
-export function checkInteraction(createNew: boolean): solidInfo  {
+export function checkInteraction(executeInteraction: boolean = false): solidInfo  {
     const ourPlayer = getOurPlayer();
     const [facingX, facingY] = getCorrectedPlayerFacingCoordinates(ourPlayer);
     const solidInfo: solidInfo = getCollisionInfo()?.[facingX]?.[facingY];
     if (!solidInfo) {
         console.error(`no solidInfo for ${facingX}:${facingY}`);
-        return
+        return null;
     }
-    solidInfo.content && createNew && solidInfo.content.onInteraction();
-            //console.log(solidInfo.content);
+    solidInfo.content && executeInteraction && solidInfo.content.onInteraction();
     return solidInfo;
 }
 
