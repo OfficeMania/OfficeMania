@@ -375,7 +375,7 @@ async function main() {
 
         //drawWhiteboard(canvas, whiteboard.getCanvas())
         if (getInputMode() === InputMode.INTERACTION) {
-            checkInteraction(true).content?.loop();
+            checkInteraction(false).content?.loop();
         }
 
         // Repeat game loop
