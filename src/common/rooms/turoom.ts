@@ -1,9 +1,9 @@
-import {Client, Room} from "colyseus";
-import {doorState, PlayerData, PongState, State, WhiteboardPlayer} from "./schema/state";
+import {Client, Presence, Room} from "colyseus";
+import {doorState, PlayerData, State, WhiteboardPlayer} from "./schema/state";
 import fs from 'fs';
 import {Direction, generateUUIDv4, MessageType} from "../util";
 import {ArraySchema} from "@colyseus/schema";
-import {PongHandler, PongMessage, registerPongHandler} from "../handler/ponghandler";
+import {PongHandler} from "../handler/ponghandler";
 import {Handler} from "../handler/handler";
 
 const path = require('path');
@@ -16,6 +16,12 @@ const handlers: Handler[] = [pongHandler];
  * See: https://docs.colyseus.io/server/room/
  */
 export class TURoom extends Room<State> {
+
+    constructor(presence: Presence) {
+        super(presence);
+        handlers.forEach((handler) => handler.init(this));
+    }
+
     onCreate(options: any) {
         const state = new State();
         this.setState(state);
@@ -68,71 +74,6 @@ export class TURoom extends Room<State> {
             }
         });
 
-        registerPongHandler.call(this);
-
-        this.onMessage(MessageType.INTERACTION, (client, message) => {
-            switch (message) {
-                case PongMessage.ON_INTERACTION: {
-                    let inGame: number = this.getPongGame(client);
-                    if(inGame === -1) {
-                        let emptyGame = this.getEmptyPongGame();
-                        console.log("empty game: " + emptyGame);
-                        if (emptyGame !== -1) {
-                            let emptyState: PongState = this.state.pongStates[emptyGame.toString()];
-                            if (emptyState){
-                                if (!emptyState.playerA){
-                                    emptyState.playerA = client.sessionId;
-                                    emptyState.posPlayerB = 500 - (emptyState.sizes.at(1)/2)
-                                }
-                                if (!emptyState.playerB){
-                                    emptyState.playerB = client.sessionId;
-                                    emptyState.posPlayerB = 500 - (emptyState.sizes.at(1)/2)
-                                }
-                            }
-                        }
-                        else {
-                            console.log("creating new pongstate");
-                            console.log(this.getNextPongSlot());
-                            let ar = this.getNextPongSlot();
-                            let newState = new PongState();
-                            newState.playerA = client.sessionId;
-                            newState.velocities.push(10,10);
-                            newState.sizes.push(10, 100)
-                            newState.posPlayerA = 500 - (newState.sizes.at(1)/2);
-
-                            this.state.pongStates[ar.toString()] = newState;
-                            console.log(this.state.pongStates[ar.toString()].posPlayerA);
-                        }
-                    }
-                    setTimeout(() => client.send(MessageType.INTERACTION, PongMessage.INIT), 1000);
-                    setTimeout(() => this.clients.forEach((client) => client.send(MessageType.INTERACTION, PongMessage.UPDATE)), 1000);
-                    break;
-                }
-                case PongMessage.END: {
-                    let inGame: number = this.getPongGame(client);
-                    if(inGame !== -1) {
-                        this.state.pongStates.delete(inGame.toString());
-                    }
-                    break;
-                }
-                case PongMessage.LEAVE: {
-                    let n = this.getPongGame(client);
-                    if(n !== -1) {
-                        let game: PongState = this.state.pongStates[n.toString()];
-                        game.playerA === client.sessionId? game.playerA = null: game.playerB = null;
-                        game.playerA === null && game.playerB === null? this.state.pongStates.delete(n.toString()): {};
-                    }
-
-                    break;
-                }
-                case PongMessage.INIT:
-                case PongMessage.UPDATE: break;
-                default: {
-                    console.log("type of interaction not defined in the turoom onMessage(MessageType.INTERACTION): " + message);
-                }
-            }
-        })
-
         this.onMessage(MessageType.PATH, (client, message) => {
             if (message === -1) {
                 this.state.whiteboardPlayer[client.sessionId].paths.push(-1);
@@ -172,7 +113,7 @@ export class TURoom extends Room<State> {
                 this.state.doorStates[message].playerId = "";
             }
         })
-        handlers.forEach((handler) => handler.init(options));
+        handlers.forEach((handler) => handler.onCreate(options));
     }
 
     onAuth(client: Client, options: any, req: any) {
@@ -188,57 +129,25 @@ export class TURoom extends Room<State> {
         this.state.players[client.sessionId].cooldown = 0;
         this.state.players[client.sessionId].participantId = null;
         this.state.whiteboardPlayer[client.sessionId] = new WhiteboardPlayer();
-        this.broadcast("newPlayer", client);
+        this.broadcast("newPlayer", client); //Does this get used any where?
+        handlers.forEach((handler) => handler.onJoin(client));
     }
 
     onLeave(client: Client, consented: boolean) {
-        let n = this.getPongGame(client);
-        if(n !== -1) {
-            let game: PongState = this.state.pongStates[n.toString()];
-            game.playerA === client.sessionId? game.playerA = null: game.playerB = null;
-            game.playerA === null && game.playerB === null? this.state.pongStates.delete(n.toString()): {};
-        }
+        handlers.forEach((handler) => handler.onLeave(client, consented));
         delete this.state.players[client.sessionId];
     }
 
     onDispose() {
         //Nothing?
+        handlers.forEach((handler) => handler.onDispose());
     }
 
     //gameloop for server
     update(deltaTime) {
-
+        //Nothing?
     }
 
-    getPongGame(client): number{
-        for(let i = 0; i < this.state.pongStates.size; i++) {
-            if (this.state.pongStates[i.toString()].playerA === client.sessionId || this.state.pongStates[i.toString()].playerB === client.sessionId){
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    getEmptyPongGame(): number {
-        if(!this.state.pongStates.size) { return -1; }
-        for(let i = 0; i < this.state.pongStates.size; i++) {
-            console.log(this.state.pongStates[i.toString()].playerA);
-            if (!this.state.pongStates[i.toString()].playerA || !this.state.pongStates[i.toString()].playerB){
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    getNextPongSlot(): number {
-        if(!this.state.pongStates.size) { return 0; }
-        for(let i = 0; i <= this.state.pongStates.size; i++) {
-            if (!this.state.pongStates[i.toString()]) {
-                return i;
-            }
-        }
-        return;
-    }
 }
 
 function getPaths(startPath, newState: State) {

@@ -31,7 +31,7 @@ export class PingPongTable extends Interactive{
         this.ourPlayer = getOurPlayer();
         this.players = getPlayers();
         if(!ourGame) {
-            this.room.send(MessageType.INTERACTION, PongMessage.ON_INTERACTION);
+            this.room.send(MessageType.INTERACTION_PONG, PongMessage.ON_INTERACTION);
             console.log("Pong game interaction...");
             //this.getPongs();
 
@@ -44,7 +44,7 @@ export class PingPongTable extends Interactive{
             button.id = "close";
             this.buttonBar.appendChild(button)
             checkInputMode();
-            this.room.onMessage(MessageType.INTERACTION, (message) => {
+            this.room.onMessage(MessageType.INTERACTION_PONG, (message) => {
                 console.log("interatction message recieved in client" + message)
                 if (message === PongMessage.INIT) {
                     this.getPongs();
@@ -122,7 +122,7 @@ export class PingPongTable extends Interactive{
     leave() {
         ourGame.canvas.style.visibility = "hidden";
         document.getElementById("close").remove();
-        this.room.send(MessageType.INTERACTION, PongMessage.LEAVE);
+        this.room.send(MessageType.INTERACTION_PONG, PongMessage.LEAVE);
         ourGame = null;
         this.pongs = [];
         checkInputMode();

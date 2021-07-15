@@ -22,6 +22,7 @@ export enum MessageType {
     UPDATE_PARTICIPANT_ID = "updateParticipantId",
     CLEAR_WHITEBOARD = "clearWhiteboard",
     INTERACTION = "interaction",
+    INTERACTION_PONG = "interactionPong",
     DOOR = "newDoor"
 }
 
