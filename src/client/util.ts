@@ -1,6 +1,6 @@
 import {Client, Room} from "colyseus.js";
 import {State} from "../common";
-import {Player} from "./player";
+import {Player, STEP_SIZE} from "./player";
 import {solidInfo} from "./map";
 import {
     Direction,
@@ -203,7 +203,9 @@ export function getCorrectedPlayerFacingCoordinates(player: Player): [number, nu
 }
 
 export function getCorrectedPlayerCoordinates(player: Player): [number, number] {
-    return [player.scaledX - xCorrection, player.scaledY - yCorrection];
+    const saved: [number, number] = [player.scaledX - xCorrection, player.scaledY - yCorrection];
+    const calculated: [number, number] = [player.positionX / STEP_SIZE - xCorrection, player.positionY / STEP_SIZE - yCorrection];
+    return calculated;
 }
 
 export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionInfo: solidInfo[][]): boolean {

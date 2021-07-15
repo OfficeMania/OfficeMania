@@ -507,7 +507,7 @@ export function nearbyPlayerCheck() {
     playersAway.forEach((participantId) => getUser(participantId).setDisabled(true));
     //TODO Check if they are on the same map
     const [ourX, ourY] = getCorrectedPlayerCoordinates(ourPlayer);
-    const ourRoomId = collisionInfo[ourX][ourY].roomId;
+    const ourRoomId = collisionInfo[ourX]?.[ourY]?.roomId;
     playersNearby.forEach((player) => {
         const user = getUser(player.participantId);
         if (!ourRoomId) {
@@ -515,7 +515,11 @@ export function nearbyPlayerCheck() {
             return;
         }
         const [x, y] = getCorrectedPlayerCoordinates(player);
-        const roomId = collisionInfo[x][y].roomId;
+        const roomId = collisionInfo[x]?.[y]?.roomId;
+        if (!roomId) {
+            user.setDisabled(false);
+            return;
+        }
         user.setDisabled(!(ourRoomId === roomId || canSeeEachOther(ourPlayer, player, collisionInfo)));
     });
 }
