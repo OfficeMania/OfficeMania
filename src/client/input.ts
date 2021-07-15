@@ -130,6 +130,10 @@ export function loadInputFunctions() {
         onDirectionKeyUp(e, "w", Direction.UP);
         onDirectionKeyUp(e, "a", Direction.LEFT);
         onDirectionKeyUp(e, "d", Direction.RIGHT);
+        onDirectionKeyDown(e, "ArrowDown", Direction.DOWN);
+        onDirectionKeyDown(e, "ArrowUp", Direction.UP);
+        onDirectionKeyDown(e, "ArrowLeft", Direction.LEFT);
+        onDirectionKeyDown(e, "ArrowRight", Direction.RIGHT);
         if (inputMode === InputMode.INTERACTION) {
             return;
         }
