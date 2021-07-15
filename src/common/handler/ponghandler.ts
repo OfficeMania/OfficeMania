@@ -3,6 +3,7 @@ import {PongState} from "../rooms/schema/state";
 
 export function registerPongHandler() {
     this.onMessage(MessageType.MOVE_PONG, (client, message) => onPongMove.call(this, client, message));
+    this.onMessage(MessageType.UPDATE_INTERACTION, (client, message) => onPongUpdate(message, this.state.pongStates[this.getPongGame(client).toString()]))
 }
 
 function onPongMove(client, message) {
@@ -35,5 +36,11 @@ function onPongMovePlayer(message: string, gameState: PongState, pos: number, ca
             }
             break;
         }
+    }
+}
+
+function onPongUpdate(message: string, gameState: PongState) {
+    if(message === "pong") {
+        gameState.posBallX
     }
 }

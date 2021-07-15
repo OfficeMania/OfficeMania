@@ -22,7 +22,12 @@ export enum MessageType {
     UPDATE_PARTICIPANT_ID = "updateParticipantId",
     CLEAR_WHITEBOARD = "clearWhiteboard",
     INTERACTION = "interaction",
+    UPDATE_INTERACTION = "updateInteraction",
     DOOR = "newDoor"
+}
+export enum GameMode {
+    SINGLE = 1,
+    MULTI = 2,
 }
 
 export function generateUUIDv4() {
