@@ -1,19 +1,20 @@
 import {Client, Presence, Room} from "colyseus";
 import {State} from "./schema/state";
 import fs from 'fs';
-import {generateUUIDv4, MessageType} from "../util";
-import {ArraySchema} from "@colyseus/schema";
+import {generateUUIDv4} from "../util";
 import {PongHandler} from "../handler/ponghandler";
 import {Handler} from "../handler/handler";
 import {DoorHandler} from "../handler/doorhandler";
 import {PlayerHandler} from "../handler/playerhandler";
+import {WhiteboardHandler} from "../handler/whiteboardhandler";
 
 const path = require('path');
 
+const doorHandler: DoorHandler = new DoorHandler();
 const playerHandler: PlayerHandler = new PlayerHandler();
 const pongHandler: PongHandler = new PongHandler();
-const doorHandler: DoorHandler = new DoorHandler();
-const handlers: Handler[] = [playerHandler, doorHandler, pongHandler];
+const whiteboardHandler: WhiteboardHandler = new WhiteboardHandler();
+const handlers: Handler[] = [doorHandler, playerHandler, pongHandler, whiteboardHandler];
 
 /*
  * See: https://docs.colyseus.io/server/room/
@@ -44,20 +45,6 @@ export class TURoom extends Room<State> {
         fs.readdirSync('./assets/img/characters').filter(file => file.includes(".png")).forEach(file => this.state.playerSpritePaths.push(file));
         //loads paths from templates
         getPaths("./assets/templates", this.state);
-        this.onMessage(MessageType.PATH, (client, message) => {
-            if (message === -1) {
-                this.state.whiteboardPlayer[client.sessionId].paths.push(-1);
-            } else {
-                this.state.whiteboardPlayer[client.sessionId].paths.push(...message);
-            }
-            this.broadcast(MessageType.REDRAW, client, {except: client});
-        });
-        this.onMessage(MessageType.CLEAR_WHITEBOARD, (client, message) => {
-            for (const [, player] of this.state.whiteboardPlayer) {
-                player.paths = new ArraySchema<number>();
-            }
-            this.broadcast(MessageType.CLEAR_WHITEBOARD, {except: client});
-        });
         handlers.forEach((handler) => handler.onCreate(options));
     }
 
