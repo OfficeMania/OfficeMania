@@ -451,7 +451,7 @@ body {
     #player-online-container.hover.vertical-animation {
         height: calc(100vh - 64px);
     }
-    
+
 }
 #help-footer {
     position: fixed;

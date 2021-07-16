@@ -361,21 +361,31 @@ export function appendFAIcon(element: HTMLElement, faIcon: string) {
     element.append(em);
 }
 
+let interactionClosed: boolean = false;
+
 export function createCloseInteractionButton(listener: () => void) {
     const button: HTMLButtonElement = createInteractionButton(listener, "button-close-interaction");
     appendFAIcon(button, "fa-times");
+    button.addEventListener("click", () => interactionClosed = true);
 }
 
-export function createInteractionButton(listener: () => void, id: string = null): HTMLButtonElement {
+export function createInteractionButton(listener: () => void, id: string = null, preAppend: (button: HTMLButtonElement) => void = null): HTMLButtonElement {
     const button: HTMLButtonElement = document.createElement("button");
     if (id) {
         button.id = id;
     }
     button.addEventListener("click", listener);
+    preAppend && preAppend(button);
     panelButtonsInteraction.append(button);
     return button;
 }
 
 export function removeCloseInteractionButton() {
     document.getElementById("button-close-interaction")?.remove();
+}
+
+export function consumeInteractionClosed() {
+    const temp: boolean = interactionClosed;
+    interactionClosed = false;
+    return temp;
 }
