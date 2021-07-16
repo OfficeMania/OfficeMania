@@ -9,7 +9,9 @@ export class VendingMachine extends Interactive{
     lastOutputs: string[];
 
     //TODO VendingMachineOutputs
-    outputs = ["You really enjoyed your sip. \nBut then you dropped your bottle :("];
+    outputs = ["You really enjoyed your sip. \nBut then you dropped your bottle :(",
+    "Want some coke? Gimme more money."
+    ];
 
     constructor(){
         super("Vending Machine", false, 1);
