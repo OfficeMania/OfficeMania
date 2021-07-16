@@ -60,7 +60,7 @@ export class Whiteboard extends Interactive{
             this.setPosition(e, this)
         });
 
-        //size
+        //size changed
         window.addEventListener('resize', () => {
             this.resize(this)
         });
@@ -146,14 +146,6 @@ export class Whiteboard extends Interactive{
             whiteboard.whiteboardPlayer[id] = 0;
         }
         whiteboard.setup(whiteboard.canvas)
-    }
-
-    getIsVisible() {
-        return this.isVisible;
-    }
-
-    getCanvas() {
-        return this.canvas
     }
 
     resize(whiteboard: Whiteboard) {
