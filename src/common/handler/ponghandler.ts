@@ -158,7 +158,7 @@ function leavePongGame(room: Room<State>, client: Client) {
 
 
 function getPongGame(room: Room<State>, client): number {
-    for (let i = 0; i < room.state.pongStates.size; i++) {
+    for (let i = 0; i <= getHighestIndexPongState(room); i++) {
         if (room.state.pongStates[i.toString()]?.playerA === client.sessionId || room.state.pongStates[i.toString()]?.playerB === client.sessionId) {
             return i;
         }
@@ -167,17 +167,18 @@ function getPongGame(room: Room<State>, client): number {
 }
 
 function getEmptyPongGame(room: Room<State>): number {
-    if (!room.state.pongStates.size) {
-        return -1;
-    }
-    for (let i = 0; i < room.state.pongStates.size; i++) {
-        const playerA = room.state.pongStates[i.toString()]?.playerA;
-        const playerB = room.state.pongStates[i.toString()]?.playerB;
-        console.debug("playerA=", playerA);
-        console.debug("playerB=", playerB);
-        if (!playerA || !playerB){
-            return i;
+    for (let i = 0; i < getHighestIndexPongState(room); i++) {
+        if (room.state.pongStates[i.toString()]) {
+            const playerA = room.state.pongStates[i.toString()]?.playerA;
+            const playerB = room.state.pongStates[i.toString()]?.playerB;
+            console.debug("playerA=", playerA);
+            console.debug("playerB=", playerB);
+            if (!playerA || !playerB){
+                return i;
+            }
         }
+        else return -1;
+        
     }
     return -1;
 }
@@ -281,5 +282,16 @@ function startNextRound(game:PongState){
     game.posBallX = 444;
     game.posBallY = 1100;
     setTimeout(() => startNewRound(game), 1000);
+}
+function getHighestIndexPongState(room: Room<State>): number {
+    let highestInt = -1;
+    room.state.pongStates.forEach((key, value) => {
+        if(parseInt(value) > highestInt){
+            highestInt = parseInt(value)
+            //console.log(highestInt);
+        }
+    });
+    highestInt > -1? highestInt++: {};
+    return highestInt;
 }
 

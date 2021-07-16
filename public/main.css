@@ -378,6 +378,7 @@ body {
 
 #player-online-list .player-state-name,
 #player-online-list .player-state-mute {
+    padding-top: 25px;
     color: white;
     font-size: 200%;
     -webkit-text-fill-color: white;
