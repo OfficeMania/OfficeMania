@@ -199,7 +199,8 @@ function loadCharacterSettings() {
 }
 
 function onSettingsOpen() {
-    currentInteraction.hide();
+    if(currentInteraction === null){interactiveCanvas.style.visibility = "hidden";}
+    currentInteraction?.hide();
     loadSettings();
     setInputMode(InputMode.SETTINGS);
 }
