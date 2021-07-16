@@ -23,7 +23,7 @@ export class Whiteboard extends Interactive{
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
 
-    private clearButton = <HTMLButtonElement>document.getElementById("button-clear-whiteboard");
+    private clearButton = <HTMLButtonElement>document.getElementById("button-interactive");
 
 
     constructor() {
@@ -37,7 +37,7 @@ export class Whiteboard extends Interactive{
         this.players = getPlayers();
 
         this.clearButton.addEventListener("click", () => this.clearPressed(this));
-        this.clearButton.style.top = "20%"
+        this.clearButton.style.top = "30%"
         this.clearButton.style.left = "20%"
 
         this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
@@ -60,9 +60,6 @@ export class Whiteboard extends Interactive{
         });
         window.addEventListener('resize', () => this.resize(this))
 
-        this.canvas.width = 1280;
-        this.canvas.height = 720;
-
         this.resize(this);
     }
 
@@ -78,6 +75,8 @@ export class Whiteboard extends Interactive{
             this.isVisible = false;
             this.canvas.style.visibility = "hidden";
             this.clearButton.style.visibility = "hidden";
+            this.clearButton.setAttribute("aria-label", "");
+            this.clearButton.innerHTML ="";
             
             checkInputMode()
 
@@ -85,6 +84,8 @@ export class Whiteboard extends Interactive{
                 Whiteboard.currentWhiteboard = -1;
             }
         } else {
+            this.clearButton.setAttribute("aria-label", "Clear Whiteboard");
+            this.clearButton.innerHTML = "<em class=\"fa fa-trash\"></em>"
             this.isVisible = true;
             this.canvas.style.visibility = "visible";
             this.clearButton.style.visibility = "visible";
