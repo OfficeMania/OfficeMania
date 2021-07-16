@@ -109,6 +109,18 @@ export class DoorState extends Schema {
 
 }
 
+export class TodoState extends Schema {
+
+    @type("string")
+    listId: string;
+
+    @type("string")
+    content: string;
+
+    @type("boolean")
+    isUsed: boolean;
+}
+
 /*
  * The state of a room. Each variable that is annotated with a @type decorator
  * automatically gets synced with the clients.
@@ -143,5 +155,8 @@ export class State extends Schema {
 
     @type({map: DoorState})
     doorStates: MapSchema<DoorState> = new MapSchema<DoorState>();
+
+    @type({map: TodoState})
+    todoState: MapSchema<TodoState> = new MapSchema<TodoState>();
 
 }

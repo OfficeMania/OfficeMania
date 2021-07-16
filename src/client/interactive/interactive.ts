@@ -93,5 +93,9 @@ export class Interactive {
     show(): void{
         this.canvas.style.visibility = "visible";
     }
+
+    leave(): void{
+        console.warn("leave not implemented");
+    }
 }
 

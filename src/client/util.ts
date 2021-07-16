@@ -16,6 +16,7 @@ export enum InputMode {
     NORMAL = "normal",
     SETTINGS = "settings",
     INTERACTION = "interaction",
+    WRITETODO = "writeTodo",
 }
 
 export type InitState = [Room<State>, Player];

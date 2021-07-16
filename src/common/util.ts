@@ -28,7 +28,12 @@ export enum MessageType {
     WHITEBOARD_CLEAR = "whiteboardClear",
     WHITEBOARD_PATH = "whiteboardPath",
     WHITEBOARD_REDRAW = "whiteboardRedraw",
-    WHITEBOARD_CREATE = "whiteboardCreate"
+    WHITEBOARD_CREATE = "whiteboardCreate",
+    //TodoListHandler
+    LIST_CREATE = "listCreate",
+    LIST_USE = "listUse",
+    LIST_STOPUSE = "listStopUse",
+    LIST_UPDATE = "listUpdate"
 }
 export enum GameMode {
     SINGLE = 1,

@@ -101,6 +101,13 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
 
 export function loadInputFunctions() {
     function onKeyDown(e: KeyboardEvent) {
+        if(e.key === "Escape") {
+            checkInteraction().content.leave();
+            return;
+        }
+        if (inputMode === InputMode.WRITETODO) {
+            return;
+        }
         if (inputMode === InputMode.SETTINGS) {
             return;
         }

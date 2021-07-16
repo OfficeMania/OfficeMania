@@ -6,6 +6,8 @@ import {PingPongTable} from "./interactive/pingpongtable";
 import {State} from "../common";
 import {MessageType} from "../common/util";
 import { Whiteboard } from "./interactive/whiteboard";
+import { toEditorSettings } from "typescript";
+import { Todo } from "./interactive/todo";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -308,6 +310,10 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         //whiteboard
         case 7: {
             return new Whiteboard();
+        }
+        //Post-its
+        case 8: {
+            return new Todo();
         }
     }
     return null;

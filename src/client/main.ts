@@ -352,7 +352,7 @@ async function main() {
 
         //check if interaction is nearby
         const solidInfo = checkInteraction();
-        if (solidInfo?.content && getInputMode() !== InputMode.INTERACTION) {
+        if (solidInfo?.content && getInputMode() !== InputMode.INTERACTION && getInputMode() !== InputMode.WRITETODO) {
             if (!interactionShown) {
                 interactionShown = true;
                 let interactionNearbyButton = document.createElement("button");
@@ -379,7 +379,7 @@ async function main() {
         ctx.restore();
 
         //drawWhiteboard(canvas, whiteboard.getCanvas())
-        if (getInputMode() === InputMode.INTERACTION) {
+        if (getInputMode() === InputMode.INTERACTION || getInputMode() === InputMode.WRITETODO) {
             checkInteraction()?.content?.loop();
         }
 
