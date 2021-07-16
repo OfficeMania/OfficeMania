@@ -5,11 +5,10 @@ import {Door, DoorDirection} from "./interactive/door";
 import {PingPongTable} from "./interactive/pingpongtable";
 import {State} from "../common";
 import {MessageType} from "../common/util";
-import { Whiteboard } from "./interactive/whiteboard";
-import { toEditorSettings } from "typescript";
-import { Todo } from "./interactive/todo";
-import { CoffeeMachine } from "./interactive/coffeeMachine";
-import { VendingMachine } from "./interactive/vendingMachine";
+import {Whiteboard} from "./interactive/whiteboard";
+import {Todo} from "./interactive/todo";
+import {CoffeeMachine} from "./interactive/coffeeMachine";
+import {VendingMachine} from "./interactive/vendingMachine";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -20,11 +19,13 @@ class solidInfo {
     isSolid: boolean;
     content: Interactive;
     roomId: number;
+    isConferenceRoom: boolean;
 
     constructor() {
         this.isSolid = false
         this.content = null;
         this.roomId = 0;
+        this.isConferenceRoom = false;
     }
 
     setIsSolid() {
@@ -41,6 +42,14 @@ class solidInfo {
 
     getRoomId() {
         return this.roomId;
+    }
+
+    setIsConferenceRoom(isConferenceRoom: boolean) {
+        this.isConferenceRoom = isConferenceRoom;
+    }
+
+    getIsConferenceRoom(): boolean {
+        return this.isConferenceRoom;
     }
 
 }
@@ -184,6 +193,7 @@ class tileset {
 const LAYER_NAME_SOLID: string = "Solid";
 const LAYER_NAME_CONTENT: string = "Content";
 const LAYER_NAME_ROOMS: string = "Rooms";
+const LAYER_NAME_CONFERENCE_ROOMS: string = "Conference rooms";
 const LAYER_NAME_ANIMATED: string = "animated";
 
 function fillSolidInfos(map: mapInfo) {
@@ -207,7 +217,8 @@ function fillSolidInfos(map: mapInfo) {
         const isSolidLayer = layer.name.search(LAYER_NAME_SOLID) !== -1;
         const isContentLayer = layer.name.search(LAYER_NAME_CONTENT) !== -1;
         const isRoomsLayer = layer.name.search(LAYER_NAME_ROOMS) !== -1;
-        if (!(isSolidLayer || isContentLayer || isRoomsLayer)) {
+        const isConferenceRoomsLayer = layer.name.search(LAYER_NAME_CONFERENCE_ROOMS) !== -1;
+        if (!(isSolidLayer || isContentLayer || isRoomsLayer || isConferenceRoomsLayer)) {
             continue;
         }
         for (const chunk of layer.chunks) {
@@ -268,7 +279,8 @@ function fillSolidInfos(map: mapInfo) {
                         } else if (isContentLayer && value !== 0) {
                             const interactive: Interactive = getInteractive(value, basePosX, basePosY, room);
                             setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setContent(interactive));
-
+                        } else if (isConferenceRoomsLayer && value === 1) {
+                            setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setIsConferenceRoom(true));
                         } else if (isRoomsLayer) {
                             setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setRoomId(value));
                         }
