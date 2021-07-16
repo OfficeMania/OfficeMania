@@ -12,8 +12,11 @@ import {Direction} from "../common/util";
 import {solidInfo} from "./map";
 import {characters} from "./main";
 import { Whiteboard } from "./interactive/whiteboard";
+import { Interactive } from "./interactive/interactive";
 
 let inputMode: InputMode = InputMode.NORMAL;
+
+export let currentInteraction: Interactive = null;
 
 function resetPlayerDirections() {
     getOurPlayer().priorDirections.length = 0;
@@ -166,6 +169,7 @@ export function checkInteraction(executeInteraction: boolean = false): solidInfo
         return null;
     }
     solidInfo.content && executeInteraction && solidInfo.content.onInteraction();
+    currentInteraction = solidInfo.content
     return solidInfo;
 }
 

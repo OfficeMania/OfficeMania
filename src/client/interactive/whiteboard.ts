@@ -46,6 +46,7 @@ export class Whiteboard extends Interactive{
 
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
 
+        //draw events
         this.canvas.addEventListener('mousemove', (e) => {
             this.draw(e, this)
         });
@@ -58,7 +59,11 @@ export class Whiteboard extends Interactive{
         this.canvas.addEventListener('mouseenter', (e) => {
             this.setPosition(e, this)
         });
-        window.addEventListener('resize', () => this.resize(this))
+
+        //size
+        window.addEventListener('resize', () => {
+            this.resize(this)
+        });
 
         this.canvas.width = 1280;
         this.canvas.height = 720;
@@ -66,42 +71,41 @@ export class Whiteboard extends Interactive{
         this.resize(this);
     }
 
-    rect(e, whiteboard: Whiteboard){
-        var canvas = whiteboard.canvas
-        var ctx = canvas.getContext("2d");
-        ctx.fillStyle = "white"
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
     onInteraction(){
         if (this.isVisible === true) {
-            this.isVisible = false;
-            this.canvas.style.visibility = "hidden";
-            this.clearButton.style.visibility = "hidden";
-            
-            checkInputMode()
-
-            if(Whiteboard.currentWhiteboard === this.wID){
-                Whiteboard.currentWhiteboard = -1;
-            }
+            this.hide()
         } else {
-            this.isVisible = true;
-            this.canvas.style.visibility = "visible";
-            this.clearButton.style.visibility = "visible";
-
-            checkInputMode()
-
-            Whiteboard.currentWhiteboard = this.wID
-
-            this.resize(this);
-            this.setup(this.canvas);
-            this.redraw(this);
+            this.show()
         }
     }
 
-    loop(){
-        
+    hide(){
+        this.isVisible = false;
+        this.canvas.style.visibility = "hidden";
+        this.clearButton.style.visibility = "hidden";
+            
+        checkInputMode()
+
+        if(Whiteboard.currentWhiteboard === this.wID){
+            Whiteboard.currentWhiteboard = -1;
+        }
     }
+
+    show(){
+        this.isVisible = true;
+        this.canvas.style.visibility = "visible";
+        this.clearButton.style.visibility = "visible";
+
+        checkInputMode()
+
+        Whiteboard.currentWhiteboard = this.wID
+
+        this.resize(this);
+        this.setup(this.canvas);
+        this.redraw(this);        
+    }
+
+    loop(){}
 
     setup(canvas) {
         var ctx = canvas.getContext("2d");
