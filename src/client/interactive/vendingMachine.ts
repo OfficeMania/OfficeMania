@@ -14,6 +14,7 @@ export class VendingMachine extends Interactive{
     "The coins are too grimy.",
     "... and now they are too shiny.",
     "butts lol",
+    "I don't remember you inserting that money..."
     ];
 
     constructor(){
@@ -31,7 +32,7 @@ export class VendingMachine extends Interactive{
         if (getInputMode() !== InputMode.INTERACTION) {
             this.canvas.style.visibility = "visible";
             createCloseInteractionButton(() => this.leave());
-            setInputMode(InputMode.WRITETODO);
+            setInputMode(InputMode.INTERACTION);
             this.searchText();
         }
         else this.leave();
