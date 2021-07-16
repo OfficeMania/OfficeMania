@@ -22,6 +22,12 @@ export enum InputMode {
 export type InitState = [Room<State>, Player];
 export type PlayerRecord = { [key: string]: Player }
 
+function $<T extends HTMLElement>(a: string) {
+    return <T>document.getElementById(a);
+}
+
+const panelButtonsInteraction = $<HTMLDivElement>("panel-buttons-interaction");
+
 let _room: Room<State> = undefined;
 let _collisionInfo: solidInfo[][] = undefined;
 let _ourPlayer: Player = undefined;
@@ -351,4 +357,23 @@ export function getPlayerByRoomId(playerId: string): Player {
     }
     console.log("not in players")
     return null;
+}
+
+export function createCloseInteractionButton(listener: () => void) {
+    const button: HTMLButtonElement = createInteractionButton(listener);
+    button.id = "button-close-interaction";
+    const em: HTMLElement = document.createElement("em");
+    em.classList.add("fa", "fa-times");
+    button.append(em);
+}
+
+export function createInteractionButton(listener: () => void): HTMLButtonElement {
+    const button: HTMLButtonElement = document.createElement("button");
+    button.addEventListener("click", listener);
+    panelButtonsInteraction.append(button);
+    return button;
+}
+
+export function removeCloseInteractionButton() {
+    document.getElementById("button-close-interaction")?.remove();
 }
