@@ -3,7 +3,7 @@ import { setInputMode } from "../input";
 import { getRoom, InputMode } from "../util";
 import { checkInputMode } from "../main";
 
-class CoffeeMachine extends Interactive {
+export class CoffeeMachine extends Interactive {
 
     counter: number = 0;
     ctx: CanvasRenderingContext2D;
@@ -11,7 +11,7 @@ class CoffeeMachine extends Interactive {
 
     //TODO Giulia does not good english speaking
     //TODO More options
-    outputs = ["Please refill Water.", "Please enter the secred Code.", "Who stole all the coffee beans?", "Why is the coffee always empty?"];
+    outputs = ["Please refill Water.", "Please enter the secret Code.", "Who stole all the coffee beans?", "Why is the coffee always empty?"];
 
     constructor(){
         super("Coffe Machine", false, 1);
@@ -27,7 +27,7 @@ class CoffeeMachine extends Interactive {
     onInteraction() {
         this.canvas.style.visibility = "visible";
         this.createButton();
-        checkInputMode();
+        setInputMode(InputMode.WRITETODO);
         this.searchText();
     }
 
@@ -43,12 +43,14 @@ class CoffeeMachine extends Interactive {
             }
         }
 
+        text = this.outputs[index];
+
         this.lastOutputs[this.counter] = this.outputs[index];
         if(this.counter === 2){
             this.counter = 0;
         }
         this.counter++;
-
+        console.log(index);
         this.print(text);
     }
 
@@ -58,7 +60,7 @@ class CoffeeMachine extends Interactive {
         }
         
         this.canvas.style.visibility = "hidden";
-        checkInputMode();
+        setInputMode(InputMode.NORMAL);
     }
 
     createButton(){
@@ -92,8 +94,8 @@ class CoffeeMachine extends Interactive {
     }
 
     getRandomInt(min:number, max: number){
-        min = Math.ceil(min);
-        max = Math.floor(max);
+        min = Math.ceil(min) + 1;
+        max = Math.floor(max) ;
         return (Math.floor(Math.random() * (max - min)) + min) - 1;
     }
 }

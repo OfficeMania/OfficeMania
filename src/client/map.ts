@@ -8,6 +8,7 @@ import {MessageType} from "../common/util";
 import { Whiteboard } from "./interactive/whiteboard";
 import { toEditorSettings } from "typescript";
 import { Todo } from "./interactive/todo";
+import { CoffeeMachine } from "./interactive/coffeeMachine";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -314,6 +315,10 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         //Post-its
         case 8: {
             return new Todo();
+        }
+        //coffee machine
+        case 9: {
+            return new CoffeeMachine();
         }
     }
     return null;
