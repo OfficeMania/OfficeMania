@@ -117,7 +117,7 @@ export function loadInputFunctions() {
         onDirectionKeyDown(e, "ArrowLeft", Direction.LEFT);
         onDirectionKeyDown(e, "ArrowRight", Direction.RIGHT);
         //player interacts with object in front of him
-        onPureKey(e, " ", () => checkInteraction(true));
+        onPureKey(e, "e", () => checkInteraction(true));
         if (inputMode === InputMode.INTERACTION) {
             return;
         }
