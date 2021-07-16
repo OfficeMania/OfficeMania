@@ -11,6 +11,7 @@ import {
     MessageType
 } from "../common/util";
 import {characters} from "./main";
+import {panelButtonsInteraction} from "./static";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -21,12 +22,6 @@ export enum InputMode {
 
 export type InitState = [Room<State>, Player];
 export type PlayerRecord = { [key: string]: Player }
-
-function $<T extends HTMLElement>(a: string) {
-    return <T>document.getElementById(a);
-}
-
-const panelButtonsInteraction = $<HTMLDivElement>("panel-buttons-interaction");
 
 let _room: Room<State> = undefined;
 let _collisionInfo: solidInfo[][] = undefined;
@@ -340,6 +335,7 @@ export function getPlayerByParticipantId(participantId: string): Player {
     console.log("not in players")
     return null;
 }
+
 export function getPlayerByRoomId(playerId: string): Player {
     if (!playerId) {
         console.log("no pid");
@@ -359,16 +355,22 @@ export function getPlayerByRoomId(playerId: string): Player {
     return null;
 }
 
-export function createCloseInteractionButton(listener: () => void) {
-    const button: HTMLButtonElement = createInteractionButton(listener);
-    button.id = "button-close-interaction";
+export function appendFAIcon(element: HTMLElement, faIcon: string) {
     const em: HTMLElement = document.createElement("em");
-    em.classList.add("fa", "fa-times");
-    button.append(em);
+    em.classList.add("fa", faIcon);
+    element.append(em);
 }
 
-export function createInteractionButton(listener: () => void): HTMLButtonElement {
+export function createCloseInteractionButton(listener: () => void) {
+    const button: HTMLButtonElement = createInteractionButton(listener, "button-close-interaction");
+    appendFAIcon(button, "fa-times");
+}
+
+export function createInteractionButton(listener: () => void, id: string = null): HTMLButtonElement {
     const button: HTMLButtonElement = document.createElement("button");
+    if (id) {
+        button.id = id;
+    }
     button.addEventListener("click", listener);
     panelButtonsInteraction.append(button);
     return button;
