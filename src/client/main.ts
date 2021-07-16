@@ -30,10 +30,31 @@ import {
     updateUsers
 } from "./conference/conference";
 import {playerLoop} from "./movement";
-import {checkInteraction, currentInteraction, getHelpMessage, getInputMode, loadInputFunctions, setInputMode} from "./input";
+import {
+    checkInteraction,
+    checkInteractionNearby,
+    currentInteraction,
+    getInputMode,
+    loadInputFunctions,
+    setInputMode
+} from "./input";
 import {drawPlayer} from "./drawplayer"
-import {Whiteboard} from "./interactive/whiteboard"
-
+import {
+    background,
+    camButton,
+    canvas,
+    characterPreview,
+    characterSelect,
+    interactiveCanvas,
+    muteButton,
+    settingsApplyButton,
+    settingsButton,
+    settingsModal,
+    settingsOkButton,
+    shareButton,
+    usernameInput,
+    usersButton
+} from "./static";
 
 export var characters: { [key: string]: HTMLImageElement } = {}
 const START_POSITION_X = -13;
@@ -44,15 +65,7 @@ const MS_PER_UPDATE2 = 15;
 export var lowestX;
 export var lowestY;
 
-function $<T extends HTMLElement>(a: string) {
-    return <T>document.getElementById(a);
-}
-
 // Mute Buttons
-
-const muteButton = $<HTMLButtonElement>("button-mute-audio");
-const camButton = $<HTMLButtonElement>("button-mute-video");
-const shareButton = $<HTMLButtonElement>("button-share-video");
 
 muteButton.addEventListener("click", () => toggleMute("audio"));
 camButton.addEventListener("click", () => toggleMute("video"));
@@ -91,25 +104,11 @@ function toggleMute(type: string) {
 
 // Settings
 
-const settingsModal = $<HTMLDivElement>("settings-modal");
-const settingsButton = $<HTMLButtonElement>("button-settings");
-const usersButton = $<HTMLButtonElement>("button-users");
-
-const settingsOkButton = $<HTMLButtonElement>("button-settings-ok");
-//const settingsCancelButton = $<HTMLButtonElement>("button-settings-cancel");
-const settingsApplyButton = $<HTMLButtonElement>("button-settings-apply");
-
 settingsButton.addEventListener("click", () => onSettingsOpen());
 usersButton.addEventListener("click", () => toggleShowParticipantsTab());
 
 settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
-
-const usernameInput = $<HTMLInputElement>("input-settings-username");
-const characterSelect = $<HTMLSelectElement>("character-select");
-const characterPreview = $<HTMLSelectElement>("character-preview");
-
-const interactiveCanvas = $<HTMLCanvasElement>("interactive");
 
 
 
@@ -259,8 +258,6 @@ async function main() {
     /*
      * Then, we wait for our map to load
      */
-    let canvas = $<HTMLCanvasElement>("canvas");
-    let background = $<HTMLCanvasElement>("background");
 
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
@@ -316,7 +313,6 @@ async function main() {
      */
 
     let playerNearbyTimer = 0;
-    let interactionShown = false;
 
     function loop(now: number) {
 
@@ -351,34 +347,7 @@ async function main() {
         }
 
         //check if interaction is nearby
-        const solidInfo = checkInteraction();
-        if (solidInfo?.content && getInputMode() !== InputMode.INTERACTION && getInputMode() !== InputMode.WRITETODO) {
-            if (!interactionShown) {
-                interactionShown = true;
-                let interactionNearbyButton = document.createElement("button");
-                interactionNearbyButton.id = "button-interact";
-                interactionNearbyButton.addEventListener("click", () => checkInteraction(true));
-                interactionNearbyButton.innerHTML = "<em class=\"fa fa-sign-in-alt\"></em>";
-                $<HTMLDivElement>("panel-buttons-interaction").append(interactionNearbyButton);
-                let spaceButton = document.createElement("img");
-                spaceButton.id = "button-space";
-                spaceButton.src = "../assets/img/transparent_32x32.png"
-                spaceButton.className = "key key-long";
-                spaceButton.style.backgroundPosition = "calc(2 * -32px) calc(5 * -32.1px)";
-                $<HTMLDivElement>("help-footer").append(spaceButton);
-                let interactionPopup = document.createElement("p");
-                interactionPopup.id = "interaction-popup";
-                interactionPopup.innerHTML = getHelpMessage();
-                $<HTMLDivElement>("help-footer").append(interactionPopup);
-
-            }
-        } else if (interactionShown) {
-            interactionShown = false;
-            $<HTMLButtonElement>("button-space")?.remove();
-            $<HTMLButtonElement>("button-interact")?.remove();
-            $<HTMLButtonElement>("interaction-popup")?.remove();
-
-        }
+        checkInteractionNearby();
 
         //DESIGN TODO: when something on the map changes: drawMap
 

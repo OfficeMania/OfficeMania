@@ -1,4 +1,6 @@
 import {
+    appendFAIcon,
+    createInteractionButton,
     getCollisionInfo,
     getCorrectedPlayerFacingCoordinates,
     getOurPlayer,
@@ -11,8 +13,8 @@ import {toggleShowParticipantsTab} from "./conference/conference";
 import {Direction} from "../common/util";
 import {solidInfo} from "./map";
 import {characters} from "./main";
-import { Whiteboard } from "./interactive/whiteboard";
-import { Interactive } from "./interactive/interactive";
+import {Interactive} from "./interactive/interactive";
+import {helpFooter} from "./static";
 
 let inputMode: InputMode = InputMode.NORMAL;
 
@@ -51,7 +53,7 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direct
     const ourPlayer = getOurPlayer();
     switch (inputMode) {
         case InputMode.NORMAL:
-            if(!ourPlayer.priorDirections.includes(direction)){
+            if (!ourPlayer.priorDirections.includes(direction)) {
                 ourPlayer.priorDirections.unshift(direction);
             }
             break;
@@ -61,7 +63,7 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direct
                 break;
             }
             const content = solidInfo.content;
-            if(!content.input.includes(direction)){
+            if (!content.input.includes(direction)) {
                 if (content.input[0]) {
                     content.input[1] = content.input[0];
                 }
@@ -87,13 +89,11 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
                 break;
             }
             const content = solidInfo.content;
-            if(content.input.indexOf(direction) === 0) {
-                if(content.input[1]){
+            if (content.input.indexOf(direction) === 0) {
+                if (content.input[1]) {
                     content.input[0] = content.input.pop();
-                }
-                else content.input.pop();
-            }
-            else content.input.pop();
+                } else content.input.pop();
+            } else content.input.pop();
             break;
 
     }
@@ -101,7 +101,7 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
 
 export function loadInputFunctions() {
     function onKeyDown(e: KeyboardEvent) {
-        if(e.key === "Escape") {
+        if (e.key === "Escape") {
             checkInteraction().content.leave();
             return;
         }
@@ -167,7 +167,7 @@ export function loadInputFunctions() {
     window.addEventListener("blur", onBlur);
 }
 
-export function checkInteraction(executeInteraction: boolean = false): solidInfo  {
+export function checkInteraction(executeInteraction: boolean = false): solidInfo {
     const ourPlayer = getOurPlayer();
     const [facingX, facingY] = getCorrectedPlayerFacingCoordinates(ourPlayer);
     const solidInfo: solidInfo = getCollisionInfo()?.[facingX]?.[facingY];
@@ -180,6 +180,38 @@ export function checkInteraction(executeInteraction: boolean = false): solidInfo
     return solidInfo;
 }
 
-export function getHelpMessage() {
-    return "   to interact with " + checkInteraction().content.name;
+const ID_BUTTON_INTERACT = "button-interact";
+const ID_INTERACTION_HELP_KEY = "interaction-help-key";
+const ID_INTERACTION_HELP_TEXT = "interaction-help-text";
+
+let interactionInfoShown = false;
+
+export function checkInteractionNearby() {
+    const solidInfo: solidInfo = checkInteraction();
+    if (solidInfo?.content && getInputMode() !== InputMode.INTERACTION && getInputMode() !== InputMode.WRITETODO) {
+        if (!interactionInfoShown) {
+            interactionInfoShown = true;
+            const interactionNearbyButton: HTMLButtonElement = createInteractionButton(() => checkInteraction(true), ID_BUTTON_INTERACT);
+            appendFAIcon(interactionNearbyButton, "fa-sign-in-alt");
+            const interactionHelpKey: HTMLImageElement = document.createElement("img");
+            interactionHelpKey.id = ID_INTERACTION_HELP_KEY;
+            interactionHelpKey.src = "../assets/img/transparent_32x32.png";
+            interactionHelpKey.classList.add("key", "key-long");
+            interactionHelpKey.style.backgroundPosition = "calc(2 * -32px) calc(5 * -32.1px)";
+            helpFooter.append(interactionHelpKey);
+            const interactionHelpText = document.createElement("p");
+            interactionHelpText.id = ID_INTERACTION_HELP_TEXT;
+            interactionHelpText.innerText = getInteractionHelpMessage(solidInfo);
+            helpFooter.append(interactionHelpText);
+        }
+    } else if (interactionInfoShown) {
+        interactionInfoShown = false;
+        document.getElementById(ID_BUTTON_INTERACT)?.remove();
+        document.getElementById(ID_INTERACTION_HELP_KEY)?.remove();
+        document.getElementById(ID_INTERACTION_HELP_TEXT)?.remove();
+    }
+}
+
+function getInteractionHelpMessage(solidInfo: solidInfo) {
+    return "   to interact with " + solidInfo.content.name;
 }

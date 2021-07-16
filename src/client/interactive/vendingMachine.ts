@@ -1,6 +1,6 @@
 import {Interactive} from "./interactive";
-import { setInputMode } from "../input";
-import { getRoom, InputMode } from "../util";
+import {setInputMode} from "../input";
+import {createCloseInteractionButton, InputMode, removeCloseInteractionButton} from "../util";
 
 export class VendingMachine extends Interactive{
 
@@ -29,7 +29,7 @@ export class VendingMachine extends Interactive{
 
     onInteraction() {
         this.canvas.style.visibility = "visible";
-        this.createButton();
+        createCloseInteractionButton(() => this.leave());
         setInputMode(InputMode.WRITETODO);
         this.searchText();
     }
@@ -57,20 +57,9 @@ export class VendingMachine extends Interactive{
     }
 
     leave() {
-        if(document.getElementById("close")){
-            document.getElementById("close").remove();
-        }
-        
+        removeCloseInteractionButton();
         this.canvas.style.visibility = "hidden";
         setInputMode(InputMode.NORMAL);
-    }
-
-    createButton(){
-        const button = document.createElement("BUTTON");
-        button.addEventListener("click", () => this.leave())
-        button.innerHTML = "<em class = \"fa fa-times\"></em>";
-        button.id = "close";
-        this.buttonBar.appendChild(button);
     }
 
     print(text: string) {
