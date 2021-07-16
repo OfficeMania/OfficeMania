@@ -453,9 +453,25 @@ body {
     }
     
 }
-.footer {
+#help-footer {
     position: fixed;
     width: 100%;
     left: 0;
     bottom: 0;
+}
+
+#help-footer p {
+    font-size: 30px;
+    margin-left: 220px;
+    margin-bottom: 50px;
+    font-weight: bolder;
+    -webkit-text-fill-color: white;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: black;
+}
+
+#help-footer img {
+    scale: 200%;
+    margin-left: 110px;
+    margin-bottom: -55px;
 }

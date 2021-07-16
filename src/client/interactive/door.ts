@@ -22,7 +22,7 @@ export class Door extends Interactive {
 
     constructor(direction: DoorDirection, posX: number, posY: number) {
 
-        super("door", true, 1);
+        super("Door", true, 1);
         this.isClosed = false;
         this.direction = direction;
         this.posX = posX;
