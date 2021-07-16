@@ -144,10 +144,11 @@ export class Todo extends Interactive {
             buffer = this.content.slice(0, this.marker - this.content.length) + "|" + this.content.slice(this.marker - this.content.length, this.content.length);
         }
 
+        //TODO make a \n every x chars
         var subs = buffer.split('\n');
 
         this.ctx.fillStyle = "black";
-        this.ctx.font = "25px sans-serif"; //monospaced so you now how musch characters are ok for one line
+        this.ctx.font = "25px sans-serif"; //TODO monospaced so you now how musch characters are ok for one line
         this.ctx.lineWidth = 3;
 
         let i = 0;
