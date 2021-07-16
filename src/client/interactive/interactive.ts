@@ -1,4 +1,4 @@
-import { Direction } from "../../common/util";
+import {Direction} from "../../common/util";
 
 /**
  * for use of $<>("") to get the correct type of object
@@ -17,9 +17,9 @@ export class Interactive {
     private _maxPlayer: number;
     canvas: HTMLCanvasElement;
     interactiveBar = $<HTMLDivElement>("interactive-bar");
-    buttonBar = $<HTMLDivElement>("panel-buttons-interaction")
+    buttonBar = $<HTMLDivElement>("panel-buttons-interaction") //TODO Remove this
     input: Direction[] = [null];
-    
+
 
     constructor(name: string, singleton: boolean = true, maxPlayer: number = 1) {
         this._name = name;

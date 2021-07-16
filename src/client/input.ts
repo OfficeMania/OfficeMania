@@ -53,7 +53,7 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direct
     const ourPlayer = getOurPlayer();
     switch (inputMode) {
         case InputMode.NORMAL:
-            if(!ourPlayer.priorDirections.includes(direction)){
+            if (!ourPlayer.priorDirections.includes(direction)) {
                 ourPlayer.priorDirections.unshift(direction);
             }
             break;
@@ -63,7 +63,7 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direct
                 break;
             }
             const content = solidInfo.content;
-            if(!content.input.includes(direction)){
+            if (!content.input.includes(direction)) {
                 if (content.input[0]) {
                     content.input[1] = content.input[0];
                 }
@@ -89,13 +89,11 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
                 break;
             }
             const content = solidInfo.content;
-            if(content.input.indexOf(direction) === 0) {
-                if(content.input[1]){
+            if (content.input.indexOf(direction) === 0) {
+                if (content.input[1]) {
                     content.input[0] = content.input.pop();
-                }
-                else content.input.pop();
-            }
-            else content.input.pop();
+                } else content.input.pop();
+            } else content.input.pop();
             break;
 
     }
@@ -103,7 +101,7 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
 
 export function loadInputFunctions() {
     function onKeyDown(e: KeyboardEvent) {
-        if(e.key === "Escape") {
+        if (e.key === "Escape") {
             checkInteraction().content.leave();
             return;
         }
