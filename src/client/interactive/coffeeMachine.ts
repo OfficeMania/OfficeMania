@@ -11,7 +11,28 @@ export class CoffeeMachine extends Interactive {
 
     //TODO Giulia does not good english speaking
     //TODO More options
-    outputs = ["Please refill Water.", "Please enter the secret Code.", "Who stole all the coffee beans?", "Why is the coffee always empty?"];
+    outputs = ["Please refill Water.",
+     "Please enter the secret Code.",
+     "Who stole all the coffee beans?",
+     "Why is the coffee always empty?",
+     "Machine is calcified. Please clean.",
+     "Only sparkling water available. No more coffee for you.",
+     "You already had ten cups of coffee today. Junkie!",
+     "Please select sufficient amount of milk!",
+     "Lorem ipsum.",
+     "Lisää kahvia! (automatically translated to finnish)",
+     "Pleas kofee fill now to get koffe.",
+     "Do change the filter, please?",
+     "Please refill coffee beans.",
+     "Please refill sugar.",
+     "Please refill uranium oxide.",
+     "Display broken. Could not display error message.",
+     "Look! Behind you! Turn around now!",
+     "Have you ever had a dreams, thats... you- erm- you hads- you'd- you would- you could- you'd do- you would- you want's- you- you could do so- you- you'd do- you could- you- you wanted- you want them to do you so much you could do anything?",
+     "Please restart.",
+     "Try again, loser!",
+     "Please try turning off and on again."
+    ];
 
     constructor(){
         super("Coffe Machine", false, 1);
@@ -50,7 +71,6 @@ export class CoffeeMachine extends Interactive {
             this.counter = 0;
         }
         this.counter++;
-        console.log(index);
         this.print(text);
     }
 
