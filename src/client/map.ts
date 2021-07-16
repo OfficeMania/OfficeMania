@@ -307,7 +307,7 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         }
         //whiteboard
         case 7: {
-            //return new Whiteboard();
+            return new Whiteboard();
         }
     }
     return null;

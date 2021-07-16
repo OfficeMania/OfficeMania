@@ -27,7 +27,8 @@ export enum MessageType {
     // WhiteboardHandler
     WHITEBOARD_CLEAR = "whiteboardClear",
     WHITEBOARD_PATH = "whiteboardPath",
-    WHITEBOARD_REDRAW = "whiteboardRedraw"
+    WHITEBOARD_REDRAW = "whiteboardRedraw",
+    WHITEBOARD_CREATE = "whiteboardCreate"
 }
 export enum GameMode {
     SINGLE = 1,

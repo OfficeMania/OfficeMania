@@ -287,25 +287,6 @@ async function main() {
 
     drawMap(currentMap);
 
-    //create whiteboard
-    let whiteboard: Whiteboard = new Whiteboard();
-    whiteboard.resize(width, height, whiteboard);
-    for (const [player] of room.state.whiteboard.at(0).whiteboardPlayer) {
-        whiteboard.addPlayer(player);
-        if (player !== ourPlayer.id) {
-            whiteboard.drawOthers(player, whiteboard);
-        }
-    }
-
-    let whiteboard2: Whiteboard = new Whiteboard();
-    whiteboard2.resize(width, height, whiteboard2);
-    for (const [player] of room.state.whiteboard.at(1).whiteboardPlayer) {
-        whiteboard2.addPlayer(player);
-        if (player !== ourPlayer.id) {
-            whiteboard2.drawOthers(player, whiteboard2);
-        }
-    }
-
     /* (from movement)
      * movement inputs
      *
@@ -316,7 +297,7 @@ async function main() {
      */
 
     //loads all the input functions
-    loadInputFunctions(whiteboard, whiteboard2);
+    loadInputFunctions();
 
     // message recieve test
 

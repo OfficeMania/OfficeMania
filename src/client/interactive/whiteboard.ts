@@ -4,6 +4,7 @@ import {getRoom, loadImage, PlayerRecord, getPlayers} from "../util";
 import {ArraySchema} from "@colyseus/schema";
 import {MessageType} from "../../common/util";
 import { Interactive } from "./interactive";
+import { checkInputMode } from "../main";
 
 
 export class Whiteboard extends Interactive{
@@ -36,6 +37,10 @@ export class Whiteboard extends Interactive{
         this.players = getPlayers();
 
         this.clearButton.addEventListener("click", () => this.clearPressed(this));
+        this.clearButton.style.top = "20%"
+        this.clearButton.style.left = "20%"
+
+        this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
 
         this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
 
@@ -53,10 +58,12 @@ export class Whiteboard extends Interactive{
         this.canvas.addEventListener('mouseenter', (e) => {
             this.setPosition(e, this)
         });
-        window.addEventListener('resize', () => this.resize(window.innerWidth, window.innerHeight, this))
+        window.addEventListener('resize', () => this.resize(this))
 
         this.canvas.width = 1280;
         this.canvas.height = 720;
+
+        this.resize(this);
     }
 
     rect(e, whiteboard: Whiteboard){
@@ -67,8 +74,33 @@ export class Whiteboard extends Interactive{
     }
 
     onInteraction(){
-        this.setup(this.canvas);
-        this.redraw(this);
+        if (this.isVisible === true) {
+            this.isVisible = false;
+            this.canvas.style.visibility = "hidden";
+            this.clearButton.style.visibility = "hidden";
+            
+            checkInputMode()
+
+            if(Whiteboard.currentWhiteboard === this.wID){
+                Whiteboard.currentWhiteboard = -1;
+            }
+        } else {
+            this.isVisible = true;
+            this.canvas.style.visibility = "visible";
+            this.clearButton.style.visibility = "visible";
+
+            checkInputMode()
+
+            Whiteboard.currentWhiteboard = this.wID
+
+            this.resize(this);
+            this.setup(this.canvas);
+            this.redraw(this);
+        }
+    }
+
+    loop(){
+        
     }
 
     setup(canvas) {
@@ -85,12 +117,12 @@ export class Whiteboard extends Interactive{
     redraw(whiteboard: Whiteboard){
         whiteboard.setup(whiteboard.canvas)
         for (const [player] of whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer) {
-            whiteboard.addPlayer(player);
+            whiteboard.resetPlayer(player);
             whiteboard.drawOthers(player, whiteboard);
         }
     }
 
-    addPlayer(player: string) {
+    resetPlayer(player: string) {
         this.whiteboardPlayer[player] = 0;
     }
 
@@ -116,45 +148,22 @@ export class Whiteboard extends Interactive{
         return this.isVisible;
     }
 
-    toggelIsVisible() {
-        if (this.isVisible === true) {
-            this.isVisible = false;
-            this.canvas.style.visibility = "hidden";
-            this.clearButton.style.visibility = "hidden";
-
-            if(Whiteboard.currentWhiteboard === this.wID){
-                Whiteboard.currentWhiteboard = -1;
-            }
-        } else {
-            this.isVisible = true;
-            this.canvas.style.visibility = "visible";
-            this.clearButton.style.visibility = "visible";
-
-            Whiteboard.currentWhiteboard = this.wID
-            this.onInteraction();
-        }
-    }
-
     getCanvas() {
         return this.canvas
     }
 
-    resize(width: number, height: number, whiteboard: Whiteboard) {
+    resize(whiteboard: Whiteboard) {
         if(Whiteboard.currentWhiteboard !== whiteboard.wID){
             return;
         }
-        whiteboard.offsetX = Math.round(width / 2) - Math.round(this.canvas.width / 2);
-        whiteboard.offsetY = Math.round(height / 2) - Math.round(this.canvas.height / 2);
 
-        whiteboard.stretchX = whiteboard.canvas.width / 1280 
-        whiteboard.stretchY = whiteboard.canvas.height / 720
-        
+        var rect: DOMRect = whiteboard.canvas.getBoundingClientRect();
 
-        whiteboard.canvas.style.left = this.offsetX + "px";
-        whiteboard.canvas.style.top = this.offsetY + "px";
+        whiteboard.offsetX = rect.left
+        whiteboard.offsetY = rect.top
 
-        whiteboard.clearButton.style.left = this.offsetX + 4 + "px";
-        whiteboard.clearButton.style.top = this.offsetY + 4 + "px";
+        whiteboard.stretchX = 1280 / rect.width 
+        whiteboard.stretchY = 720 / rect.height
     }
 
     // new position from mouse event
@@ -164,9 +173,6 @@ export class Whiteboard extends Interactive{
         }
         whiteboard.x = (e.clientX - whiteboard.offsetX) * whiteboard.stretchX;
         whiteboard.y = (e.clientY - whiteboard.offsetY) * whiteboard.stretchY;
-        //console.log(e.clientX - whiteboard.offsetX, e.clientY - whiteboard.offsetY)
-        //console.log(whiteboard.canvas.width, whiteboard.canvas.height, "canvas")
-        //console.log(whiteboard.interactiveBar.clientWidth, whiteboard.interactiveBar.clientHeight, "div")
     }
 
     private draw(e, whiteboard: Whiteboard) {

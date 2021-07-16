@@ -96,7 +96,7 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
     }
 }
 
-export function loadInputFunctions(whiteboard: Whiteboard, whiteboard2: Whiteboard) {
+export function loadInputFunctions() {
     function onKeyDown(e: KeyboardEvent) {
         if (inputMode === InputMode.SETTINGS) {
             return;
@@ -123,12 +123,6 @@ export function loadInputFunctions(whiteboard: Whiteboard, whiteboard2: Whiteboa
                 nextIndex = 0;
             }
             setCharacter(filenames[nextIndex]);
-        });
-        onPureKey(e, "i", () => {
-            whiteboard.toggelIsVisible();
-        });
-        onPureKey(e, "j", () => {
-            whiteboard2.toggelIsVisible();
         });
         //rename players name
         onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")));

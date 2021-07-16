@@ -282,21 +282,20 @@ body {
 }
 
 #interactive-bar button {
+    margin-left: 20%;
+    margin-top: 15%;
     height: 40px;
     width: 40px;
     cursor: pointer;
     font-size: 110%;
     font-weight: bold;
-    position: relative;
+    position: absolute;
     margin: 5px;
     color: #3a3a50;
     background: #f8f8f8;
     border: solid;
     border-width: 2px;
     border-radius: 10px;
-    /*position: absolute;*/
-    top: 0;
-    left: 0;
     z-index: 1;
     visibility: hidden;
 }
@@ -310,7 +309,7 @@ body {
     height: 80%;
 }
 
-#whiteboard-bar button {
+/*#interactive-bar button {
     height: 40px;
     width: 40px;
     cursor: pointer;
@@ -327,7 +326,7 @@ body {
     left: 0;
     z-index: 1;
     visibility: hidden;
-}
+}*/
 
 .player-state {
     display: flex;
