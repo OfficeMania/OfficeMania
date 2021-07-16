@@ -108,7 +108,12 @@ const optionsAudioTrack = {
 
 const optionsCamTrack = {
     devices: [trackTypeVideo],
-    maxFps: 30
+    maxFps: 30,
+    constraints: {
+        video: {
+            aspectRatio: 16 / 9,
+        }
+    }
 }
 
 const optionsDesktopTrack = {
