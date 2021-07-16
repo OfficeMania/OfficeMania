@@ -2,8 +2,8 @@ import {Room} from "colyseus.js";
 import {State} from "../../common";
 import {MessageType} from "../../common/util";
 import {Interactive} from "./interactive";
-import { setInputMode } from "../input";
-import { getRoom, InputMode } from "../util";
+import {setInputMode} from "../input";
+import {createCloseInteractionButton, getRoom, InputMode, removeCloseInteractionButton} from "../util";
 
 export class Todo extends Interactive {
 
@@ -44,7 +44,7 @@ export class Todo extends Interactive {
         this.room.send(MessageType.LIST_USE, this.id.toString())
 
         this.canvas.style.visibility = "visible";
-        this.createButton();
+        createCloseInteractionButton(() => this.leave());
         this.paint();
         setInputMode(InputMode.WRITETODO);
 
@@ -52,7 +52,7 @@ export class Todo extends Interactive {
     }
 
     leave(){
-        document.getElementById("close").remove();
+        removeCloseInteractionButton();
         document.removeEventListener("keydown", this.inputLam);
 
         this.syncServer();
@@ -60,14 +60,6 @@ export class Todo extends Interactive {
 
         this.canvas.style.visibility = "hidden";
         setInputMode(InputMode.NORMAL);
-    }
-
-    createButton(){
-        const button = document.createElement("BUTTON");
-        button.addEventListener("click", () => this.leave())
-        button.innerHTML = "<em class = \"fa fa-times\"></em>";
-        button.id = "close";
-        this.buttonBar.appendChild(button);
     }
 
     syncServer(){
@@ -108,10 +100,10 @@ export class Todo extends Interactive {
             } else {
                 this.content = this.content.slice(0, this.marker - this.content.length - 1) + this.content.slice(this.marker - this.content.length, this.content.length);
             }
-            this.marker = this.marker - 1; 
+            this.marker = this.marker - 1;
         }
 
-        
+
         else if(e.key === "ArrowLeft") {
             if(this.marker > 0){
                 this.marker--;
