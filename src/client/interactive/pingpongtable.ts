@@ -1,10 +1,17 @@
 import {Room} from "colyseus.js";
 import {State} from "../../common";
 import {PongState} from "../../common/rooms/schema/state";
-import {Direction,  MessageType} from "../../common/util";
+import {Direction, MessageType} from "../../common/util";
 import {checkInputMode} from "../main";
 import {Player} from "../player";
-import {getOurPlayer, getPlayers, getRoom, PlayerRecord} from "../util";
+import {
+    createCloseInteractionButton,
+    getOurPlayer,
+    getPlayers,
+    getRoom,
+    PlayerRecord,
+    removeCloseInteractionButton
+} from "../util";
 import {Interactive} from "./interactive";
 import {Pong, PongPlayer} from "./pong";
 import {PongMessage} from "../../common/handler/ponghandler";
@@ -37,7 +44,7 @@ export class PingPongTable extends Interactive {
             ourGame.canvas.style.visibility = "visible";
             checkInputMode();
             this.initListener();
-            
+
         } else {
             console.log("already in a game");
         }
@@ -52,7 +59,7 @@ export class PingPongTable extends Interactive {
                     console.log("1st0");
                     console.log(ourGame);
                     console.log("ourgame");
-                    this.createAuxilaryStuff();
+                    createCloseInteractionButton(() => this.leave());
                     break;
                 }
                 case PongMessage.UPDATE: {
@@ -122,13 +129,12 @@ export class PingPongTable extends Interactive {
     }
 
     leave() {
+        removeCloseInteractionButton();
         ourGame.canvas.style.visibility = "hidden";
         this.room.removeAllListeners();
-        document.getElementById("close").remove();
         this.room.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
         ourGame = null;
         checkInputMode();
-        document.getElementById("p");
     }
     onLeave() {
         if (!this.room.state.pongStates[ourGame.selfGameId.toString()]) {
@@ -170,24 +176,7 @@ export class PingPongTable extends Interactive {
             }
         }
     }
-    createAuxilaryStuff() {
-        const button = document.createElement("BUTTON");
-        button.addEventListener("click", () => this.leave())
-        let em = document.createElement("em");
-        em.classList.add("fa");
-        em.classList.add("fa-times");
-        button.append(em);
-        button.id = "close";
-        button.style.visibility = "hidden";
-        this.buttonBar.appendChild(button);
-        button.style.visibility = "visible";
-        let p = document.createElement("p");
-        p.innerText = "";
-        p.style.position = "absolute";
-        ourGame.p = p;
-        this.interactiveBar.append(p);
-        console.log("created auxilary stuffs");
-    }
+
     updateInput() {
         //console.log(this.input);
         switch (this.input[0]) {
