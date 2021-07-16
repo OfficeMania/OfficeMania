@@ -494,7 +494,6 @@ export function toggleSharing(done: (enabled: boolean) => void) {
 
 const minDistance: number = 300;
 const minDistanceSquared: number = minDistance * minDistance;
-const openRooms: number[] = [7, 16, 28]; //FIXME This should be read from the Map and not be hardcoded here
 
 export function nearbyPlayerCheck() {
     const players: PlayerRecord = getPlayers();
@@ -505,8 +504,9 @@ export function nearbyPlayerCheck() {
     const playersNearby: string[] = [];
     //TODO Check if they are on the same map
     const [ourX, ourY] = getCorrectedPlayerCoordinates(ourPlayer);
-    const ourRoomId: number = collisionInfo[ourX]?.[ourY]?.roomId;
-    const isOurRoomOpen: boolean = ourRoomId && openRooms.includes(ourRoomId);
+    const solidInfo: solidInfo = collisionInfo[ourX]?.[ourY];
+    const ourRoomId: number = solidInfo?.roomId;
+    const isOurRoomConferenceRoom: boolean = solidInfo?.isConferenceRoom;
     for (const player of Object.values(players)) {
         if (player.id === ourPlayer.id) {
             continue;
@@ -527,7 +527,7 @@ export function nearbyPlayerCheck() {
             continue;
         }
         const distanceSquared = Math.pow(player.positionX - ourPlayer.positionX, 2) + Math.pow(player.positionY - ourPlayer.positionY, 2);
-        if (distanceSquared <= minDistanceSquared || (isOurRoomOpen && sameRoom)) {
+        if (distanceSquared <= minDistanceSquared || (isOurRoomConferenceRoom && sameRoom)) {
             playersNearby.push(player.participantId);
             continue;
         }
