@@ -65,15 +65,7 @@ const MS_PER_UPDATE2 = 15;
 export var lowestX;
 export var lowestY;
 
-function $<T extends HTMLElement>(a: string) {
-    return <T>document.getElementById(a);
-}
-
 // Mute Buttons
-
-const muteButton = $<HTMLButtonElement>("button-mute-audio");
-const camButton = $<HTMLButtonElement>("button-mute-video");
-const shareButton = $<HTMLButtonElement>("button-share-video");
 
 muteButton.addEventListener("click", () => toggleMute("audio"));
 camButton.addEventListener("click", () => toggleMute("video"));
@@ -112,25 +104,11 @@ function toggleMute(type: string) {
 
 // Settings
 
-const settingsModal = $<HTMLDivElement>("settings-modal");
-const settingsButton = $<HTMLButtonElement>("button-settings");
-const usersButton = $<HTMLButtonElement>("button-users");
-
-const settingsOkButton = $<HTMLButtonElement>("button-settings-ok");
-//const settingsCancelButton = $<HTMLButtonElement>("button-settings-cancel");
-const settingsApplyButton = $<HTMLButtonElement>("button-settings-apply");
-
 settingsButton.addEventListener("click", () => onSettingsOpen());
 usersButton.addEventListener("click", () => toggleShowParticipantsTab());
 
 settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
-
-const usernameInput = $<HTMLInputElement>("input-settings-username");
-const characterSelect = $<HTMLSelectElement>("character-select");
-const characterPreview = $<HTMLSelectElement>("character-preview");
-
-const interactiveCanvas = $<HTMLCanvasElement>("interactive");
 
 
 
@@ -280,8 +258,6 @@ async function main() {
     /*
      * Then, we wait for our map to load
      */
-    let canvas = $<HTMLCanvasElement>("canvas");
-    let background = $<HTMLCanvasElement>("background");
 
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
@@ -337,7 +313,6 @@ async function main() {
      */
 
     let playerNearbyTimer = 0;
-    let interactionShown = false;
 
     function loop(now: number) {
 
