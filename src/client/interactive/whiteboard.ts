@@ -1,11 +1,17 @@
 import {Room} from "colyseus.js";
 import {State} from "../../common";
-import {getRoom, loadImage, PlayerRecord, getPlayers} from "../util";
+import {
+    createCloseInteractionButton,
+    getPlayers,
+    getRoom,
+    loadImage,
+    PlayerRecord,
+    removeCloseInteractionButton
+} from "../util";
 import {ArraySchema} from "@colyseus/schema";
 import {MessageType} from "../../common/util";
-import { Interactive } from "./interactive";
-import { checkInputMode } from "../main";
-
+import {Interactive} from "./interactive";
+import {checkInputMode} from "../main";
 
 export class Whiteboard extends Interactive{
 
@@ -62,16 +68,8 @@ export class Whiteboard extends Interactive{
             this.hide()
         } else {
             this.show()
-            this.createButton();
+            createCloseInteractionButton(() => this.leave());
         }
-    }
-
-    createButton(){
-        const button = document.createElement("BUTTON");
-        button.addEventListener("click", () => this.leave())
-        button.innerHTML = "<em class = \"fa fa-times\"></em>";
-        button.id = "close";
-        this.buttonBar.appendChild(button);
     }
 
     hide(){
@@ -82,7 +80,7 @@ export class Whiteboard extends Interactive{
 
         window.removeEventListener('resize', this.resized);
 
-        document.getElementById("close").remove();
+        removeCloseInteractionButton();
 
         this.isVisible = false;
         this.canvas.style.visibility = "hidden";
@@ -102,7 +100,7 @@ export class Whiteboard extends Interactive{
     }
 
     show(){
-                
+
         this.canvas.addEventListener('mousemove',this.mousemove);
         this.canvas.addEventListener('mousedown',this.mousedown);
         this.canvas.addEventListener('mouseup',this.mouseup);
@@ -110,7 +108,7 @@ export class Whiteboard extends Interactive{
 
         //size changed
         window.addEventListener('resize', this.resized);
-        
+
         this.clearButton.setAttribute("aria-label", "Clear Whiteboard");
         this.clearButton.innerHTML = "<em class=\"fa fa-trash\"></em>"
         this.isVisible = true;
@@ -123,7 +121,7 @@ export class Whiteboard extends Interactive{
 
         this.resize(this);
         this.setup(this.canvas);
-        this.redraw(this);     
+        this.redraw(this);
     }
 
     loop(){}
@@ -172,7 +170,7 @@ export class Whiteboard extends Interactive{
         whiteboard.offsetX = rect.left
         whiteboard.offsetY = rect.top
 
-        whiteboard.stretchX = 1280 / rect.width 
+        whiteboard.stretchX = 1280 / rect.width
         whiteboard.stretchY = 720 / rect.height
     }
 
