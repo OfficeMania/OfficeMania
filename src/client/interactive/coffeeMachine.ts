@@ -1,6 +1,7 @@
 import {Interactive} from "./interactive";
-import {setInputMode} from "../input";
+import {getInputMode, setInputMode} from "../input";
 import {createCloseInteractionButton, InputMode, removeCloseInteractionButton} from "../util";
+import { checkInputMode } from "../main";
 
 export class CoffeeMachine extends Interactive {
 
@@ -45,10 +46,14 @@ export class CoffeeMachine extends Interactive {
     loop() {}
 
     onInteraction() {
-        this.canvas.style.visibility = "visible";
-        createCloseInteractionButton(() => this.leave());
-        setInputMode(InputMode.WRITETODO);
-        this.searchText();
+        if(getInputMode() !== InputMode.INTERACTION) {
+            this.canvas.style.visibility = "visible";
+            createCloseInteractionButton(() => this.leave());
+            setInputMode(InputMode.INTERACTION);
+            this.searchText();
+        }
+        else this.leave();
+        
     }
 
     searchText() {
