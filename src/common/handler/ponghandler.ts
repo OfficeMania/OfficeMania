@@ -64,6 +64,7 @@ function onPongInteraction(room: Room<State>, client, message: PongMessage) {
                 }
             }
             setTimeout(() => client.send(MessageType.PONG_INTERACTION, PongMessage.INIT), 1000);
+            console.log("sent message init to client")
             setTimeout(() => room.clients.forEach((client) => client.send(MessageType.PONG_INTERACTION, PongMessage.UPDATE)), 1000);
             break;
         }
@@ -122,21 +123,21 @@ function onPongMovePlayer(message: string, gameState: PongState, pos: number, ca
 
 function initNewState(room: Room<State>, client: Client) {
     console.log("creating new pongstate");
-                    console.log(getNextPongSlot(room));
-                    let ar = getNextPongSlot(room);
-                    let newState = new PongState();
-                    newState.playerA = client.sessionId;
-                    newState.velocities.push(10, 10);
-                    newState.sizes.push(30, 150)
-                    newState.posPlayerA = 360 - (newState.sizes.at(1) / 2);
-                    newState.velBallX = 0.8;
-                    newState.velBallY = 0.2;
-                    newState.posBallX = 640-(newState.sizes.at(0)/2);
-                    newState.posBallY = 320-(newState.sizes.at(0)/2);
-                    newState.scoreA = 0;
-                    newState.scoreB = 0;
-                    room.state.pongStates[ar.toString()] = newState;
-                    console.log(room.state.pongStates[ar.toString()].posPlayerA);
+    console.log(getNextPongSlot(room));
+    let ar = getNextPongSlot(room);
+    let newState = new PongState();
+    newState.playerA = client.sessionId;
+    newState.velocities.push(10, 10);
+    newState.sizes.push(30, 150)
+    newState.posPlayerA = 360 - (newState.sizes.at(1) / 2);
+    newState.velBallX = 0.8;
+    newState.velBallY = 0.2;
+    newState.posBallX = 640-(newState.sizes.at(0)/2);
+    newState.posBallY = 320-(newState.sizes.at(0)/2);
+    newState.scoreA = 0;
+    newState.scoreB = 0;
+    room.state.pongStates[ar.toString()] = newState;
+    console.log(room.state.pongStates[ar.toString()].posPlayerA);
 }
 
 function leavePongGame(room: Room<State>, client: Client) {
@@ -144,23 +145,21 @@ function leavePongGame(room: Room<State>, client: Client) {
     if (n === -1) {
         return;
     }
-    const game: PongState = room.state.pongStates[n.toString()];
-    if (game.playerA === client.sessionId) {
-        game.playerA = null;
-    } else {
-        game.playerB = null;
-    }
-    if (game.playerA === null && game.playerB === null) {
-        room.state.pongStates.delete(n.toString());
-    }
-    setTimeout(() => room.clients.forEach((client) => client.send(MessageType.PONG_UPDATE, "pong-update")), 1000)
+    console.log("deleting " + n);
+    let otherClient: Client;
+    room.clients.forEach((nclient) => {if (nclient.sessionId !== client.sessionId && getPongGame(room, nclient) === n) {otherClient = nclient}});
+    room.state.pongStates.delete(n.toString());
+    setTimeout(() => {
+        //client.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE); 
+        otherClient?.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE)
+    }, 1000);
 }
 
 
 
 function getPongGame(room: Room<State>, client): number {
-    for (let i = 0; i < room.state.pongStates.size; i++) {
-        if (room.state.pongStates[i.toString()].playerA === client.sessionId || room.state.pongStates[i.toString()].playerB === client.sessionId) {
+    for (let i = 0; i <= getHighestIndexPongState(room); i++) {
+        if (room.state.pongStates[i.toString()]?.playerA === client.sessionId || room.state.pongStates[i.toString()]?.playerB === client.sessionId) {
             return i;
         }
     }
@@ -168,17 +167,18 @@ function getPongGame(room: Room<State>, client): number {
 }
 
 function getEmptyPongGame(room: Room<State>): number {
-    if (!room.state.pongStates.size) {
-        return -1;
-    }
-    for (let i = 0; i < room.state.pongStates.size; i++) {
-        const playerA = room.state.pongStates[i.toString()].playerA;
-        const playerB = room.state.pongStates[i.toString()].playerB;
-        console.debug("playerA=", playerA);
-        console.debug("playerB=", playerB);
-        if (!playerA || !playerB){
-            return i;
+    for (let i = 0; i < getHighestIndexPongState(room); i++) {
+        if (room.state.pongStates[i.toString()]) {
+            const playerA = room.state.pongStates[i.toString()]?.playerA;
+            const playerB = room.state.pongStates[i.toString()]?.playerB;
+            console.debug("playerA=", playerA);
+            console.debug("playerB=", playerB);
+            if (!playerA || !playerB){
+                return i;
+            }
         }
+        else return -1;
+        
     }
     return -1;
 }
@@ -196,39 +196,41 @@ function getNextPongSlot(room: Room<State>): number {
 }
 function onPongUpdate(client: Client, room: Room<State>) {
     const gameState: PongState = room.state.pongStates[getPongGame(room, client).toString()];
-    let posX = gameState.posBallX;
-    let posY = gameState.posBallY;
-    posX += gameState.velBallX * gameState.velocities.at(0);
-    //console.log(posX);
-    posY += gameState.velBallY * gameState.velocities.at(0);
-    if (posY > 720 - gameState.sizes.at(0)/2 || posY < 0 + gameState.sizes.at(0)/2) {
-        gameState.velBallY *= -1;
-    }
-    gameState.posBallY = posY;
-    if(hasScored) {
-        return;
-    }
-    if (posX > 1380 - gameState.sizes.at(0)/2) { 
-        if(gameState.playerB){
-            gameState.scoreB++;
-            hasScored = true;
-            startNextRound(gameState);
+    if(gameState && client.sessionId === gameState.playerA) {
+        let posX = gameState.posBallX;
+        let posY = gameState.posBallY;
+        posX += gameState.velBallX * gameState.velocities.at(0);
+        //console.log(posX);
+        posY += gameState.velBallY * gameState.velocities.at(0);
+        if (posY > 720 - gameState.sizes.at(0)/2 || posY < 0 + gameState.sizes.at(0)/2) {
+            gameState.velBallY *= -1;
         }
-        else gameState.velBallX *= -1;
-        
-        //console.log("hit the wall")
-    }
-    else if(posX < -100 + gameState.sizes.at(0)/2) {
-        if(gameState.playerA){
-            gameState.scoreA++;
-            hasScored = true;
-            startNextRound(gameState);
+        gameState.posBallY = posY;
+        if(hasScored) {
+            return;
         }
-        else gameState.velBallX *= -1;
+        if (posX > 1380 - gameState.sizes.at(0)/2) { 
+            if(gameState.playerB){
+                gameState.scoreB++;
+                hasScored = true;
+                startNextRound(gameState);
+            }
+            else gameState.velBallX *= -1;
+            
+            //console.log("hit the wall")
+        }
+        else if(posX < -100 + gameState.sizes.at(0)/2) {
+            if(gameState.playerA){
+                gameState.scoreA++;
+                hasScored = true;
+                startNextRound(gameState);
+            }
+            else gameState.velBallX *= -1;
+        }
+        checkCollision(client, gameState);
+        gameState.posBallX = posX;
+        //console.log(gameState.posBallX +" " + gameState.posBallY)
     }
-    checkCollision(client, gameState);
-    gameState.posBallX = posX;
-    //console.log(gameState.posBallX +" " + gameState.posBallY)
 }
 function checkCollision(client: Client, gameState: PongState) {
     if(gameState.posBallX <= 20 && gameState.posBallX >= 0 && gameState.velBallX < 0) {
@@ -280,5 +282,16 @@ function startNextRound(game:PongState){
     game.posBallX = 444;
     game.posBallY = 1100;
     setTimeout(() => startNewRound(game), 1000);
+}
+function getHighestIndexPongState(room: Room<State>): number {
+    let highestInt = -1;
+    room.state.pongStates.forEach((key, value) => {
+        if(parseInt(value) > highestInt){
+            highestInt = parseInt(value)
+            //console.log(highestInt);
+        }
+    });
+    highestInt > -1? highestInt++: {};
+    return highestInt;
 }
 

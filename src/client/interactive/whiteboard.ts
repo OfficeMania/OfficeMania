@@ -25,8 +25,14 @@ export class Whiteboard extends Interactive{
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
 
-    private clearButton = <HTMLButtonElement>document.getElementById("button-clear-whiteboard");
+    private clearButton = <HTMLButtonElement>document.getElementById("button-interactive");
 
+    mousemove = (e) => this.draw(e, this)
+    mousedown = (e) => this.mouseDown(e, this)
+    mouseup = (e) => this.mouseUp(e, this)
+    mouseenter = (e) => this.mouseEnter(e, this)
+
+    resized = () => this.resize(this);
 
     constructor() {
 
@@ -39,7 +45,7 @@ export class Whiteboard extends Interactive{
         this.players = getPlayers();
 
         this.clearButton.addEventListener("click", () => this.clearPressed(this));
-        this.clearButton.style.top = "20%"
+        this.clearButton.style.top = "30%"
         this.clearButton.style.left = "20%"
 
         this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
@@ -47,28 +53,6 @@ export class Whiteboard extends Interactive{
         this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
 
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
-
-        //draw events
-        this.canvas.addEventListener('mousemove', (e) => {
-            this.draw(e, this)
-        });
-        this.canvas.addEventListener('mousedown', (e) => {
-            this.mousedown(e, this)
-        });
-        this.canvas.addEventListener('mouseup', (e) => {
-            this.mouseup(e, this)
-        });
-        this.canvas.addEventListener('mouseenter', (e) => {
-            this.mouseenter(e, this)
-        });
-
-        //size changed
-        window.addEventListener('resize', () => {
-            this.resize(this)
-        });
-
-        this.canvas.width = 1280;
-        this.canvas.height = 720;
 
         this.resize(this);
     }
@@ -82,10 +66,19 @@ export class Whiteboard extends Interactive{
     }
 
     hide(){
+        this.canvas.removeEventListener('mousemove',this.mousemove);
+        this.canvas.removeEventListener('mousedown',this.mousedown);
+        this.canvas.removeEventListener('mouseup',this.mouseup);
+        this.canvas.removeEventListener('mouseenter',this.mouseenter);
+
+        window.removeEventListener('resize', this.resized);
+
         this.isVisible = false;
         this.canvas.style.visibility = "hidden";
         this.clearButton.style.visibility = "hidden";
-            
+        this.clearButton.setAttribute("aria-label", "");
+        this.clearButton.innerHTML ="";
+
         checkInputMode()
 
         if(Whiteboard.currentWhiteboard === this.wID){
@@ -94,6 +87,17 @@ export class Whiteboard extends Interactive{
     }
 
     show(){
+                
+        this.canvas.addEventListener('mousemove',this.mousemove);
+        this.canvas.addEventListener('mousedown',this.mousedown);
+        this.canvas.addEventListener('mouseup',this.mouseup);
+        this.canvas.addEventListener('mouseenter',this.mouseenter);
+
+        //size changed
+        window.addEventListener('resize', this.resized);
+        
+        this.clearButton.setAttribute("aria-label", "Clear Whiteboard");
+        this.clearButton.innerHTML = "<em class=\"fa fa-trash\"></em>"
         this.isVisible = true;
         this.canvas.style.visibility = "visible";
         this.clearButton.style.visibility = "visible";
@@ -104,7 +108,7 @@ export class Whiteboard extends Interactive{
 
         this.resize(this);
         this.setup(this.canvas);
-        this.redraw(this);        
+        this.redraw(this);     
     }
 
     loop(){}
@@ -133,9 +137,6 @@ export class Whiteboard extends Interactive{
     }
 
     clearPressed(whiteboard: Whiteboard) {
-        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
-            return;
-        }
         whiteboard.room.send(MessageType.WHITEBOARD_CLEAR, whiteboard.wID);
         whiteboard.clear(whiteboard, whiteboard.wID);
     }
@@ -151,10 +152,6 @@ export class Whiteboard extends Interactive{
     }
 
     resize(whiteboard: Whiteboard) {
-        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
-            return;
-        }
-
         var rect: DOMRect = whiteboard.canvas.getBoundingClientRect();
 
         whiteboard.offsetX = rect.left
@@ -165,9 +162,6 @@ export class Whiteboard extends Interactive{
     }
 
     drawOthers(clientID: string, whiteboard: Whiteboard) {
-        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
-            return;
-        }
         var max: number = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths.length;
         var start: number = whiteboard.whiteboardPlayer[clientID]
         var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths;
@@ -214,9 +208,6 @@ export class Whiteboard extends Interactive{
 
     // new position from mouse event
     private setPosition(e, whiteboard: Whiteboard) {
-        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
-            return;
-        }
         whiteboard.oldX = whiteboard.x;
         whiteboard.oldY = whiteboard.y;
         whiteboard.x = (e.clientX - whiteboard.offsetX) * whiteboard.stretchX;
@@ -224,9 +215,6 @@ export class Whiteboard extends Interactive{
     }
 
     private draw(e, whiteboard: Whiteboard) {
-        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
-            return;
-        }
         // mouse left button must be pressed
         if (e.buttons !== 1) return;
         whiteboard.setPosition(e, whiteboard);
@@ -256,24 +244,18 @@ export class Whiteboard extends Interactive{
     }
 
 
-    mouseup(e, whiteboard: Whiteboard) {
-        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
-            return;
-        }
+    mouseUp(e, whiteboard: Whiteboard) {
         this.setPosition(e, whiteboard);
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
     }
 
-    mousedown(e, whiteboard: Whiteboard){
+    mouseDown(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
         this.setPosition(e, whiteboard);
     }
 
-    mouseenter(e, whiteboard: Whiteboard){
-        if(Whiteboard.currentWhiteboard !== whiteboard.wID || e.buttons !== 1){
-            return;
-        }
+    mouseEnter(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
