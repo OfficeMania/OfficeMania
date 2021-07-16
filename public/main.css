@@ -451,4 +451,11 @@ body {
     #player-online-container.hover.vertical-animation {
         height: calc(100vh - 64px);
     }
+    
+}
+.footer {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    bottom: 0;
 }
