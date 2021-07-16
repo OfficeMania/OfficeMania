@@ -10,7 +10,10 @@ export class VendingMachine extends Interactive{
 
     //TODO VendingMachineOutputs
     outputs = ["You really enjoyed your sip. \nBut then you dropped your bottle :(",
-    "Want some coke? Gimme more money."
+    "Want some coke? Gimme more money.",
+    "The coins are too grimy.",
+    "... and now they are too shiny.",
+    "butts lol",
     ];
 
     constructor(){
@@ -33,23 +36,23 @@ export class VendingMachine extends Interactive{
 
     searchText() {
 
-        let text;
-        let index = this.getRandomInt(0, this.outputs.length + 1);
-
-        for (let i = 0; i < 3; i++) {
-            if(this.outputs[index] === this.lastOutputs[i]){
-                this.searchText();
-                return;
-            }
-        }
+        let text: string;
+        let index: number;
+        index = this.getRandomInt(0, this.outputs.length + 1);
 
         text = this.outputs[index];
 
-        this.lastOutputs[this.counter] = this.outputs[index];
-        if(this.counter === 2){
-            this.counter = 0;
+        if (this.lastOutputs.includes(text) || index === 3) {
+            this.searchText();
+            return;
         }
-        this.counter++;
+        if (this.lastOutputs[0] === this.outputs[2]) {
+            index = 3;
+            text = this.outputs[index];
+        }
+
+        this.lastOutputs.unshift(text);
+        this.lastOutputs.length > 3 && this.lastOutputs.pop();
         this.print(text);
     }
 

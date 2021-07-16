@@ -11,27 +11,27 @@ export class CoffeeMachine extends Interactive {
 
     //TODO Giulia does not good english speaking
     //TODO More options
-    outputs = ["Please refill Water.",
-     "Please enter the secret Code.",
-     "Who stole all the coffee beans?",
-     "Why is the coffee always empty?",
-     "Machine is calcified. Please clean.",
-     "Only sparkling water available. No more coffee for you.",
-     "You already had ten cups of coffee today. Junkie!",
-     "Please select sufficient amount of milk!",
-     "Lorem ipsum.",
-     "Lisää kahvia! (automatically translated to finnish)",
-     "Pleas kofee fill now to get koffe.",
-     "Do change the filter, please?",
-     "Please refill coffee beans.",
-     "Please refill sugar.",
-     "Please refill uranium oxide.",
-     "Display broken. Could not display error message.",
-     "Look! Behind you! Turn around now!",
-     "Have you ever had a dreams, thats... you- erm- you hads- you'd- you would- you could- you'd do- you would- you want's- you- you could do so- you- you'd do- you could- you- you wanted- you want them to do you so much you could do anything?",
-     "Please restart.",
-     "Try again, loser!",
-     "Please try turning off and on again."
+    outputs = ["Please refill water.",
+        "Please enter the secret code.",
+        "Who stole all the coffee beans?",
+        "Why is the coffee always empty?",
+        "Machine is calcified. Please clean.",
+        "Only sparkling water available. No more coffee for you.",
+        "You already had ten cups of coffee today. Junkie!",
+        "Please select sufficient amount of milk!",
+        "Lorem ipsum.",
+        "Lisää kahvia! (automatically translated to finnish)",
+        "Pleas kofee fill now to get koffe.",
+        "Do change the filter, please?",
+        "Please refill coffee beans.",
+        "Please refill sugar.",
+        "Please refill uranium oxide.",
+        "Display broken. Could not display error message.",
+        "Look! Behind you! Turn around now!",
+        "Have you ever had a dreams, thats... you- erm- you hads- you'd- you would- you could- you'd do- \nyou would- you want's- you- you could do so- you- you'd do- you could- you- you wanted- \nyou want them to do you so much you could do anything?",
+        "Please restart.",
+        "Try again, loser!",
+        "Please try turning off and on again."
     ];
 
     constructor(){
@@ -57,20 +57,15 @@ export class CoffeeMachine extends Interactive {
         let text;
         let index = this.getRandomInt(0, this.outputs.length + 1);
 
-        for (let i = 0; i < 3; i++) {
-            if(this.outputs[index] === this.lastOutputs[i]){
-                this.searchText();
-                return;
-            }
+        if (this.lastOutputs.includes(text)) {
+            this.searchText();
+            return;
         }
 
         text = this.outputs[index];
 
-        this.lastOutputs[this.counter] = this.outputs[index];
-        if(this.counter === 2){
-            this.counter = 0;
-        }
-        this.counter++;
+        this.lastOutputs.unshift(text);
+        this.lastOutputs.length > 3 && this.lastOutputs.pop();
         this.print(text);
     }
 
