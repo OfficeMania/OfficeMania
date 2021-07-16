@@ -31,7 +31,6 @@ export class PlayerHandler implements Handler {
         this.room.state.players[client.sessionId].y = 0;
         this.room.state.players[client.sessionId].cooldown = 0;
         this.room.state.players[client.sessionId].participantId = null;
-        this.room.broadcast("newPlayer", client); //Does this get used any where?
     }
 
     onLeave(client: Client, consented: boolean) {

@@ -30,7 +30,7 @@ import {
     updateUsers
 } from "./conference/conference";
 import {playerLoop} from "./movement";
-import {checkInteraction, getInputMode, loadInputFunctions, setInputMode} from "./input";
+import {checkInteraction, currentInteraction, getInputMode, loadInputFunctions, setInputMode} from "./input";
 import {drawPlayer} from "./drawplayer"
 import {Whiteboard} from "./interactive/whiteboard"
 
@@ -199,7 +199,8 @@ function loadCharacterSettings() {
 }
 
 function onSettingsOpen() {
-    interactiveCanvas.style.visibility = "hidden";
+    if(currentInteraction === null){interactiveCanvas.style.visibility = "hidden";}
+    currentInteraction?.hide();
     loadSettings();
     setInputMode(InputMode.SETTINGS);
 }

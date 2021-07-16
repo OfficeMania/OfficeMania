@@ -85,5 +85,13 @@ export class Interactive {
     updateInput(): void {
         console.log("No input method speccified");
     }
+
+    hide(): void{
+        this.canvas.style.visibility = "hidden";
+    }
+
+    show(): void{
+        this.canvas.style.visibility = "visible";
+    }
 }
 

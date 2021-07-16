@@ -12,6 +12,8 @@ export class Whiteboard extends Interactive{
     private isVisible: boolean = false;
     private x: number = 0;
     private y: number = 0;
+    private oldX: number = 0;
+    private oldY: number = 0;
     private offsetX: number = 100;
     private offsetY: number = 100;
     stretchX: number = 1;
@@ -46,63 +48,67 @@ export class Whiteboard extends Interactive{
 
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
 
+        //draw events
         this.canvas.addEventListener('mousemove', (e) => {
             this.draw(e, this)
         });
         this.canvas.addEventListener('mousedown', (e) => {
-            this.setPosition(e, this)
+            this.mousedown(e, this)
         });
         this.canvas.addEventListener('mouseup', (e) => {
             this.mouseup(e, this)
         });
         this.canvas.addEventListener('mouseenter', (e) => {
-            this.setPosition(e, this)
+            this.mouseenter(e, this)
         });
-        window.addEventListener('resize', () => this.resize(this))
+
+        //size changed
+        window.addEventListener('resize', () => {
+            this.resize(this)
+        });
 
         this.resize(this);
     }
 
-    rect(e, whiteboard: Whiteboard){
-        var canvas = whiteboard.canvas
-        var ctx = canvas.getContext("2d");
-        ctx.fillStyle = "white"
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
     onInteraction(){
         if (this.isVisible === true) {
-            this.isVisible = false;
-            this.canvas.style.visibility = "hidden";
-            this.clearButton.style.visibility = "hidden";
-            this.clearButton.setAttribute("aria-label", "");
-            this.clearButton.innerHTML ="";
-            
-            checkInputMode()
-
-            if(Whiteboard.currentWhiteboard === this.wID){
-                Whiteboard.currentWhiteboard = -1;
-            }
+            this.hide()
         } else {
-            this.clearButton.setAttribute("aria-label", "Clear Whiteboard");
-            this.clearButton.innerHTML = "<em class=\"fa fa-trash\"></em>"
-            this.isVisible = true;
-            this.canvas.style.visibility = "visible";
-            this.clearButton.style.visibility = "visible";
-
-            checkInputMode()
-
-            Whiteboard.currentWhiteboard = this.wID
-
-            this.resize(this);
-            this.setup(this.canvas);
-            this.redraw(this);
+            this.show()
         }
     }
 
-    loop(){
-        
+    hide(){
+        this.isVisible = false;
+        this.canvas.style.visibility = "hidden";
+        this.clearButton.style.visibility = "hidden";
+        this.clearButton.setAttribute("aria-label", "");
+        this.clearButton.innerHTML ="";
+            
+        checkInputMode()
+
+        if(Whiteboard.currentWhiteboard === this.wID){
+            Whiteboard.currentWhiteboard = -1;
+        }
     }
+
+    show(){
+        this.clearButton.setAttribute("aria-label", "Clear Whiteboard");
+        this.clearButton.innerHTML = "<em class=\"fa fa-trash\"></em>"
+        this.isVisible = true;
+        this.canvas.style.visibility = "visible";
+        this.clearButton.style.visibility = "visible";
+
+        checkInputMode()
+
+        Whiteboard.currentWhiteboard = this.wID
+
+        this.resize(this);
+        this.setup(this.canvas);
+        this.redraw(this);        
+    }
+
+    loop(){}
 
     setup(canvas) {
         var ctx = canvas.getContext("2d");
@@ -145,14 +151,6 @@ export class Whiteboard extends Interactive{
         whiteboard.setup(whiteboard.canvas)
     }
 
-    getIsVisible() {
-        return this.isVisible;
-    }
-
-    getCanvas() {
-        return this.canvas
-    }
-
     resize(whiteboard: Whiteboard) {
         if(Whiteboard.currentWhiteboard !== whiteboard.wID){
             return;
@@ -165,31 +163,6 @@ export class Whiteboard extends Interactive{
 
         whiteboard.stretchX = 1280 / rect.width 
         whiteboard.stretchY = 720 / rect.height
-    }
-
-    // new position from mouse event
-    private setPosition(e, whiteboard: Whiteboard) {
-        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
-            return;
-        }
-        whiteboard.x = (e.clientX - whiteboard.offsetX) * whiteboard.stretchX;
-        whiteboard.y = (e.clientY - whiteboard.offsetY) * whiteboard.stretchY;
-    }
-
-    private draw(e, whiteboard: Whiteboard) {
-        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
-            return;
-        }
-        // mouse left button must be pressed
-        if (e.buttons !== 1) return;
-
-        var oldX = whiteboard.x;
-        var oldY = whiteboard.y;
-        whiteboard.setPosition(e, whiteboard);
-
-        this.drawLine(oldX, oldY, whiteboard.x, whiteboard.y, whiteboard)
-
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, oldX, oldY])
     }
 
     drawOthers(clientID: string, whiteboard: Whiteboard) {
@@ -211,15 +184,19 @@ export class Whiteboard extends Interactive{
         for (var i: number = start; i + 3 < max; i++) {
             if (paths[i] === -1) {
                 i = i + 1
+                j = 1;
                 continue;
             } else if (paths[i + 1] === -1) {
                 i = i + 2
+                j = 1;
                 continue;
             } else if (paths[i + 2] === -1) {
                 i = i + 3
+                j = 1;
                 continue;
             } else if (paths[i + 3] === -1) {
                 i = i + 4
+                j = 1;
                 continue;
             }
             if (j === 0) {
@@ -234,6 +211,30 @@ export class Whiteboard extends Interactive{
 
         whiteboard.whiteboardPlayer[clientID] = max - 2;
 
+    }
+
+    // new position from mouse event
+    private setPosition(e, whiteboard: Whiteboard) {
+        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
+            return;
+        }
+        whiteboard.oldX = whiteboard.x;
+        whiteboard.oldY = whiteboard.y;
+        whiteboard.x = (e.clientX - whiteboard.offsetX) * whiteboard.stretchX;
+        whiteboard.y = (e.clientY - whiteboard.offsetY) * whiteboard.stretchY;
+    }
+
+    private draw(e, whiteboard: Whiteboard) {
+        if(Whiteboard.currentWhiteboard !== whiteboard.wID){
+            return;
+        }
+        // mouse left button must be pressed
+        if (e.buttons !== 1) return;
+        whiteboard.setPosition(e, whiteboard);
+
+        this.drawLine(whiteboard.oldX, whiteboard.oldY, whiteboard.x, whiteboard.y, whiteboard)
+
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.oldX, whiteboard.oldY])
     }
 
     makeLine(firstX: number, firstY: number, secondX: number, secondY: number, whiteboard: Whiteboard, ctx) {
@@ -256,12 +257,27 @@ export class Whiteboard extends Interactive{
     }
 
 
-    private mouseup(e, whiteboard: Whiteboard) {
+    mouseup(e, whiteboard: Whiteboard) {
         if(Whiteboard.currentWhiteboard !== whiteboard.wID){
             return;
         }
+        this.setPosition(e, whiteboard);
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
+    }
+
+    mousedown(e, whiteboard: Whiteboard){
+        this.setPosition(e, whiteboard);
+        this.setPosition(e, whiteboard);
+    }
+
+    mouseenter(e, whiteboard: Whiteboard){
+        if(Whiteboard.currentWhiteboard !== whiteboard.wID || e.buttons !== 1){
+            return;
+        }
+        this.setPosition(e, whiteboard);
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
     }
 
 
