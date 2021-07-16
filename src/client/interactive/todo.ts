@@ -1,9 +1,7 @@
 import {Room} from "colyseus.js";
 import {State} from "../../common";
-import {Direction, MessageType} from "../../common/util";
-import { checkInputMode } from "../main";
+import {MessageType} from "../../common/util";
 import {Interactive} from "./interactive";
-import { Whiteboard } from "./whiteboard";
 import { setInputMode } from "../input";
 import { getRoom, InputMode } from "../util";
 
