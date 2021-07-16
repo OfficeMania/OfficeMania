@@ -9,6 +9,7 @@ import { Whiteboard } from "./interactive/whiteboard";
 import { toEditorSettings } from "typescript";
 import { Todo } from "./interactive/todo";
 import { CoffeeMachine } from "./interactive/coffeeMachine";
+import { VendingMachine } from "./interactive/vendingMachine";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -319,6 +320,10 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         //coffee machine
         case 9: {
             return new CoffeeMachine();
+        }
+        //vending machine
+        case 11: {
+            return new VendingMachine();
         }
     }
     return null;
