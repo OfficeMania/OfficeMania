@@ -20,7 +20,7 @@ export class PingPongTable extends Interactive {
     previousInput: Direction[];
 
     constructor() {
-        super("pingpongtable", false, 2)
+        super("Pong table", false, 2)
         this.room = getRoom();
         this.players = getPlayers();
         //this.pongs = [];

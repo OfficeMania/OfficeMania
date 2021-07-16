@@ -453,9 +453,21 @@ body {
     }
     
 }
-.footer {
+#help-footer {
     position: fixed;
     width: 100%;
     left: 0;
     bottom: 0;
+}
+
+#help-footer p {
+    font-size: 30px;
+    margin-left: 220px;
+    margin-bottom: 50px;
+}
+
+#help-footer img {
+    scale: 200%;
+    margin-left: 110px;
+    margin-bottom: -55px;
 }

@@ -29,7 +29,7 @@ export class Todo extends Interactive {
 
 
     constructor(){
-        super("Todo", false, 1);
+        super("sticky notes", false, 1);
         this.id = Todo.todoId;
         Todo.todoId++;
         this.ctx = this.canvas.getContext("2d");

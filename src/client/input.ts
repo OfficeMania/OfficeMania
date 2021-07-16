@@ -180,3 +180,6 @@ export function checkInteraction(executeInteraction: boolean = false): solidInfo
     return solidInfo;
 }
 
+export function getHelpMessage() {
+    return "   to interact with " + checkInteraction().content.name;
+}

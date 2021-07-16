@@ -30,7 +30,7 @@ import {
     updateUsers
 } from "./conference/conference";
 import {playerLoop} from "./movement";
-import {checkInteraction, currentInteraction, getInputMode, loadInputFunctions, setInputMode} from "./input";
+import {checkInteraction, currentInteraction, getHelpMessage, getInputMode, loadInputFunctions, setInputMode} from "./input";
 import {drawPlayer} from "./drawplayer"
 import {Whiteboard} from "./interactive/whiteboard"
 
@@ -360,10 +360,24 @@ async function main() {
                 interactionNearbyButton.addEventListener("click", () => checkInteraction(true));
                 interactionNearbyButton.innerHTML = "<em class=\"fa fa-sign-in-alt\"></em>";
                 $<HTMLDivElement>("panel-buttons-interaction").append(interactionNearbyButton);
+                let spaceButton = document.createElement("img");
+                spaceButton.id = "button-space";
+                spaceButton.src = "../assets/img/transparent_32x32.png"
+                spaceButton.className = "key key-long";
+                spaceButton.style.backgroundPosition = "calc(2 * -32px) calc(5 * -32.1px)";
+                $<HTMLDivElement>("help-footer").append(spaceButton);
+                let interactionPopup = document.createElement("p");
+                interactionPopup.id = "interaction-popup";
+                interactionPopup.innerHTML = getHelpMessage();
+                $<HTMLDivElement>("help-footer").append(interactionPopup);
+
             }
         } else if (interactionShown) {
             interactionShown = false;
+            $<HTMLButtonElement>("button-space")?.remove();
             $<HTMLButtonElement>("button-interact")?.remove();
+            $<HTMLButtonElement>("interaction-popup")?.remove();
+
         }
 
         //DESIGN TODO: when something on the map changes: drawMap
