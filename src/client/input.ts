@@ -1,5 +1,6 @@
 import {
     appendFAIcon,
+    consumeInteractionClosed,
     createInteractionButton,
     getCollisionInfo,
     getCorrectedPlayerFacingCoordinates,
@@ -184,15 +185,20 @@ const ID_BUTTON_INTERACT = "button-interact";
 const ID_INTERACTION_HELP_KEY = "interaction-help-key";
 const ID_INTERACTION_HELP_TEXT = "interaction-help-text";
 
+const interactionNearbyButton: HTMLButtonElement = createInteractionButton(() => checkInteraction(true), ID_BUTTON_INTERACT, (button) => {
+    button.style.opacity = "0";
+    button.style.display = "none";
+});
+appendFAIcon(interactionNearbyButton, "fa-sign-in-alt");
+
 let interactionInfoShown = false;
 
 export function checkInteractionNearby() {
     const solidInfo: solidInfo = checkInteraction();
-    if (solidInfo?.content && getInputMode() !== InputMode.INTERACTION && getInputMode() !== InputMode.WRITETODO) {
+    const fade: boolean = inputMode === InputMode.NORMAL;
+    if (solidInfo?.content && inputMode !== InputMode.INTERACTION && inputMode !== InputMode.WRITETODO) {
         if (!interactionInfoShown) {
             interactionInfoShown = true;
-            const interactionNearbyButton: HTMLButtonElement = createInteractionButton(() => checkInteraction(true), ID_BUTTON_INTERACT);
-            appendFAIcon(interactionNearbyButton, "fa-sign-in-alt");
             const interactionHelpKey: HTMLImageElement = document.createElement("img");
             interactionHelpKey.id = ID_INTERACTION_HELP_KEY;
             interactionHelpKey.src = "../assets/img/transparent_32x32.png";
@@ -203,10 +209,11 @@ export function checkInteractionNearby() {
             interactionHelpText.id = ID_INTERACTION_HELP_TEXT;
             interactionHelpText.innerText = getInteractionHelpMessage(solidInfo);
             helpFooter.append(interactionHelpText);
+            showButton(interactionNearbyButton, fade && !consumeInteractionClosed());
         }
     } else if (interactionInfoShown) {
         interactionInfoShown = false;
-        document.getElementById(ID_BUTTON_INTERACT)?.remove();
+        hideButton(interactionNearbyButton, fade);
         document.getElementById(ID_INTERACTION_HELP_KEY)?.remove();
         document.getElementById(ID_INTERACTION_HELP_TEXT)?.remove();
     }
@@ -214,4 +221,24 @@ export function checkInteractionNearby() {
 
 function getInteractionHelpMessage(solidInfo: solidInfo) {
     return "   to interact with " + solidInfo.content.name;
+}
+
+function showButton(button: HTMLButtonElement, fade: boolean = true) {
+    button.style.display = null;
+    button.disabled = false;
+    if (fade) {
+        setTimeout(() => button.style.opacity = "1", 10);
+    } else {
+        button.style.opacity = "1";
+    }
+}
+
+function hideButton(button: HTMLButtonElement, fade: boolean = true) {
+    interactionNearbyButton.disabled = true;
+    interactionNearbyButton.style.opacity = "0";
+    if (fade) {
+        setTimeout(() => interactionNearbyButton.style.display = "none", 510);
+    } else {
+        interactionNearbyButton.style.display = "none";
+    }
 }
