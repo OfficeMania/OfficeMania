@@ -10,11 +10,17 @@ export class VendingMachine extends Interactive{
 
     //TODO VendingMachineOutputs
     outputs = ["You really enjoyed your sip. \nBut then you dropped your bottle :(",
-    "Want some coke? Gimme more money.",
+    "Want s'more Coke? Pay up.",
     "The coins are too grimy.",
     "... and now they are too shiny.",
     "butts lol",
-    "I don't remember you inserting that money..."
+    "Well I don't remember you inserting that money...",
+    "Was that a dollar, or a penny?",
+    "Better get the maintainance guy!",
+    "Have you seen my cousin, the coffee maker? \nGive him my best.",
+    "Sorry, all out of that.",
+    "Out of order.",
+
     ];
 
     constructor(){
