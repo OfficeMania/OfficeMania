@@ -62,7 +62,16 @@ export class Whiteboard extends Interactive{
             this.hide()
         } else {
             this.show()
+            this.createButton();
         }
+    }
+
+    createButton(){
+        const button = document.createElement("BUTTON");
+        button.addEventListener("click", () => this.leave())
+        button.innerHTML = "<em class = \"fa fa-times\"></em>";
+        button.id = "close";
+        this.buttonBar.appendChild(button);
     }
 
     hide(){
@@ -72,6 +81,8 @@ export class Whiteboard extends Interactive{
         this.canvas.removeEventListener('mouseenter',this.mouseenter);
 
         window.removeEventListener('resize', this.resized);
+
+        document.getElementById("close").remove();
 
         this.isVisible = false;
         this.canvas.style.visibility = "hidden";
@@ -84,6 +95,10 @@ export class Whiteboard extends Interactive{
         if(Whiteboard.currentWhiteboard === this.wID){
             Whiteboard.currentWhiteboard = -1;
         }
+    }
+
+    leave() {
+        this.hide();
     }
 
     show(){
