@@ -214,10 +214,10 @@ function fillSolidInfos(map: mapInfo) {
     }
 
     for (const layer of map.layers) {
-        const isSolidLayer = layer.name.search(LAYER_NAME_SOLID) !== -1;
-        const isContentLayer = layer.name.search(LAYER_NAME_CONTENT) !== -1;
-        const isRoomsLayer = layer.name.search(LAYER_NAME_ROOMS) !== -1;
-        const isConferenceRoomsLayer = layer.name.search(LAYER_NAME_CONFERENCE_ROOMS) !== -1;
+        const isSolidLayer = layer.name === LAYER_NAME_SOLID;
+        const isContentLayer = layer.name === LAYER_NAME_CONTENT;
+        const isRoomsLayer = layer.name === LAYER_NAME_ROOMS;
+        const isConferenceRoomsLayer = layer.name === LAYER_NAME_CONFERENCE_ROOMS;
         if (!(isSolidLayer || isContentLayer || isRoomsLayer || isConferenceRoomsLayer)) {
             continue;
         }
