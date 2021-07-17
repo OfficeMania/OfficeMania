@@ -18,6 +18,7 @@ export const settingsApplyButton = $<HTMLButtonElement>("button-settings-apply")
 export const usernameInput = $<HTMLInputElement>("input-settings-username");
 export const characterSelect = $<HTMLSelectElement>("character-select");
 export const characterPreview = $<HTMLSelectElement>("character-preview");
+export const helpExitButton = $<HTMLSelectElement>("button-help-ok");
 export const interactiveCanvas = $<HTMLCanvasElement>("interactive");
 export const canvas = $<HTMLCanvasElement>("canvas");
 export const background = $<HTMLCanvasElement>("background");

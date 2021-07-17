@@ -119,7 +119,7 @@ observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
 
 export function checkInputMode() {
     if (settingsModal.style.display && !settingsModal.style.display.match(/none/)) {
-        setInputMode(InputMode.SETTINGS);
+        setInputMode(InputMode.IGNORE);
     } else if (!interactiveCanvas.style.visibility.match(/hidden/)) {
         setInputMode(InputMode.INTERACTION);
     } else {
@@ -201,7 +201,7 @@ function onSettingsOpen() {
     if(currentInteraction === null){interactiveCanvas.style.visibility = "hidden";}
     currentInteraction?.hide();
     loadSettings();
-    setInputMode(InputMode.SETTINGS);
+    setInputMode(InputMode.IGNORE);
 }
 
 function onPongOpen() {
@@ -362,7 +362,7 @@ async function main() {
         ctx.restore();
 
         //drawWhiteboard(canvas, whiteboard.getCanvas())
-        if (getInputMode() === InputMode.INTERACTION || getInputMode() === InputMode.WRITETODO) {
+        if (getInputMode() === InputMode.INTERACTION) {
             checkInteraction()?.content?.loop();
         }
 

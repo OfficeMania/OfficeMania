@@ -15,9 +15,8 @@ import {panelButtonsInteraction} from "./static";
 
 export enum InputMode {
     NORMAL = "normal",
-    SETTINGS = "settings",
+    IGNORE = "settings",
     INTERACTION = "interaction",
-    WRITETODO = "writeTodo",
 }
 
 export type InitState = [Room<State>, Player];

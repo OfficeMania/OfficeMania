@@ -4,6 +4,7 @@ import {MessageType} from "../../common/util";
 import {Interactive} from "./interactive";
 import {setInputMode} from "../input";
 import {createCloseInteractionButton, getRoom, InputMode, removeCloseInteractionButton} from "../util";
+import { checkInputMode } from "../main";
 
 export class Todo extends Interactive {
 
@@ -46,7 +47,7 @@ export class Todo extends Interactive {
         this.canvas.style.visibility = "visible";
         createCloseInteractionButton(() => this.leave());
         this.paint();
-        setInputMode(InputMode.WRITETODO);
+        checkInputMode();
 
         document.addEventListener("keydown", this.inputLam);
     }

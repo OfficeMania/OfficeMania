@@ -15,7 +15,7 @@ import {Direction} from "../common/util";
 import {solidInfo} from "./map";
 import {characters} from "./main";
 import {Interactive} from "./interactive/interactive";
-import {camButton, helpButton, helpFooter, muteButton, settingsButton, shareButton} from "./static";
+import {camButton, helpButton, helpExitButton, helpFooter, muteButton, settingsButton, settingsCancelButton, shareButton} from "./static";
 
 let inputMode: InputMode = InputMode.NORMAL;
 
@@ -100,14 +100,18 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
 
 export function loadInputFunctions() {
     function onKeyDown(e: KeyboardEvent) {
-        if (e.key === "Escape" && inputMode !== InputMode.NORMAL) {
-            checkInteraction().content.leave();
-            return;
+        if (e.key === "Escape") {
+            if (inputMode === InputMode.INTERACTION) {
+                checkInteraction().content.leave();
+                return;
+            }
+            if (inputMode === InputMode.IGNORE) {
+                helpExitButton.click();
+                settingsCancelButton.click();
+                return;
+            }
         }
-        if (inputMode === InputMode.WRITETODO) {
-            return;
-        }
-        if (inputMode === InputMode.SETTINGS) {
+        if (inputMode === InputMode.IGNORE || checkInteraction().content.name === "sticky notes") {
             return;
         }
         const ourPlayer = getOurPlayer();
@@ -145,7 +149,7 @@ export function loadInputFunctions() {
     }
 
     function onKeyUp(e: KeyboardEvent) {
-        if (inputMode === InputMode.SETTINGS) {
+        if (inputMode === InputMode.IGNORE) {
             return;
         }
         onDirectionKeyUp(e, "s", Direction.DOWN);
@@ -203,7 +207,7 @@ let interactionInfoShown = false;
 export function checkInteractionNearby() {
     const solidInfo: solidInfo = checkInteraction();
     const fade: boolean = inputMode === InputMode.NORMAL;
-    if (solidInfo?.content && inputMode !== InputMode.INTERACTION && inputMode !== InputMode.WRITETODO) {
+    if (solidInfo?.content && inputMode !== InputMode.INTERACTION && solidInfo.content.name !== "sticky notes") {
         if (!interactionInfoShown) {
             interactionInfoShown = true;
             interactionHelpItem.innerText = solidInfo.content.name;

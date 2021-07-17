@@ -27,13 +27,9 @@ export class Pong {
         this.room = room;
         //this.canvas.style.visibility = "visible";
         this.ctx = this.canvas.getContext("2d");
-        this.ctx.fillStyle = "white"
+        this.ctx.fillStyle = "black"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle = "black";
-        this.ctx.fillRect(5, 5, 10, this.sizeBat)
-        this.ctx.fillStyle = "black";
-        this.ctx.fillRect(this.canvas.width - 15, this.canvas.height - 5 - this.sizeBat, 10, this.sizeBat)
         this.loop();
     }
 
@@ -105,7 +101,7 @@ export class PongPlayer {
     constructor(id: string) {
         this._id = id;
         this._score = 0;
-        this._pos = 0;
+        this._pos = 500;
     }
 
     get id(): string {
