@@ -7,7 +7,6 @@ import {
     getOurPlayer,
     InputMode,
     payRespect,
-    removeChildren,
     setCharacter,
     setUsername
 } from "./util";
@@ -181,12 +180,17 @@ export function checkInteraction(executeInteraction: boolean = false): solidInfo
 
 const ID_BUTTON_INTERACT = "button-interact";
 const ID_HELP_INTERACTION = "help-interaction";
+const ID_HELP_INTERACTION_ITEM = "help-interaction-item";
 
 const interactionNearbyButton: HTMLButtonElement = createInteractionButton(() => checkInteraction(true), ID_BUTTON_INTERACT, (button) => {
     button.style.opacity = "0";
     button.style.display = "none";
 });
 appendFAIcon(interactionNearbyButton, "fa-sign-in-alt");
+const [interactionHelp, interactionHelpItem]: [HTMLDivElement, HTMLSpanElement] = createInteractionHelp();
+interactionHelp.style.opacity = "0";
+interactionHelp.style.display = "none";
+helpFooter.append(interactionHelp);
 
 let interactionInfoShown = false;
 
@@ -196,34 +200,37 @@ export function checkInteractionNearby() {
     if (solidInfo?.content && inputMode !== InputMode.INTERACTION && inputMode !== InputMode.WRITETODO) {
         if (!interactionInfoShown) {
             interactionInfoShown = true;
-            const interactionHelp: HTMLDivElement = createInteractionHelp(solidInfo.content.name);
-            helpFooter.append(interactionHelp);
+            interactionHelpItem.innerText = solidInfo.content.name;
             interactionNearbyButton.disabled = false;
+            showElement(interactionHelp, fade && !consumeInteractionClosed());
             showElement(interactionNearbyButton, fade && !consumeInteractionClosed());
         }
     } else if (interactionInfoShown) {
         interactionInfoShown = false;
         interactionNearbyButton.disabled = true;
         hideElement(interactionNearbyButton, fade);
-        removeChildren(helpFooter);
+        hideElement(interactionHelp, fade);
     }
 }
 
-function createInteractionHelp(interactiveName: string) {
-    const interactionHelp: HTMLDivElement = document.createElement("div");
-    interactionHelp.id = ID_HELP_INTERACTION;
+function createInteractionHelp(): [HTMLDivElement, HTMLSpanElement] {
+    const divElement: HTMLDivElement = document.createElement("div");
+    divElement.id = ID_HELP_INTERACTION;
     const interactionHelpTextPrefix = document.createElement("span");
     interactionHelpTextPrefix.innerText = "Press ";
-    interactionHelp.append(interactionHelpTextPrefix);
+    divElement.append(interactionHelpTextPrefix);
     const interactionHelpKey: HTMLImageElement = document.createElement("img");
     interactionHelpKey.src = "../assets/img/transparent_32x32.png";
     interactionHelpKey.classList.add("key", "key-small");
     interactionHelpKey.style.backgroundPosition = "calc(6 * -32px) calc(-32px)";
-    interactionHelp.append(interactionHelpKey);
+    divElement.append(interactionHelpKey);
     const interactionHelpText = document.createElement("span");
-    interactionHelpText.innerText = "to interact with " + interactiveName;
-    interactionHelp.append(interactionHelpText);
-    return interactionHelp;
+    interactionHelpText.innerText = "to interact with ";
+    divElement.append(interactionHelpText);
+    const spanElement = document.createElement("span");
+    spanElement.id = ID_HELP_INTERACTION_ITEM;
+    divElement.append(spanElement);
+    return [divElement, spanElement];
 }
 
 function showElement(element: HTMLElement, fade: boolean = true) {
