@@ -1,4 +1,4 @@
-import {Direction, MessageType} from "../util";
+import {Direction, MessageType, TaskExecutor} from "../util";
 import {PongState, State} from "../rooms/schema/state";
 import {Client, Room} from "colyseus";
 import {Handler} from "./handler";
@@ -12,6 +12,9 @@ export enum PongMessage {
 }
 const batSections: number[] = [-0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1,  0.2, 0.3, 0.4, 0.5]
 let hasScored: boolean = false;
+
+const taskExecutor:TaskExecutor<void> = new TaskExecutor<void>();
+
 export class PongHandler implements Handler {
 
     room: Room<State>;
@@ -39,31 +42,32 @@ export class PongHandler implements Handler {
     }
 
 }
-let letInit: boolean = true;
+
+function joinPong(room: Room<State>, client) {
+    if (getPongGame(room, client) === -1) {
+        const emptyGame = getEmptyPongGame(room);
+        console.debug("empty game: " + emptyGame);
+        if (emptyGame !== -1) {
+            const emptyState: PongState = room.state.pongStates[emptyGame.toString()];
+            if (emptyState) {
+                emptyState.playerB = client.sessionId;
+                emptyState.posPlayerB = 360 - (emptyState.sizes.at(1) / 2)
+            }
+        } else {
+            initNewState(room, client);
+        }
+    }
+    setTimeout(() => {
+        client.send(MessageType.PONG_INTERACTION, PongMessage.INIT);
+        console.debug("sent message init to client")
+        room.clients.forEach((client) => client.send(MessageType.PONG_INTERACTION, PongMessage.UPDATE));
+    }, 100);
+}
+
 function onPongInteraction(room: Room<State>, client, message: PongMessage) {
     switch (message) {
         case PongMessage.ON_INTERACTION: {
-            if (letInit) {
-                letInit = false;
-                let inGame: number = getPongGame(room, client);
-                if (inGame === -1) {
-                    let emptyGame = getEmptyPongGame(room);
-                    console.log("empty game: " + emptyGame);
-                    if (emptyGame !== -1) {
-                        let emptyState: PongState = room.state.pongStates[emptyGame.toString()];
-                        if (emptyState) {
-                            emptyState.playerB = client.sessionId;
-                            emptyState.posPlayerB = 360 - (emptyState.sizes.at(1) / 2)
-                        }
-                    } else {
-                        initNewState(room, client);
-                    }
-                }
-                client.send(MessageType.PONG_INTERACTION, PongMessage.INIT);
-                console.log("sent message init to client")
-                room.clients.forEach((client) => client.send(MessageType.PONG_INTERACTION, PongMessage.UPDATE));
-            }
-            letInit = true;
+            taskExecutor.queueTask(() => joinPong(room, client)).catch(console.error);
             break;
         }
         case PongMessage.END: {
