@@ -50,13 +50,13 @@ export class Pong {
         } else {
             console.log("still no");
         }
-        if(currentState) {
-            if (currentState.playerB && this.playerB){
+        if (currentState) {
+            if (currentState.playerB && this.playerB) {
                 this.playerB.pos = currentState.posPlayerB;
                 this.playerB.score = currentState.scoreB;
                 //console.log(this.playerB.pos + " playerB");
             }
-            if (currentState.playerA && this.playerA){
+            if (currentState.playerA && this.playerA) {
                 this.playerA.pos = currentState.posPlayerA;
                 this.playerA.score = currentState.scoreA;
                 //console.log(this.playerA.pos + "PlayerA");
@@ -69,29 +69,29 @@ export class Pong {
     paint() {
         this.ctx.fillStyle = "black"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        if(this.playerA){
-            this.ctx.fillStyle ="white";
+
+        if (this.playerA) {
+            this.ctx.fillStyle = "white";
             this.ctx.fillRect(0, this.playerA.pos, 15, this.sizeBat);
             //console.log("painting a");
             //console.log(this.playerA);
         }
         if (this.playerB) {
-            this.ctx.fillStyle ="white";
-            this.ctx.fillRect(this.canvas.width-15, this.playerB.pos, 20, this.sizeBat);
+            this.ctx.fillStyle = "white";
+            this.ctx.fillRect(this.canvas.width - 15, this.playerB.pos, 20, this.sizeBat);
             //console.log("painting b");
             //console.log(this.playerB);
         }
         this.ctx.fillStyle = "white";
-        this.ctx.fillRect(this.posBallX - (this.sizeBall/2), this.posBallY -(this.sizeBall/2), this.sizeBall, this.sizeBall);
+        this.ctx.fillRect(this.posBallX - (this.sizeBall / 2), this.posBallY - (this.sizeBall / 2), this.sizeBall, this.sizeBall);
         if (this.playerA && this.playerB) {
             let scoreTab: string = getPlayerByRoomId(this.playerA.id).name + ": " + this.playerA.score.toString() + " : " + this.playerB?.score.toString() + " :" + getPlayerByRoomId(this.playerB?.id).name;
-            this.ctx.fillStyle ="white";
+            this.ctx.fillStyle = "white";
             this.ctx.textAlign = "center";
             this.ctx.font = "30px Arial"
-            this.ctx.fillText(scoreTab, this.canvas.width/2, 50);
+            this.ctx.fillText(scoreTab, this.canvas.width / 2, 50);
         }
-        this.canvas.style.outline ="black 3px solid";
+        this.canvas.style.outline = "black 3px solid";
     }
 
 }
