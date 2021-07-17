@@ -10,7 +10,7 @@ import {
     setCharacter,
     setUsername
 } from "./util";
-import {toggleMuteByType, toggleShowParticipantsTab} from "./conference/conference";
+import {toggleShowParticipantsTab} from "./conference/conference";
 import {Direction} from "../common/util";
 import {solidInfo} from "./map";
 import {characters} from "./main";
@@ -51,47 +51,50 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direct
     if (!isPureKey(event) || event.key.toLowerCase() !== key.toLowerCase()) {
         return;
     }
-    const ourPlayer = getOurPlayer();
+    let input: Direction[] = null;
     switch (inputMode) {
         case InputMode.NORMAL:
-            if (!ourPlayer.priorDirections.includes(direction)) {
-                ourPlayer.priorDirections.unshift(direction);
-            }
+            input = getOurPlayer().priorDirections;
             break;
         case InputMode.INTERACTION:
-            const solidInfo = checkInteraction();
-            if (!solidInfo) {
+            const solidInfo: solidInfo = checkInteraction();
+            if (!solidInfo?.content) {
                 break;
             }
-            const content = solidInfo.content;
-            if (!content.input.includes(direction)) {
-                content.input.unshift(direction);
-            }
+            input = solidInfo.content.input;
             break;
-
+    }
+    if (!input) {
+        return;
+    }
+    if (!input.includes(direction)) {
+        input.unshift(direction);
     }
 }
 
 function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Direction) {
-    if (!isPureKey(event) || event.key.toLowerCase() !== key.toLowerCase()) {
+    if (/*!isPureKey(event) || */event.key.toLowerCase() !== key.toLowerCase()) {
         return;
     }
-    const ourPlayer = getOurPlayer();
+    let input: Direction[] = null;
     switch (inputMode) {
         case InputMode.NORMAL:
-            ourPlayer.priorDirections.splice(ourPlayer.priorDirections.indexOf(direction), 1);
+            input = getOurPlayer().priorDirections;
             break;
         case InputMode.INTERACTION:
-            const solidInfo = checkInteraction();
-            if (!solidInfo) {
+            const solidInfo: solidInfo = checkInteraction();
+            if (!solidInfo?.content) {
                 break;
             }
-            const content = solidInfo.content;
-            let index = -1;
-            index = content.input.indexOf(direction);
-            if (index > -1) content.input.splice(index, 1);
+            input = solidInfo.content.input;
             break;
-
+    }
+    if (!input) {
+        return;
+    }
+    const index = input.indexOf(direction);
+    if (index > -1) {
+        input.splice(index, 1);
     }
 }
 
@@ -139,7 +142,6 @@ export function loadInputFunctions() {
         onPureKey(e, ",", () => shareButton.click());
         onPureKey(e, "q", () => settingsButton.click());
         onPureKey(e, "h", () => helpButton.click());
-        
     }
 
     function onKeyUp(e: KeyboardEvent) {
