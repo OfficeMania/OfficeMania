@@ -460,18 +460,19 @@ body {
     bottom: 0;
 }
 
-#help-footer p {
+#help-interaction {
+    margin-left: 5%;
+    margin-bottom: 3%;
+}
+
+#help-interaction span {
     font-size: 30px;
-    margin-left: 220px;
-    margin-bottom: 50px;
     font-weight: bolder;
     -webkit-text-fill-color: white;
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: black;
 }
 
-#help-footer img {
-    scale: 200%;
-    margin-left: 110px;
-    margin-bottom: -55px;
+#help-interaction img {
+    margin-bottom: 15px;
 }

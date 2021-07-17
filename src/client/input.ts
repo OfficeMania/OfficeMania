@@ -7,6 +7,7 @@ import {
     getOurPlayer,
     InputMode,
     payRespect,
+    removeChildren,
     setCharacter,
     setUsername
 } from "./util";
@@ -177,8 +178,7 @@ export function checkInteraction(executeInteraction: boolean = false): solidInfo
 }
 
 const ID_BUTTON_INTERACT = "button-interact";
-const ID_INTERACTION_HELP_KEY = "interaction-help-key";
-const ID_INTERACTION_HELP_TEXT = "interaction-help-text";
+const ID_HELP_INTERACTION = "help-interaction";
 
 const interactionNearbyButton: HTMLButtonElement = createInteractionButton(() => checkInteraction(true), ID_BUTTON_INTERACT, (button) => {
     button.style.opacity = "0";
@@ -194,28 +194,32 @@ export function checkInteractionNearby() {
     if (solidInfo?.content && inputMode !== InputMode.INTERACTION && inputMode !== InputMode.WRITETODO) {
         if (!interactionInfoShown) {
             interactionInfoShown = true;
-            const interactionHelpKey: HTMLImageElement = document.createElement("img");
-            interactionHelpKey.id = ID_INTERACTION_HELP_KEY;
-            interactionHelpKey.src = "../assets/img/transparent_32x32.png";
-            interactionHelpKey.classList.add("key", "key-long");
-            interactionHelpKey.style.backgroundPosition = "calc(2 * -32px) calc(5 * -32.1px)";
-            helpFooter.append(interactionHelpKey);
-            const interactionHelpText = document.createElement("p");
-            interactionHelpText.id = ID_INTERACTION_HELP_TEXT;
-            interactionHelpText.innerText = getInteractionHelpMessage(solidInfo);
-            helpFooter.append(interactionHelpText);
+            const interactionHelp: HTMLDivElement = createInteractionHelp(solidInfo.content.name);
+            helpFooter.append(interactionHelp);
             showButton(interactionNearbyButton, fade && !consumeInteractionClosed());
         }
     } else if (interactionInfoShown) {
         interactionInfoShown = false;
         hideButton(interactionNearbyButton, fade);
-        document.getElementById(ID_INTERACTION_HELP_KEY)?.remove();
-        document.getElementById(ID_INTERACTION_HELP_TEXT)?.remove();
+        removeChildren(helpFooter);
     }
 }
 
-function getInteractionHelpMessage(solidInfo: solidInfo) {
-    return "   to interact with " + solidInfo.content.name;
+function createInteractionHelp(interactiveName: string) {
+    const interactionHelp: HTMLDivElement = document.createElement("div");
+    interactionHelp.id = ID_HELP_INTERACTION;
+    const interactionHelpTextPrefix = document.createElement("span");
+    interactionHelpTextPrefix.innerText = "Press ";
+    interactionHelp.append(interactionHelpTextPrefix);
+    const interactionHelpKey: HTMLImageElement = document.createElement("img");
+    interactionHelpKey.src = "../assets/img/transparent_32x32.png";
+    interactionHelpKey.classList.add("key", "key-small");
+    interactionHelpKey.style.backgroundPosition = "calc(6 * -32px) calc(-32px)";
+    interactionHelp.append(interactionHelpKey);
+    const interactionHelpText = document.createElement("span");
+    interactionHelpText.innerText = "to interact with " + interactiveName;
+    interactionHelp.append(interactionHelpText);
+    return interactionHelp;
 }
 
 function showButton(button: HTMLButtonElement, fade: boolean = true) {
