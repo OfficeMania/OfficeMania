@@ -213,6 +213,7 @@ function fillSolidInfos(map: mapInfo) {
         }
     }
 
+    const lastTileSet = map.tilesets[map.tilesets.length - 1];
     for (const layer of map.layers) {
         const isSolidLayer = layer.name === LAYER_NAME_SOLID;
         const isContentLayer = layer.name === LAYER_NAME_CONTENT;
@@ -234,35 +235,27 @@ function fillSolidInfos(map: mapInfo) {
                         continue;
                     }
                     let newFirstGridId: number;
-                    let newTileset: tileset;
-                    const lastTileSet = map.tilesets[map.tilesets.length - 1];
+                    let newTileSet: tileset;
                     for (const tileSet of map.tilesets) {
-
                         if (chunkElement >= tileSet.firstGridId || map.tilesets.length === 1) {
-
                             newFirstGridId = tileSet.firstGridId;
-                            newTileset = tileSet;
+                            newTileSet = tileSet;
                         }
-
-                        let value: number;
                         if (!(newFirstGridId < tileSet.firstGridId || tileSet === lastTileSet)) {
                             continue;
                         }
-                        //if this is true we found the right tileset with help of the firstGridId
-                        value = chunkElement - newTileset.firstGridId + 1;
+                        //if this is true we found the right tileSet with help of the firstGridId
+                        const value: number = chunkElement - newTileSet.firstGridId + 1;
                         if (isSolidLayer && value !== 0 && value < 16) {
-
                             let numbBin: string = value.toString(2);
                             let fillerString: string = "";
-
-                            if (numbBin.length < 4) {
-
-                                for (let j = 0; j < 4 - numbBin.length; j++) {
-                                    fillerString = fillerString.concat("0");
+                            const length = numbBin.length;
+                            if (length < 4) {
+                                for (let j = 0; j < 4 - length; j++) {
+                                    fillerString += "0";
                                 }
-                                numbBin = fillerString.concat(numbBin);
+                                numbBin = fillerString + numbBin;
                             }
-
                             //makes different quarters of a block solid
                             if (numbBin.charAt(0) === "1") {
                                 solidInfoMap[basePosX][basePosY].setIsSolid();
