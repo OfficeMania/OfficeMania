@@ -541,13 +541,10 @@ function drawMapWithChunks (mapData: mapInfo) {
 
 function drawMap(mapData: mapInfo) {
     for (const layer of mapData.layers) {
+        if (layer.name === LAYER_NAME_SOLID || layer.name === LAYER_NAME_CONTENT || layer.name === LAYER_NAME_ROOMS || layer.name === LAYER_NAME_CONFERENCE_ROOMS) {
+            continue;
+        }
         for (const chunk of layer.chunks) {
-            //if the chunk is not animated
-            if (!(layer.name.search(LAYER_NAME_ANIMATED) === -1 && layer.name.search(LAYER_NAME_CONTENT) === -1 && layer.name.search(LAYER_NAME_ROOMS) === -1 && layer.name.search(LAYER_NAME_SOLID) === -1)) {
-                //draw gif
-                //https://stackoverflow.com/questions/48234696/how-to-put-a-gif-with-canvas
-                continue;
-            }
             for (let x = 0; x < 16; x++) {
                 for (let y = 0; y < 16; y++) {
                     const chunkElement = chunk.element[x][y];
@@ -555,39 +552,36 @@ function drawMap(mapData: mapInfo) {
                         //dont paint if there is nothing
                         continue;
                     }
-                    let positionX: number;
-                    let positionY: number;
-                    positionX = x + chunk.posX + Math.floor(mapData.widthOfMap / 2);
-                    positionY = y + chunk.posY + Math.floor(mapData.heightOfMap / 2);
+                    const positionX: number = x + chunk.posX + Math.floor(mapData.widthOfMap / 2);
+                    const positionY: number = y + chunk.posY + Math.floor(mapData.heightOfMap / 2);
                     const tileSetElement = chunk.tilesetForElement[x][y];
+                    const dx = positionX * mapData.resolution;
+                    const dy = positionY * mapData.resolution;
                     if (tileSetElement !== null) {
                         //draw the image without searching
-                        mapData.ctx.drawImage(mapData.textures.get(tileSetElement.path), chunk.tilesetX[x][y], chunk.tilesetY[x][y], mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
+                        mapData.ctx.drawImage(mapData.textures.get(tileSetElement.path), chunk.tilesetX[x][y], chunk.tilesetY[x][y], mapData.resolution, mapData.resolution, dx, dy, mapData.resolution, mapData.resolution);
                         continue;
                     }
-                    //saves a tileset, we need this to find the right one
+                    //saves a tileSet, we need this to find the right one
                     let newFirstGridId: number;
-                    let newTileset: tileset;
+                    let newTileSet: tileset;
                     const lastTileSet: tileset = mapData.tilesets[mapData.tilesets.length - 1];
                     for (const tileSet of mapData.tilesets) {
                         if (chunkElement >= tileSet.firstGridId || mapData.tilesets.length === 1) {
                             newFirstGridId = tileSet.firstGridId;
-                            newTileset = tileSet;
+                            newTileSet = tileSet;
                         }
-                        let value: number;
-                        let sourceX: number;
-                        let sourceY: number;
                         //if this is true we found the right tileset with help of the firstGridId
                         if (!(newFirstGridId < tileSet.firstGridId || tileSet === lastTileSet)) {
                             continue;
                         }
-                        chunk.tilesetForElement[x][y] = newTileset;
-                        value = chunkElement - newTileset.firstGridId;
-                        sourceX = (value % (newTileset.tileWidth / mapData.resolution)) * mapData.resolution
+                        chunk.tilesetForElement[x][y] = newTileSet;
+                        const value: number = chunkElement - newTileSet.firstGridId;
+                        const sourceX: number = (value % (newTileSet.tileWidth / mapData.resolution)) * mapData.resolution
                         chunk.tilesetX[x][y] = sourceX;
-                        sourceY = Math.floor(value / (newTileset.tileWidth / mapData.resolution)) * mapData.resolution;
+                        const sourceY: number = Math.floor(value / (newTileSet.tileWidth / mapData.resolution)) * mapData.resolution;
                         chunk.tilesetY[x][y] = sourceY;
-                        mapData.ctx.drawImage(mapData.textures.get(newTileset.path), sourceX, sourceY, mapData.resolution, mapData.resolution, positionX * mapData.resolution, positionY * mapData.resolution, mapData.resolution, mapData.resolution);
+                        mapData.ctx.drawImage(mapData.textures.get(newTileSet.path), sourceX, sourceY, mapData.resolution, mapData.resolution, dx, dy, mapData.resolution, mapData.resolution);
                         break;
                     }
                 }
