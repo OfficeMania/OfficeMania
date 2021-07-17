@@ -11,7 +11,7 @@ import {
     setCharacter,
     setUsername
 } from "./util";
-import {toggleShowParticipantsTab} from "./conference/conference";
+import {toggleMuteByType, toggleShowParticipantsTab} from "./conference/conference";
 import {Direction} from "../common/util";
 import {solidInfo} from "./map";
 import {characters} from "./main";
@@ -134,7 +134,9 @@ export function loadInputFunctions() {
         //rename players name
         onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")));
         onPureKey(e, "u", () => toggleShowParticipantsTab());
-        onPureKey(e, "f", () => payRespect())
+        onPureKey(e, "f", () => payRespect());
+        onPureKey(e, "m", () => toggleMuteByType("video"));
+        onPureKey(e, "n", () => toggleMuteByType("audio"));
     }
 
     function onKeyUp(e: KeyboardEvent) {
