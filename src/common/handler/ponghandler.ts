@@ -62,7 +62,7 @@ function joinPong(room: Room<State>, client) {
         client.send(MessageType.PONG_INTERACTION, PongMessage.INIT);
         console.debug("sent message init to client")
         room.clients.forEach((client) => client.send(MessageType.PONG_INTERACTION, PongMessage.UPDATE));
-    }, 100);
+    }, 200);
 }
 
 function onPongInteraction(room: Room<State>, client, message: PongMessage) {
@@ -208,9 +208,7 @@ function onPongUpdate(client: Client, room: Room<State>) {
         posX += gameState.velBallX * gameState.velocities.at(0);
         //console.log(posX);
         posY += gameState.velBallY * gameState.velocities.at(0);
-        if (posY > 720 - gameState.sizes.at(0) / 2 && gameState.velBallY > 0) {
-            gameState.velBallY *= -1;
-        } else if (posY < 0 + gameState.sizes.at(0) / 2 && gameState.velBallY < 0) {
+        if ((posY > 720 - gameState.sizes.at(0) / 2 && gameState.velBallY > 0) || (posY < 0 + gameState.sizes.at(0) / 2 && gameState.velBallY < 0)) {
             gameState.velBallY *= -1;
         }
 
@@ -219,7 +217,7 @@ function onPongUpdate(client: Client, room: Room<State>) {
             return;
         }
         if (posX > 1380 - gameState.sizes.at(0) / 2) {
-            if (gameState.playerA) {
+            if (gameState.playerB) {
                 gameState.scoreA++;
                 hasScored = true;
                 startNextRound(gameState);
