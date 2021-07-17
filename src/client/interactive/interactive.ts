@@ -1,11 +1,7 @@
 import {Direction} from "../../common/util";
+import { interactiveCanvas } from "../static";
 
-/**
- * for use of $<>("") to get the correct type of object
- */
-function $<T extends HTMLElement>(a: string) {
-    return <T>document.getElementById(a);
-}
+
 
 /**
  * Yes "[Interactive](https://en.wiktionary.org/wiki/interactive#Noun)" is a noun
@@ -22,7 +18,7 @@ export class Interactive {
         this._name = name;
         this._singleton = singleton;
         this._maxPlayer = maxPlayer;
-        this.canvas = $<HTMLCanvasElement>("interactive");
+        this.canvas = interactiveCanvas;
     }
 
     /**

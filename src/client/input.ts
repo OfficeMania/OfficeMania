@@ -15,7 +15,7 @@ import {Direction} from "../common/util";
 import {solidInfo} from "./map";
 import {characters} from "./main";
 import {Interactive} from "./interactive/interactive";
-import {helpFooter} from "./static";
+import {camButton, helpButton, helpFooter, muteButton, settingsButton, shareButton} from "./static";
 
 let inputMode: InputMode = InputMode.NORMAL;
 
@@ -134,8 +134,12 @@ export function loadInputFunctions() {
         onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")));
         onPureKey(e, "u", () => toggleShowParticipantsTab());
         onPureKey(e, "f", () => payRespect());
-        onPureKey(e, "m", () => toggleMuteByType("audio"));
-        onPureKey(e, "n", () => toggleMuteByType("video"));
+        onPureKey(e, "n", () => muteButton.click());
+        onPureKey(e, "m", () => camButton.click());
+        onPureKey(e, ",", () => shareButton.click());
+        onPureKey(e, "q", () => settingsButton.click());
+        onPureKey(e, "h", () => helpButton.click());
+        
     }
 
     function onKeyUp(e: KeyboardEvent) {
