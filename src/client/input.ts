@@ -218,7 +218,7 @@ let interactionInfoShown = false;
 export function checkInteractionNearby() {
     const solidInfo: solidInfo = checkInteraction();
     const fade: boolean = inputMode === InputMode.NORMAL;
-    if (solidInfo?.content && inputMode !== InputMode.INTERACTION && interactionWithMovement.includes(solidInfo.content.name)) {
+    if (solidInfo?.content && inputMode !== InputMode.INTERACTION) {
         if (!interactionInfoShown) {
             interactionInfoShown = true;
             interactionHelpItem.innerText = solidInfo.content.name;
