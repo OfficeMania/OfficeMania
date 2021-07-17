@@ -45,6 +45,7 @@ export class PingPongTable extends Interactive {
             ourGame.canvas.style.visibility = "visible";
             checkInputMode();
             this.initListener();
+            createCloseInteractionButton(() => this.leave());
 
         } else {
             console.log("already in a game");
@@ -56,7 +57,6 @@ export class PingPongTable extends Interactive {
             switch (message) {
                 case PongMessage.INIT: {
                     this.getPong();
-                    createCloseInteractionButton(() => this.leave());
                     this.leavable = true;
                     break;
                 }
