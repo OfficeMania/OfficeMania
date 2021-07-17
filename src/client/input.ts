@@ -198,11 +198,13 @@ export function checkInteractionNearby() {
             interactionInfoShown = true;
             const interactionHelp: HTMLDivElement = createInteractionHelp(solidInfo.content.name);
             helpFooter.append(interactionHelp);
-            showButton(interactionNearbyButton, fade && !consumeInteractionClosed());
+            interactionNearbyButton.disabled = false;
+            showElement(interactionNearbyButton, fade && !consumeInteractionClosed());
         }
     } else if (interactionInfoShown) {
         interactionInfoShown = false;
-        hideButton(interactionNearbyButton, fade);
+        interactionNearbyButton.disabled = true;
+        hideElement(interactionNearbyButton, fade);
         removeChildren(helpFooter);
     }
 }
@@ -224,22 +226,20 @@ function createInteractionHelp(interactiveName: string) {
     return interactionHelp;
 }
 
-function showButton(button: HTMLButtonElement, fade: boolean = true) {
-    button.style.display = null;
-    button.disabled = false;
+function showElement(element: HTMLElement, fade: boolean = true) {
+    element.style.display = null;
     if (fade) {
-        setTimeout(() => button.style.opacity = "1", 10);
+        setTimeout(() => element.style.opacity = "1", 10);
     } else {
-        button.style.opacity = "1";
+        element.style.opacity = "1";
     }
 }
 
-function hideButton(button: HTMLButtonElement, fade: boolean = true) {
-    interactionNearbyButton.disabled = true;
-    interactionNearbyButton.style.opacity = "0";
+function hideElement(element: HTMLElement, fade: boolean = true) {
+    element.style.opacity = "0";
     if (fade) {
-        setTimeout(() => interactionNearbyButton.style.display = "none", 510);
+        setTimeout(() => element.style.display = "none", 510);
     } else {
-        interactionNearbyButton.style.display = "none";
+        element.style.display = "none";
     }
 }
