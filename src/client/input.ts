@@ -266,7 +266,7 @@ function showElement(element: HTMLElement, fade: boolean = true) {
 function hideElement(element: HTMLElement, fade: boolean = true) {
     element.style.opacity = "0";
     if (fade) {
-        setTimeout(() => element.style.display = "none", 510);
+        setTimeout(() => element.style.display = interactionInfoShown ? null : "none", 510);
     } else {
         element.style.display = "none";
     }
