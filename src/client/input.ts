@@ -15,7 +15,16 @@ import {Direction} from "../common/util";
 import {solidInfo} from "./map";
 import {characters} from "./main";
 import {Interactive} from "./interactive/interactive";
-import {camButton, helpButton, helpExitButton, helpFooter, muteButton, settingsButton, settingsCancelButton, shareButton} from "./static";
+import {
+    camButton,
+    helpButton,
+    helpExitButton,
+    helpFooter,
+    muteButton,
+    settingsButton,
+    settingsCancelButton,
+    shareButton
+} from "./static";
 
 let inputMode: InputMode = InputMode.NORMAL;
 
@@ -113,7 +122,7 @@ export function loadInputFunctions() {
                 return;
             }
         }
-        if (inputMode !== InputMode.IGNORE && inputMode !== InputMode.INTERACTION && !interactionWithMovement.includes(checkInteraction()?.content?.name)){
+        if ((inputMode === InputMode.IGNORE || inputMode === InputMode.INTERACTION) && !interactionWithMovement.includes(checkInteraction()?.content?.name)){
             return;
         }
         const ourPlayer = getOurPlayer();
