@@ -80,6 +80,7 @@ export class CoffeeMachine extends Interactive {
     }
 
     print(text: string) {
+        this.ctx.textAlign = "left";
         this.ctx.fillStyle = "white";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle = "black";

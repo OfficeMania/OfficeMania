@@ -39,33 +39,31 @@ export class PongHandler implements Handler {
     }
 
 }
-
+let letInit: boolean = true;
 function onPongInteraction(room: Room<State>, client, message: PongMessage) {
     switch (message) {
         case PongMessage.ON_INTERACTION: {
-            let inGame: number = getPongGame(room, client);
-            if (inGame === -1) {
-                let emptyGame = getEmptyPongGame(room);
-                console.log("empty game: " + emptyGame);
-                if (emptyGame !== -1) {
-                    let emptyState: PongState = room.state.pongStates[emptyGame.toString()];
-                    if (emptyState) {
-                        if (!emptyState.playerA) {
-                            emptyState.playerA = client.sessionId;
-                            emptyState.posPlayerA = 360 - (emptyState.sizes.at(1) / 2)
-                        }
-                        if (!emptyState.playerB) {
+            if (letInit) {
+                letInit = false;
+                let inGame: number = getPongGame(room, client);
+                if (inGame === -1) {
+                    let emptyGame = getEmptyPongGame(room);
+                    console.log("empty game: " + emptyGame);
+                    if (emptyGame !== -1) {
+                        let emptyState: PongState = room.state.pongStates[emptyGame.toString()];
+                        if (emptyState) {
                             emptyState.playerB = client.sessionId;
                             emptyState.posPlayerB = 360 - (emptyState.sizes.at(1) / 2)
                         }
+                    } else {
+                        initNewState(room, client);
                     }
-                } else {
-                    initNewState(room, client);
                 }
+                client.send(MessageType.PONG_INTERACTION, PongMessage.INIT);
+                console.log("sent message init to client")
+                room.clients.forEach((client) => client.send(MessageType.PONG_INTERACTION, PongMessage.UPDATE));
             }
-            setTimeout(() => client.send(MessageType.PONG_INTERACTION, PongMessage.INIT), 1000);
-            console.log("sent message init to client")
-            setTimeout(() => room.clients.forEach((client) => client.send(MessageType.PONG_INTERACTION, PongMessage.UPDATE)), 1000);
+            letInit = true;
             break;
         }
         case PongMessage.END: {
@@ -202,16 +200,19 @@ function onPongUpdate(client: Client, room: Room<State>) {
         posX += gameState.velBallX * gameState.velocities.at(0);
         //console.log(posX);
         posY += gameState.velBallY * gameState.velocities.at(0);
-        if (posY > 720 - gameState.sizes.at(0)/2 || posY < 0 + gameState.sizes.at(0)/2) {
+        if (posY > 720 - gameState.sizes.at(0)/2 && gameState.velBallY > 0) {
+            gameState.velBallY *= -1;
+        } else if(posY < 0 + gameState.sizes.at(0)/2 && gameState.velBallY < 0) {
             gameState.velBallY *= -1;
         }
+
         gameState.posBallY = posY;
         if(hasScored) {
             return;
         }
         if (posX > 1380 - gameState.sizes.at(0)/2) { 
-            if(gameState.playerB){
-                gameState.scoreB++;
+            if(gameState.playerA){
+                gameState.scoreA++;
                 hasScored = true;
                 startNextRound(gameState);
             }
@@ -220,8 +221,8 @@ function onPongUpdate(client: Client, room: Room<State>) {
             //console.log("hit the wall")
         }
         else if(posX < -100 + gameState.sizes.at(0)/2) {
-            if(gameState.playerA){
-                gameState.scoreA++;
+            if(gameState.playerB){
+                gameState.scoreB++;
                 hasScored = true;
                 startNextRound(gameState);
             }
@@ -230,6 +231,10 @@ function onPongUpdate(client: Client, room: Room<State>) {
         checkCollision(client, gameState);
         gameState.posBallX = posX;
         //console.log(gameState.posBallX +" " + gameState.posBallY)
+        //exit condition
+        if (gameState.scoreA === 5 || gameState.scoreB === 5) {
+            leavePongGame(room, client);
+        }
     }
 }
 function checkCollision(client: Client, gameState: PongState) {

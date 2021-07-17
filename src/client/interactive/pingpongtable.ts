@@ -56,6 +56,7 @@ export class PingPongTable extends Interactive {
             console.log("interatction message recieved in client " + message)
             switch (message) {
                 case PongMessage.INIT: {
+                    
                     this.getPong();
                     this.leavable = true;
                     break;
