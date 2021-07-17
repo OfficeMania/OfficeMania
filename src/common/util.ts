@@ -43,3 +43,23 @@ export enum GameMode {
 export function generateUUIDv4() {
     return uuid4();
 }
+
+export class TaskExecutor<T> {
+
+    private _pending: Promise<T>;
+
+    queueTask(task: () => T): Promise<T> {
+        this._pending = this.run(task);
+        return this._pending;
+    }
+
+    private async run(task: () => T): Promise<T> {
+        try {
+            await this._pending;
+        } finally {
+            //Nothing
+        }
+        return task();
+    }
+
+}
