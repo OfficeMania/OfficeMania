@@ -212,6 +212,8 @@ body {
     width: 100%;
     max-width: 15%;
     min-width: 0;
+    height: 720;
+    width: 480;
     margin-left: 50px;
     flex-shrink: 1;
     overflow: hidden;
