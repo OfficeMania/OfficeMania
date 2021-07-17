@@ -15,7 +15,7 @@ import {panelButtonsInteraction} from "./static";
 
 export enum InputMode {
     NORMAL = "normal",
-    IGNORE = "settings",
+    IGNORE = "ignore",
     INTERACTION = "interaction",
 }
 

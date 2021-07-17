@@ -19,6 +19,8 @@ import {camButton, helpButton, helpExitButton, helpFooter, muteButton, settingsB
 
 let inputMode: InputMode = InputMode.NORMAL;
 
+export const interactionWithMovement: string[] = ["Pong table"];
+
 export let currentInteraction: Interactive = null;
 
 function resetPlayerDirections() {
@@ -111,7 +113,7 @@ export function loadInputFunctions() {
                 return;
             }
         }
-        if (inputMode === InputMode.IGNORE || checkInteraction().content.name === "sticky notes") {
+        if (inputMode !== InputMode.IGNORE && inputMode !== InputMode.INTERACTION && !interactionWithMovement.includes(checkInteraction()?.content?.name)){
             return;
         }
         const ourPlayer = getOurPlayer();
@@ -207,7 +209,7 @@ let interactionInfoShown = false;
 export function checkInteractionNearby() {
     const solidInfo: solidInfo = checkInteraction();
     const fade: boolean = inputMode === InputMode.NORMAL;
-    if (solidInfo?.content && inputMode !== InputMode.INTERACTION && solidInfo.content.name !== "sticky notes") {
+    if (solidInfo?.content && inputMode !== InputMode.INTERACTION && interactionWithMovement.includes(solidInfo.content.name)) {
         if (!interactionInfoShown) {
             interactionInfoShown = true;
             interactionHelpItem.innerText = solidInfo.content.name;
