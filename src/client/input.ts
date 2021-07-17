@@ -221,11 +221,11 @@ export function checkInteractionNearby() {
     if (solidInfo?.content && inputMode !== InputMode.INTERACTION) {
         if (!interactionInfoShown) {
             interactionInfoShown = true;
-            interactionHelpItem.innerText = solidInfo.content.name;
             interactionNearbyButton.disabled = false;
             showElement(interactionHelp, fade && !consumeInteractionClosed());
             showElement(interactionNearbyButton, fade && !consumeInteractionClosed());
         }
+        interactionHelpItem.innerText = solidInfo.content.name;
     } else if (interactionInfoShown) {
         interactionInfoShown = false;
         interactionNearbyButton.disabled = true;
