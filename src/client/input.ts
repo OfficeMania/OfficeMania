@@ -135,8 +135,8 @@ export function loadInputFunctions() {
         onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")));
         onPureKey(e, "u", () => toggleShowParticipantsTab());
         onPureKey(e, "f", () => payRespect());
-        onPureKey(e, "m", () => toggleMuteByType("video"));
-        onPureKey(e, "n", () => toggleMuteByType("audio"));
+        onPureKey(e, "m", () => toggleMuteByType("audio"));
+        onPureKey(e, "n", () => toggleMuteByType("video"));
     }
 
     function onKeyUp(e: KeyboardEvent) {
