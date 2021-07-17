@@ -69,8 +69,7 @@ export class Pong {
     paint() {
         this.ctx.fillStyle = "black"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle ="white";
-        this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
+        
         if(this.playerA){
             this.ctx.fillStyle ="white";
             this.ctx.fillRect(0, this.playerA.pos, 15, this.sizeBat);
@@ -85,11 +84,14 @@ export class Pong {
         }
         this.ctx.fillStyle = "white";
         this.ctx.fillRect(this.posBallX - (this.sizeBall/2), this.posBallY -(this.sizeBall/2), this.sizeBall, this.sizeBall);
-        if (this.p && this.playerA && this.playerB) {
-            let scoreTab: string = getPlayerByRoomId(this.playerA.id).name + ": " + this.playerA.score.toString() + " : " + this.playerB.score.toString() + " :" + getPlayerByRoomId(this.playerB.id).name
-            let num = scoreTab.length;
-            this.p.innerText = scoreTab;
+        if (this.playerA && this.playerB) {
+            let scoreTab: string = getPlayerByRoomId(this.playerA.id).name + ": " + this.playerA.score.toString() + " : " + this.playerB?.score.toString() + " :" + getPlayerByRoomId(this.playerB?.id).name;
+            this.ctx.fillStyle ="white";
+            this.ctx.textAlign = "center";
+            this.ctx.font = "30px Arial"
+            this.ctx.fillText(scoreTab, this.canvas.width/2, 50);
         }
+        this.canvas.style.outline ="black 3px solid";
     }
 
 }
