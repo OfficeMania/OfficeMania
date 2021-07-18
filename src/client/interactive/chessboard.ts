@@ -24,7 +24,7 @@ function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
     context.save();
     context.fillStyle = "red";
     context.fillRect(0, 0, canvas.width, canvas.height);
-    const maxLength = Math.min(canvas.width, canvas.height);
+    const maxLength = getMaxLength(canvas, 0);
     const squareLength = maxLength / 8;
     context.fillStyle = "black";
     for (let i = 0; i < 8; i++) {
@@ -45,7 +45,7 @@ function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
 }
 
 function cropCanvas(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
-    const maxLength = Math.min(canvas.width, canvas.height);
+    const maxLength = getMaxLength(canvas, 0);
     context.translate(borderSize, borderSize);
     context.beginPath();
     context.rect(0, 0, maxLength - borderSizeDouble, maxLength - borderSizeDouble);
@@ -56,7 +56,7 @@ function drawBoard(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D)
     context.save();
     cropCanvas(canvas, context);
     context.fillStyle = "white";
-    const maxLength = Math.min(canvas.width - borderSizeDouble, canvas.height - borderSizeDouble);
+    const maxLength = getMaxLength(canvas);
     context.fillRect(0, 0, maxLength, maxLength);
     const squareLength = maxLength / 8;
     context.fillStyle = "black";
@@ -91,7 +91,7 @@ function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D,
     }
     context.save();
     cropCanvas(canvas, context);
-    const maxLength: number = Math.min(canvas.width - borderSizeDouble, canvas.height - borderSizeDouble);
+    const maxLength = getMaxLength(canvas);
     const squareLength: number = maxLength / 8;
     context.fillStyle = "blue";
     const [currentFieldX, currentFieldY] = getCoordinates(currentField);
@@ -107,7 +107,7 @@ function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D,
 function drawPieces(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: { [key: string]: string }) {
     context.save();
     cropCanvas(canvas, context);
-    const maxLength = Math.min(canvas.width - borderSizeDouble, canvas.height - borderSizeDouble);
+    const maxLength = getMaxLength(canvas);
     const squareLength = maxLength / 8;
     context.fillStyle = "black";
     for (const field in pieces) {
@@ -140,6 +140,10 @@ function getMoveColor(pieces: any, move: string): string {
     const isCurrentBlack: boolean = isPieceBlack(pieces[currentField]);
     const isBlack: boolean = isPieceBlack(piece);
     return isCurrentBlack === isBlack ? "yellow" : "red";
+}
+
+function getMaxLength(canvas: HTMLCanvasElement, offset: number = borderSizeDouble): number {
+    return Math.min(canvas.offsetWidth - offset, canvas.offsetHeight - offset);
 }
 
 const cols: string[] = ["A", "B", "C", "D", "E", "F", "G", "H"];
