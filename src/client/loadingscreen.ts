@@ -15,6 +15,7 @@ const loadHeight: number = 100;
 let showLoadingScreen: boolean = true;
 let scale: number;
 const ctx = canvas.getContext("2d");
+const lineThiccness: number = 8;
 const writing: boolean[][] = [[], [],
 [false, false, true, true, false, false, true, true, true, true, false, true, true, true, true, false,  true, false,  true, true, true, true, false, true, true, true, true, false],
 [false, true, false, false, true, false, true, false, false, false, false, true, false, false, false, false, true, false, true, false, false, false, false, true, false, false, false, false,],
@@ -99,16 +100,16 @@ function writeOfficeMania(ctx: CanvasRenderingContext2D) {
                 ctx.fillRect(j*scale, i*scale, scale, scale);
                 ctx.fillStyle = "black";
                 if (!writing[i-1][j]) {
-                    ctx.fillRect(j*scale, i*scale, scale, scale/6);
+                    ctx.fillRect(j*scale, i*scale, scale, scale/lineThiccness);
                 }
                 if (!writing[i+1][j]) {
-                    ctx.fillRect(j*scale, i*scale + 5*scale/6, scale, scale/6);
+                    ctx.fillRect(j*scale, i*scale + (lineThiccness - 1)*scale/lineThiccness, scale, scale/lineThiccness);
                 }
                 if (!writing[i][j-1]) {
-                    ctx.fillRect(j*scale, i*scale, scale/6, scale);
+                    ctx.fillRect(j*scale, i*scale, scale/lineThiccness, scale);
                 }
                 if (!writing[i][j+1]) {
-                    ctx.fillRect(j*scale + 5*scale/6, i*scale, scale/6, scale);
+                    ctx.fillRect(j*scale + (lineThiccness - 1)*scale/lineThiccness, i*scale, scale/lineThiccness, scale);
                 }
             }
             
