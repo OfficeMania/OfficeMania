@@ -31,7 +31,7 @@ export class Door extends Interactive {
         this.posX = posX;
         this.posY = posY;
         this.map = map;
-        this.setTexture();
+        //this.setTexture();
     }
 
     onInteraction(): void {
