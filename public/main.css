@@ -479,3 +479,11 @@ body {
 #help-interaction img {
     margin-bottom: 15px;
 }
+
+#loading-screen {
+    position: fixed;
+    background-color: #b99e86;
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
