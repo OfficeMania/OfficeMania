@@ -49,13 +49,13 @@ export class PingPongTable extends Interactive {
             createCloseInteractionButton(() => this.leave());
 
         } else {
-            console.log("already in a game");
+            //console.log("already in a game");
         }
     }
 
     initListener() {
         this.room.onMessage(MessageType.PONG_INTERACTION, (message) => {
-            console.log("interatction message recieved in client " + message)
+            //console.log("interatction message recieved in client " + message)
             switch (message) {
                 case PongMessage.INIT: {
 
@@ -115,7 +115,7 @@ export class PingPongTable extends Interactive {
                 return i;
             }
         }
-        console.log("nothing found, exiting");
+        //console.log("nothing found, exiting");
         return -1;
     }
 
@@ -151,13 +151,10 @@ export class PingPongTable extends Interactive {
         const playerA: string = this.room.state.pongStates[ourGame.selfGameId.toString()].playerA;
         if (playerA) {
             if (!ourGame.playerA) {
-                console.log("inserting player A");
                 ourGame.playerA = new PongPlayer(this.room.state.pongStates[this.getGame(this.ourPlayer.id).toString()].playerA);
-                console.log(ourGame);
             }
         } else {
             if (ourGame.playerA) {
-                console.log("removed player A")
                 ourGame.playerA = null;
             }
         }
@@ -165,19 +162,16 @@ export class PingPongTable extends Interactive {
         const playerB = this.room.state.pongStates[ourGame.selfGameId.toString()].playerB;
         if (playerB) {
             if (!ourGame.playerB) {
-                console.log("inserting player b");
                 ourGame.playerB = new PongPlayer(this.room.state.pongStates[this.getGame(this.ourPlayer.id).toString()].playerB);
             }
         } else {
             if (ourGame.playerB) {
-                console.log("removed player B");
                 ourGame.playerB = null;
             }
         }
     }
 
     updateInput() {
-        //console.log(this.input);
         switch (this.input[0]) {
             case Direction.UP: {
                 this.room.send(MessageType.PONG_MOVE, Direction.UP);

@@ -43,8 +43,6 @@ export class Pong {
         let currentState: PongState;
         if (this.selfGameId !== -1) {
             currentState = this.room.state.pongStates[this.selfGameId.toString()]
-        } else {
-            console.log("still no");
         }
         if (currentState) {
             if (currentState.playerB && this.playerB) {

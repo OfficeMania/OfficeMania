@@ -127,7 +127,6 @@ export function checkInputMode() {
     } else {
         setInputMode(InputMode.NORMAL);
     }
-    console.log(getInputMode());
 }
 
 function checkValidSettings() {
