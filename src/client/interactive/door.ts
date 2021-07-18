@@ -1,6 +1,7 @@
 import {Interactive} from "./interactive"
 import {Player} from "./../player"
 import {getOurPlayer} from "./../util"
+import {mapInfo, tileset} from "./../map"
 
 export enum DoorDirection {
     UNKNOWN,
@@ -18,21 +19,47 @@ export class Door extends Interactive {
     playerId: string;
     posX: number;
     posY: number;
+    map: mapInfo
+    texture: HTMLImageElement;
 
 
-    constructor(direction: DoorDirection, posX: number, posY: number) {
+    constructor(direction: DoorDirection, posX: number, posY: number, map: mapInfo) {
 
         super("Door", true, 1);
         this.isClosed = false;
         this.direction = direction;
         this.posX = posX;
         this.posY = posY;
+        this.map = map;
+        this.setTexture();
     }
 
     onInteraction(): void {
         
         let player = getOurPlayer();
         this.startInteraction(player.positionX, player.positionY, player.id);
+    }
+
+    setTexture() {
+
+        let x = this.posX / 2 + this.map.lowestX;
+        let y = this.posY / 2 + this.map.lowestY;
+        let tileset: tileset;
+
+        for (const layer of this.map.layers) { 
+            
+            if (layer.name !== "Content" && layer.name !== "Rooms" && layer.name !== "Conference rooms" && layer.name !== "Solid") {
+
+                for (const chunk of layer.chunks) {
+
+                    if ((x % 16) * 16 === chunk.posX && (y % 16) * 16 === chunk.posY) {
+
+                        tileset = chunk.tilesetForElement[x % 16][y % 16];
+                        this.texture = this.map.textures.get(tileset.path);
+                    }
+                }
+            }
+        }
     }
 
     proofIfClosed(playerDirection: number) {

@@ -166,7 +166,7 @@ class saveArray {
 
 }
 
-class tileset {
+export class tileset {
 
     firstGridId: number;
     path: string;
@@ -270,7 +270,7 @@ function fillSolidInfos(map: mapInfo) {
                                 solidInfoMap[basePosX + 1][basePosY + 1].setIsSolid();
                             }
                         } else if (isContentLayer && value !== 0) {
-                            const interactive: Interactive = getInteractive(value, basePosX, basePosY, room);
+                            const interactive: Interactive = getInteractive(value, basePosX, basePosY, room, map);
                             setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setContent(interactive));
                         } else if (isConferenceRoomsLayer && value === 1) {
                             setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setIsConferenceRoom(true));
@@ -292,23 +292,23 @@ function setSolidInfoMap(solidInfoMap: solidInfo[][], basePosX: number, basePosY
     callback(solidInfoMap[basePosX + 1][basePosY + 1]);
 }
 
-function getInteractive(value: number, basePosX: number, basePosY: number, room: Room<State>) {
+function getInteractive(value: number, basePosX: number, basePosY: number, room: Room<State>, map: mapInfo) {
     switch (value) {
         //doors
         case 1: {
-            return createDoor(DoorDirection.NORTH, basePosX, basePosY, room);
+            return createDoor(DoorDirection.NORTH, basePosX, basePosY, room, map);
         }
         case 2: {
-            return createDoor(DoorDirection.EAST, basePosX, basePosY, room);
+            return createDoor(DoorDirection.EAST, basePosX, basePosY, room, map);
         }
         case 3: {
-            return createDoor(DoorDirection.SOUTH, basePosX, basePosY, room);
+            return createDoor(DoorDirection.SOUTH, basePosX, basePosY, room, map);
         }
         case 4: {
-            return createDoor(DoorDirection.WEST, basePosX, basePosY, room);
+            return createDoor(DoorDirection.WEST, basePosX, basePosY, room, map);
         }
         case 5: {
-            return createDoor(DoorDirection.ALWAYS_OPEN, basePosX, basePosY, room);
+            return createDoor(DoorDirection.ALWAYS_OPEN, basePosX, basePosY, room, map);
         }
         //pongtable
         case 6: {
@@ -334,9 +334,9 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
     return null;
 }
 
-function createDoor(direction: DoorDirection, basePosX: number, basePosY: number, room: Room<State>): Door {
+function createDoor(direction: DoorDirection, basePosX: number, basePosY: number, room: Room<State>, map: mapInfo): Door {
     room.send(MessageType.NEW_DOOR, basePosX + "." + basePosY);
-    return new Door(direction, basePosX, basePosY);
+    return new Door(direction, basePosX, basePosY, map);
 }
 
 //saves the paths from the templates
