@@ -5,9 +5,13 @@ import {generateUUIDv4, MessageType, TaskExecutor} from "../util";
 
 const jsChessEngine = require('js-chess-engine');
 
-enum Colors {
+export enum ChessColor {
     BLACK = "black",
     WHITE = "white"
+}
+
+export function getOppositeChessColor(chessColor: ChessColor): ChessColor {
+    return chessColor === ChessColor.WHITE ? ChessColor.BLACK : ChessColor.WHITE;
 }
 
 const taskExecutor: TaskExecutor<void> = new TaskExecutor<void>();
@@ -50,7 +54,7 @@ function onChessMove(room: Room<State>, client: Client, message) {
     const game = games[gameId];
     const from: string = message.from;
     const to: string = message.to;
-    const colorMove: string = chessState.playerWhite === client.sessionId ? Colors.WHITE : Colors.BLACK;
+    const colorMove: string = chessState.playerWhite === client.sessionId ? ChessColor.WHITE : ChessColor.BLACK;
     const alone: boolean = !chessState.playerWhite || !chessState.playerBlack;
     try {
         if (!alone && game.board.configuration.turn !== colorMove) {
@@ -58,6 +62,7 @@ function onChessMove(room: Room<State>, client: Client, message) {
             return;
         }
         game.move(from, to);
+        game.moves();
         updateChessState(room, gameId, chessState);
         setTimeout(() => getChessStateClients(room, chessState).forEach(client => client.send(MessageType.CHESS_MOVE, {
             gameId,
@@ -84,6 +89,7 @@ function leaveChessGame(room: Room<State>, client: Client) {
         room.state.chessStates.delete(gameId);
         delete games[gameId];
         games[gameId] = null;
+        console.debug("delete chess game:", gameId);
         return;
     }
     //TODO Notify remaining Player?
