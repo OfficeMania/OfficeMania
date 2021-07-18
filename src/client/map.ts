@@ -9,6 +9,7 @@ import {Whiteboard} from "./interactive/whiteboard";
 import {Todo} from "./interactive/todo";
 import {CoffeeMachine} from "./interactive/coffeeMachine";
 import {VendingMachine} from "./interactive/vendingMachine";
+import { ChessBoard } from "./interactive/chessboard";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -329,6 +330,10 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         //vending machine
         case 11: {
             return new VendingMachine();
+        }
+        //chess table
+        case 15: {
+            return new ChessBoard();
         }
     }
     return null;
