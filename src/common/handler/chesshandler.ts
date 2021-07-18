@@ -67,10 +67,12 @@ function leaveChessGame(room: Room<State>, client: Client) {
         chessState.playerBlack = null;
     }
     if (!chessState.playerWhite && !chessState.playerBlack) {
-        //TODO everybody left, so end this game?
+        room.state.chessStates.delete(gameId);
+        delete games[gameId];
+        games[gameId] = null;
         return;
     }
-    //TODO
+    //TODO Notify remaining Player?
 }
 
 function joinOrCreateChessGame(room: Room<State>, client: Client) {
