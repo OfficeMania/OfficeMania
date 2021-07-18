@@ -310,7 +310,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         checkInputMode();
     }
 
-    private onClick(event: MouseEvent) {
+    private onClick(event: MouseEvent) { //FIXME Closing and opening a game again removes the drawing of possible moves
         if (!ourGame || ourGame.board?.configuration?.isFinished) {
             return;
         }
