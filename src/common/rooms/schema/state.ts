@@ -117,8 +117,8 @@ export class TodoState extends Schema {
     @type("string")
     content: string;
 
-    @type("boolean")
-    isUsed: boolean;
+    @type("string")
+    isUsed: string;
 
 }
 

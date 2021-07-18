@@ -39,11 +39,12 @@ export class Todo extends Interactive {
     onInteraction(){
         if(this.room.state.todoState[this.id.toString()].isUsed){
             //error Text?
+            console.log("used");
             return;
         }
         this.content = this.room.state.todoState[this.id.toString()].content;
         this.room.send(MessageType.LIST_USE, this.id.toString())
-
+        this.ctx.textAlign = "left";
         this.canvas.style.visibility = "visible";
         createCloseInteractionButton(() => this.leave());
         this.paint();

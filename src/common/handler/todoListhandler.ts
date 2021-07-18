@@ -26,6 +26,10 @@ export class TodoListHandler implements Handler {
     }
 
     onLeave(client: Client, consented: boolean) {
+        let index: number = getStateID(this.room, client);
+        if (index > -1) {
+            onStopUse(this.room, client, index.toString());
+        }
         //Nothing
     }
 
@@ -38,7 +42,7 @@ function onCreate(room: Room<State>, client: Client, ID: string) {
 
     if(!room.state.todoState[ID]){
         room.state.todoState[ID] = new TodoState();
-        room.state.todoState[ID].isUsed = false;
+        room.state.todoState[ID].isUsed = null;
         room.state.todoState[ID].content = "";
     }
 
@@ -52,12 +56,24 @@ function onUpdate(room: Room<State>, client: Client, message: string[]) { //mess
 
 function onUse(room: Room<State>, client: Client, ID: string) {
 
-    room.state.todoState[ID].isUsed = true;
+    room.state.todoState[ID].isUsed = client.sessionId;
+    console.log(ID);
 
 }
 
 function onStopUse(room: Room<State>, client: Client, ID: string){
 
-    room.state.todoState[ID].isUsed = false;
+    room.state.todoState[ID].isUsed = null;
+    console.log("onstopuse");
 
+}
+function getStateID(room: Room <State>, client: Client): number {
+    const states = room.state.todoState;
+    for (let i = 0; i < states.size; i++) {
+        if(states[i].isUsed === client.sessionId) {
+            console.log(i);
+            return i;
+        }
+    }
+    return -1;
 }
