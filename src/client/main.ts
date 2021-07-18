@@ -369,7 +369,7 @@ async function main() {
         // Repeat game loop
         requestAnimationFrame(loop);
     }
-    loadingScreen.style.display = "none";
+    //loadingScreen.style.display = "none";
     setShowLoadingscreen(false);
     setInputMode(InputMode.NORMAL);
         // Start game loop

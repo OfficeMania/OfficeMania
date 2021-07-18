@@ -44,6 +44,8 @@ export class PingPongTable extends Interactive {
             console.log("Pong game interaction...");
             ourGame = new Pong(this.canvas, this.room, this.players, "a");
             ourGame.canvas.style.visibility = "visible";
+            ourGame.canvas.width = 1280;
+            ourGame.canvas.height = 720;
             checkInputMode();
             this.initListener();
             createCloseInteractionButton(() => this.leave());

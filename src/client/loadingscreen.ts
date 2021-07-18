@@ -36,11 +36,6 @@ export async function initLoading(){
         console.log("Loading screen is already over");
         return;
     }*/
-    const showAndRemove = () => {
-        setShowLoadingscreen(false)
-        document.removeEventListener('DOMContentLoaded', showAndRemove)
-    };
-    document.addEventListener('DOMContentLoaded', showAndRemove);
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     //ctx.fillStyle = "black";
@@ -80,6 +75,7 @@ export async function initLoading(){
         
         loadCounter++;
     }
+    canvas.style.visibility = "hidden";
 }   
 
 export function setShowLoadingscreen(show: boolean) {
