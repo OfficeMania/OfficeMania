@@ -66,7 +66,7 @@ export class PongState extends Schema {
 
     @type("string")
     playerB: string;
-    
+
     @type("number")
     posBallX: number;
     @type("number")
@@ -89,7 +89,7 @@ export class PongState extends Schema {
 
     @type("number")
     scoreB: number;
-    
+
     //0: sizeBall, 1: sizeBat
     @type({array: "number"})
     sizes = new ArraySchema<number>();
@@ -119,6 +119,20 @@ export class TodoState extends Schema {
 
     @type("boolean")
     isUsed: boolean;
+
+}
+
+export class ChessState extends Schema {
+
+    @type("string")
+    playerWhite: string;
+
+    @type("string")
+    playerBlack: string;
+
+    @type("string")
+    configuration: string;
+
 }
 
 /*
@@ -158,5 +172,8 @@ export class State extends Schema {
 
     @type({map: TodoState})
     todoState: MapSchema<TodoState> = new MapSchema<TodoState>();
+
+    @type({map: ChessState})
+    chessStates: MapSchema<ChessState> = new MapSchema<ChessState>();
 
 }
