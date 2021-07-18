@@ -5,12 +5,13 @@ import {generateUUIDv4, MessageType, TaskExecutor} from "../util";
 
 const jsChessEngine = require('js-chess-engine');
 
-enum ChessMessage {
-    INVALID_MOVE = "invalid-move"
+enum Colors {
+    BLACK = "black",
+    WHITE = "white"
 }
 
 const taskExecutor: TaskExecutor<void> = new TaskExecutor<void>();
-const games: {[key: string]: any} = {};
+const games: { [key: string]: any } = {};
 
 export class ChessHandler implements Handler {
 
@@ -49,10 +50,20 @@ function onChessMove(room: Room<State>, client: Client, message) {
     const game = games[gameId];
     const from: string = message.from;
     const to: string = message.to;
+    const colorMove: string = chessState.playerWhite === client.sessionId ? Colors.WHITE : Colors.BLACK;
+    const alone: boolean = !chessState.playerWhite || !chessState.playerBlack;
     try {
+        if (!alone && game.board.configuration.turn !== colorMove) {
+            //Nothing, just ignore the invalid move
+            return;
+        }
         game.move(from, to);
         updateChessState(room, gameId, chessState);
-        setTimeout(() => getChessStateClients(room, chessState).forEach(client => client.send(MessageType.CHESS_MOVE, {gameId, from, to})), 100);
+        setTimeout(() => getChessStateClients(room, chessState).forEach(client => client.send(MessageType.CHESS_MOVE, {
+            gameId,
+            from,
+            to
+        })), 100);
     } catch (error) {
         //Nothing, just ignore the invalid move
     }
