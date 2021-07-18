@@ -12,8 +12,8 @@ const borderSizeDouble: number = borderSize * 2;
 function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, game: any, moves: string[] = null) {
     drawBorder(canvas, context);
     drawBoard(canvas, context);
+    drawMoves(canvas, context, game.board.configuration.pieces, moves);
     drawPieces(canvas, context, game.board.configuration.pieces);
-    drawMoves(canvas, context, moves);
 }
 
 function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
@@ -21,7 +21,7 @@ function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
     context.fillStyle = "red";
     context.fillRect(0, 0, canvas.width, canvas.height);
     const maxLength = Math.min(canvas.width, canvas.height);
-    const squareLength = Math.floor(maxLength / 8);
+    const squareLength = maxLength / 8;
     context.fillStyle = "black";
     for (let i = 0; i < 8; i++) {
         const pos = i * squareLength;
@@ -81,11 +81,30 @@ function drawBoard(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D)
     context.restore();
 }
 
+function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: any, moves: string[]) {
+    if (!moves || moves.length === 0) {
+        return;
+    }
+    context.save();
+    cropCanvas(canvas, context);
+    const maxLength: number = Math.min(canvas.width - borderSizeDouble, canvas.height - borderSizeDouble);
+    const squareLength: number = maxLength / 8;
+    context.fillStyle = "blue";
+    const [currentFieldX, currentFieldY] = getCoordinates(currentField);
+    context.fillRect(currentFieldX * squareLength, currentFieldY * squareLength, squareLength + 1, squareLength + 1);
+    for (const move of moves) {
+        context.fillStyle = getMoveColor(pieces, move);
+        const [fieldX, fieldY] = getCoordinates(move);
+        context.fillRect(fieldX * squareLength, fieldY * squareLength, squareLength + 1, squareLength + 1);
+    }
+    context.restore();
+}
+
 function drawPieces(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: { [key: string]: string }) {
     context.save();
     cropCanvas(canvas, context);
     const maxLength = Math.min(canvas.width - borderSizeDouble, canvas.height - borderSizeDouble);
-    const squareLength = Math.floor(maxLength / 8);
+    const squareLength = maxLength / 8;
     context.fillStyle = "black";
     for (const field in pieces) {
         const piece: string = pieces[field];
@@ -101,20 +120,22 @@ function drawPieces(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
     context.restore();
 }
 
-function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, moves: string[]) {
-    if (!moves || moves.length === 0) {
-        return;
+function isPieceBlack(piece: string): boolean {
+    return piece && piece === piece.toLowerCase();
+}
+
+function isPieceWhite(piece: string): boolean {
+    return piece && piece === piece.toUpperCase();
+}
+
+function getMoveColor(pieces: any, move: string): string {
+    const piece: string = pieces[move];
+    if (!piece) {
+        return "green";
     }
-    context.save();
-    cropCanvas(canvas, context);
-    const maxLength: number = Math.min(canvas.width - borderSizeDouble, canvas.height - borderSizeDouble);
-    const squareLength: number = maxLength / 8;
-    context.fillStyle = "green";
-    for (const move of moves) {
-        const [fieldX, fieldY] = getCoordinates(move);
-        context.fillRect(fieldX * squareLength, fieldY * squareLength, squareLength + 1, squareLength + 1);
-    }
-    context.restore();
+    const isCurrentBlack: boolean = isPieceBlack(pieces[currentField]);
+    const isBlack: boolean = isPieceBlack(piece);
+    return isCurrentBlack === isBlack ? "yellow" : "red";
 }
 
 const cols: string[] = ["A", "B", "C", "D", "E", "F", "G", "H"];
@@ -169,6 +190,14 @@ function getCursorPosition(canvas: HTMLCanvasElement, event: MouseEvent): [numbe
     return [event.clientX - clientRect.left - borderSize, event.clientY - clientRect.top - borderSize];
 }
 
+let currentField: string = null;
+let currentMoves: string[] = null;
+
+function setCurrentMoves(field: string, moves: string[] = null) {
+    currentField = field;
+    currentMoves = moves;
+}
+
 function onClick(event: MouseEvent) {
     const canvas: HTMLCanvasElement = canvasChess;
     const [cursorX, cursorY] = getCursorPosition(canvas, event);
@@ -177,12 +206,28 @@ function onClick(event: MouseEvent) {
     const fieldX: number = Math.floor(cursorX / squareLength);
     const fieldY: number = Math.floor(cursorY / squareLength);
     const field: string = getField(fieldX, fieldY);
+    if (!field) {
+        return;
+    }
     console.debug("field:", field);
+    if (currentField && currentMoves && currentMoves.includes(field)) {
+        console.debug(`move from ${currentField} to ${field}`);
+        testGame.move(currentField, field);
+        setCurrentMoves(null);
+        redraw(canvasChess, contextChess, testGame);
+        return;
+    } else if (currentField === field) {
+        setCurrentMoves(null);
+        redraw(canvasChess, contextChess, testGame);
+        return;
+    }
     const moves: string[] = testGame.moves(field);
     if (!moves || moves.length === 0) {
         console.debug("no moves available for this field");
+        setCurrentMoves(null);
     } else {
         console.debug("moves:", moves);
+        setCurrentMoves(field, moves);
     }
     redraw(canvasChess, contextChess, testGame, moves);
 }
