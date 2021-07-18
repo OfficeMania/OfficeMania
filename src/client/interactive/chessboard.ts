@@ -45,10 +45,10 @@ function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
 }
 
 function cropCanvas(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
-    const maxLength = getMaxLength(canvas, 0);
+    const maxLength = getMaxLength(canvas);
     context.translate(borderSize, borderSize);
     context.beginPath();
-    context.rect(0, 0, maxLength - borderSizeDouble, maxLength - borderSizeDouble);
+    context.rect(0, 0, maxLength, maxLength);
     context.clip();
 }
 
@@ -143,7 +143,7 @@ function getMoveColor(pieces: any, move: string): string {
 }
 
 function getMaxLength(canvas: HTMLCanvasElement, offset: number = borderSizeDouble): number {
-    return Math.min(canvas.offsetWidth - offset, canvas.offsetHeight - offset);
+    return Math.min(canvas.width - offset, canvas.height - offset);
 }
 
 const cols: string[] = ["A", "B", "C", "D", "E", "F", "G", "H"];
@@ -190,7 +190,9 @@ function getCursorPosition(canvas: HTMLCanvasElement, event: MouseEvent): [numbe
     if (!clientRect) {
         return [null, null];
     }
-    return [event.clientX - clientRect.left - borderSize, event.clientY - clientRect.top - borderSize];
+    const scaleX: number = canvas.width / clientRect.width;
+    const scaleY: number = canvas.height / clientRect.height;
+    return [(event.clientX - clientRect.left - borderSize) * scaleX, (event.clientY - clientRect.top - borderSize) * scaleY];
 }
 
 let currentField: string = null;
@@ -270,7 +272,11 @@ export class ChessBoard extends Interactive {
             return;
         }
         const [cursorX, cursorY] = getCursorPosition(this.canvas, event);
-        const maxLength: number = Math.min(this.canvas.width - borderSizeDouble, this.canvas.height - borderSizeDouble);
+        if (!cursorX || !cursorY) {
+            console.warn("Why no cursor position from canvas?");
+            return;
+        }
+        const maxLength = getMaxLength(this.canvas);
         const squareLength: number = maxLength / 8;
         const fieldX: number = Math.floor(cursorX / squareLength);
         const fieldY: number = Math.floor(cursorY / squareLength);
