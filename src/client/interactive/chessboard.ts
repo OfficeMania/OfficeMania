@@ -186,7 +186,10 @@ function createImg(entry: [string, string]) {
 Object.entries(imageSources).forEach(createImg);
 
 function getCursorPosition(canvas: HTMLCanvasElement, event: MouseEvent): [number, number] {
-    const clientRect = canvas.getBoundingClientRect();
+    const clientRect = canvas?.getBoundingClientRect();
+    if (!clientRect) {
+        return [null, null];
+    }
     return [event.clientX - clientRect.left - borderSize, event.clientY - clientRect.top - borderSize];
 }
 
@@ -226,7 +229,7 @@ export class ChessBoard extends Interactive {
     }
 
     private initListeners() {
-        this.canvas.addEventListener('mousedown', this.onClick);
+        this.canvas.addEventListener('mousedown', (event) => this.onClick(event));
         this.room.onMessage(MessageType.CHESS_INIT, gameId => {
             if (!gameId) {
                 console.warn("Got CHESS_INIT message without a gameId")
@@ -247,7 +250,7 @@ export class ChessBoard extends Interactive {
 
     loop() {
         if (ourChessState) {
-            redraw(this.canvas, this.context, ourChessState.configuration, currentMoves);
+            redraw(this.canvas, this.context, JSON.parse(ourChessState.configuration), currentMoves);
         }
     }
 
