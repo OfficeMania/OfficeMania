@@ -5,6 +5,7 @@ import {createCloseInteractionButton, getRoom, removeCloseInteractionButton} fro
 import {ChessState} from "../../common/rooms/schema/state";
 import {MessageType} from "../../common/util";
 import {checkInputMode} from "../main";
+import {ChessColor, getOppositeChessColor} from "../../common/handler/chesshandler";
 
 const jsChessEngine = require('js-chess-engine');
 
@@ -18,6 +19,7 @@ function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, co
     drawBoard(canvas, context);
     drawMoves(canvas, context, configuration.pieces, moves);
     drawPieces(canvas, context, configuration.pieces);
+    drawResult(canvas, context, configuration);
 }
 
 function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
@@ -124,6 +126,21 @@ function drawPieces(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
     context.restore();
 }
 
+function drawResult(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any) {
+    if (configuration?.isFinished) {
+        const winner: ChessColor = getOppositeChessColor(configuration.turn);
+        const text: string = `Winner is: ${winner}`;
+        context.save();
+        context.font = "150px Arial bold";
+        const textMetrics = context.measureText(text);
+        context.fillStyle = "rgba(255, 255, 255, 0.85)";
+        context.fillRect((canvas.width - textMetrics.width) / 2, canvas.height / 2 - textMetrics.actualBoundingBoxAscent, textMetrics.width, textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent);
+        context.fillStyle = "black";
+        context.fillText(text, (canvas.width - textMetrics.width) / 2, canvas.height / 2);
+        context.restore();
+    }
+}
+
 function isPieceBlack(piece: string): boolean {
     return piece && piece === piece.toLowerCase();
 }
@@ -207,7 +224,15 @@ let ourGame;
 let ourChessState: ChessState;
 let ourGameId: string;
 
-export class ChessBoard extends Interactive {
+function resetVariables() {
+    ourGame = null;
+    ourChessState = null;
+    ourGameId = null;
+    currentField = null;
+    currentMoves = null;
+}
+
+export class ChessBoard extends Interactive { //TODO Use the rest of the space on the canvas for a history of moves?
 
     room: Room<State>;
     context: CanvasRenderingContext2D = this.canvas.getContext("2d");
@@ -247,7 +272,26 @@ export class ChessBoard extends Interactive {
                 return;
             }
             ourGame.move(message.from, message.to);
+            ourGame.moves();
         });
+    }
+
+    isFinished(): boolean {
+        return ourGame?.board?.configuration?.isFinished;
+    }
+
+    getLoser(): string {
+        if (!this.isFinished()) {
+            return null;
+        }
+        return ourGame.board.configuration.turn;
+    }
+
+    getWinner(): string {
+        if (!this.isFinished()) {
+            return null;
+        }
+        return getOppositeChessColor(ourGame.board.configuration.turn);
     }
 
     loop() {
@@ -259,16 +303,15 @@ export class ChessBoard extends Interactive {
     leave() {
         removeCloseInteractionButton();
         this.hide();
+        this.canvas.onmousedown = null;
         this.room.removeAllListeners();
         this.room.send(MessageType.CHESS_LEAVE);
-        ourGame = null;
-        ourChessState = null;
-        ourGameId = null;
+        resetVariables();
         checkInputMode();
     }
 
     private onClick(event: MouseEvent) {
-        if (!ourGame) {
+        if (!ourGame || ourGame.board?.configuration?.isFinished) {
             return;
         }
         const [cursorX, cursorY] = getCursorPosition(this.canvas, event);
