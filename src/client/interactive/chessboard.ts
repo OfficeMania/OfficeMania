@@ -1,9 +1,13 @@
-const jsChessEngine = require('js-chess-engine');
-// import jsChessEngine from "js-chess-engine";
+import {Interactive} from "./interactive";
+import {Room} from "colyseus.js";
+import {State} from "../../common";
+import {createCloseInteractionButton, getRoom, removeCloseInteractionButton} from "../util";
+import {ChessState} from "../../common/rooms/schema/state";
+import {MessageType} from "../../common/util";
+import {checkInputMode} from "../main";
 
-const canvasChess: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("canvas-chess");
-canvasChess.addEventListener('mousedown', onClick);
-const contextChess: CanvasRenderingContext2D = canvasChess.getContext("2d");
+const jsChessEngine = require('js-chess-engine');
+
 const borderSize: number = 20;
 const borderSizeHalf: number = borderSize / 2;
 const borderSizeQuarter: number = borderSize / 4;
@@ -152,7 +156,7 @@ function getCoordinates(field: string): [number, number] {
     return [cols.indexOf(field.charAt(0)), rows.indexOf(field.charAt(1))];
 }
 
-const imageSources: {[key: string]: string} = {
+const imageSources: { [key: string]: string } = {
     'K': "https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg",
     'Q': "https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg",
     'R': "https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg",
@@ -167,7 +171,7 @@ const imageSources: {[key: string]: string} = {
     'p': "https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg"
 }
 
-const images: {[key: string]: HTMLImageElement} = {};
+const images: { [key: string]: HTMLImageElement } = {};
 
 function createImg(entry: [string, string]) {
     const image: HTMLImageElement = document.createElement("img");
@@ -176,14 +180,6 @@ function createImg(entry: [string, string]) {
 }
 
 Object.entries(imageSources).forEach(createImg);
-
-const testGame = new jsChessEngine.Game();
-redraw(canvasChess, contextChess, testGame.board.configuration);
-
-export function testChess() {
-    // game.printToConsole();
-    console.debug(`board: ${JSON.stringify(testGame.board.configuration.pieces)}`);
-}
 
 function getCursorPosition(canvas: HTMLCanvasElement, event: MouseEvent): [number, number] {
     const clientRect = canvas.getBoundingClientRect();
@@ -198,36 +194,103 @@ function setCurrentMoves(field: string, moves: string[] = null) {
     currentMoves = moves;
 }
 
-function onClick(event: MouseEvent) {
-    const canvas: HTMLCanvasElement = canvasChess;
-    const [cursorX, cursorY] = getCursorPosition(canvas, event);
-    const maxLength: number = Math.min(canvas.width - borderSizeDouble, canvas.height - borderSizeDouble);
-    const squareLength: number = maxLength / 8;
-    const fieldX: number = Math.floor(cursorX / squareLength);
-    const fieldY: number = Math.floor(cursorY / squareLength);
-    const field: string = getField(fieldX, fieldY);
-    if (!field) {
-        return;
+let ourGame;
+let ourChessState: ChessState;
+let ourGameId: string;
+
+export class ChessBoard extends Interactive {
+
+    room: Room<State>;
+    context: CanvasRenderingContext2D = this.canvas.getContext("2d");
+
+    constructor() {
+        super("Chess Board", false, 2);
+        this.room = getRoom();
     }
-    console.debug("field:", field);
-    if (currentField && currentMoves && currentMoves.includes(field)) {
-        console.debug(`move from ${currentField} to ${field}`);
-        testGame.move(currentField, field);
-        setCurrentMoves(null);
-        redraw(canvasChess, contextChess, testGame.board.configuration);
-        return;
-    } else if (currentField === field) {
-        setCurrentMoves(null);
-        redraw(canvasChess, contextChess, testGame.board.configuration);
-        return;
+
+    onInteraction() {
+        if (!ourGame) {
+            this.room.send(MessageType.CHESS_INTERACTION);
+            console.debug("Requesting ChessState...");
+            checkInputMode();
+            this.initListeners();
+            createCloseInteractionButton(() => this.leave());
+        } else {
+            console.warn("You're already in a Game!");
+        }
     }
-    const moves: string[] = testGame.moves(field);
-    if (!moves || moves.length === 0) {
-        console.debug("no moves available for this field");
-        setCurrentMoves(null);
-    } else {
-        console.debug("moves:", moves);
-        setCurrentMoves(field, moves);
+
+    private initListeners() {
+        this.canvas.addEventListener('mousedown', this.onClick);
+        this.room.onMessage(MessageType.CHESS_INIT, gameId => {
+            if (!gameId) {
+                console.warn("Got CHESS_INIT message without a gameId")
+                return;
+            }
+            ourGameId = gameId;
+            ourChessState = this.room.state.chessStates[gameId];
+            ourGame = new jsChessEngine.Game(ourChessState.configuration);
+        });
+        this.room.onMessage(MessageType.CHESS_MOVE, message => {
+            if (!ourGame || ourGameId !== message?.gameId) {
+                return;
+            }
+            ourGame.move(message.from, message.to);
+        });
     }
-    redraw(canvasChess, contextChess, testGame.board.configuration, moves);
+
+    loop() {
+        if (ourChessState) {
+            redraw(this.canvas, this.context, ourChessState.configuration, currentMoves);
+        }
+    }
+
+    leave() {
+        removeCloseInteractionButton();
+        this.hide();
+        this.room.removeAllListeners();
+        this.room.send(MessageType.CHESS_LEAVE);
+        ourGame = null;
+        ourChessState = null;
+        ourGameId = null;
+        checkInputMode();
+    }
+
+    private onClick(event: MouseEvent) {
+        if (!ourGame) {
+            return;
+        }
+        const [cursorX, cursorY] = getCursorPosition(this.canvas, event);
+        const maxLength: number = Math.min(this.canvas.width - borderSizeDouble, this.canvas.height - borderSizeDouble);
+        const squareLength: number = maxLength / 8;
+        const fieldX: number = Math.floor(cursorX / squareLength);
+        const fieldY: number = Math.floor(cursorY / squareLength);
+        const field: string = getField(fieldX, fieldY);
+        if (!field) {
+            return;
+        }
+        // console.debug("field:", field);
+        if (currentField && currentMoves && currentMoves.includes(field)) {
+            console.debug(`move from ${currentField} to ${field}`);
+            // ourGame.move(currentField, field);
+            this.room.send(MessageType.CHESS_MOVE, {from: currentField, to: field});
+            setCurrentMoves(null);
+            // redraw(canvasChess, contextChess, ourGame.board.configuration);
+            return;
+        } else if (currentField === field) {
+            setCurrentMoves(null);
+            // redraw(canvasChess, contextChess, ourGame.board.configuration);
+            return;
+        }
+        const moves: string[] = ourGame.moves(field);
+        if (!moves || moves.length === 0) {
+            console.debug("no moves available for this field");
+            setCurrentMoves(null);
+        } else {
+            console.debug("moves:", moves);
+            setCurrentMoves(field, moves);
+        }
+        // redraw(canvasChess, contextChess, ourGame.board.configuration, moves);
+    }
+
 }
