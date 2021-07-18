@@ -51,7 +51,8 @@ function onChessMove(room: Room<State>, client: Client, message) {
     const to: string = message.to;
     try {
         game.move(from, to);
-        getChessStateClients(room, chessState).forEach(client => client.send(MessageType.CHESS_MOVE, {from, to})); //TODO Let the clients move their local game on this message
+        updateChessState(room, gameId, chessState);
+        setTimeout(() => getChessStateClients(room, chessState).forEach(client => client.send(MessageType.CHESS_MOVE, {gameId, from, to})), 100);
     } catch (error) {
         //Nothing, just ignore the invalid move
     }
@@ -120,13 +121,12 @@ function createChessState(room: Room<State>, client: Client): [string, ChessStat
     const chessState = new ChessState();
     chessState.playerWhite = client.sessionId;
     games[gameId] = new jsChessEngine.Game();
-    updateChessState(room, gameId);
+    updateChessState(room, gameId, chessState);
     room.state.chessStates[gameId] = chessState;
     return [gameId, chessState];
 }
 
-function updateChessState(room: Room<State>, gameId: string) {
-    const chessState: ChessState = room.state.chessStates[gameId];
+function updateChessState(room: Room<State>, gameId: string, chessState: ChessState) {
     const game = games[gameId];
     if (!chessState || !game) {
         return;
