@@ -9,11 +9,11 @@ const borderSizeHalf: number = borderSize / 2;
 const borderSizeQuarter: number = borderSize / 4;
 const borderSizeDouble: number = borderSize * 2;
 
-function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, game: any, moves: string[] = null) {
+function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any, moves: string[] = null) {
     drawBorder(canvas, context);
     drawBoard(canvas, context);
-    drawMoves(canvas, context, game.board.configuration.pieces, moves);
-    drawPieces(canvas, context, game.board.configuration.pieces);
+    drawMoves(canvas, context, configuration.pieces, moves);
+    drawPieces(canvas, context, configuration.pieces);
 }
 
 function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
@@ -178,7 +178,7 @@ function createImg(entry: [string, string]) {
 Object.entries(imageSources).forEach(createImg);
 
 const testGame = new jsChessEngine.Game();
-redraw(canvasChess, contextChess, testGame);
+redraw(canvasChess, contextChess, testGame.board.configuration);
 
 export function testChess() {
     // game.printToConsole();
@@ -214,11 +214,11 @@ function onClick(event: MouseEvent) {
         console.debug(`move from ${currentField} to ${field}`);
         testGame.move(currentField, field);
         setCurrentMoves(null);
-        redraw(canvasChess, contextChess, testGame);
+        redraw(canvasChess, contextChess, testGame.board.configuration);
         return;
     } else if (currentField === field) {
         setCurrentMoves(null);
-        redraw(canvasChess, contextChess, testGame);
+        redraw(canvasChess, contextChess, testGame.board.configuration);
         return;
     }
     const moves: string[] = testGame.moves(field);
@@ -229,5 +229,5 @@ function onClick(event: MouseEvent) {
         console.debug("moves:", moves);
         setCurrentMoves(field, moves);
     }
-    redraw(canvasChess, contextChess, testGame, moves);
+    redraw(canvasChess, contextChess, testGame.board.configuration, moves);
 }
