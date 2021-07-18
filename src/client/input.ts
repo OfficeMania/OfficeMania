@@ -28,7 +28,7 @@ import {
 
 let inputMode: InputMode = InputMode.IGNORE;
 
-export const interactionWithMovement: string[] = ["Pong table"];
+export const interactionIgnore: string[] = ["sticky notes"];
 
 export let currentInteraction: Interactive = null;
 
@@ -122,7 +122,8 @@ export function loadInputFunctions() {
                 return;
             }
         }
-        if ((inputMode === InputMode.IGNORE || inputMode === InputMode.INTERACTION) && !interactionWithMovement.includes(checkInteraction()?.content?.name)){
+        if (inputMode === InputMode.IGNORE || (inputMode === InputMode.INTERACTION && interactionIgnore.includes(checkInteraction()?.content?.name))){
+            console.log("exiting");
             return;
         }
         const ourPlayer = getOurPlayer();
@@ -175,7 +176,7 @@ export function loadInputFunctions() {
             return;
         }
     }
-
+    
     //gets called when window is out auf focus
     function onBlur() {
         resetPlayerDirections();
@@ -187,6 +188,9 @@ export function loadInputFunctions() {
 }
 
 export function checkInteraction(executeInteraction: boolean = false): solidInfo {
+    if(executeInteraction) {
+        console.log("called manually, want to switch2);");
+    }
     const ourPlayer = getOurPlayer();
     const [facingX, facingY] = getCorrectedPlayerFacingCoordinates(ourPlayer);
     const solidInfo: solidInfo = getCollisionInfo()?.[facingX]?.[facingY];

@@ -1,6 +1,7 @@
 import {Interactive} from "./interactive";
 import {getInputMode, setInputMode} from "../input";
 import {createCloseInteractionButton, InputMode, removeCloseInteractionButton} from "../util";
+import { checkInputMode } from "../main";
 
 export class VendingMachine extends Interactive{
 
@@ -37,8 +38,9 @@ export class VendingMachine extends Interactive{
     onInteraction() {
         if (getInputMode() !== InputMode.INTERACTION) {
             this.canvas.style.visibility = "visible";
+            this.canvas.getContext("2d").textAlign = "center";
             createCloseInteractionButton(() => this.leave());
-            setInputMode(InputMode.INTERACTION);
+            checkInputMode();
             this.searchText();
         }
         else this.leave();

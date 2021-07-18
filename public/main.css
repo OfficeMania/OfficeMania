@@ -482,6 +482,7 @@ body {
 
 #loading-screen {
     position: fixed;
+    transition: 0.5s;
     background-color: #d0be9c;
     display: flex;
     height: 100%;

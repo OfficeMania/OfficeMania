@@ -127,6 +127,7 @@ export function checkInputMode() {
     } else {
         setInputMode(InputMode.NORMAL);
     }
+    //console.log(getInputMode());
 }
 
 function checkValidSettings() {
@@ -205,10 +206,6 @@ function onSettingsOpen() {
     setInputMode(InputMode.IGNORE);
 }
 
-function onPongOpen() {
-    setInputMode(InputMode.INTERACTION);
-}
-
 function loadSettings() {
     loadUsernameSettings();
     loadCharacterSettings();
@@ -256,6 +253,7 @@ async function main() {
     //loads all the character information
     await loadCharacter();
     initLoading();
+    checkInputMode();
 
     /*
      * Then, we wait for our map to load
@@ -279,7 +277,7 @@ async function main() {
     //retrieve lowest coords
     lowestX = currentMap.lowestX;
     lowestY = currentMap.lowestY;
-    console.log(lowestX, lowestY)
+    //console.log(lowestX, lowestY)
 
     //start position
     let posX: number = (START_POSITION_X + Math.floor(currentMap.widthOfMap / 2)) * currentMap.resolution;
