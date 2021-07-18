@@ -225,11 +225,12 @@ export class ChessBoard extends Interactive {
         this.room.onMessage(MessageType.CHESS_INIT, gameId => {
             if (!gameId) {
                 console.warn("Got CHESS_INIT message without a gameId")
+                this.leave();
                 return;
             }
             ourGameId = gameId;
             ourChessState = this.room.state.chessStates[gameId];
-            ourGame = new jsChessEngine.Game(ourChessState.configuration);
+            ourGame = new jsChessEngine.Game(JSON.parse(ourChessState.configuration));
         });
         this.room.onMessage(MessageType.CHESS_MOVE, message => {
             if (!ourGame || ourGameId !== message?.gameId) {

@@ -60,6 +60,9 @@ function onChessMove(room: Room<State>, client: Client, message) {
 
 function leaveChessGame(room: Room<State>, client: Client) {
     const [gameId, chessState] = getChessState(room, client);
+    if (!chessState) {
+        return;
+    }
     if (chessState.playerWhite === client.sessionId) {
         chessState.playerWhite = null;
     }
@@ -81,8 +84,15 @@ function joinOrCreateChessGame(room: Room<State>, client: Client) {
         //FIXME Already in a game?!
         return;
     }
-    const [gameId] = joinOpenChessState(room, client) ?? createChessState(room, client);
-    setTimeout(() => client.send(MessageType.CHESS_INIT, gameId), 100);
+    const [openGameId] = joinOpenChessState(room, client);
+    let gameId: string = openGameId;
+    if (!gameId) {
+        const [newGameId] = createChessState(room, client);
+        console.debug("create chess game:", newGameId);
+        gameId = newGameId;
+    }
+    console.debug("join chess game:", gameId);
+    setTimeout(() => client.send(MessageType.CHESS_INIT, gameId), 200);
 }
 
 function getChessState(room: Room<State>, client: Client): [string, ChessState] {
