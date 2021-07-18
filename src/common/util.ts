@@ -13,6 +13,12 @@ export enum Direction {
 }
 
 export enum MessageType {
+    // ChessHandler
+    CHESS_INTERACTION = "chess-interaction",
+    CHESS_INIT = "chess-init",
+    CHESS_MOVE = "chess-move",
+    CHESS_LEAVE = "chess-leave",
+    CHESS_END = "chess-end",
     // DoorHandler
     NEW_DOOR = "newDoor",
     // PlayerHandler
