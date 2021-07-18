@@ -212,6 +212,7 @@ export class ChessBoard extends Interactive {
         if (!ourGame) {
             this.room.send(MessageType.CHESS_INTERACTION);
             console.debug("Requesting ChessState...");
+            this.show();
             checkInputMode();
             this.initListeners();
             createCloseInteractionButton(() => this.leave());
