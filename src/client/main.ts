@@ -55,7 +55,6 @@ import {
     usernameInput,
     usersButton
 } from "./static";
-import {testChess} from "./interactive/chessboard";
 
 export var characters: { [key: string]: HTMLImageElement } = {}
 const START_POSITION_X = -13;
@@ -228,7 +227,6 @@ function applySettings() {
 
 // async is necessary here, because we use 'await' to resolve the promises
 async function main() {
-    testChess();
     /*
      * We communicate to our server via WebSockets (ws-protocol instead of http)
      */
