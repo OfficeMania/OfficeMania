@@ -26,7 +26,7 @@ import {
     shareButton
 } from "./static";
 
-let inputMode: InputMode = InputMode.NORMAL;
+let inputMode: InputMode = InputMode.IGNORE;
 
 export const interactionWithMovement: string[] = ["Pong table"];
 

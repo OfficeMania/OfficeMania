@@ -46,6 +46,7 @@ import {
     characterPreview,
     characterSelect,
     interactiveCanvas,
+    loadingScreen,
     muteButton,
     settingsApplyButton,
     settingsButton,
@@ -55,6 +56,7 @@ import {
     usernameInput,
     usersButton
 } from "./static";
+import { initLoading, setShowLoadingscreen } from "./loadingscreen";
 
 export var characters: { [key: string]: HTMLImageElement } = {}
 const START_POSITION_X = -13;
@@ -253,7 +255,8 @@ async function main() {
     getCharacterIntern = () => ourPlayer.character;
 
     //loads all the character information
-    loadCharacter();
+    await loadCharacter();
+    initLoading();
 
     /*
      * Then, we wait for our map to load
@@ -369,8 +372,10 @@ async function main() {
         // Repeat game loop
         requestAnimationFrame(loop);
     }
-
-    // Start game loop
+    loadingScreen.style.display = "none";
+    setShowLoadingscreen(false);
+    setInputMode(InputMode.NORMAL);
+        // Start game loop
     requestAnimationFrame(loop);
 }
 
