@@ -57,6 +57,7 @@ const focusBar = $<HTMLDivElement>("focus-bar");
 
 const audioInputSelect = $<HTMLSelectElement>("audio-input-select");
 const audioOutputSelect = $<HTMLSelectElement>("audio-output-select");
+const videoInputSelect = $<HTMLSelectElement>("video-input-select");
 
 const playerOnlineContainer = $<HTMLUListElement>("player-online-container");
 const playerOnlineList = $<HTMLUListElement>("player-online-list");
@@ -609,9 +610,11 @@ export function setShowParticipantsTab(setTo: boolean) {
 
 let audioInputDevices: MediaDeviceInfo[] = null;
 let audioOutputDevices: MediaDeviceInfo[] = null;
+let videoInputDevices: MediaDeviceInfo[] = null;
 
 let audioInputDevice: MediaDeviceInfo = undefined;
 let audioOutputDevice: MediaDeviceInfo = undefined;
+let videoInputDevice: MediaDeviceInfo = undefined;
 
 export async function loadConferenceSettings() {
     // Audio Input
@@ -630,6 +633,14 @@ export async function loadConferenceSettings() {
         audioOutputSelect.disabled = false;
     } else {
         audioOutputSelect.disabled = true;
+    }
+    // Video Input
+    videoInputDevices = await getMediaDeviceInfos(deviceTypeVideo, deviceDirectionInput);
+    if (videoInputDevices) {
+        setMediaDevices(videoInputSelect, videoInputDevices, videoInputDevice);
+        videoInputSelect.disabled = false;
+    } else {
+        videoInputSelect.disabled = true;
     }
 }
 
