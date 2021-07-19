@@ -9,10 +9,10 @@ import {Whiteboard} from "./interactive/whiteboard";
 import {Todo} from "./interactive/todo";
 import {CoffeeMachine} from "./interactive/coffeeMachine";
 import {VendingMachine} from "./interactive/vendingMachine";
-import { ChessBoard } from "./interactive/chessboard";
+import {ChessBoard} from "./interactive/chessboard";
 import { WaterCooler } from "./interactive/waterCooler";
 
-export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
+export {convertMapData, MapInfo, drawMap, fillSolidInfos, solidInfo}
 
 //map which contains infos if something is solid
 
@@ -56,62 +56,14 @@ class solidInfo {
 
 }
 
-//only important for infinite maps
-class chunk {
+class MapInfo {
 
-    element: number[][];
-    tilesetForElement: tileset[][];
-    tilesetX: number[][];
-    tilesetY: number[][];
-    posX: number;
-    posY: number;
-
-    constructor(entries: number[], xPos: number, yPos: number) {
-        this.tilesetForElement = [];
-        for (let a = 0; a < 16; a++) {
-            this.tilesetForElement[a] = [];
-        }
-
-        this.tilesetX = [];
-        for (let a = 0; a < 16; a++) {
-            this.tilesetX[a] = [];
-        }
-
-        this.tilesetY = [];
-        for (let a = 0; a < 16; a++) {
-            this.tilesetY[a] = [];
-        }
-
-        for (let i = 0; i < 16; i++) {
-            for (let j = 0; j < 16; j++) {
-                this.tilesetForElement[i][j] = null;
-                this.tilesetX[i][j] = null;
-                this.tilesetY[i][j] = null;
-            }
-        }
-
-        this.element = [];
-        for (let a = 0; a < 16; a++) {
-            this.element[a] = [];
-        }
-
-        for (let i: number = 0; i < entries.length; i++) {
-            this.element[i % 16][Math.floor(i / 16)] = entries[i];
-        }
-
-        this.posX = xPos;
-        this.posY = yPos;
-    }
-
-}
-
-class mapInfo {
     lowestX: number;
     lowestY: number;
     highestY: number;
     highestX: number;
-    layers: layer[];
-    tilesets: tileset[];
+    layers: Layer[];
+    tileSets: TileSet[];
     heightOfMap: number;
     widthOfMap: number;
     ctx: CanvasRenderingContext2D;
@@ -119,13 +71,13 @@ class mapInfo {
     resolution: number;
     canvas: HTMLCanvasElement;
 
-    constructor(layers: layer[], tilesets: tileset[], canvas: HTMLCanvasElement, resolution: number, textures: Map<string, HTMLImageElement>, lowestX: number, lowestY: number, highestY: number, highestX: number) {
+    constructor(layers: Layer[], tileSets: TileSet[], canvas: HTMLCanvasElement, resolution: number, textures: Map<string, HTMLImageElement>, lowestX: number, lowestY: number, highestY: number, highestX: number) {
         this.lowestX = lowestX;
         this.lowestY = lowestY;
         this.highestY = highestY;
         this.highestX = highestX;
         this.layers = layers;
-        this.tilesets = tilesets;
+        this.tileSets = tileSets;
         this.heightOfMap = canvas.height / (resolution);
         this.widthOfMap = canvas.width / (resolution);
         this.ctx = canvas.getContext("2d");
@@ -136,39 +88,85 @@ class mapInfo {
 
 }
 
-class layer {
+class Layer {
 
-    name: string;
-    chunks: chunk[];
+    private readonly _name: string;
+    private readonly _chunks: Chunk[] = [];
 
-    constructor(x: number[], y: number[], data: saveArray[], layerName: string) {
-        this.chunks = [];
-        this.name = layerName;
 
-        const tempData: number[] = [];
+    constructor(name: string, chunks: Chunk[]) {
+        this._name = name;
+        this._chunks = chunks;
+    }
 
-        for (let i = 0; i < x.length; i++) {
-            for (let a = 0; a < 256; a++) {
-                tempData[a] = data[i].array[a];
+    get name(): string {
+        return this._name;
+    }
+
+    get chunks(): Chunk[] {
+        return this._chunks;
+    }
+
+}
+
+//only important for infinite maps
+class Chunk {
+
+    private readonly _posX: number;
+    private readonly _posY: number;
+    private readonly _data: number[][] = [];
+    private readonly _tileSetForElement: TileSet[][] = [];
+    private readonly _tileSetX: number[][] = [];
+    private readonly _tileSetY: number[][] = [];
+
+    constructor(posX: number, posY: number, data: number[]) {
+        this._posX = posX;
+        this._posY = posY;
+        this.data.fill([]);
+        this.tileSetForElement.fill([]);
+        this.tileSetX.fill([]);
+        this.tileSetY.fill([]);
+        for (let i = 0; i < 16; i++) {
+            this.tileSetForElement[i] = [];
+            this.tileSetX[i] = [];
+            this.tileSetY[i] = [];
+        }
+        for (let i = 0; i < data.length; i++) {
+            const x = i % 16;
+            if (!this.data[x]) {
+                this.data[x] = [];
             }
-            this.chunks.push(new chunk(tempData, x[i], y[i]));
+            this.data[x][Math.floor(i / 16)] = data[i];
         }
     }
 
-}
+    get posX(): number {
+        return this._posX;
+    }
 
-class saveArray {
+    get posY(): number {
+        return this._posY;
+    }
 
-    array: number[];
+    get data(): number[][] {
+        return this._data;
+    }
 
-    constructor(a: number[]) {
-        this.array = [];
-        a.forEach(item => this.array.push(item));
+    get tileSetForElement(): TileSet[][] {
+        return this._tileSetForElement;
+    }
+
+    get tileSetX(): number[][] {
+        return this._tileSetX;
+    }
+
+    get tileSetY(): number[][] {
+        return this._tileSetY;
     }
 
 }
 
-export class tileset {
+export class TileSet {
 
     firstGridId: number;
     path: string;
@@ -198,7 +196,7 @@ const LAYER_NAME_ROOMS: string = "Rooms";
 const LAYER_NAME_CONFERENCE_ROOMS: string = "Conference rooms";
 const LAYER_NAME_ANIMATED: string = "animated";
 
-function fillSolidInfos(map: mapInfo) {
+function fillSolidInfos(map: MapInfo) {
 
     let solidInfoMap: solidInfo[][];
     const height = Math.abs(map.lowestY - map.highestY) + 32; //TODO why 32? Is this the same for every map
@@ -215,7 +213,7 @@ function fillSolidInfos(map: mapInfo) {
         }
     }
 
-    const lastTileSet = map.tilesets[map.tilesets.length - 1];
+    const lastTileSet = map.tileSets[map.tileSets.length - 1];
     for (const layer of map.layers) {
         const isSolidLayer = layer.name === LAYER_NAME_SOLID;
         const isContentLayer = layer.name === LAYER_NAME_CONTENT;
@@ -227,7 +225,7 @@ function fillSolidInfos(map: mapInfo) {
         for (const chunk of layer.chunks) {
             for (let y = 0; y < 16; y++) {
                 for (let x = 0; x < 16; x++) {
-                    const chunkElement = chunk.element[x][y];
+                    const chunkElement = chunk.data[x][y];
                     const basePosX = (x + chunk.posX - mapStartX) * 2;
                     const basePosY = (y + chunk.posY - mapStartY) * 2;
                     if (chunkElement === 0) {
@@ -237,9 +235,9 @@ function fillSolidInfos(map: mapInfo) {
                         continue;
                     }
                     let newFirstGridId: number;
-                    let newTileSet: tileset;
-                    for (const tileSet of map.tilesets) {
-                        if (chunkElement >= tileSet.firstGridId || map.tilesets.length === 1) {
+                    let newTileSet: TileSet;
+                    for (const tileSet of map.tileSets) {
+                        if (chunkElement >= tileSet.firstGridId || map.tileSets.length === 1) {
                             newFirstGridId = tileSet.firstGridId;
                             newTileSet = tileSet;
                         }
@@ -294,7 +292,7 @@ function setSolidInfoMap(solidInfoMap: solidInfo[][], basePosX: number, basePosY
     callback(solidInfoMap[basePosX + 1][basePosY + 1]);
 }
 
-function getInteractive(value: number, basePosX: number, basePosY: number, room: Room<State>, map: mapInfo) {
+function getInteractive(value: number, basePosX: number, basePosY: number, room: Room<State>, map: MapInfo) {
     switch (value) {
         //doors
         case 1: {
@@ -343,7 +341,7 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
     return null;
 }
 
-function createDoor(direction: DoorDirection, basePosX: number, basePosY: number, room: Room<State>, map: mapInfo): Door {
+function createDoor(direction: DoorDirection, basePosX: number, basePosY: number, room: Room<State>, map: MapInfo): Door {
     room.send(MessageType.NEW_DOOR, basePosX + "." + basePosY);
     return new Door(direction, basePosX, basePosY, map);
 }
@@ -351,10 +349,10 @@ function createDoor(direction: DoorDirection, basePosX: number, basePosY: number
 //saves the paths from the templates
 let paths: string[];
 
-async function convertMapData(map: any, room: Room, canvas: HTMLCanvasElement) {
+async function convertMapData(mapJson: {[key: string]: any}, room: Room, canvas: HTMLCanvasElement) {
 
     //saves the layers from the map
-    let layerArray: layer[];
+    const layers: Layer[] = [];
 
     //the resolution is 48 and shouldn't be changed, would be too complicated to get the right resolution
     let resolution: number;
@@ -372,8 +370,8 @@ async function convertMapData(map: any, room: Room, canvas: HTMLCanvasElement) {
     //zoom in and out on the map, 1 is the standard
     let scaling: number;
 
-    //saves the tilesets from the map
-    let tilesetArray: tileset[];
+    //saves the tileSets from the map
+    const tileSets: TileSet[] = [];
 
     paths = [];
 
@@ -388,22 +386,10 @@ async function convertMapData(map: any, room: Room, canvas: HTMLCanvasElement) {
     //     isInfinite = false;
     // }
 
-    resolution = parseInt(map.tileheight);
+    resolution = parseInt(mapJson.tileheight);
 
-    canvas.height = map.height * resolution;
-    canvas.width = map.width * resolution;
-
-    // mapWidth = canvas.width / (resolution * scaling);
-    // mapHeight = canvas.height / (resolution * scaling);
-
-    layerArray = [];
-    tilesetArray = [];
-
-    let xPos: number[] = [];
-    let yPos: number[] = [];
-    let dataArray: saveArray[] = [];
-    let x: string;
-    let y: string;
+    canvas.height = mapJson.height * resolution;
+    canvas.width = mapJson.width * resolution;
 
     let lowestX: number;
     let lowestY: number;
@@ -411,42 +397,39 @@ async function convertMapData(map: any, room: Room, canvas: HTMLCanvasElement) {
     let highestX: number;
     let isSet: boolean = false;
 
-    for (const layer_ of map.layers) {
-        for (const chunk of layer_.chunks) {
-            x = chunk.x;
-            y = chunk.y;
-            xPos.push(parseInt(x));
-            yPos.push(parseInt(y));
-            dataArray.push(new saveArray(chunk.data));
+    for (const mapJsonLayer of mapJson.layers) {
+        const chunks: Chunk[] = [];
+        for (const mapJsonChunk of mapJsonLayer.chunks) {
+            chunks.push(new Chunk(mapJsonChunk.x, mapJsonChunk.y, mapJsonChunk.data));
             if (!isSet) {
-                lowestX = chunk.x;
-                lowestY = chunk.y;
-                highestY = chunk.y + 15;
-                highestX = chunk.x + 15;
+                lowestX = mapJsonChunk.x;
+                lowestY = mapJsonChunk.y;
+                highestY = mapJsonChunk.y + 15;
+                highestX = mapJsonChunk.x + 15;
                 isSet = true;
             }
-            if (chunk.x < lowestX) {
-                lowestX = chunk.x;
+            if (mapJsonChunk.x < lowestX) {
+                lowestX = mapJsonChunk.x;
             }
-            if (chunk.y < lowestY) {
-                lowestY = chunk.y;
+            if (mapJsonChunk.y < lowestY) {
+                lowestY = mapJsonChunk.y;
             }
-            if (chunk.y + 15 > highestY) {
-                highestY = chunk.y + 15;
+            if (mapJsonChunk.y + 15 > highestY) {
+                highestY = mapJsonChunk.y + 15;
             }
-            if (chunk.x + 15 > highestX) {
-                highestY = chunk.x + 15;
+            if (mapJsonChunk.x + 15 > highestX) {
+                highestY = mapJsonChunk.x + 15;
             }
         }
-        layerArray.push(new layer(xPos, yPos, dataArray, layer_.name));
+        layers.push(new Layer(mapJsonLayer.name, chunks));
     }
-    for (let t = 0; t < map.tilesets.length; t++) {
-        tilesetArray.push(new tileset(parseInt(map.tilesets[t].firstgid), map.tilesets[t].source));
-        image = await loadImage(tilesetArray[t].path);
-        tilesetArray[t].tileWidth = image.naturalWidth;
-        textures.set(tilesetArray[t].path, image);
+    for (let t = 0; t < mapJson.tilesets.length; t++) {
+        tileSets.push(new TileSet(parseInt(mapJson.tilesets[t].firstgid), mapJson.tilesets[t].source));
+        image = await loadImage(tileSets[t].path);
+        tileSets[t].tileWidth = image.naturalWidth;
+        textures.set(tileSets[t].path, image);
     }
-    return new mapInfo(layerArray, tilesetArray, canvas, resolution, textures, lowestX, lowestY, highestY, highestX);
+    return new MapInfo(layers, tileSets, canvas, resolution, textures, lowestX, lowestY, highestY, highestX);
 }
 
 /*
@@ -541,7 +524,7 @@ function drawMapWithChunks (mapData: mapInfo) {
 }
 */
 
-function drawMap(mapData: mapInfo) {
+function drawMap(mapData: MapInfo) {
     for (const layer of mapData.layers) {
         if (layer.name === LAYER_NAME_SOLID || layer.name === LAYER_NAME_CONTENT || layer.name === LAYER_NAME_ROOMS || layer.name === LAYER_NAME_CONFERENCE_ROOMS) {
             continue;
@@ -549,27 +532,27 @@ function drawMap(mapData: mapInfo) {
         for (const chunk of layer.chunks) {
             for (let x = 0; x < 16; x++) {
                 for (let y = 0; y < 16; y++) {
-                    const chunkElement = chunk.element[x][y];
+                    const chunkElement = chunk.data[x][y];
                     if (chunkElement === 0) {
                         //dont paint if there is nothing
                         continue;
                     }
                     const positionX: number = x + chunk.posX + Math.floor(mapData.widthOfMap / 2);
                     const positionY: number = y + chunk.posY + Math.floor(mapData.heightOfMap / 2);
-                    const tileSetElement = chunk.tilesetForElement[x][y];
+                    const tileSetElement = chunk.tileSetForElement[x][y];
                     const dx = positionX * mapData.resolution;
                     const dy = positionY * mapData.resolution;
-                    if (tileSetElement !== null) {
+                    if (tileSetElement) {
                         //draw the image without searching
-                        mapData.ctx.drawImage(mapData.textures.get(tileSetElement.path), chunk.tilesetX[x][y], chunk.tilesetY[x][y], mapData.resolution, mapData.resolution, dx, dy, mapData.resolution, mapData.resolution);
+                        mapData.ctx.drawImage(mapData.textures.get(tileSetElement.path), chunk.tileSetX[x][y], chunk.tileSetY[x][y], mapData.resolution, mapData.resolution, dx, dy, mapData.resolution, mapData.resolution);
                         continue;
                     }
                     //saves a tileSet, we need this to find the right one
                     let newFirstGridId: number;
-                    let newTileSet: tileset;
-                    const lastTileSet: tileset = mapData.tilesets[mapData.tilesets.length - 1];
-                    for (const tileSet of mapData.tilesets) {
-                        if (chunkElement >= tileSet.firstGridId || mapData.tilesets.length === 1) {
+                    let newTileSet: TileSet;
+                    const lastTileSet: TileSet = mapData.tileSets[mapData.tileSets.length - 1];
+                    for (const tileSet of mapData.tileSets) {
+                        if (chunkElement >= tileSet.firstGridId || mapData.tileSets.length === 1) {
                             newFirstGridId = tileSet.firstGridId;
                             newTileSet = tileSet;
                         }
@@ -577,12 +560,12 @@ function drawMap(mapData: mapInfo) {
                         if (!(newFirstGridId < tileSet.firstGridId || tileSet === lastTileSet)) {
                             continue;
                         }
-                        chunk.tilesetForElement[x][y] = newTileSet;
+                        chunk.tileSetForElement[x][y] = newTileSet;
                         const value: number = chunkElement - newTileSet.firstGridId;
                         const sourceX: number = (value % (newTileSet.tileWidth / mapData.resolution)) * mapData.resolution
-                        chunk.tilesetX[x][y] = sourceX;
+                        chunk.tileSetX[x][y] = sourceX;
                         const sourceY: number = Math.floor(value / (newTileSet.tileWidth / mapData.resolution)) * mapData.resolution;
-                        chunk.tilesetY[x][y] = sourceY;
+                        chunk.tileSetY[x][y] = sourceY;
                         mapData.ctx.drawImage(mapData.textures.get(newTileSet.path), sourceX, sourceY, mapData.resolution, mapData.resolution, dx, dy, mapData.resolution, mapData.resolution);
                         break;
                     }
