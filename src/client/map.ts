@@ -9,6 +9,8 @@ import {Whiteboard} from "./interactive/whiteboard";
 import {Todo} from "./interactive/todo";
 import {CoffeeMachine} from "./interactive/coffeeMachine";
 import {VendingMachine} from "./interactive/vendingMachine";
+import { ChessBoard } from "./interactive/chessboard";
+import { WaterCooler } from "./interactive/waterCooler";
 
 export {convertMapData, mapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -199,7 +201,7 @@ const LAYER_NAME_ANIMATED: string = "animated";
 function fillSolidInfos(map: mapInfo) {
 
     let solidInfoMap: solidInfo[][];
-    const height = Math.abs(map.lowestY - map.highestY) + 32;
+    const height = Math.abs(map.lowestY - map.highestY) + 32; //TODO why 32? Is this the same for every map
     const width = Math.abs(map.lowestX - map.highestX) + 32;
     const mapStartX = map.lowestX;
     const mapStartY = map.lowestY;
@@ -329,6 +331,13 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         //vending machine
         case 11: {
             return new VendingMachine();
+        }
+        //chess table
+        case 15: {
+            return new ChessBoard();
+        }
+        case 16: {
+            return new WaterCooler();
         }
     }
     return null;
