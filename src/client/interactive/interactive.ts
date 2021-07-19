@@ -90,5 +90,10 @@ export class Interactive {
     leave(): void{
         console.warn("leave not implemented");
     }
+
+    //need this for doors and Zitdruck
+    proofIfClosed(): any{
+        console.log("No proofIfClosed method speccified");
+    }
 }
 

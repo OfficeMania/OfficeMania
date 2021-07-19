@@ -76,7 +76,7 @@ export function updatePosition(player: Player, room: Room) {
 
 }
 
-
+//TODO no hardcoding
 let xCorrection: number = -38;
 let yCorrection: number = -83;
 
@@ -89,14 +89,19 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                 collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1].isSolid === false) &&         //dont go in direction if there are objects
                 (collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1] === undefined ||
                     collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1].isSolid === false)) {
-                player.moveDirection = Direction.DOWN
-                player.facing = Direction.DOWN
-
-                player.lastScaledY.pop()
-                player.lastScaledY.unshift(player.scaledY) //stores the previous position
-
-                player.scaledY++;
-                room.send(MessageType.MOVE, Direction.DOWN);
+                let content = collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection + 1].content;
+                let content2 = collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection + 1].content;
+                if(content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door"
+                    || content2 && content2.name === "Door" && !content2.proofIfClosed() || !content2 || content2.name !== "Door") {
+                    player.moveDirection = Direction.DOWN
+                    player.facing = Direction.DOWN
+    
+                    player.lastScaledY.pop()
+                    player.lastScaledY.unshift(player.scaledY) //stores the previous position
+    
+                    player.scaledY++;
+                    room.send(MessageType.MOVE, Direction.DOWN);
+                }
             } else {
                 player.facing = Direction.DOWN
             }
@@ -107,14 +112,20 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1].isSolid === false) &&         //dont go in direction if there are objects
                     (collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection - 1] === undefined ||
                         collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection - 1].isSolid === false))) {         //dont go in direction if there are objects
-                player.moveDirection = Direction.UP
-                player.facing = Direction.UP
-
-                player.lastScaledY.pop()
-                player.lastScaledY.unshift(player.scaledY) //stores the previous position
-
-                player.scaledY--;
-                room.send(MessageType.MOVE, Direction.UP);
+                //TODO if  there is a door
+                let content = collisionInfo[player.scaledX - xCorrection][player.scaledY - yCorrection - 1].content;
+                let content2 = collisionInfo[player.scaledX - xCorrection + 1][player.scaledY - yCorrection - 1].content;
+                if(content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door"
+                    || content2 && content2.name === "Door" && !content2.proofIfClosed() || !content2 || content2.name !== "Door"){
+                    player.moveDirection = Direction.UP
+                    player.facing = Direction.UP
+    
+                    player.lastScaledY.pop()
+                    player.lastScaledY.unshift(player.scaledY) //stores the previous position
+    
+                    player.scaledY--;
+                    room.send(MessageType.MOVE, Direction.UP);
+                }
             } else {
                 player.facing = Direction.UP
             }
@@ -123,14 +134,18 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
             if (player.scaledX - xCorrection > 0 &&
                 (collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection] === undefined ||
                     collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection].isSolid === false)) {         //dont go in direction if there are objects
-                player.moveDirection = Direction.LEFT
-                player.facing = Direction.LEFT
-
-                player.lastScaledX.pop()
-                player.lastScaledX.unshift(player.scaledX) //stores the previous position
-
-                player.scaledX--;
-                room.send(MessageType.MOVE, Direction.LEFT);
+                //TODO if there is a door
+                let content = collisionInfo[player.scaledX - xCorrection - 1][player.scaledY - yCorrection].content;
+                if(content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door"){
+                    player.moveDirection = Direction.LEFT
+                    player.facing = Direction.LEFT
+    
+                    player.lastScaledX.pop()
+                    player.lastScaledX.unshift(player.scaledX) //stores the previous position
+    
+                    player.scaledX--;
+                    room.send(MessageType.MOVE, Direction.LEFT);
+                }
             } else {
                 player.facing = Direction.LEFT
             }
@@ -138,14 +153,18 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
         if (player.priorDirections[0] === Direction.RIGHT && player.moveDirection === null) {
             if (collisionInfo[player.scaledX - xCorrection + 2][player.scaledY - yCorrection] === undefined ||
                 collisionInfo[player.scaledX - xCorrection + 2][player.scaledY - yCorrection].isSolid === false) {         //dont go in direction if there are objects
-                player.moveDirection = Direction.RIGHT
-                player.facing = Direction.RIGHT
-
-                player.lastScaledX.pop()
-                player.lastScaledX.unshift(player.scaledX) //stores the previous position
-
-                player.scaledX++;
-                room.send(MessageType.MOVE, Direction.RIGHT);
+                //TODO if there is a door
+                let content = collisionInfo[player.scaledX - xCorrection + 2][player.scaledY - yCorrection].content;
+                if(content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door"){
+                    player.moveDirection = Direction.RIGHT
+                    player.facing = Direction.RIGHT
+    
+                    player.lastScaledX.pop()
+                    player.lastScaledX.unshift(player.scaledX) //stores the previous position
+    
+                    player.scaledX++;
+                    room.send(MessageType.MOVE, Direction.RIGHT);
+                }
             } else {
                 player.facing = Direction.RIGHT
             }

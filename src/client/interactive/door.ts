@@ -1,6 +1,10 @@
 import {Interactive} from "./interactive"
-import {getOurPlayer} from "./../util"
+import {getOurPlayer, getRoom} from "./../util"
 import {MapInfo, TileSet} from "./../map"
+import { Player } from "../player";
+import {Room} from "colyseus.js";
+import {State} from "../../common";
+import {MessageType} from "../../common/util";
 
 export enum DoorDirection {
     UNKNOWN,
@@ -21,6 +25,10 @@ export class Door extends Interactive {
     map: MapInfo
     texture: HTMLImageElement;
     tileSet: TileSet;
+    private room: Room<State>;
+    //TODO no hardcoding
+    xCorrection: number = -38;
+    yCorrection: number = -83;
 
 
     constructor(direction: DoorDirection, posX: number, posY: number, map: MapInfo) {
@@ -31,12 +39,19 @@ export class Door extends Interactive {
         this.posX = posX;
         this.posY = posY;
         this.map = map;
+        this.room = getRoom();
+        let id = posX + "" + posY;
+        this.room.send(MessageType.NEW_DOOR, id);
         this.setTexture();
     }
 
+    
     onInteraction(): void {
+        return;
         let player = getOurPlayer();
-        this.startInteraction(player.positionX, player.positionY, player.id);
+        this.isClosed = this.room.state.doorStates[this.posX + "" + this.posY].isClosed;
+        this.playerId = this.room.state.doorStates[this.posX + "" + this.posY].playerId;
+        this.startInteraction(player.scaledX - this.xCorrection, player.scaledY - this.yCorrection, player.id);
     }
 
     setTexture() {
@@ -61,7 +76,7 @@ export class Door extends Interactive {
 
                     if (Math.floor(x / 16) * 16 === chunk.posX && Math.floor(y / 16) * 16 === chunk.posY) {
 
-                        if(!chunk.tileSetForElement[chunkPosX][chunkPosY]){
+                        if(!chunk.tileSetForElement[chunkPosX][chunkPosY]){ //why are there two doors with this?
                             console.log("ehhhh");
                             return;
                         } else{
@@ -74,13 +89,16 @@ export class Door extends Interactive {
         }
     }
 
-    proofIfClosed(playerDirection: number) {
+    proofIfClosed() {
 
-        //TODO
-        //update Door from server before
-        //Open door if Player who looked is in the room and wants to leave
+        this.isClosed = this.room.state.doorStates[this.posX + "" + this.posY].isClosed;
+        this.playerId = this.room.state.doorStates[this.posX + "" + this.posY].playerId;
         if (this.isClosed) {
-            //if direction is inside the room then return false
+            let player: Player;
+            player = getOurPlayer();
+            if(this.isInside(player.scaledX - this.xCorrection, player.scaledY - this.yCorrection)) {
+                return false;
+            }
             return true;
         } else {
             return false;
@@ -90,66 +108,30 @@ export class Door extends Interactive {
     lockDoor(id: string) {
         //if you are not allowed to close this door
         if (this.direction === DoorDirection.ALWAYS_OPEN) {
-            //error
+            //TODO error message
         } else {
             this.playerId = id;
             this.isClosed = true;
-            //TODO send to server
+            let message = [this.posX + "" + this.posY, this.playerId]
+            this.room.send(MessageType.CLOSE_DOOR, message);
         }
-        //TODO
     }
 
     openDoor(id: string) {
 
-        //TODO
         if (id === this.playerId) {
             this.isClosed = false;
-            //TODO send to server
+            this.room.send(MessageType.OPEN_DOOR, this.posX + "" + this.posY);
         } else {
-           //error
+           //TODO error message
         }
     }
 
     startInteraction(playerX: number, playerY: number, playerId: string) {
 
-        //update Door before
         switch (this.direction) {
 
             case DoorDirection.NORTH: {
-
-                if (playerY > this.posY) {
-
-                    this.openDoor(playerId);
-                } else {
-
-                    if (this.isClosed) {
-
-                        this.openDoor(playerId);
-                    } else {
-
-                        this.lockDoor(playerId);
-                    }
-                }
-                break;
-            }
-            case DoorDirection.EAST: {
-
-                if (playerX < this.posX) {
-
-                    this.openDoor(playerId);
-                } else {
-
-                    if (this.isClosed) {
-
-                        this.openDoor(playerId);
-                    } else {
-
-                        this.lockDoor(playerId);
-                    }
-                }
-                break;
-            }
-            case DoorDirection.SOUTH: {
 
                 if (playerY < this.posY) {
 
@@ -166,7 +148,7 @@ export class Door extends Interactive {
                 }
                 break;
             }
-            case DoorDirection.WEST: {
+            case DoorDirection.EAST: {
 
                 if (playerX > this.posX) {
 
@@ -183,6 +165,79 @@ export class Door extends Interactive {
                 }
                 break;
             }
+            case DoorDirection.SOUTH: {
+
+                if (playerY > this.posY) {
+
+                    this.openDoor(playerId);
+                } else {
+
+                    if (this.isClosed) {
+
+                        this.openDoor(playerId);
+                    } else {
+
+                        this.lockDoor(playerId);
+                    }
+                }
+                break;
+            }
+            case DoorDirection.WEST: {
+
+                if (playerX < this.posX) {
+
+                    this.openDoor(playerId);
+                } else {
+
+                    if (this.isClosed) {
+
+                        this.openDoor(playerId);
+                    } else {
+
+                        this.lockDoor(playerId);
+                    }
+                }
+                break;
+            }
         }
+    }
+
+    isInside (playerX: number, playerY: number) {
+
+        switch (this.direction) {
+
+            case DoorDirection.NORTH: {
+
+                if (playerY < this.posY) {
+
+                    return true;
+                }
+            }
+            case DoorDirection.EAST: {
+
+                if (playerX < this.posX) {
+
+                    return true;
+                }
+                break;
+            }
+            case DoorDirection.SOUTH: {
+
+                if (playerY < this.posY) {
+
+                    return true;
+                }
+                break;
+            }
+            case DoorDirection.WEST: {
+
+                if (playerX < this.posX) {
+
+                    return true;
+                }
+                break;
+            }
+        }
+        return false;
     }
 }
