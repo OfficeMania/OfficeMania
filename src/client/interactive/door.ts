@@ -20,6 +20,7 @@ export class Door extends Interactive {
     posY: number;
     map: MapInfo
     texture: HTMLImageElement;
+    tileSet: TileSet;
 
 
     constructor(direction: DoorDirection, posX: number, posY: number, map: MapInfo) {
@@ -30,7 +31,7 @@ export class Door extends Interactive {
         this.posX = posX;
         this.posY = posY;
         this.map = map;
-        //this.setTexture();
+        this.setTexture();
     }
 
     onInteraction(): void {
@@ -53,21 +54,15 @@ export class Door extends Interactive {
             chunkPosY = 16 - Math.abs(chunkPosY);
         }
 
-        let tileset: TileSet;
-
-        console.log(this.posX + "." + this.posY + "   " + x + "." + y + "     " + Math.floor(x / 16) * 16 + "." + Math.floor(y / 16) * 16 + "   " + chunkPosX + "." + chunkPosY);
-
         for (const layer of this.map.layers) {
-            if (layer.name !== "Content" && layer.name !== "Rooms" && layer.name !== "Conference rooms" && layer.name !== "Solid") {
+            if (layer.name === "Doors") {
 
                 for (const chunk of layer.chunks) {
 
                     if (Math.floor(x / 16) * 16 === chunk.posX && Math.floor(y / 16) * 16 === chunk.posY) {
 
-                        console.log(chunk);
-                        console.log(layer);
-                        tileset = chunk.tileSetForElement[chunkPosX][chunkPosY];
-                        this.texture = this.map.textures.get(tileset.path);
+                        this.tileSet = chunk.tileSetForElement[chunkPosX][chunkPosY];
+                        this.texture = this.map.textures.get(this.tileSet.path);
                     }
                 }
             }
