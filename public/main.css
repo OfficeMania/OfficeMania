@@ -56,7 +56,8 @@ body {
     flex-direction: row;
 }
 
-#panel-buttons button {
+#panel-buttons button,
+#interactive-bar button {
     height: 40px;
     width: 40px;
     cursor: pointer;
@@ -71,11 +72,13 @@ body {
     position: relative;
 }
 
-#panel-buttons button:hover {
+#panel-buttons button:hover,
+#interactive-bar button:hover {
     transition: 0.5s;
 }
 
-#panel-buttons button span {
+#panel-buttons button span,
+#interactive-bar span {
     display: none;
     position: absolute;
     background: rgba(248, 248, 248, 0.8);
@@ -86,11 +89,13 @@ body {
     left: 16px;
 }
 
-#panel-buttons button:hover span {
+#panel-buttons button:hover span,
+#interactive-bar button:hover span {
     display: block;
 }
 
-#panel-buttons button span:after {
+#panel-buttons button span:after,
+#interactive-bar button span:after {
     transition: 0.5s;
     right: 0;
 }
@@ -125,6 +130,14 @@ body {
 
 #close:hover span:after {
     content: '  Close'
+}
+
+#button-chess-export:hover span:after {
+    content: '  Export Game to Clipboard'
+}
+
+#button-chess-import:hover span:after {
+    content: '  Import Game from Clipboard'
 }
 
 #panel-buttons button:hover span:after {
@@ -284,8 +297,6 @@ body {
 }
 
 #interactive-bar button {
-    margin-left: 20%;
-    margin-top: 15%;
     height: 40px;
     width: 40px;
     cursor: pointer;
@@ -295,11 +306,22 @@ body {
     margin: 5px;
     color: #3a3a50;
     background: #f8f8f8;
-    border: solid;
-    border-width: 2px;
+    border: 2px solid;
     border-radius: 10px;
     z-index: 1;
     visibility: hidden;
+}
+
+#interactive-bar-chess {
+    position: absolute;
+    top: 30%;
+    right: 30%;
+    visibility: hidden;
+    display: flex;
+}
+
+#interactive-bar-chess button {
+    position: unset;
 }
 
 #whiteboard {
