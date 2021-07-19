@@ -1,6 +1,6 @@
 import {createPlayerState, trackTypeDesktop, trackTypeVideo} from "./conference";
 import {Player} from "../player";
-import {removeChildren} from "../util";
+import {appendFAIcon, removeChildren} from "../util";
 
 export {User, SelfUser};
 
@@ -15,17 +15,20 @@ function createAudioTrackElement(id: string): HTMLAudioElement {
 }
 
 function createVideoElementContainer(id: string, user: User, onUpdate: () => void): VideoContainer {
-    const element = document.createElement("video");
-    element.setAttribute("id", id);
-    element.setAttribute("poster", "/img/pause-standby.png");
-    element.toggleAttribute("muted", true);
-    element.toggleAttribute("playsinline", true);
-    element.toggleAttribute("autoplay", true);
-    element.onclick = () => {
+    const videoElement = document.createElement("video");
+    videoElement.setAttribute("id", id);
+    videoElement.setAttribute("poster", "/img/pause-standby.png");
+    videoElement.toggleAttribute("muted", true);
+    videoElement.toggleAttribute("playsinline", true);
+    videoElement.toggleAttribute("autoplay", true);
+    const focusToggle = () => {
         user.setFocused(!user.isFocused());
         onUpdate.call(user);
     };
-    return new VideoContainer(element);
+    videoElement.addEventListener("click", focusToggle);
+    const videoContainer = new VideoContainer(videoElement);
+    videoContainer.buttonToggleSize.addEventListener("click", focusToggle);
+    return videoContainer;
 }
 
 //Exported functions
@@ -35,20 +38,25 @@ class VideoContainer {
     private readonly _container: HTMLDivElement;
     private readonly _video: HTMLVideoElement;
     private readonly _overlay: HTMLDivElement;
+    private readonly _buttonToggleSize: HTMLButtonElement;
 
     constructor(video: HTMLVideoElement) {
         this._container = document.createElement("div");
         this._video = video;
         this._overlay = document.createElement("div");
+        this._buttonToggleSize = document.createElement("button");
         this.init();
     }
 
     protected init() {
-        this.container.classList.add("video-container")
+        this.container.classList.add("video-container");
         this.container.append(this.video);
         this.overlay.classList.add("video-overlay");
         this.container.append(this.overlay);
         this.updatePlayerState(undefined);
+        this.buttonToggleSize.classList.add("button-video-toggle-size");
+        appendFAIcon(this.buttonToggleSize, "expand-alt");
+        this.container.append(this.buttonToggleSize);
     }
 
     get container(): HTMLDivElement {
@@ -63,9 +71,18 @@ class VideoContainer {
         return this._overlay;
     }
 
+    get buttonToggleSize(): HTMLButtonElement {
+        return this._buttonToggleSize;
+    }
+
     updatePlayerState(player: Player) {
         removeChildren(this.overlay);
         this.overlay.append(createPlayerState(player, document.createElement("div")));
+    }
+
+    updateFocus(focused: boolean) {
+        removeChildren(this.buttonToggleSize);
+        appendFAIcon(this.buttonToggleSize, focused ? "compress-alt" : "expand-alt");
     }
 
 }
@@ -176,6 +193,7 @@ class User {
             return;
         }
         const focused = this.isFocused();
+        this.videoContainer.updateFocus(focused);
         const currentBar = focused ? this.focusBar : this.videoBar;
         const lastBar = !focused ? this.focusBar : this.videoBar;
         if (lastBar.contains(element)) {

@@ -221,6 +221,10 @@ body {
     justify-content: center;
 }
 
+.video-container {
+    position: relative;
+}
+
 #video-bar .video-container {
     width: 100%;
     max-width: 15%;
@@ -249,6 +253,13 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.button-video-toggle-size {
+    position: absolute;
+    bottom: 45px;
+    right: 0;
+    margin: 5px;
 }
 
 #focus-bar {

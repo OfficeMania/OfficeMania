@@ -176,7 +176,7 @@ export function loadInputFunctions() {
             return;
         }
     }
-    
+
     //gets called when window is out auf focus
     function onBlur() {
         resetPlayerDirections();
@@ -211,7 +211,7 @@ const interactionNearbyButton: HTMLButtonElement = createInteractionButton(() =>
     button.style.opacity = "0";
     button.style.display = "none";
 });
-appendFAIcon(interactionNearbyButton, "fa-sign-in-alt");
+appendFAIcon(interactionNearbyButton, "sign-in-alt");
 const [interactionHelp, interactionHelpItem]: [HTMLDivElement, HTMLSpanElement] = createInteractionHelp();
 interactionHelp.style.opacity = "0";
 interactionHelp.style.display = "none";

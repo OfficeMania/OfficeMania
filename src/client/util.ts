@@ -356,7 +356,7 @@ export function getPlayerByRoomId(playerId: string): Player {
 
 export function appendFAIcon(element: HTMLElement, faIcon: string) {
     const em: HTMLElement = document.createElement("em");
-    em.classList.add("fa", faIcon);
+    em.classList.add("fa", "fa-" + faIcon);
     element.append(em);
 }
 
@@ -364,7 +364,7 @@ let interactionClosed: boolean = false;
 
 export function createCloseInteractionButton(listener: () => void) {
     const button: HTMLButtonElement = createInteractionButton(listener, "button-close-interaction");
-    appendFAIcon(button, "fa-times");
+    appendFAIcon(button, "times");
     button.addEventListener("click", () => interactionClosed = true);
 }
 
