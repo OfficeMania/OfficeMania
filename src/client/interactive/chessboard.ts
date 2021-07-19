@@ -18,6 +18,7 @@ function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, co
     drawBorder(canvas, context);
     drawBoard(canvas, context);
     drawMoves(canvas, context, configuration.pieces, moves);
+    drawConfiguration(canvas, context, configuration);
     drawPieces(canvas, context, configuration.pieces);
     drawResult(canvas, context, configuration);
 }
@@ -73,6 +74,22 @@ function drawBoard(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D)
             context.fillRect(posX, posY, squareLength, squareLength);
         }
     }
+    context.restore();
+}
+
+function drawConfiguration(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any) {
+    if (!configuration?.check) {
+        return;
+    }
+    context.save();
+    cropCanvas(canvas, context);
+    const maxLength = getMaxLength(canvas);
+    const squareLength: number = maxLength / 8;
+    context.fillStyle = "orange";
+    const king: string = configuration.turn === ChessColor.WHITE ? "K" : "k";
+    const field: string = Object.entries(configuration.pieces).find(entry => entry[1] === king)[0];
+    const [fieldX, fieldY] = getCoordinates(field);
+    context.fillRect(fieldX * squareLength, fieldY * squareLength, squareLength, squareLength);
     context.restore();
 }
 
