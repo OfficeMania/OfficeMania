@@ -270,6 +270,9 @@ async function main() {
     const map: mapInfo = await convertMapData(mapJson, room, background);
 
     let currentMap = new mapInfo(map.layers, map.tilesets, map.canvas, map.resolution, map.textures, map.lowestX, map.lowestY, map.highestY, map.highestX);
+
+    drawMap(currentMap);
+    
     let collisionInfo: solidInfo[][] = fillSolidInfos(currentMap);
     setCollisionInfo(collisionInfo);
     console.log(collisionInfo)
@@ -282,8 +285,6 @@ async function main() {
     //start position
     let posX: number = (START_POSITION_X + Math.floor(currentMap.widthOfMap / 2)) * currentMap.resolution;
     let posY: number = (START_POSITION_Y + Math.floor(currentMap.heightOfMap / 2)) * currentMap.resolution;
-
-    drawMap(currentMap);
 
     /* (from movement)
      * movement inputs

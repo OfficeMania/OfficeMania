@@ -44,7 +44,20 @@ export class Door extends Interactive {
 
         let x = this.posX / 2 + this.map.lowestX;
         let y = this.posY / 2 + this.map.lowestY;
+
+        let chunkPosX = x % 16;
+        let chunkPosY = y % 16;
+
+        if (chunkPosX < 0) {
+            chunkPosX = 16 - Math.abs(chunkPosX);
+        }
+        if (chunkPosY < 0) {
+            chunkPosY = 16 - Math.abs(chunkPosY);
+        }
+
         let tileset: tileset;
+
+        console.log(this.posX + "." + this.posY + "   " + x + "." + y + "     " + Math.floor(x / 16) * 16 + "." + Math.floor(y / 16) * 16 + "   " + chunkPosX + "." + chunkPosY);
 
         for (const layer of this.map.layers) { 
             
@@ -52,9 +65,11 @@ export class Door extends Interactive {
 
                 for (const chunk of layer.chunks) {
 
-                    if ((x % 16) * 16 === chunk.posX && (y % 16) * 16 === chunk.posY) {
+                    if (Math.floor(x / 16) * 16 === chunk.posX && Math.floor(y / 16) * 16 === chunk.posY) {
 
-                        tileset = chunk.tilesetForElement[x % 16][y % 16];
+                        console.log(chunk);
+                        console.log(layer);
+                        tileset = chunk.tilesetForElement[chunkPosX][chunkPosY];
                         this.texture = this.map.textures.get(tileset.path);
                     }
                 }
