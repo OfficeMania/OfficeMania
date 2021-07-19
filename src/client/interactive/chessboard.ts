@@ -61,27 +61,16 @@ function drawBoard(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D)
     const maxLength = getMaxLength(canvas);
     context.fillRect(0, 0, maxLength, maxLength);
     const squareLength = maxLength / 8;
-    context.fillStyle = "black";
-    for (let i = 0; i < 8; i++) {
-        const pos = i * squareLength;
-        // Draw Vertical Lines
-        context.beginPath();
-        context.moveTo(pos, 0);
-        context.lineTo(pos, maxLength);
-        context.stroke();
-        // Draw Horizontal Lines
-        context.beginPath();
-        context.moveTo(0, pos);
-        context.lineTo(maxLength, pos);
-        context.stroke();
-    }
+    context.fillStyle = "gray";
     for (let x = 0; x < 8; x++) {
         for (let y = 0; y < 8; y++) {
-            const text: string = getField(x, y);
-            const textMetrics = context.measureText(text);
-            const posX = (x + 0.5) * squareLength - (textMetrics.width / 2);
-            const posY = (y + 0.5) * squareLength;
-            // context.fillText(text, posX, posY);
+            if (x % 2 === y % 2) {
+                continue;
+            }
+            const posX = x * squareLength;
+            const posY = y * squareLength;
+            // Draw Gray Squares
+            context.fillRect(posX, posY, squareLength, squareLength);
         }
     }
     context.restore();
