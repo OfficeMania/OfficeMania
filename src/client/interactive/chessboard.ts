@@ -86,11 +86,11 @@ function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D,
     const squareLength: number = maxLength / 8;
     context.fillStyle = "blue";
     const [currentFieldX, currentFieldY] = getCoordinates(currentField);
-    context.fillRect(currentFieldX * squareLength, currentFieldY * squareLength, squareLength + 1, squareLength + 1);
+    context.fillRect(currentFieldX * squareLength, currentFieldY * squareLength, squareLength, squareLength);
     for (const move of moves) {
         context.fillStyle = getMoveColor(pieces, move);
         const [fieldX, fieldY] = getCoordinates(move);
-        context.fillRect(fieldX * squareLength, fieldY * squareLength, squareLength + 1, squareLength + 1);
+        context.fillRect(fieldX * squareLength, fieldY * squareLength, squareLength, squareLength);
     }
     context.restore();
 }
