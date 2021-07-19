@@ -14,7 +14,7 @@ export class VendingMachine extends Interactive{
     "Want s'more Coke? Pay up.",
     "The coins are too grimy.",
     "... and now they are too shiny.",
-    "butts lol",
+    /*"butts lol"*/,
     "Well I don't remember you inserting that money...",
     "Was that a dollar, or a penny?",
     "Better get the maintainance guy!",
