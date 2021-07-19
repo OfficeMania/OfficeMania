@@ -61,8 +61,13 @@ export class Door extends Interactive {
 
                     if (Math.floor(x / 16) * 16 === chunk.posX && Math.floor(y / 16) * 16 === chunk.posY) {
 
-                        this.tileSet = chunk.tileSetForElement[chunkPosX][chunkPosY];
-                        this.texture = this.map.textures.get(this.tileSet.path);
+                        if(!chunk.tileSetForElement[chunkPosX][chunkPosY]){
+                            console.log("ehhhh");
+                            return;
+                        } else{
+                            this.tileSet = chunk.tileSetForElement[chunkPosX][chunkPosY];
+                            this.texture = this.map.textures.get(this.tileSet.path);
+                        }
                     }
                 }
             }
@@ -83,16 +88,13 @@ export class Door extends Interactive {
     }
 
     lockDoor(id: string) {
-        if (this.isClosed) {
+        //if you are not allowed to close this door
+        if (this.direction === DoorDirection.ALWAYS_OPEN) {
             //error
         } else {
-            //if you are not allowed to close this door
-            if (this.direction === DoorDirection.ALWAYS_OPEN) {
-                //error
-            } else {
-                this.playerId = id;
-                this.isClosed = true;
-            }
+            this.playerId = id;
+            this.isClosed = true;
+            //TODO send to server
         }
         //TODO
     }
@@ -100,14 +102,11 @@ export class Door extends Interactive {
     openDoor(id: string) {
 
         //TODO
-        if (!this.isClosed) {
-            //error
+        if (id === this.playerId) {
+            this.isClosed = false;
+            //TODO send to server
         } else {
-            if (id === this.playerId) {
-                this.isClosed = false;
-            } else {
-                //error
-            }
+           //error
         }
     }
 
