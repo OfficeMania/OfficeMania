@@ -47,7 +47,6 @@ export class Door extends Interactive {
 
     
     onInteraction(): void {
-        return;
         let player = getOurPlayer();
         this.isClosed = this.room.state.doorStates[this.posX + "" + this.posY].isClosed;
         this.playerId = this.room.state.doorStates[this.posX + "" + this.posY].playerId;
@@ -118,6 +117,7 @@ export class Door extends Interactive {
     }
 
     openDoor(id: string) {
+        console.log("in open");
 
         if (id === this.playerId) {
             this.isClosed = false;
@@ -215,7 +215,7 @@ export class Door extends Interactive {
             }
             case DoorDirection.EAST: {
 
-                if (playerX < this.posX) {
+                if (playerX > this.posX) {
 
                     return true;
                 }
@@ -223,7 +223,7 @@ export class Door extends Interactive {
             }
             case DoorDirection.SOUTH: {
 
-                if (playerY < this.posY) {
+                if (playerY > this.posY) {
 
                     return true;
                 }
