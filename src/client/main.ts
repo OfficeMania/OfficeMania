@@ -17,7 +17,7 @@ import {
     setRoom,
     setUsername
 } from "./util";
-import {convertMapData, drawMap, fillSolidInfos, mapInfo, solidInfo} from "./map";
+import {convertMapData, drawMap, fillSolidInfos, MapInfo, solidInfo} from "./map";
 import {
     applyConferenceSettings,
     initConference,
@@ -46,7 +46,6 @@ import {
     characterPreview,
     characterSelect,
     interactiveCanvas,
-    loadingScreen,
     muteButton,
     settingsApplyButton,
     settingsButton,
@@ -56,7 +55,7 @@ import {
     usernameInput,
     usersButton
 } from "./static";
-import { initLoading, setShowLoadingscreen } from "./loadingscreen";
+import {initLoading, setShowLoadingscreen} from "./loadingscreen";
 
 export var characters: { [key: string]: HTMLImageElement } = {}
 const START_POSITION_X = -13;
@@ -267,12 +266,12 @@ async function main() {
 
     //load map from server
     const mapJson = await fetch("/map/Map.json").then((response) => response.json());
-    const map: mapInfo = await convertMapData(mapJson, room, background);
+    const map: MapInfo = await convertMapData(mapJson, room, background);
 
-    let currentMap = new mapInfo(map.layers, map.tilesets, map.canvas, map.resolution, map.textures, map.lowestX, map.lowestY, map.highestY, map.highestX);
+    let currentMap = new MapInfo(map.layers, map.tileSets, map.canvas, map.resolution, map.textures, map.lowestX, map.lowestY, map.highestY, map.highestX);
 
     drawMap(currentMap);
-    
+
     let collisionInfo: solidInfo[][] = fillSolidInfos(currentMap);
     setCollisionInfo(collisionInfo);
     console.log(collisionInfo)

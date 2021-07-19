@@ -1,7 +1,6 @@
 import {Interactive} from "./interactive"
-import {Player} from "./../player"
 import {getOurPlayer} from "./../util"
-import {mapInfo, tileset} from "./../map"
+import {MapInfo, TileSet} from "./../map"
 
 export enum DoorDirection {
     UNKNOWN,
@@ -19,11 +18,11 @@ export class Door extends Interactive {
     playerId: string;
     posX: number;
     posY: number;
-    map: mapInfo
+    map: MapInfo
     texture: HTMLImageElement;
 
 
-    constructor(direction: DoorDirection, posX: number, posY: number, map: mapInfo) {
+    constructor(direction: DoorDirection, posX: number, posY: number, map: MapInfo) {
 
         super("Door", true, 1);
         this.isClosed = false;
@@ -35,7 +34,6 @@ export class Door extends Interactive {
     }
 
     onInteraction(): void {
-        
         let player = getOurPlayer();
         this.startInteraction(player.positionX, player.positionY, player.id);
     }
@@ -55,12 +53,11 @@ export class Door extends Interactive {
             chunkPosY = 16 - Math.abs(chunkPosY);
         }
 
-        let tileset: tileset;
+        let tileset: TileSet;
 
         console.log(this.posX + "." + this.posY + "   " + x + "." + y + "     " + Math.floor(x / 16) * 16 + "." + Math.floor(y / 16) * 16 + "   " + chunkPosX + "." + chunkPosY);
 
-        for (const layer of this.map.layers) { 
-            
+        for (const layer of this.map.layers) {
             if (layer.name !== "Content" && layer.name !== "Rooms" && layer.name !== "Conference rooms" && layer.name !== "Solid") {
 
                 for (const chunk of layer.chunks) {
@@ -69,7 +66,7 @@ export class Door extends Interactive {
 
                         console.log(chunk);
                         console.log(layer);
-                        tileset = chunk.tilesetForElement[chunkPosX][chunkPosY];
+                        tileset = chunk.tileSetForElement[chunkPosX][chunkPosY];
                         this.texture = this.map.textures.get(tileset.path);
                     }
                 }
