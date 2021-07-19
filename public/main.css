@@ -405,8 +405,14 @@ body {
     flex-direction: column;
     align-items: center;
     height: 100%;
-    overflow: scroll;
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
+
+#player-online-list::-webkit-scrollbar {
+    display: none; /*chrome*/
+  }
 
 #player-online-list .player-state {
     width: 100%;
