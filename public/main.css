@@ -394,6 +394,7 @@ body {
     flex-direction: column;
     align-items: center;
     height: 100%;
+    overflow: scroll;
 }
 
 #player-online-list .player-state {
