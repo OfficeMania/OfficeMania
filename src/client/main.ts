@@ -224,6 +224,9 @@ function applySettings() {
 
 // async is necessary here, because we use 'await' to resolve the promises
 async function main() {
+
+    $("#welcome-modal").modal();
+    
     /*
      * We communicate to our server via WebSockets (ws-protocol instead of http)
      */
@@ -304,7 +307,6 @@ async function main() {
     });
 
     initConference(room);
-
 
     /* (from movement)
      * Create a gameLoop-like function for drawing a simple animation

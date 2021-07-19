@@ -181,6 +181,11 @@ body {
     display: inline-block;
 }
 
+#welcome-body p {
+    font-size: large;
+    display: inline-block;
+}
+
 .key {
     background-image: url('../assets/keys/KeysExtended.png');
 }
