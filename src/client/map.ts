@@ -200,7 +200,7 @@ const LAYER_NAME_ANIMATED: string = "animated";
 function fillSolidInfos(map: mapInfo) {
 
     let solidInfoMap: solidInfo[][];
-    const height = Math.abs(map.lowestY - map.highestY) + 32;
+    const height = Math.abs(map.lowestY - map.highestY) + 32; //TODO why 32? Is this the same for every map
     const width = Math.abs(map.lowestX - map.highestX) + 32;
     const mapStartX = map.lowestX;
     const mapStartY = map.lowestY;
