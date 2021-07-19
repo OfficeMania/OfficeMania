@@ -7,6 +7,7 @@ import {
     KEY_CAMERA_DEVICE_ID,
     KEY_CHARACTER,
     KEY_MIC_DEVICE_ID,
+    KEY_SPEAKER_DEVICE_ID,
     KEY_USERNAME,
     MessageType
 } from "../common/util";
@@ -285,6 +286,14 @@ export function setMicDeviceId(value: string) {
 
 export function getMicDeviceId(): string {
     return localStorage.getItem(KEY_MIC_DEVICE_ID);
+}
+
+export function setSpeakerDeviceId(value: string) {
+    localStorage.setItem(KEY_SPEAKER_DEVICE_ID, value);
+}
+
+export function getSpeakerDeviceId(): string {
+    return localStorage.getItem(KEY_SPEAKER_DEVICE_ID);
 }
 
 export function setCameraDeviceId (value: string) {

@@ -4,15 +4,21 @@ import {
     appendIcon,
     canSeeEachOther,
     createPlayerAvatar,
+    getCameraDeviceId,
     getChatEnabled,
     getCollisionInfo,
     getCorrectedPlayerCoordinates,
+    getMicDeviceId,
     getOurPlayer,
     getPlayerByParticipantId,
     getPlayers,
     getRoom,
+    getSpeakerDeviceId,
     PlayerRecord,
-    removeChildren
+    removeChildren,
+    setCameraDeviceId,
+    setMicDeviceId,
+    setSpeakerDeviceId
 } from "../util";
 import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
@@ -113,8 +119,8 @@ const optionsCamTrack = {
     constraints: {
         video: {
             aspectRatio: 16 / 9,
-            width: { min: 1024, ideal: 1280, max: 1920 },
-            height: { min: 576, ideal: 720, max: 1080 }
+            width: {min: 1024, ideal: 1280, max: 1920},
+            height: {min: 576, ideal: 720, max: 1080}
         }
     }
 }
@@ -360,7 +366,7 @@ function unload() {
     connection.disconnect();
 }
 
-function createCamTrack(cameraDeviceId: string = undefined) {
+function createCamTrack(cameraDeviceId: string = getCameraDeviceId()) {
     createVideoTrack(!cameraDeviceId ? optionsCamTrack : {...optionsCamTrack, cameraDeviceId});
 }
 
@@ -391,7 +397,7 @@ function createVideoTrack(options: {}, sharing: boolean = false) {
     });
 }
 
-function createAudioTrack(micDeviceId: string = undefined) {
+function createAudioTrack(micDeviceId: string = getMicDeviceId()) {
     const options = !micDeviceId ? optionsAudioTrack : {...optionsAudioTrack, micDeviceId};
     createLocalTracks(options, (tracks) => {
         tracks.forEach(onLocalTrackCreated);
@@ -620,6 +626,10 @@ export async function loadConferenceSettings() {
     // Audio Input
     audioInputDevices = await getMediaDeviceInfos(deviceTypeAudio, deviceDirectionInput);
     if (audioInputDevices) {
+        if (!audioInputDevice) {
+            const micDeviceId = getMicDeviceId();
+            audioInputDevice = micDeviceId ? audioInputDevices.find(audioInputDevice => audioInputDevice.deviceId === micDeviceId) : audioInputDevices[0];
+        }
         setMediaDevices(audioInputSelect, audioInputDevices, audioInputDevice);
         audioInputSelect.disabled = false;
     } else {
@@ -628,6 +638,10 @@ export async function loadConferenceSettings() {
     // Audio Output
     audioOutputDevices = await getMediaDeviceInfos(deviceTypeAudio, deviceDirectionOutput);
     if (audioOutputDevices) {
+        if (!audioOutputDevice) {
+            const speakerDeviceId = getSpeakerDeviceId();
+            audioOutputDevice = speakerDeviceId ? audioOutputDevices.find(audioOutputDevice => audioOutputDevice.deviceId === speakerDeviceId) : audioOutputDevices[0];
+        }
         const currentAudioOutputDevice = JitsiMeetJSIntern.mediaDevices.getAudioOutputDevice();
         setMediaDevices(audioOutputSelect, audioOutputDevices, !currentAudioOutputDevice || currentAudioOutputDevice == '' ? undefined : audioOutputDevices.find(device => device.deviceId == currentAudioOutputDevice));
         audioOutputSelect.disabled = false;
@@ -637,6 +651,10 @@ export async function loadConferenceSettings() {
     // Video Input
     videoInputDevices = await getMediaDeviceInfos(deviceTypeVideo, deviceDirectionInput);
     if (videoInputDevices) {
+        if (!videoInputDevice) {
+            const cameraDeviceId = getCameraDeviceId();
+            videoInputDevice = cameraDeviceId ? videoInputDevices.find(videoInputDevice => videoInputDevice.deviceId === cameraDeviceId) : videoInputDevices[0];
+        }
         setMediaDevices(videoInputSelect, videoInputDevices, videoInputDevice);
         videoInputSelect.disabled = false;
     } else {
@@ -648,20 +666,33 @@ export function applyConferenceSettings() {
     // Audio Input
     if (audioInputDevices) {
         const newAudioInputDevice = audioInputDevices[audioInputSelect.selectedIndex];
-        if (newAudioInputDevice !== audioInputDevice) {
+        if (newAudioInputDevice.deviceId !== audioInputDevice?.deviceId) {
             audioInputDevice = newAudioInputDevice;
             if (audioInputDevice) {
                 createAudioTrack(audioInputDevice.deviceId);
+                setMicDeviceId(audioInputDevice.deviceId);
             }
         }
     }
     // Audio Output
     if (audioOutputDevices) {
         const newAudioOutputDevice = audioOutputDevices[audioOutputSelect.selectedIndex];
-        if (newAudioOutputDevice !== audioOutputDevice) {
+        if (newAudioOutputDevice.deviceId !== audioOutputDevice?.deviceId) {
             audioOutputDevice = newAudioOutputDevice;
             if (audioOutputDevice) {
                 JitsiMeetJSIntern.mediaDevices.setAudioOutputDevice(audioOutputDevice.deviceId);
+                setSpeakerDeviceId(audioOutputDevice.deviceId);
+            }
+        }
+    }
+    // Video Input
+    if (videoInputDevices) {
+        const newVideoInputDevice = videoInputDevices[videoInputSelect.selectedIndex];
+        if (newVideoInputDevice.deviceId !== videoInputDevice?.deviceId) {
+            videoInputDevice = newVideoInputDevice;
+            if (videoInputDevice) {
+                createCamTrack(videoInputDevice.deviceId);
+                setCameraDeviceId(videoInputDevice.deviceId);
             }
         }
     }
