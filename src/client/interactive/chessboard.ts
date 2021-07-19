@@ -6,6 +6,7 @@ import {ChessState} from "../../common/rooms/schema/state";
 import {MessageType} from "../../common/util";
 import {checkInputMode} from "../main";
 import {ChessColor, getOppositeChessColor} from "../../common/handler/chesshandler";
+import {chessExportButton, chessImportButton, interactiveBarChess} from "../static";
 
 const jsChessEngine = require('js-chess-engine');
 
@@ -255,7 +256,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
             this.show();
             checkInputMode();
             this.initListeners();
-            createCloseInteractionButton(() => this.leave());
+            this.showButtons();
         } else {
             console.warn("You're already in a Game!");
         }
@@ -273,6 +274,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
             ourChessState = this.room.state.chessStates[gameId];
             ourGame = new jsChessEngine.Game(JSON.parse(ourChessState.configuration));
         });
+        this.room.onMessage(MessageType.CHESS_UPDATE, (message) => ourGame = new jsChessEngine.Game(message));
         this.room.onMessage(MessageType.CHESS_MOVE, message => {
             if (!ourGame || ourGameId !== message?.gameId) {
                 return;
@@ -280,6 +282,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
             ourGame.move(message.from, message.to);
             ourGame.moves();
         });
+        chessImportButton.addEventListener("click", () => this.loadGameFromClipboard());
     }
 
     isFinished(): boolean {
@@ -307,13 +310,28 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
     }
 
     leave() {
-        removeCloseInteractionButton();
+        this.hideButtons();
         this.hide();
         this.canvas.onmousedown = null;
+        chessImportButton.click = null;
         this.room.removeAllListeners();
         this.room.send(MessageType.CHESS_LEAVE);
         resetVariables();
         checkInputMode();
+    }
+
+    private showButtons() {
+        createCloseInteractionButton(() => this.leave());
+        interactiveBarChess.style.visibility = "visible";
+        chessImportButton.style.visibility = "visible";
+        chessExportButton.style.visibility = "visible";
+    }
+
+    private hideButtons() {
+        removeCloseInteractionButton();
+        interactiveBarChess.style.visibility = "hidden";
+        chessImportButton.style.visibility = "hidden";
+        chessExportButton.style.visibility = "hidden";
     }
 
     private onClick(event: MouseEvent) { //FIXME Closing and opening a game again removes the drawing of possible moves
@@ -357,4 +375,22 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         // redraw(canvasChess, contextChess, ourGame.board.configuration, moves);
     }
 
+    private loadGameFromClipboard() {
+        navigator.clipboard.readText().then(text => {
+            try {
+                this.room.send(MessageType.CHESS_UPDATE, JSON.parse(text));
+            } catch (error) {
+                console.error(error);
+            }
+        });
+    }
+
+}
+
+chessExportButton.addEventListener("click", () => saveGameToClipboard());
+
+export function saveGameToClipboard() {
+    if (ourChessState?.configuration) {
+        navigator.clipboard.writeText(ourChessState.configuration).catch(console.error);
+    }
 }

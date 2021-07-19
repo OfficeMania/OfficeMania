@@ -29,6 +29,7 @@ export class ChessHandler implements Handler {
         this.room.onMessage(MessageType.CHESS_INTERACTION, (client) => onChessInteraction(this.room, client));
         this.room.onMessage(MessageType.CHESS_MOVE, (client, message) => onChessMove(this.room, client, message));
         this.room.onMessage(MessageType.CHESS_LEAVE, (client) => leaveChessGame(this.room, client));
+        this.room.onMessage(MessageType.CHESS_UPDATE, (client, message) => updateChessGame(this.room, client, message));
     }
 
     onJoin(client: Client) {
@@ -93,6 +94,25 @@ function leaveChessGame(room: Room<State>, client: Client) {
         return;
     }
     //TODO Notify remaining Player?
+}
+
+function updateChessGame(room: Room<State>, client: Client, message) {
+    const [gameId, chessState] = getChessState(room, client);
+    if (!chessState) {
+        return;
+    }
+    if (chessState.playerWhite && chessState.playerBlack) {
+        return;
+    }
+    try {
+        const game = new jsChessEngine.Game(message);
+        delete games[gameId];
+        games[gameId] = game;
+        updateChessState(room, gameId, chessState);
+        setTimeout(() => getChessStateClients(room, chessState).forEach(client => client.send(MessageType.CHESS_UPDATE, game.board.configuration)), 100);
+    } catch (error) {
+        //Ignore it?
+    }
 }
 
 function joinOrCreateChessGame(room: Room<State>, client: Client) {
