@@ -30,7 +30,7 @@ export class DoorHandler implements Handler {
 }
 
 function onNewDoor(room: Room<State>, client: Client, message) {
-    if (room.state.doorStates[message] !== null) {
+    if (room.state.doorStates[message]) {
         room.state.doorStates[message] = new DoorState();
         room.state.doorStates[message].isClosed = false;
         room.state.doorStates[message].playerId = "";

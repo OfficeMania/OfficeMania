@@ -152,7 +152,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
         }
     }
     //moves to the next tile
-    if (player.moveDirection !== null) {
+    if (player.moveDirection) {
         player.moveTime++;
         if (player.moveDirection === Direction.DOWN) {
             player.positionY += PLAYER_MOVEMENT_PER_TICK;
