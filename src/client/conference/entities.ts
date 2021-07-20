@@ -22,7 +22,7 @@ function createVideoElementContainer(id: string, user: User, onUpdate: () => voi
     videoElement.toggleAttribute("playsinline", true);
     videoElement.toggleAttribute("autoplay", true);
     const focusToggle = () => {
-        user.setFocused(!user.isFocused());
+        user.toggleFocus();
         onUpdate.call(user);
     };
     videoElement.addEventListener("click", focusToggle);
@@ -110,11 +110,11 @@ class User {
         this.participantId = participantId;
     }
 
-    isAudioMuted(): boolean {
+    isAudioTrackMuted(): boolean {
         return this.audioTrack?.isMuted();
     }
 
-    isVideoMuted(): boolean {
+    isVideoTrackMuted(): boolean {
         return this.videoTrack?.isMuted();
     }
 
@@ -123,41 +123,51 @@ class User {
             this.videoTrack = null;
             this.update();
         } else {
-            //TODO How to make sure that this is the cam audio track and not the share audio track?
             this.audioTrack = null;
             this.update();
         }
     }
 
-    setAudioTrack(track, createElement: boolean = true) {
+    async setAudioTrack(track, isLocal: boolean) {
+        await this.disposeAudio();
         if (!track) {
-            console.warn("the cam audio track should not be set null");
+            console.warn("The Audio Track should not be empty");
             this.audioTrack = null;
             this.update();
             return;
         }
-        //TODO What to do with overridden tracks? detach them?
         this.audioTrack = track;
-        if (createElement) {
-            const element = createAudioTrackElement(`track-audio-${this.participantId}-${track.getId()}`);
-            this.audioElement = element;
-            track.attach(element);
+        if (isLocal) {
+            this.conference.addTrack(this.audioTrack);
+        } else {
+            if (!this.audioElement) {
+                this.audioElement = createAudioTrackElement(`track-audio-${this.participantId}-${track.getId()}`);
+            }
+            if (this.audioElement) {
+                this.audioTrack.attach(this.audioElement);
+            }
         }
         this.update();
     }
 
-    setVideoTrack(track) {
+    async setVideoTrack(track, isLocal: boolean) {
+        await this.disposeVideo();
         if (!track) {
-            console.warn("the cam video track should not be set null");
+            console.warn("The Video Track should not be empty");
             this.videoTrack = null;
             this.update();
             return;
         }
-        //TODO What to do with overridden tracks? detach them?
         this.videoTrack = track;
-        const container = createVideoElementContainer(`track-video-${this.participantId}-${track.getId()}`, this, this.updateVideoContainer);
-        this.videoContainer = container;
-        track.attach(container.video);
+        if (!this.videoContainer) {
+            this.videoContainer = createVideoElementContainer(`track-video-${this.participantId}-${track.getId()}`, this, this.updateVideoContainer);
+        }
+        if (this.videoContainer?.video) {
+            this.videoTrack.attach(this.videoContainer.video);
+        }
+        if (isLocal) {
+            this.conference.addTrack(this.videoTrack);
+        }
         this.update();
     }
 
@@ -165,20 +175,24 @@ class User {
         return false;
     }
 
-    setHidden(hide: boolean) {
+    protected setHidden(hide: boolean) {
         this.videoContainer?.video?.toggleAttribute(attributeHide, hide);
     }
 
-    isHidden(): boolean {
+    protected isHidden(): boolean {
         return this.videoContainer?.video?.hasAttribute(attributeHide);
     }
 
-    setFocused(focus: boolean) {
+    protected setFocused(focus: boolean) {
         this.videoContainer?.video?.toggleAttribute(attributeFocus, focus);
     }
 
-    isFocused(): boolean {
+    protected isFocused(): boolean {
         return this.videoContainer?.video?.hasAttribute(attributeFocus);
+    }
+
+    toggleFocus() {
+        this.setFocused(!this.isFocused());
     }
 
     protected updateVideoContainer() {
@@ -202,6 +216,7 @@ class User {
         if (!currentBar.contains(element)) {
             currentBar.append(element);
         }
+        this.videoContainer.video.play().catch(console.error);
     }
 
     update() {
@@ -235,10 +250,8 @@ class User {
                                 this.setHidden(true);
                                 this.updateVideoContainer();
                             } else {
-                                this.videoContainer.video.play().then(() => {
-                                    this.setHidden(false);
-                                    this.updateVideoContainer();
-                                });
+                                this.setHidden(false);
+                                this.updateVideoContainer();
                             }
                         }
                     }
@@ -301,19 +314,19 @@ class User {
         this.videoTrack?.detach(this.videoContainer.video);
     }
 
-    dispose() {
-        this.disposeAudio();
-        this.disposeVideo();
+    async dispose() {
+        await this.disposeAudio();
+        await this.disposeVideo();
     }
 
-    disposeAudio() {
+    async disposeAudio() {
         this.audioTrack?.detach(this.audioElement);
-        this.audioTrack?.dispose();
+        await this.audioTrack?.dispose();
     }
 
-    disposeVideo() {
+    async disposeVideo() {
         this.videoTrack?.detach(this.videoContainer.video);
-        this.videoTrack?.dispose();
+        await this.videoTrack?.dispose();
     }
 
 }
