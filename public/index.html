@@ -31,7 +31,7 @@
             <div id="panel-buttons-interaction"></div>
             <div id="group-right">
                 <button id="button-settings" aria-label="Open Settings" data-toggle="modal" data-target="#settings-modal"><em class="fa fa-cog"></em><span></span></button>
-                <button id="button-users" aria-label="Show Users"><em class="fa fa-user-friends"></em><span></span></button>
+                <button id="button-users" aria-label="Show Users"><em class="fa fa-users"></em><span></span></button>
                 <button id="button-help"data-toggle="modal" data-target="#help-modal"><em class="fa fa-question-circle"></em><span></span></button>
             </div>
         </div>
@@ -118,18 +118,29 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Exit Settings">&times;</button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Exit Welcome Screen">&times;</button>
                         <h2 class="modal-title">Welcome to OfficeMania</h2>
                     </div>
                     <div class="modal-body">
                         <div id="welcome-body">
-                            <p>Move wround with arrow keys or WASD.</p> 
+                            <span>Move around with the Arrow Keys or </span>
+                            <img src="../assets/img/transparent_32x32.png" alt="W-Key" class="key key-small" style="background-position: calc(3 * -32px) calc(4 * -32px);">
+                            <img src="../assets/img/transparent_32x32.png" alt="A-Key" class="key key-small" style="background-position: calc(2 * -32px) -32px;">
+                            <img src="../assets/img/transparent_32x32.png" alt="S-Key" class="key key-small" style="background-position: calc(6 * -32px) calc(3 * -32px);">
+                            <img src="../assets/img/transparent_32x32.png" alt="D-Key" class="key key-small" style="background-position: calc(5 * -32px) calc(1 * -32px);">
+                            <br><br>
+                            <span>Press</span>
+                            <img src="../assets/img/transparent_32x32.png" alt="E-Key" class="key key-small" style="background-position: calc(6 * -32px) calc(-32px);">
+                            <span>to interact with Objects like: Doors, Computers, Vending Machines, Whiteboards and more</span>
                             <hr>
-                            <p>Press <strong>E</strong> to interact with Objects like: Doors, Computers, Vending Machines, Whiteboards and more...</p>
+                            <span>For Help click on</span>
+                            <em class="fa fa-question-circle"></em>
                             <br>
-                            <p>Need help? Press <strong>?</strong> on the top right.</p>
+                            <span>To show all online Users</span>
+                            <em class="fa fa-users"></em>
                             <br>
-                            <p>To change settigs click "Zahnrad-Bild hier einfügen"</p>
+                            <span>To change Settings click on</span>
+                            <em class="fa fa-cog"></em>
                         </div>
                     </div>
                     <div class="modal-footer">
