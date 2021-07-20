@@ -64,6 +64,7 @@ function onChessMove(room: Room<State>, client: Client, message) {
         }
         game.move(from, to);
         game.moves();
+        updateCheck(game);
         updateChessState(room, gameId, chessState);
         setTimeout(() => getChessStateClients(room, chessState).forEach(client => client.send(MessageType.CHESS_MOVE, {
             gameId,
@@ -185,4 +186,32 @@ function updateChessState(room: Room<State>, gameId: string, chessState: ChessSt
 
 function getChessStateClients(room: Room<State>, chessState: ChessState): Client[] {
     return room.clients.filter(client => chessState.playerWhite === client.sessionId || chessState.playerBlack === client.sessionId);
+}
+
+function getPieceField(pieces: any, piece: string) {
+    return Object.entries(pieces).find(entry => entry[1] === piece)[0];
+}
+
+function isKingInCheck(configuration: any, king: string): boolean {
+    const field = getPieceField(configuration.pieces, king);
+    const moves = new jsChessEngine.Game(configuration).moves();
+    for (const destination of Object.values(moves)) {
+        // @ts-ignore
+        if (destination.includes(field)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function updateCheck(game) {
+    const configurationOriginal = game.board.configuration;
+    const isTurnWhite: boolean = configurationOriginal.turn === ChessColor.WHITE;
+    const configurationWhiteKing = JSON.parse(JSON.stringify(configurationOriginal));
+    const configurationBlackKing = JSON.parse(JSON.stringify(configurationOriginal));
+    configurationWhiteKing.turn = ChessColor.BLACK;
+    configurationBlackKing.turn = ChessColor.WHITE;
+    const isWhiteKingInCheck = isKingInCheck(configurationWhiteKing, "K");
+    const isBlackKingInCheck = isKingInCheck(configurationBlackKing, "k");
+    configurationOriginal.check = isTurnWhite ? isWhiteKingInCheck : isBlackKingInCheck;
 }
