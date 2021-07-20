@@ -302,6 +302,16 @@ body {
     -webkit-text-stroke-color: black;
 }
 
+#interactive-bar iframe {
+    margin-top: 15%;
+    margin-left: 20%;
+    width: 1280px;
+    height: 720px;
+    width: 60%;
+    height: 60%;
+    position: absolute;
+}
+
 #interactive {
     /*position:absolute;*/
     margin-left: 20%;

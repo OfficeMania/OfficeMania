@@ -11,6 +11,7 @@ import {CoffeeMachine} from "./interactive/coffeeMachine";
 import {VendingMachine} from "./interactive/vendingMachine";
 import {ChessBoard} from "./interactive/chessboard";
 import { WaterCooler } from "./interactive/waterCooler";
+import { Computer } from "./interactive/computer";
 
 export {convertMapData, MapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -330,6 +331,10 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         //vending machine
         case 11: {
             return new VendingMachine();
+        }
+        //computer
+        case 12: {
+            return new Computer();
         }
         //chess table
         case 15: {
