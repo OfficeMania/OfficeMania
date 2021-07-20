@@ -31,6 +31,7 @@ function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
     const maxLength = getMaxLength(canvas, 0);
     const squareLength = maxLength / 8;
     context.fillStyle = "black";
+    context.font = "15px Arial sans-serif";
     for (let i = 0; i < 8; i++) {
         const pos = i * squareLength;
         // Draw Border Text
@@ -119,6 +120,7 @@ function drawPieces(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
     const maxLength = getMaxLength(canvas);
     const squareLength = maxLength / 8;
     context.fillStyle = "black";
+    context.font = "15px Arial sans-serif";
     for (const field in pieces) {
         const piece: string = pieces[field];
         const [x, y] = getCoordinates(field);
