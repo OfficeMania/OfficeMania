@@ -3,6 +3,7 @@ import {TILE_SIZE} from "./player";
 import {
     createPlayerAvatar,
     getCharacter,
+    getCurrentVersion,
     getUsername,
     InitState,
     InputMode,
@@ -12,6 +13,7 @@ import {
     removeChildren,
     setCharacter,
     setCollisionInfo,
+    setCurrentVersion,
     setOurPlayer,
     setPlayers,
     setRoom,
@@ -54,7 +56,8 @@ import {
     settingsOkButton,
     shareButton,
     usernameInput,
-    usersButton
+    usersButton,
+    version
 } from "./static";
 import {initLoading, setShowLoadingscreen} from "./loadingscreen";
 
@@ -202,11 +205,22 @@ function applySettings() {
     applyConferenceSettings();
 }
 
+function showWelcomeScreen() {
+    // @ts-ignore
+    $("#welcome-modal").modal();
+}
+
+function checkWelcomeScreen() {
+    const currentVersion = getCurrentVersion();
+    if (!currentVersion || version > currentVersion) {
+        showWelcomeScreen();
+    }
+    setCurrentVersion(version);
+}
+
 // async is necessary here, because we use 'await' to resolve the promises
 async function main() {
-
-    $("#welcome-modal").modal();
-    
+    checkWelcomeScreen();
     /*
      * We communicate to our server via WebSockets (ws-protocol instead of http)
      */

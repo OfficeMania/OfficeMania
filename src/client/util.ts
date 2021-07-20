@@ -6,6 +6,7 @@ import {
     Direction,
     KEY_CAMERA_DEVICE_ID,
     KEY_CHARACTER,
+    KEY_CURRENT_VERSION,
     KEY_MIC_DEVICE_ID,
     KEY_SPEAKER_DEVICE_ID,
     KEY_USERNAME,
@@ -302,6 +303,14 @@ export function setCameraDeviceId (value: string) {
 
 export function getCameraDeviceId(): string {
     return localStorage.getItem(KEY_CAMERA_DEVICE_ID);
+}
+
+export function setCurrentVersion (value: number) {
+    localStorage.setItem(KEY_CURRENT_VERSION, String(value));
+}
+
+export function getCurrentVersion(): number {
+    return Number(localStorage.getItem(KEY_CURRENT_VERSION));
 }
 
 export function appendIcon(element: HTMLElement, icon: string): HTMLSpanElement {

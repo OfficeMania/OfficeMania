@@ -1,3 +1,5 @@
+export const version: number = 1;
+
 function $<T extends HTMLElement>(a: string) {
     return <T>document.getElementById(a);
 }
