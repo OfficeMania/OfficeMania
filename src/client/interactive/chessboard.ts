@@ -27,7 +27,7 @@ const borderSizeHalf: number = borderSize / 2;
 const borderSizeQuarter: number = borderSize / 4;
 const borderSizeDouble: number = borderSize * 2;
 
-function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any, moves: string[] = null, possibleMoves: { [key: string]: string[] }) {
+function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any, moves: string[], possibleMoves: { [key: string]: string[] }) {
     drawBorder(canvas, context);
     drawBoard(canvas, context);
     drawMoves(canvas, context, configuration.pieces, moves, possibleMoves);
