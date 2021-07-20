@@ -13,11 +13,13 @@ const jsChessEngine = require('js-chess-engine');
 enum ChessSquareColor {
     NORMAL_WHITE = "white",
     NORMAL_GRAY = "gray",
+    POSSIBLE = "lightgreen",
     OWN = "blue",
     MOVE = "green",
     KICK = "red",
     CASTLING = "yellow", //TODO Doesn't seem to be implemented in the chess engine to show the tower as a possible field
-    CHECK = "orange"
+    CHECK = "orange",
+    CHECK_CANT_MOVE = "orangered"
 }
 
 const borderSize: number = 20;
@@ -25,11 +27,11 @@ const borderSizeHalf: number = borderSize / 2;
 const borderSizeQuarter: number = borderSize / 4;
 const borderSizeDouble: number = borderSize * 2;
 
-function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any, moves: string[] = null) {
+function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any, moves: string[] = null, possibleMoves: { [key: string]: string[] }) {
     drawBorder(canvas, context);
     drawBoard(canvas, context);
-    drawMoves(canvas, context, configuration.pieces, moves);
-    drawConfiguration(canvas, context, configuration);
+    drawMoves(canvas, context, configuration.pieces, moves, possibleMoves);
+    drawCheck(canvas, context, configuration, possibleMoves);
     drawPieces(canvas, context, configuration.pieces);
     drawResult(canvas, context, configuration);
 }
@@ -89,7 +91,28 @@ function drawBoard(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D)
     context.restore();
 }
 
-function drawConfiguration(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any) {
+function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: any, moves: string[], possibleMoves: { [key: string]: string[] }) {
+    context.save();
+    cropCanvas(canvas, context);
+    const maxLength = getMaxLength(canvas);
+    const squareLength: number = maxLength / 8;
+    if (possibleMoves) {
+        for (const move of Object.keys(possibleMoves)) {
+            drawSquare(context, squareLength, move, ChessSquareColor.POSSIBLE);
+        }
+    }
+    if (moves) {
+        context.fillStyle = ChessSquareColor.OWN;
+        const [currentFieldX, currentFieldY] = getCoordinates(currentField);
+        context.fillRect(currentFieldX * squareLength, currentFieldY * squareLength, squareLength, squareLength);
+        for (const move of moves) {
+            drawSquare(context, squareLength, move, getMoveColor(pieces, move));
+        }
+    }
+    context.restore();
+}
+
+function drawCheck(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any, possibleMoves: { [key: string]: string[] }) {
     if (!configuration?.check) {
         return;
     }
@@ -100,7 +123,8 @@ function drawConfiguration(canvas: HTMLCanvasElement, context: CanvasRenderingCo
     const king: string = configuration.turn === ChessColor.WHITE ? "K" : "k";
     const field: string = Object.entries(configuration.pieces).find(entry => entry[1] === king)[0];
     if (field) {
-        drawSquare(context, squareLength, field, ChessSquareColor.CHECK);
+        const color = possibleMoves && Object.keys(possibleMoves).includes(field) ? ChessSquareColor.CHECK : ChessSquareColor.CHECK_CANT_MOVE;
+        drawSquare(context, squareLength, field, color);
     }
     context.restore();
 }
@@ -109,23 +133,6 @@ function drawSquare(context: CanvasRenderingContext2D, squareLength: number, fie
     context.fillStyle = color;
     const [fieldX, fieldY] = getCoordinates(field);
     context.fillRect(fieldX * squareLength, fieldY * squareLength, squareLength, squareLength);
-}
-
-function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: any, moves: string[]) {
-    if (!moves || moves.length === 0) {
-        return;
-    }
-    context.save();
-    cropCanvas(canvas, context);
-    const maxLength = getMaxLength(canvas);
-    const squareLength: number = maxLength / 8;
-    context.fillStyle = ChessSquareColor.OWN;
-    const [currentFieldX, currentFieldY] = getCoordinates(currentField);
-    context.fillRect(currentFieldX * squareLength, currentFieldY * squareLength, squareLength, squareLength);
-    for (const move of moves) {
-        drawSquare(context, squareLength, move, getMoveColor(pieces, move));
-    }
-    context.restore();
 }
 
 function drawPieces(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: { [key: string]: string }) {
@@ -237,10 +244,15 @@ function getCursorPosition(canvas: HTMLCanvasElement, event: MouseEvent): [numbe
 
 let currentField: string = null;
 let currentMoves: string[] = null;
+let allMoves: { [key: string]: string[] } = null;
 
 function setCurrentMoves(field: string, moves: string[] = null) {
     currentField = field;
     currentMoves = moves;
+}
+
+function setAllMoves(moves: { [key: string]: string[] }) {
+    allMoves = moves;
 }
 
 let ourGame;
@@ -290,14 +302,18 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
             ourGameId = gameId;
             ourChessState = this.room.state.chessStates[gameId];
             ourGame = new jsChessEngine.Game(JSON.parse(ourChessState.configuration));
+            setAllMoves(ourGame.moves());
         });
-        this.room.onMessage(MessageType.CHESS_UPDATE, (message) => ourGame = new jsChessEngine.Game(message));
+        this.room.onMessage(MessageType.CHESS_UPDATE, (message) => {
+            ourGame = new jsChessEngine.Game(message);
+            setAllMoves(ourGame.moves());
+        });
         this.room.onMessage(MessageType.CHESS_MOVE, message => {
             if (!ourGame || ourGameId !== message?.gameId) {
                 return;
             }
             ourGame.move(message.from, message.to);
-            ourGame.moves();
+            setAllMoves(ourGame.moves());
         });
         chessImportButton.addEventListener("click", () => this.loadGameFromClipboard());
     }
@@ -322,7 +338,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
 
     loop() {
         if (ourChessState) {
-            redraw(this.canvas, this.context, JSON.parse(ourChessState.configuration), currentMoves);
+            redraw(this.canvas, this.context, JSON.parse(ourChessState.configuration), currentMoves, allMoves);
         }
     }
 
