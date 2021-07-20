@@ -10,6 +10,16 @@ import {chessExportButton, chessImportButton, interactiveBarChess} from "../stat
 
 const jsChessEngine = require('js-chess-engine');
 
+enum ChessSquareColor {
+    NORMAL_WHITE = "white",
+    NORMAL_GRAY = "gray",
+    OWN = "blue",
+    MOVE = "green",
+    KICK = "red",
+    CASTLING = "yellow", //TODO Doesn't seem to be implemented in the chess engine to show the tower as a possible field
+    CHECK = "orange"
+}
+
 const borderSize: number = 20;
 const borderSizeHalf: number = borderSize / 2;
 const borderSizeQuarter: number = borderSize / 4;
@@ -60,11 +70,11 @@ function cropCanvas(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
 function drawBoard(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     context.save();
     cropCanvas(canvas, context);
-    context.fillStyle = "white";
+    context.fillStyle = ChessSquareColor.NORMAL_WHITE;
     const maxLength = getMaxLength(canvas);
     context.fillRect(0, 0, maxLength, maxLength);
     const squareLength = maxLength / 8;
-    context.fillStyle = "gray";
+    context.fillStyle = ChessSquareColor.NORMAL_GRAY;
     for (let x = 0; x < 8; x++) {
         for (let y = 0; y < 8; y++) {
             if (x % 2 === y % 2) {
@@ -103,7 +113,7 @@ function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D,
     cropCanvas(canvas, context);
     const maxLength = getMaxLength(canvas);
     const squareLength: number = maxLength / 8;
-    context.fillStyle = "blue";
+    context.fillStyle = ChessSquareColor.OWN;
     const [currentFieldX, currentFieldY] = getCoordinates(currentField);
     context.fillRect(currentFieldX * squareLength, currentFieldY * squareLength, squareLength, squareLength);
     for (const move of moves) {
@@ -161,11 +171,11 @@ function isPieceWhite(piece: string): boolean {
 function getMoveColor(pieces: any, move: string): string {
     const piece: string = pieces[move];
     if (!piece) {
-        return "green";
+        return ChessSquareColor.MOVE;
     }
     const isCurrentBlack: boolean = isPieceBlack(pieces[currentField]);
     const isBlack: boolean = isPieceBlack(piece);
-    return isCurrentBlack === isBlack ? "yellow" : "red";
+    return isCurrentBlack === isBlack ? ChessSquareColor.CASTLING : ChessSquareColor.KICK;
 }
 
 function getMaxLength(canvas: HTMLCanvasElement, offset: number = borderSizeDouble): number {
