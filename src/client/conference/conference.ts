@@ -386,6 +386,9 @@ function createVideoTrack(options: {}) {
     createLocalTracks(options, (tracks) => {
         // tracks.forEach(onLocalTrackCreated);
         selfUser.setNewVideoTrack(tracks[0]).then(() => updateButtons());
+    }, error => {
+        console.error(error);
+        setCameraDeviceId(null);
     });
 }
 
@@ -394,6 +397,9 @@ function createAudioTrack(micDeviceId: string = getMicDeviceId()) {
     createLocalTracks(options, (tracks) => {
         // tracks.forEach(onLocalTrackCreated);
         selfUser.setNewAudioTrack(tracks[0]).then(() => updateButtons());
+    }, error => {
+        console.error(error);
+        setMicDeviceId(null);
     });
 }
 
@@ -683,8 +689,7 @@ export function applyConferenceSettings() {
         if (newAudioOutputDevice.deviceId !== audioOutputDevice?.deviceId) {
             audioOutputDevice = newAudioOutputDevice;
             if (audioOutputDevice) {
-                JitsiMeetJSIntern.mediaDevices.setAudioOutputDevice(audioOutputDevice.deviceId);
-                setSpeakerDeviceId(audioOutputDevice.deviceId);
+                setAudioOutputDevice(audioOutputDevice.deviceId);
             }
         }
     }
@@ -701,12 +706,19 @@ export function applyConferenceSettings() {
     }
 }
 
-// Code
+function setAudioOutputDevice(deviceId: string) {
+    try {
+        JitsiMeetJSIntern.mediaDevices.setAudioOutputDevice(deviceId);
+        setSpeakerDeviceId(deviceId);
+    } catch (error) { //TODO Does this trigger if we try to set a non existing audio device as an output
+        setSpeakerDeviceId(null);
+    }
+}
 
 function init(room: Room) {
     serverRoom = room;
     window.addEventListener("pagehide", unload);
-    JitsiMeetJSIntern.setLogLevel(JitsiMeetJSIntern.logLevels.ERROR);          //mutes logger
+    JitsiMeetJSIntern.setLogLevel(JitsiMeetJSIntern.logLevels.ERROR);
     JitsiMeetJSIntern.init(optionsInit);
     updateButtons();
     connection = new JitsiMeetJSIntern.JitsiConnection(null, null, optionsConnection());
@@ -716,6 +728,10 @@ function init(room: Room) {
     connection.addEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_FAILED, onConnectionFailed);
     connection.addEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_DISCONNECTED, onDisconnected);
     connection.connect();
+    const speakerDeviceId = getSpeakerDeviceId();
+    if (speakerDeviceId) {
+        setAudioOutputDevice(speakerDeviceId);
+    }
     createCamTrack();
     createAudioTrack();
     loadConferenceSettings();
