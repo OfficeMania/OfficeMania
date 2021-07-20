@@ -256,19 +256,18 @@ function onTrackAdded(track) {
  * @param track JitsiTrack object
  */
 function onRemoteTrackAdded(track): void {
-    console.debug(`Remote Track added: ${track}`); //DEBUG
+    // console.debug(`Remote Track added: ${track}`); //DEBUG
+    // track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel => console.debug(`Audio Level Remote: ${audioLevel}`)); //DEBUG
+    // track.addEventListener(JitsiMeetJSIntern.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Remote Track stopped')); //DEBUG
+    // track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Remote Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
+    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_MUTE_CHANGED, () => onRemoteTrackMuteChanged(track));
     const participantId = track.getParticipantId();
     const user = getUser(participantId);
-    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel => console.debug(`Audio Level Remote: ${audioLevel}`)); //DEBUG
-    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_MUTE_CHANGED, () => onRemoteTrackMuteChanged(track));
-    track.addEventListener(JitsiMeetJSIntern.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Remote Track stopped')); //DEBUG
-    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Remote Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
     if (track.getType() === trackTypeVideo) {
-        user.setVideoTrack(track);
+        user.setVideoTrack(track, false);
     } else {
-        user.setAudioTrack(track);
+        user.setAudioTrack(track, false);
     }
-    console.debug(`User is: ${user}`); //DEBUG
 }
 
 function onTrackRemoved(track) {
@@ -360,8 +359,8 @@ function processTrackType<R>(trackType: string, onTrackTypeAudio: () => R, onTra
     }
 }
 
-function unload() {
-    selfUser.dispose();
+async function unload() {
+    await selfUser.dispose();
     conference.leave();
     connection.disconnect();
 }
@@ -370,40 +369,31 @@ function createCamTrack(cameraDeviceId: string = getCameraDeviceId()) {
     createVideoTrack(!cameraDeviceId ? optionsCamTrack : {...optionsCamTrack, cameraDeviceId});
 }
 
-function createDesktopTrack(done: (enabled: boolean) => void) {
+function createDesktopTrack() {
     //createVideoTrack(optionsDesktopTrack, true);
     createLocalTracks(optionsDesktopTrack, (tracks) => {
-        selfUser.setTempVideoTrack(tracks[0]);
-        selfUser.setSharing(true);
-        selfUser.swapTracks();
-        done(true);
-        updateButtons();
+        // tracks.forEach(onLocalTrackCreated);
+        selfUser.setNewVideoTrack(tracks[0], true).then(() => updateButtons());
     }, error => {
         if (error.name !== "gum.screensharing_user_canceled") {
             console.error(error);
         }
-        done(false);
         disableSharing();
     });
 }
 
-function createVideoTrack(options: {}, sharing: boolean = false) {
+function createVideoTrack(options: {}) {
     createLocalTracks(options, (tracks) => {
-        tracks.forEach(onLocalTrackCreated);
-        selfUser.setTempVideoTrack(tracks[0]);
-        selfUser.setSharing(sharing);
-        selfUser.swapTracks();
-        updateButtons();
+        // tracks.forEach(onLocalTrackCreated);
+        selfUser.setNewVideoTrack(tracks[0]).then(() => updateButtons());
     });
 }
 
 function createAudioTrack(micDeviceId: string = getMicDeviceId()) {
     const options = !micDeviceId ? optionsAudioTrack : {...optionsAudioTrack, micDeviceId};
     createLocalTracks(options, (tracks) => {
-        tracks.forEach(onLocalTrackCreated);
-        selfUser.setTempAudioTrack(tracks[0]);
-        selfUser.swapTracks();
-        updateButtons();
+        // tracks.forEach(onLocalTrackCreated);
+        selfUser.setNewAudioTrack(tracks[0]).then(() => updateButtons());
     });
 }
 
@@ -416,9 +406,9 @@ function disableSharing() {
     createCamTrack();
 }
 
-function enableSharing(done: (enabled: boolean) => void) {
+function enableSharing() {
     selfUser.disposeVideo();
-    createDesktopTrack(done);
+    createDesktopTrack();
 }
 
 export function setAudioButtonMute(muted: boolean, sharing: boolean = false) {
@@ -503,19 +493,15 @@ export function isDesktopSharingSupported() {
 }
 
 export function toggleMuteByType(type: string): boolean {
-    const muted = processTrackType(type, () => selfUser.toggleCamAudio(), () => selfUser.toggleCamVideo());
-    updateButtons();
-    return muted;
+    return processTrackType(type, () => selfUser.toggleAudio(), () => selfUser.toggleVideo());
 }
 
-export function toggleSharing(done: (enabled: boolean) => void) {
-    const sharing = !selfUser.isSharing();
-    if (!sharing) {
-        done(false);
+export function toggleSharing() {
+    if (selfUser.isSharing()) {
         disableSharing();
         return;
     }
-    enableSharing(done);
+    enableSharing();
 }
 
 const minDistance: number = 300;
@@ -571,12 +557,12 @@ export function createPlayerState<Type extends HTMLElement>(player: Player, elem
     playerName.innerText = player ? player.name : "You";
     if (showMuteState && player && selfUser.participantId !== player.participantId) {
         const user = getUser(player.participantId);
-        if (user.isAudioMuted()) {
+        if (user.isAudioTrackMuted()) {
             const icon = appendIcon(element, "microphone-slash");
             icon.classList.add("fa-xs");
             icon.classList.add("player-state-mute");
         }
-        if (user.isVideoMuted()) {
+        if (user.isVideoTrackMuted()) {
             const icon = appendIcon(element, "video-slash");
             icon.classList.add("fa-xs");
             icon.classList.add("player-state-mute");
@@ -645,7 +631,7 @@ export async function loadConferenceSettings() {
     if (audioInputDevices) {
         if (!audioInputDevice) {
             const micDeviceId = getMicDeviceId();
-            audioInputDevice = micDeviceId ? audioInputDevices.find(audioInputDevice => audioInputDevice.deviceId === micDeviceId) : audioInputDevices[0];
+            audioInputDevice = (micDeviceId ? audioInputDevices.find(audioInputDevice => audioInputDevice.deviceId === micDeviceId) : audioInputDevices[0]) ?? audioInputDevices[0];
         }
         setMediaDevices(audioInputSelect, audioInputDevices, audioInputDevice);
         audioInputSelect.disabled = false;
@@ -657,7 +643,7 @@ export async function loadConferenceSettings() {
     if (audioOutputDevices) {
         if (!audioOutputDevice) {
             const speakerDeviceId = getSpeakerDeviceId();
-            audioOutputDevice = speakerDeviceId ? audioOutputDevices.find(audioOutputDevice => audioOutputDevice.deviceId === speakerDeviceId) : audioOutputDevices[0];
+            audioOutputDevice = (speakerDeviceId ? audioOutputDevices.find(audioOutputDevice => audioOutputDevice.deviceId === speakerDeviceId) : audioOutputDevices[0]) ?? audioOutputDevices[0];
         }
         const currentAudioOutputDevice = JitsiMeetJSIntern.mediaDevices.getAudioOutputDevice();
         setMediaDevices(audioOutputSelect, audioOutputDevices, !currentAudioOutputDevice || currentAudioOutputDevice == '' ? undefined : audioOutputDevices.find(device => device.deviceId == currentAudioOutputDevice));
@@ -670,7 +656,7 @@ export async function loadConferenceSettings() {
     if (videoInputDevices) {
         if (!videoInputDevice) {
             const cameraDeviceId = getCameraDeviceId();
-            videoInputDevice = cameraDeviceId ? videoInputDevices.find(videoInputDevice => videoInputDevice.deviceId === cameraDeviceId) : videoInputDevices[0];
+            videoInputDevice = (cameraDeviceId ? videoInputDevices.find(videoInputDevice => videoInputDevice.deviceId === cameraDeviceId) : videoInputDevices[0]) ?? videoInputDevices[0];
         }
         setMediaDevices(videoInputSelect, videoInputDevices, videoInputDevice);
         videoInputSelect.disabled = false;
