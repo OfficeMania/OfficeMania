@@ -97,12 +97,18 @@ function drawConfiguration(canvas: HTMLCanvasElement, context: CanvasRenderingCo
     cropCanvas(canvas, context);
     const maxLength = getMaxLength(canvas);
     const squareLength: number = maxLength / 8;
-    context.fillStyle = "orange";
     const king: string = configuration.turn === ChessColor.WHITE ? "K" : "k";
     const field: string = Object.entries(configuration.pieces).find(entry => entry[1] === king)[0];
+    if (field) {
+        drawSquare(context, squareLength, field, ChessSquareColor.CHECK);
+    }
+    context.restore();
+}
+
+function drawSquare(context: CanvasRenderingContext2D, squareLength: number, field: string, color: string) {
+    context.fillStyle = color;
     const [fieldX, fieldY] = getCoordinates(field);
     context.fillRect(fieldX * squareLength, fieldY * squareLength, squareLength, squareLength);
-    context.restore();
 }
 
 function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: any, moves: string[]) {
@@ -117,9 +123,7 @@ function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D,
     const [currentFieldX, currentFieldY] = getCoordinates(currentField);
     context.fillRect(currentFieldX * squareLength, currentFieldY * squareLength, squareLength, squareLength);
     for (const move of moves) {
-        context.fillStyle = getMoveColor(pieces, move);
-        const [fieldX, fieldY] = getCoordinates(move);
-        context.fillRect(fieldX * squareLength, fieldY * squareLength, squareLength, squareLength);
+        drawSquare(context, squareLength, move, getMoveColor(pieces, move));
     }
     context.restore();
 }
