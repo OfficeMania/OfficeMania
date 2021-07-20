@@ -22,7 +22,12 @@ export class DoorHandler implements Handler {
     }
 
     onLeave(client: Client, consented: boolean) {
-        //TODO Unlock all by disconnected Client locked Doors?
+        this.room.state.doorStates.forEach((value, key) =>{
+            if(value.playerId && value.playerId === client.id) {
+                value.playerId = "";
+                value.isClosed = false;
+            }
+        });
     }
 
     onDispose() {

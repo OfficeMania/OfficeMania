@@ -38,7 +38,7 @@ export class Todo extends Interactive {
 
     onInteraction(){
         if(this.room.state.todoState[this.id.toString()].isUsed){
-            //error Text?
+            //TODO output for user
             console.log("used");
             return;
         }
@@ -70,11 +70,9 @@ export class Todo extends Interactive {
     }
 
     getInput(e:KeyboardEvent){
-        console.log("Marker:" + this.marker + "Text:" + this.content.length);
         let i = 0;
         while(this.inputs[i]){
             if(this.inputs[i] === e.key){
-                console.log(this.content.length);
                 if(this.marker === this.content.length){
                     this.content = this.content.concat(e.key);
                 } else {
@@ -138,11 +136,11 @@ export class Todo extends Interactive {
             buffer = this.content.slice(0, this.marker - this.content.length) + "|" + this.content.slice(this.marker - this.content.length, this.content.length);
         }
 
-        //TODO make a \n every x chars
+        //TODO make a \n every 53 chars
         var subs = buffer.split('\n');
 
         this.ctx.fillStyle = "black";
-        this.ctx.font = "25px sans-serif"; //TODO monospaced so you now how musch characters are ok for one line
+        this.ctx.font = "25px sans-serif"; //TODO monospaced so you now how much characters are ok for one line
         this.ctx.lineWidth = 3;
 
         let i = 0;
@@ -150,6 +148,7 @@ export class Todo extends Interactive {
             this.ctx.fillText(subs[i], 100, 100 + (50*i));
             i++;
         }
+
     }
 
     loop(){}

@@ -1,10 +1,11 @@
 import {Interactive} from "./interactive"
 import {getOurPlayer, getRoom} from "./../util"
-import {MapInfo, TileSet} from "./../map"
+import {MapInfo, solidInfo, TileSet} from "./../map"
 import { Player } from "../player";
 import {Room} from "colyseus.js";
 import {State} from "../../common";
 import {MessageType} from "../../common/util";
+import { DoorState } from "../../common/rooms/schema/state";
 
 export enum DoorDirection {
     UNKNOWN,
@@ -29,6 +30,7 @@ export class Door extends Interactive {
     //TODO no hardcoding
     xCorrection: number = -38;
     yCorrection: number = -83;
+    static doors: Door[] = [];
 
 
     constructor(direction: DoorDirection, posX: number, posY: number, map: MapInfo) {
@@ -43,13 +45,13 @@ export class Door extends Interactive {
         let id = posX + "" + posY;
         this.room.send(MessageType.NEW_DOOR, id);
         this.setTexture();
+        Door.doors.push(this);
     }
 
     
     onInteraction(): void {
         let player = getOurPlayer();
-        this.isClosed = this.room.state.doorStates[this.posX + "" + this.posY].isClosed;
-        this.playerId = this.room.state.doorStates[this.posX + "" + this.posY].playerId;
+        this.update();
         this.startInteraction(player.scaledX - this.xCorrection, player.scaledY - this.yCorrection, player.id);
     }
 
@@ -90,14 +92,8 @@ export class Door extends Interactive {
 
     proofIfClosed() {
 
-        this.isClosed = this.room.state.doorStates[this.posX + "" + this.posY].isClosed;
-        this.playerId = this.room.state.doorStates[this.posX + "" + this.posY].playerId;
+        this.update();
         if (this.isClosed) {
-            let player: Player;
-            player = getOurPlayer();
-            if(this.isInside(player.scaledX - this.xCorrection, player.scaledY - this.yCorrection)) {
-                return false;
-            }
             return true;
         } else {
             return false;
@@ -107,7 +103,7 @@ export class Door extends Interactive {
     lockDoor(id: string) {
         //if you are not allowed to close this door
         if (this.direction === DoorDirection.ALWAYS_OPEN) {
-            //TODO error message
+            console.warn("Tried to close an always open door");
         } else {
             this.playerId = id;
             this.isClosed = true;
@@ -117,13 +113,12 @@ export class Door extends Interactive {
     }
 
     openDoor(id: string) {
-        console.log("in open");
-
         if (id === this.playerId) {
             this.isClosed = false;
             this.room.send(MessageType.OPEN_DOOR, this.posX + "" + this.posY);
         } else {
-           //TODO error message
+           //TODO Klopfton im Raum abspielen (also bei Spielern, die sich aktuell in der RaumID des Raumes befinden)
+           console.log("Klopf, klopf");
         }
     }
 
@@ -202,42 +197,20 @@ export class Door extends Interactive {
         }
     }
 
-    isInside (playerX: number, playerY: number) {
-
-        switch (this.direction) {
-
-            case DoorDirection.NORTH: {
-
-                if (playerY < this.posY) {
-
-                    return true;
-                }
+    update() {
+        if(this.room.state.doorStates[this.posX + "" + this.posY].isClosed !== this.isClosed || this.room.state.doorStates[this.posX + "" + this.posY].playerId != this.playerId){
+            if(this.room.state.doorStates[this.posX + "" + this.posY].isClosed !== this.isClosed){
+                //TODO start animation
             }
-            case DoorDirection.EAST: {
-
-                if (playerX > this.posX) {
-
-                    return true;
-                }
-                break;
-            }
-            case DoorDirection.SOUTH: {
-
-                if (playerY > this.posY) {
-
-                    return true;
-                }
-                break;
-            }
-            case DoorDirection.WEST: {
-
-                if (playerX < this.posX) {
-
-                    return true;
-                }
-                break;
-            }
+            this.isClosed = this.room.state.doorStates[this.posX + "" + this.posY].isClosed;
+            this.playerId = this.room.state.doorStates[this.posX + "" + this.posY].playerId;
         }
-        return false;
     }
+
+}
+
+export function updateDoors(collisionInfo: solidInfo[][]) {
+    Door.doors.forEach((value, index, array) => {
+        value.update;
+    });
 }

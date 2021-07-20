@@ -56,6 +56,7 @@ import {
     usersButton
 } from "./static";
 import {initLoading, setShowLoadingscreen} from "./loadingscreen";
+import { updateDoors } from "./interactive/door";
 
 export var characters: { [key: string]: HTMLImageElement } = {}
 const START_POSITION_X = -13;
@@ -328,6 +329,9 @@ async function main() {
 
         //calculate everything regarding the player
         playerLoop(ourPlayer, players, room, now, canvas, ctx, collisionInfo);
+
+        //check if a doorState changed
+        updateDoors(collisionInfo);
 
 
         /*

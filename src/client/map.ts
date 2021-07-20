@@ -195,6 +195,7 @@ const LAYER_NAME_CONTENT: string = "Content";
 const LAYER_NAME_ROOMS: string = "Rooms";
 const LAYER_NAME_CONFERENCE_ROOMS: string = "Conference rooms";
 const LAYER_NAME_ANIMATED: string = "animated";
+const LAYER_NAME_DOORS: string = "Doors";
 
 function fillSolidInfos(map: MapInfo) {
 
@@ -566,6 +567,9 @@ function drawMap(mapData: MapInfo) {
                         chunk.tileSetX[x][y] = sourceX;
                         const sourceY: number = Math.floor(value / (newTileSet.tileWidth / mapData.resolution)) * mapData.resolution;
                         chunk.tileSetY[x][y] = sourceY;
+                        if(layer.name === LAYER_NAME_DOORS){
+                            break;
+                        }
                         mapData.ctx.drawImage(mapData.textures.get(newTileSet.path), sourceX, sourceY, mapData.resolution, mapData.resolution, dx, dy, mapData.resolution, mapData.resolution);
                         break;
                     }

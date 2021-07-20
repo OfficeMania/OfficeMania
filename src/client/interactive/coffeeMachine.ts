@@ -35,7 +35,7 @@ export class CoffeeMachine extends Interactive {
     ];
 
     constructor(){
-        super("Coffe Machine", false, 1);
+        super("Coffee Machine", false, 1);
         this.ctx = this.canvas.getContext("2d");
         this.lastOutputs = [];
         for (let i = 0; i < 3; i++) {
