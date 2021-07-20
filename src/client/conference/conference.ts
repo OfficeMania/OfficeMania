@@ -373,7 +373,9 @@ function createDesktopTrack() {
     //createVideoTrack(optionsDesktopTrack, true);
     createLocalTracks(optionsDesktopTrack, (tracks) => {
         // tracks.forEach(onLocalTrackCreated);
-        selfUser.setNewVideoTrack(tracks[0], true).then(() => updateButtons());
+        const track = tracks[0];
+        track.track.addEventListener("ended", () => disableSharing());
+        selfUser.setNewVideoTrack(track, true).then(() => updateButtons());
     }, error => {
         if (error.name !== "gum.screensharing_user_canceled") {
             console.error(error);
