@@ -26,7 +26,7 @@ function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, co
 
 function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     context.save();
-    context.fillStyle = "red";
+    context.fillStyle = "burlywood";
     context.fillRect(0, 0, canvas.width, canvas.height);
     const maxLength = getMaxLength(canvas, 0);
     const squareLength = maxLength / 8;

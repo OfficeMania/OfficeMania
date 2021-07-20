@@ -181,7 +181,11 @@ body {
     display: inline-block;
 }
 
-#welcome-body p {
+#help-body img {
+    margin-right: 10px;
+}
+
+#welcome-body {
     font-size: large;
     display: inline-block;
 }
@@ -193,19 +197,16 @@ body {
 .key-small {
     width: 32px;
     height: 32px;
-    margin-right: 10px;
 }
 
 .key-medium {
     width: 48px;
     height: 32px;
-    margin-right: 10px;
 }
 
 .key-long {
     width: 64px;
     height: 32px;
-    margin-right: 10px;
 }
 
 #stats-bar {

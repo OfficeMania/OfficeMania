@@ -22,7 +22,7 @@ function createVideoElementContainer(id: string, user: User, onUpdate: () => voi
     videoElement.toggleAttribute("playsinline", true);
     videoElement.toggleAttribute("autoplay", true);
     const focusToggle = () => {
-        user.setFocused(!user.isFocused());
+        user.toggleFocus();
         onUpdate.call(user);
     };
     videoElement.addEventListener("click", focusToggle);
@@ -110,11 +110,11 @@ class User {
         this.participantId = participantId;
     }
 
-    isAudioMuted(): boolean {
+    isAudioTrackMuted(): boolean {
         return this.audioTrack?.isMuted();
     }
 
-    isVideoMuted(): boolean {
+    isVideoTrackMuted(): boolean {
         return this.videoTrack?.isMuted();
     }
 
@@ -123,41 +123,51 @@ class User {
             this.videoTrack = null;
             this.update();
         } else {
-            //TODO How to make sure that this is the cam audio track and not the share audio track?
             this.audioTrack = null;
             this.update();
         }
     }
 
-    setAudioTrack(track, createElement: boolean = true) {
+    async setAudioTrack(track, isLocal: boolean) {
+        await this.disposeAudio();
         if (!track) {
-            console.warn("the cam audio track should not be set null");
+            console.warn("The Audio Track should not be empty");
             this.audioTrack = null;
             this.update();
             return;
         }
-        //TODO What to do with overridden tracks? detach them?
         this.audioTrack = track;
-        if (createElement) {
-            const element = createAudioTrackElement(`track-audio-${this.participantId}-${track.getId()}`);
-            this.audioElement = element;
-            track.attach(element);
+        if (isLocal) {
+            this.conference.addTrack(this.audioTrack);
+        } else {
+            if (!this.audioElement) {
+                this.audioElement = createAudioTrackElement(`track-audio-${this.participantId}-${track.getId()}`);
+            }
+            if (this.audioElement) {
+                this.audioTrack.attach(this.audioElement);
+            }
         }
         this.update();
     }
 
-    setVideoTrack(track) {
+    async setVideoTrack(track, isLocal: boolean) {
+        await this.disposeVideo();
         if (!track) {
-            console.warn("the cam video track should not be set null");
+            console.warn("The Video Track should not be empty");
             this.videoTrack = null;
             this.update();
             return;
         }
-        //TODO What to do with overridden tracks? detach them?
         this.videoTrack = track;
-        const container = createVideoElementContainer(`track-video-${this.participantId}-${track.getId()}`, this, this.updateVideoContainer);
-        this.videoContainer = container;
-        track.attach(container.video);
+        if (!this.videoContainer) {
+            this.videoContainer = createVideoElementContainer(`track-video-${this.participantId}-${track.getId()}`, this, this.updateVideoContainer);
+        }
+        if (this.videoContainer?.video) {
+            this.videoTrack.attach(this.videoContainer.video);
+        }
+        if (isLocal) {
+            this.conference.addTrack(this.videoTrack);
+        }
         this.update();
     }
 
@@ -165,20 +175,24 @@ class User {
         return false;
     }
 
-    setHidden(hide: boolean) {
+    protected setHidden(hide: boolean) {
         this.videoContainer?.video?.toggleAttribute(attributeHide, hide);
     }
 
-    isHidden(): boolean {
+    protected isHidden(): boolean {
         return this.videoContainer?.video?.hasAttribute(attributeHide);
     }
 
-    setFocused(focus: boolean) {
+    protected setFocused(focus: boolean) {
         this.videoContainer?.video?.toggleAttribute(attributeFocus, focus);
     }
 
-    isFocused(): boolean {
+    protected isFocused(): boolean {
         return this.videoContainer?.video?.hasAttribute(attributeFocus);
+    }
+
+    toggleFocus() {
+        this.setFocused(!this.isFocused());
     }
 
     protected updateVideoContainer() {
@@ -202,6 +216,7 @@ class User {
         if (!currentBar.contains(element)) {
             currentBar.append(element);
         }
+        this.videoContainer.video.play().catch(console.error);
     }
 
     update() {
@@ -235,10 +250,8 @@ class User {
                                 this.setHidden(true);
                                 this.updateVideoContainer();
                             } else {
-                                this.videoContainer.video.play().then(() => {
-                                    this.setHidden(false);
-                                    this.updateVideoContainer();
-                                });
+                                this.setHidden(false);
+                                this.updateVideoContainer();
                             }
                         }
                     }
@@ -301,60 +314,82 @@ class User {
         this.videoTrack?.detach(this.videoContainer.video);
     }
 
-    dispose() {
-        this.disposeAudio();
-        this.disposeVideo();
+    async dispose() {
+        await this.disposeAudio();
+        await this.disposeVideo();
     }
 
-    disposeAudio() {
+    async disposeAudio() {
         this.audioTrack?.detach(this.audioElement);
-        this.audioTrack?.dispose();
+        await this.audioTrack?.dispose();
     }
 
-    disposeVideo() {
+    async disposeVideo() {
         this.videoTrack?.detach(this.videoContainer.video);
-        this.videoTrack?.dispose();
+        await this.videoTrack?.dispose();
     }
 
 }
 
 class SelfUser extends User {
 
-    protected sharing: boolean = false;
-    private sharedAudioMuted: boolean = false;
-    private sharedVideoMuted: boolean = false;
+    private _sharingAudio: boolean = false;
+    private _sharingVideo: boolean = false;
     private _audioMuted: boolean = false;
     private _videoMuted: boolean = false;
-    // Temp
-    protected tempAudioTrack: any = null;
-    protected tempVideoTrack: any = null;
+    private _sharedAudioMuted: boolean = false;
+    private _sharedVideoMuted: boolean = false;
 
     constructor(audioBar: HTMLDivElement, videoBar: HTMLDivElement, focusBar: HTMLDivElement) {
         super(null, audioBar, videoBar, focusBar, null);
     }
 
-    get audioMuted(): boolean {
-        return this.sharing ? this.sharedAudioMuted : this._audioMuted;
+    private get sharingAudio(): boolean {
+        return this._sharingAudio;
     }
 
-    set audioMuted(value: boolean) {
-        if (this.sharing) {
-            this.sharedAudioMuted = value;
-        } else {
-            this._audioMuted = value;
-        }
+    private set sharingAudio(value: boolean) {
+        this._sharingAudio = value;
     }
 
-    get videoMuted(): boolean {
-        return this.sharing ? this.sharedVideoMuted : this._videoMuted;
+    private get sharingVideo(): boolean {
+        return this._sharingVideo;
     }
 
-    set videoMuted(value: boolean) {
-        if (this.sharing) {
-            this.sharedVideoMuted = value;
-        } else {
-            this._videoMuted = value;
-        }
+    private set sharingVideo(value: boolean) {
+        this._sharingVideo = value;
+    }
+
+    private get audioMuted(): boolean {
+        return this._audioMuted;
+    }
+
+    private set audioMuted(value: boolean) {
+        this._audioMuted = value;
+    }
+
+    private get videoMuted(): boolean {
+        return this._videoMuted;
+    }
+
+    private set videoMuted(value: boolean) {
+        this._videoMuted = value;
+    }
+
+    private get sharedAudioMuted(): boolean {
+        return this._sharedAudioMuted;
+    }
+
+    private set sharedAudioMuted(value: boolean) {
+        this._sharedAudioMuted = value;
+    }
+
+    private get sharedVideoMuted(): boolean {
+        return this._sharedVideoMuted;
+    }
+
+    private set sharedVideoMuted(value: boolean) {
+        this._sharedVideoMuted = value;
     }
 
     addToConference() {
@@ -366,99 +401,91 @@ class SelfUser extends User {
         }
     }
 
-    toggleCamAudio(): boolean {
-        const muted = this.toggleTrack(this.audioTrack);
-        this.audioMuted = muted;
-        return muted;
-    }
-
-    toggleCamVideo(): boolean {
-        const muted = this.toggleTrack(this.videoTrack);
-        this.videoMuted = muted;
-        return muted;
-    }
-
-    private toggleTrack(track: any): boolean {
-        if (!track) {
-            console.warn("toggling undefined or null track?")
-            return undefined;
-        }
-        let muted = false;
-        if (track.isMuted()) {
-            track.unmute().then(() => this.update());
+    toggleAudio(): boolean {
+        const muted = toggleTrack(this.audioTrack, () => this.update());
+        if (this.sharingAudio) {
+            this.sharedAudioMuted = muted;
         } else {
-            track.mute().then(() => this.update());
-            muted = true;
+            this.audioMuted = muted;
         }
         return muted;
     }
 
-    setTempAudioTrack(track) {
-        if (!track) {
-            this.tempAudioTrack = null;
-            return;
-        }
-        this.tempAudioTrack = track;
-    }
-
-    setTempVideoTrack(track) {
-        if (!track) {
-            this.tempVideoTrack = null;
-            return;
-        }
-        this.tempVideoTrack = track;
-    }
-
-    swapTracks() {
-        if (!this.sharing && this.tempVideoTrack && this.tempVideoTrack.isMuted() !== this.videoMuted) {
-            if (this.videoMuted) {
-                this.tempVideoTrack.mute().then(() => this.swapTracksIntern());
-            } else {
-                this.tempVideoTrack.unmute().then(() => this.swapTracksIntern());
-            }
+    toggleVideo(): boolean {
+        const muted = toggleTrack(this.videoTrack, () => this.update());
+        if (this.sharingVideo) {
+            this.sharedVideoMuted = muted;
         } else {
-            this.swapTracksIntern();
+            this.videoMuted = muted;
         }
+        return muted;
     }
 
-    private async swapTracksIntern() {
+    async setNewAudioTrack(track, sharing: boolean = false) {
         if (!this.conference) {
-            return; //FIXME When is the Track swapped than?
+            return; //TODO When will the new Track be set then?
         }
-        if (this.tempAudioTrack) {
-            await this.audioTrack?.dispose();
-            this.audioTrack = this.tempAudioTrack;
-            this.tempAudioTrack = null;
-            if (this.audioElement) {
-                this.audioTrack.attach(this.audioElement);
+        this.sharingAudio = sharing;
+        const mute: boolean = this.currentAudioMuted();
+        if (track.isMuted() !== mute) {
+            if (mute) {
+                track.mute();
+            } else {
+                track.unmute();
             }
-            this.conference.addTrack(this.audioTrack);
         }
-        if (this.tempVideoTrack) {
-            if (!this.videoContainer) {
-                this.setVideoTrack(this.tempVideoTrack);
-                this.tempVideoTrack = null;
-                this.conference.addTrack(this.videoTrack);
-                return
-            }
-            this.videoTrack = this.tempVideoTrack;
-            this.tempVideoTrack = null;
-            this.videoTrack.attach(this.videoContainer.video);
-            this.conference.addTrack(this.videoTrack);
-        }
-        this.update();
+        await this.setAudioTrack(track, true);
     }
 
-    protected pauseVideo(): boolean {
-        return this.sharing;
+    async setNewVideoTrack(track, sharing: boolean = false) {
+        if (!this.conference) {
+            return; //TODO When will the new Track be set then?
+        }
+        this.sharingVideo = sharing;
+        const mute: boolean = this.currentVideoMuted();
+        if (track.isMuted() !== mute) {
+            if (mute) {
+                track.mute();
+            } else {
+                track.unmute();
+            }
+        }
+        await this.setVideoTrack(track, true);
     }
 
-    setSharing(sharing: boolean) {
-        this.sharing = sharing;
+    currentAudioMuted(): boolean {
+        return this.sharingAudio ? this.sharedAudioMuted : this.audioMuted;
+    }
+
+    currentVideoMuted(): boolean {
+        return this.sharingVideo ? this.sharedVideoMuted : this.videoMuted;
+    }
+
+    isSharingAudio(): boolean {
+        return this.sharingAudio;
+    }
+
+    isSharingVideo(): boolean {
+        return this.sharingVideo;
     }
 
     isSharing(): boolean {
-        return this.sharing;
+        return this.isSharingVideo() || this.isSharingAudio();
     }
 
+}
+
+function toggleTrack(track: any, callback: () => void): boolean {
+    if (!track) {
+        console.warn("Toggling undefined or null Track?")
+        return undefined;
+    }
+    let muted = false;
+    if (track.isMuted()) {
+        track.unmute().then(callback);
+    } else {
+        track.mute().then(callback);
+        muted = true;
+    }
+    return muted;
 }

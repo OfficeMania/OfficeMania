@@ -6,7 +6,9 @@ import {
     Direction,
     KEY_CAMERA_DEVICE_ID,
     KEY_CHARACTER,
+    KEY_CURRENT_VERSION,
     KEY_MIC_DEVICE_ID,
+    KEY_SPEAKER_DEVICE_ID,
     KEY_USERNAME,
     MessageType
 } from "../common/util";
@@ -105,7 +107,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
             * See: https://docs.colyseus.io/state/schema/#onadd-instance-key
             */
             room.state.players.onAdd = (playerData, sessionId) => {
-                console.log("Add", sessionId, playerData);
+                // console.log("Add", sessionId, playerData);
 
                 let player: Player = {
                     id: sessionId,
@@ -287,12 +289,28 @@ export function getMicDeviceId(): string {
     return localStorage.getItem(KEY_MIC_DEVICE_ID);
 }
 
+export function setSpeakerDeviceId(value: string) {
+    localStorage.setItem(KEY_SPEAKER_DEVICE_ID, value);
+}
+
+export function getSpeakerDeviceId(): string {
+    return localStorage.getItem(KEY_SPEAKER_DEVICE_ID);
+}
+
 export function setCameraDeviceId (value: string) {
     localStorage.setItem(KEY_CAMERA_DEVICE_ID, value);
 }
 
 export function getCameraDeviceId(): string {
     return localStorage.getItem(KEY_CAMERA_DEVICE_ID);
+}
+
+export function setCurrentVersion (value: number) {
+    localStorage.setItem(KEY_CURRENT_VERSION, String(value));
+}
+
+export function getCurrentVersion(): number {
+    return Number(localStorage.getItem(KEY_CURRENT_VERSION));
 }
 
 export function appendIcon(element: HTMLElement, icon: string): HTMLSpanElement {
