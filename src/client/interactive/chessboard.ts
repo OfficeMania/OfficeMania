@@ -27,16 +27,16 @@ const borderSizeHalf: number = borderSize / 2;
 const borderSizeQuarter: number = borderSize / 4;
 const borderSizeDouble: number = borderSize * 2;
 
-function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any, moves: string[], possibleMoves: { [key: string]: string[] }) {
-    drawBorder(canvas, context);
+function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any, moves: string[], possibleMoves: { [key: string]: string[] }, turned: boolean) {
+    drawBorder(canvas, context, turned);
     drawBoard(canvas, context);
-    drawMoves(canvas, context, configuration.pieces, moves, possibleMoves);
-    drawCheck(canvas, context, configuration, possibleMoves);
-    drawPieces(canvas, context, configuration.pieces);
+    drawMoves(canvas, context, configuration.pieces, moves, possibleMoves, turned);
+    drawCheck(canvas, context, configuration, possibleMoves, turned);
+    drawPieces(canvas, context, configuration.pieces, turned);
     drawResult(canvas, context, configuration);
 }
 
-function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, turned: boolean) {
     context.save();
     context.fillStyle = "burlywood";
     context.fillRect(0, 0, canvas.width, canvas.height);
@@ -46,13 +46,14 @@ function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
     context.font = "15px Arial sans-serif";
     for (let i = 0; i < 8; i++) {
         const pos = i * squareLength;
-        // Draw Border Text
-        const rowText = rows[i];
+        // Draw Numbers
+        const rowText = rows[turned ? 7 - i : i];
         const textMetricsRow = context.measureText(rowText);
         const rowPos = pos + squareLength / 2 + borderSize - borderSizeQuarter * i;
         context.fillText(rowText, borderSizeQuarter, rowPos);
         context.fillText(rowText, maxLength - textMetricsRow.width - borderSizeQuarter, rowPos);
-        const colText = cols[i];
+        // Draw Characters
+        const colText = cols[turned ? 7 - i : i];
         const textMetricsCol = context.measureText(colText);
         const colPos = pos + squareLength / 2 + borderSize - borderSizeQuarter * i - textMetricsCol.width;
         context.fillText(colText, colPos, borderSize - borderSizeQuarter);
@@ -91,28 +92,26 @@ function drawBoard(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D)
     context.restore();
 }
 
-function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: any, moves: string[], possibleMoves: { [key: string]: string[] }) {
+function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: any, moves: string[], possibleMoves: { [key: string]: string[] }, turned: boolean) {
     context.save();
     cropCanvas(canvas, context);
     const maxLength = getMaxLength(canvas);
     const squareLength: number = maxLength / 8;
     if (possibleMoves) {
         for (const move of Object.keys(possibleMoves)) {
-            drawSquare(context, squareLength, move, ChessSquareColor.POSSIBLE);
+            drawSquare(context, squareLength, move, ChessSquareColor.POSSIBLE, turned);
         }
     }
     if (moves) {
-        context.fillStyle = ChessSquareColor.OWN;
-        const [currentFieldX, currentFieldY] = getCoordinates(currentField);
-        context.fillRect(currentFieldX * squareLength, currentFieldY * squareLength, squareLength, squareLength);
+        drawSquare(context, squareLength, currentField, ChessSquareColor.OWN, turned);
         for (const move of moves) {
-            drawSquare(context, squareLength, move, getMoveColor(pieces, move));
+            drawSquare(context, squareLength, move, getMoveColor(pieces, move), turned);
         }
     }
     context.restore();
 }
 
-function drawCheck(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any, possibleMoves: { [key: string]: string[] }) {
+function drawCheck(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any, possibleMoves: { [key: string]: string[] }, turned: boolean) {
     if (!configuration?.check) {
         return;
     }
@@ -124,18 +123,18 @@ function drawCheck(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D,
     const field: string = Object.entries(configuration.pieces).find(entry => entry[1] === king)[0];
     if (field) {
         const color = possibleMoves && Object.keys(possibleMoves).includes(field) ? ChessSquareColor.CHECK : ChessSquareColor.CHECK_CANT_MOVE;
-        drawSquare(context, squareLength, field, color);
+        drawSquare(context, squareLength, field, color, turned);
     }
     context.restore();
 }
 
-function drawSquare(context: CanvasRenderingContext2D, squareLength: number, field: string, color: string) {
+function drawSquare(context: CanvasRenderingContext2D, squareLength: number, field: string, color: string, turned: boolean) {
     context.fillStyle = color;
-    const [fieldX, fieldY] = getCoordinates(field);
+    const [fieldX, fieldY] = getCoordinates(field, turned);
     context.fillRect(fieldX * squareLength, fieldY * squareLength, squareLength, squareLength);
 }
 
-function drawPieces(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: { [key: string]: string }) {
+function drawPieces(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: { [key: string]: string }, turned: boolean) {
     context.save();
     cropCanvas(canvas, context);
     const maxLength = getMaxLength(canvas);
@@ -144,7 +143,7 @@ function drawPieces(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
     context.font = "15px Arial sans-serif";
     for (const field in pieces) {
         const piece: string = pieces[field];
-        const [x, y] = getCoordinates(field);
+        const [x, y] = getCoordinates(field, turned);
         const textMetrics = context.measureText(piece);
         const textPosX: number = (x + 0.5) * squareLength - (textMetrics.width / 2);
         const textPosY: number = (y + 0.5) * squareLength;
@@ -196,13 +195,19 @@ function getMaxLength(canvas: HTMLCanvasElement, offset: number = borderSizeDoub
 const cols: string[] = ["A", "B", "C", "D", "E", "F", "G", "H"];
 const rows: string[] = ["8", "7", "6", "5", "4", "3", "2", "1"];
 
-function getField(col: number, row: number): string {
+function getField(col: number, row: number, turned: boolean): string {
+    if (turned) {
+        return cols[7 - col] + rows[7 - row];
+    }
     return cols[col] + rows[row];
 }
 
-function getCoordinates(field: string): [number, number] {
+function getCoordinates(field: string, turned: boolean): [number, number] {
     if (!field || field.length !== 2) {
         return null;
+    }
+    if (turned) {
+        return [7 - cols.indexOf(field.charAt(0)), 7 - rows.indexOf(field.charAt(1))];
     }
     return [cols.indexOf(field.charAt(0)), rows.indexOf(field.charAt(1))];
 }
@@ -338,7 +343,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
 
     loop() {
         if (ourChessState) {
-            redraw(this.canvas, this.context, JSON.parse(ourChessState.configuration), currentMoves, allMoves);
+            redraw(this.canvas, this.context, JSON.parse(ourChessState.configuration), currentMoves, allMoves, ourChessState.playerBlack === this.room.sessionId);
         }
     }
 
@@ -380,7 +385,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         const squareLength: number = maxLength / 8;
         const fieldX: number = Math.floor(cursorX / squareLength);
         const fieldY: number = Math.floor(cursorY / squareLength);
-        const field: string = getField(fieldX, fieldY);
+        const field: string = getField(fieldX, fieldY, ourChessState.playerBlack === this.room.sessionId);
         if (!field) {
             return;
         }
