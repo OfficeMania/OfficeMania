@@ -22,10 +22,10 @@ import {
 } from "../util";
 import {SelfUser, User} from "./entities";
 import {Room} from "colyseus.js";
-import {setAudioButtonMute, setSwitchToDesktop, setVideoButtonMute} from "../main";
 import {solidInfo} from "../map";
 import {Player} from "../player";
 import {MessageType} from "../../common/util";
+import {camButton, muteButton, shareButton} from "../static";
 
 export {
     init as initConference,
@@ -421,13 +421,31 @@ function enableSharing(done: (enabled: boolean) => void) {
     createDesktopTrack(done);
 }
 
-function updateButtons() {
-    const audioMuted: boolean = selfUser.audioMuted;
-    const VideoMuted: boolean = selfUser.videoMuted;
-    const sharingEnabled: boolean = selfUser.isSharing();
-    setAudioButtonMute(audioMuted, sharingEnabled);
-    setVideoButtonMute(VideoMuted, sharingEnabled);
-    setSwitchToDesktop(sharingEnabled, isDesktopSharingSupported());
+export function setAudioButtonMute(muted: boolean, sharing: boolean = false) {
+    muteButton.disabled = false;
+    muteButton.innerHTML = muted ? "<em class = \"fa fa-microphone-slash\"></em><span></span>" : "<em class = \"fa fa-microphone\"></em><span></span>";
+}
+
+export function setVideoButtonMute(muted: boolean, sharing: boolean = false) {
+    camButton.disabled = false;
+    const camNormal = "<em class = \"fa fa-video\"></em><span></span>";
+    const camMuted = "<em class = \"fa fa-video-slash\"></em><span></span>";
+    const sharingNormal = "<em class = \"fa fa-pause\"></em><span></span>";
+    const sharingMuted = "<em class = \"fa fa-play\"></em><span></span>";
+    const textNormal = sharing ? sharingNormal : camNormal;
+    const textMuted = sharing ? sharingMuted : camMuted;
+    camButton.innerHTML = muted ? textMuted : textNormal;
+}
+
+export function setSwitchToDesktop(enabled: boolean, supported: boolean = false) {
+    shareButton.disabled = !supported;
+    shareButton.innerHTML = enabled ? "<em class = \"fa fa-user\"></em><span></span>" : "<em class = \"fa fa-desktop\"></em><span></span>";
+}
+
+export function updateButtons() {
+    setAudioButtonMute(selfUser.currentAudioMuted(), selfUser.isSharing());
+    setVideoButtonMute(selfUser.currentVideoMuted(), selfUser.isSharing());
+    setSwitchToDesktop(selfUser.isSharing(), isDesktopSharingSupported());
 }
 
 function getMediaDeviceInfos(deviceType: string, deviceDirection: string): Promise<MediaDeviceInfo[]> {

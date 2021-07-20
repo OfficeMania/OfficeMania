@@ -26,6 +26,7 @@ import {
     toggleMuteByType,
     toggleSharing,
     toggleShowParticipantsTab,
+    updateButtons,
     updateChat,
     updateUsers
 } from "./conference/conference";
@@ -72,35 +73,14 @@ muteButton.addEventListener("click", () => toggleMute("audio"));
 camButton.addEventListener("click", () => toggleMute("video"));
 shareButton.addEventListener("click", () => toggleMute("desktop")); //TODO Maybe make a confirmation dialog to confirm the stopping of a screenshare?
 
-export function setAudioButtonMute(muted: boolean, sharing: boolean = false) {
-    //muteButton.toggleAttribute("disabled", sharing);
-    muteButton.toggleAttribute("disabled", false);
-    muteButton.innerHTML = muted ? "<em class = \"fa fa-microphone-slash\"></em><span></span>" : "<em class = \"fa fa-microphone\"></em><span></span>";
-}
-
-export function setVideoButtonMute(muted: boolean, sharing: boolean = false) {
-    camButton.toggleAttribute("disabled", false);
-    const camNormal = "<em class = \"fa fa-video\"></em><span></span>";
-    const camMuted = "<em class = \"fa fa-video-slash\"></em><span></span>";
-    const sharingNormal = "<em class = \"fa fa-pause\"></em><span></span>";
-    const sharingMuted = "<em class = \"fa fa-play\"></em><span></span>";
-    const textNormal = sharing ? sharingNormal : camNormal;
-    const textMuted = sharing ? sharingMuted : camMuted;
-    camButton.innerHTML = muted ? textMuted : textNormal;
-}
-
-export function setSwitchToDesktop(enabled: boolean, supported: boolean = false) {
-    shareButton.toggleAttribute("disabled", !supported);
-    shareButton.innerHTML = enabled ? "<em class = \"fa fa-user\"></em><span></span>" : "<em class = \"fa fa-desktop\"></em><span></span>";
-}
-
 //toggle mute of tracks by type
 function toggleMute(type: string) {
     if (type === "desktop") {
-        toggleSharing(setSwitchToDesktop);
+        toggleSharing();
     } else {
         toggleMuteByType(type);
     }
+    updateButtons();
 }
 
 // Settings
