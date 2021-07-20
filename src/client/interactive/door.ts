@@ -1,7 +1,7 @@
 import {Interactive} from "./interactive"
 import {getOurPlayer, getRoom} from "./../util"
 import {MapInfo, TileSet} from "./../map"
-import { Player } from "../player";
+import {Player} from "../player";
 import {Room} from "colyseus.js";
 import {State} from "../../common";
 import {MessageType} from "../../common/util";
@@ -45,7 +45,7 @@ export class Door extends Interactive {
         this.setTexture();
     }
 
-    
+
     onInteraction(): void {
         let player = getOurPlayer();
         this.isClosed = this.room.state.doorStates[this.posX + "" + this.posY].isClosed;
@@ -76,7 +76,7 @@ export class Door extends Interactive {
                     if (Math.floor(x / 16) * 16 === chunk.posX && Math.floor(y / 16) * 16 === chunk.posY) {
 
                         if(!chunk.tileSetForElement[chunkPosX][chunkPosY]){ //why are there two doors with this?
-                            console.log("ehhhh");
+                            // console.log("ehhhh");
                             return;
                         } else{
                             this.tileSet = chunk.tileSetForElement[chunkPosX][chunkPosY];

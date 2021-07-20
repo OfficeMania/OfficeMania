@@ -106,7 +106,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
             * See: https://docs.colyseus.io/state/schema/#onadd-instance-key
             */
             room.state.players.onAdd = (playerData, sessionId) => {
-                console.log("Add", sessionId, playerData);
+                // console.log("Add", sessionId, playerData);
 
                 let player: Player = {
                     id: sessionId,

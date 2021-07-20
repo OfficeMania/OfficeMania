@@ -146,7 +146,7 @@ let conference = null;
  * This is called when the device list has changed.
  */
 function onDeviceListChanged(devices) {
-    console.debug('Current Devices: ' + devices); //DEBUG
+    // console.debug('Current Devices: ' + devices); //DEBUG
 }
 
 /**
@@ -165,13 +165,13 @@ function onConnectionSuccess() {
     conference.on(JitsiMeetJSIntern.events.conference.TRACK_ADDED, onTrackAdded);
     conference.on(JitsiMeetJSIntern.events.conference.TRACK_REMOVED, onTrackRemoved);
     conference.on(JitsiMeetJSIntern.events.conference.CONFERENCE_JOINED, onConferenceJoined);
-    conference.on(JitsiMeetJSIntern.events.conference.CONFERENCE_LEFT, onConferenceLeft); //TODO Verify that this event exists
+    conference.on(JitsiMeetJSIntern.events.conference.CONFERENCE_LEFT, onConferenceLeft);
     conference.on(JitsiMeetJSIntern.events.conference.USER_JOINED, onUserJoined);
     conference.on(JitsiMeetJSIntern.events.conference.USER_LEFT, onUserLeft);
-    conference.on(JitsiMeetJSIntern.events.conference.TRACK_MUTE_CHANGED, track => console.debug(`${track.isLocal() ? "Local" : "Remote"} '${track.getType()}' is muted: ${track.isMuted()}`)); //DEBUG
-    conference.on(JitsiMeetJSIntern.events.conference.TRACK_AUDIO_LEVEL_CHANGED, (userID, audioLevel) => console.debug(`${userID} - ${audioLevel}`)); //DEBUG
-    conference.on(JitsiMeetJSIntern.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
-    conference.on(JitsiMeetJSIntern.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${conference.getPhoneNumber()} - ${conference.getPhonePin()}`)); //DEBUG //REMOVE
+    // conference.on(JitsiMeetJSIntern.events.conference.TRACK_MUTE_CHANGED, track => console.debug(`${track.isLocal() ? "Local" : "Remote"} '${track.getType()}' is muted: ${track.isMuted()}`)); //DEBUG
+    // conference.on(JitsiMeetJSIntern.events.conference.TRACK_AUDIO_LEVEL_CHANGED, (userID, audioLevel) => console.debug(`${userID} - ${audioLevel}`)); //DEBUG
+    // conference.on(JitsiMeetJSIntern.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
+    // conference.on(JitsiMeetJSIntern.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${conference.getPhoneNumber()} - ${conference.getPhonePin()}`)); //DEBUG //REMOVE
     conference.on(JitsiMeetJSIntern.events.conference.MESSAGE_RECEIVED, onMessageReceived);
     if (conferenceData().password) {
         conference.join(conferenceData().password);
@@ -181,7 +181,7 @@ function onConnectionSuccess() {
     users.forEach(user => user.conference = conference);
     selfUser.conference = conference;
     selfUser.participantId = conference.myUserId();
-    console.debug("participantId:", selfUser.participantId)
+    // console.debug("participantId:", selfUser.participantId)
     serverRoom.send(MessageType.UPDATE_PARTICIPANT_ID, selfUser.participantId);
 }
 
@@ -189,7 +189,7 @@ function onConnectionSuccess() {
  * This is called after a connection has been closed
  */
 function onDisconnected() {
-    console.debug('Disconnected from Jitsi Server');
+    // console.debug('Disconnected from Jitsi Server');
     connection.removeEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
     connection.removeEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_FAILED, onConnectionFailed);
     connection.removeEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_DISCONNECTED, onDisconnected);
@@ -199,7 +199,7 @@ function onDisconnected() {
  * This is called when a conference has been joined.
  */
 function onConferenceJoined() {
-    console.debug('Conference joined'); //DEBUG
+    // console.debug('Conference joined'); //DEBUG
     isJoined = true;
     selfUser.addToConference();
     //toggleMuteByType("video");
@@ -210,7 +210,7 @@ function onConferenceJoined() {
  * This is called when a conference has been left.
  */
 function onConferenceLeft() {
-    console.debug('Conference left'); //DEBUG
+    // console.debug('Conference left'); //DEBUG
     isJoined = false;
 }
 
@@ -227,7 +227,7 @@ function onTrack(track, onLocal, onRemote) {
 }
 
 function onMessageReceived(participantId: string, message: string, ts: number) {
-    console.debug(`participantId: ${participantId}, ts: ${ts}, message: ${message}`); //DEBUG
+    // console.debug(`participantId: ${participantId}, ts: ${ts}, message: ${message}`); //DEBUG
     if (!getChatEnabled()) {
         return;
     }
@@ -239,7 +239,7 @@ function onMessageReceived(participantId: string, message: string, ts: number) {
 }
 
 function onLocalTrackCreated(track) {
-    console.debug(`Local Track added: ${track}`); //DEBUG
+    // console.debug(`Local Track added: ${track}`); //DEBUG
     track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel => console.debug(`Audio Level Local: ${audioLevel}`)); //DEBUG
     track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_MUTE_CHANGED, () => console.debug('Local Track Mute changed')); //DEBUG
     track.addEventListener(JitsiMeetJSIntern.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Local Track stopped')); //DEBUG
@@ -276,12 +276,12 @@ function onTrackRemoved(track) {
 }
 
 function onLocalTrackRemoved(track) {
-    console.debug(`Local Track removed: ${track}`); //DEBUG
+    // console.debug(`Local Track removed: ${track}`); //DEBUG
     selfUser.removeTrack(track);
 }
 
 function onRemoteTrackRemoved(track) {
-    console.debug(`Remote Track removed: ${track}`); //DEBUG
+    // console.debug(`Remote Track removed: ${track}`); //DEBUG
     getUser(track.getParticipantId())?.removeTrack(track);
 }
 
@@ -289,7 +289,7 @@ function onRemoteTrackRemoved(track) {
  *  Checks if muted button was audio or other
  */
 function onRemoteTrackMuteChanged(track) {
-    console.debug('Remote Track Mute changed'); //DEBUG
+    // console.debug('Remote Track Mute changed'); //DEBUG
     if (track.getType() === trackTypeAudio) {
         //The Audio Element doesn't need to be updated on remote mute change, because it's already silent
         return;
@@ -303,7 +303,7 @@ function onRemoteTrackMuteChanged(track) {
  * @param participantId
  */
 function onUserJoined(participantId) {
-    console.debug('User joined: ' + participantId); //DEBUG
+    // console.debug('User joined: ' + participantId); //DEBUG
     getUser(participantId); // Creates a User with the participantId
 }
 
@@ -313,7 +313,7 @@ function onUserJoined(participantId) {
  * @param participantId Participant id
  */
 function onUserLeft(participantId) {
-    console.debug('User left: ' + participantId); //DEBUG
+    // console.debug('User left: ' + participantId); //DEBUG
     getUser(participantId)?.remove();
 }
 
@@ -435,7 +435,6 @@ function getMediaDeviceInfos(deviceType: string, deviceDirection: string): Promi
         return undefined;
     }
     const kind = deviceType + deviceDirection;
-    JitsiMeetJSIntern.mediaDevices.enumerateDevices(() => console.debug("Updated Media Devices"));
     return navigator.mediaDevices.enumerateDevices().then((devices) => devices.filter(device => device.kind === kind));
 }
 
@@ -707,7 +706,7 @@ function init(room: Room) {
     JitsiMeetJSIntern.init(optionsInit);
     updateButtons();
     connection = new JitsiMeetJSIntern.JitsiConnection(null, null, optionsConnection());
-    console.debug("conference.id:", conferenceData().id); //DEBUG
+    // console.debug("conference.id:", conferenceData().id); //DEBUG
     JitsiMeetJSIntern.mediaDevices.addEventListener(JitsiMeetJSIntern.events.mediaDevices.DEVICE_LIST_CHANGED, onDeviceListChanged);
     connection.addEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
     connection.addEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_FAILED, onConnectionFailed);

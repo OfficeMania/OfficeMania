@@ -277,7 +277,7 @@ async function main() {
 
     let collisionInfo: solidInfo[][] = fillSolidInfos(currentMap);
     setCollisionInfo(collisionInfo);
-    console.log(collisionInfo)
+    // console.log(collisionInfo);
 
     //retrieve lowest coords
     lowestX = currentMap.lowestX;
