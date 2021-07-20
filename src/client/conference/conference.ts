@@ -112,8 +112,8 @@ const optionsCamTrack = {
     constraints: {
         video: {
             aspectRatio: 16 / 9,
-            width: { min: 1024, ideal: 1280, max: 1920 },
-            height: { min: 576, ideal: 720, max: 1080 }
+            width: { min: 640, ideal: 1280, max: 1920 },
+            height: { min: 360, ideal: 720, max: 1080 }
         }
     }
 }
