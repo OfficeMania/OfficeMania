@@ -253,6 +253,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
 
     onInteraction() {
         if (!ourGame) {
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.room.send(MessageType.CHESS_INTERACTION);
             console.debug("Requesting ChessState...");
             this.show();
