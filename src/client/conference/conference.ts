@@ -419,20 +419,20 @@ function enableSharing() {
     createDesktopTrack();
 }
 
-export function setAudioButtonMute(muted: boolean, sharing: boolean = false) {
-    muteButton.disabled = false;
-    muteButton.innerHTML = muted ? "<em class = \"fa fa-microphone-slash\"></em><span></span>" : "<em class = \"fa fa-microphone\"></em><span></span>";
+export function setAudioButtonMute(muted: boolean, supported: boolean, sharing: boolean) {
+    muteButton.disabled = !supported;
+    muteButton.innerHTML = muted || !supported ? "<em class = \"fa fa-microphone-slash\"></em><span></span>" : "<em class = \"fa fa-microphone\"></em><span></span>";
 }
 
-export function setVideoButtonMute(muted: boolean, sharing: boolean = false) {
-    camButton.disabled = false;
+export function setVideoButtonMute(muted: boolean, supported: boolean, sharing: boolean) {
+    camButton.disabled = !supported;
     const camNormal = "<em class = \"fa fa-video\"></em><span></span>";
     const camMuted = "<em class = \"fa fa-video-slash\"></em><span></span>";
     const sharingNormal = "<em class = \"fa fa-pause\"></em><span></span>";
     const sharingMuted = "<em class = \"fa fa-play\"></em><span></span>";
     const textNormal = sharing ? sharingNormal : camNormal;
     const textMuted = sharing ? sharingMuted : camMuted;
-    camButton.innerHTML = muted ? textMuted : textNormal;
+    camButton.innerHTML = muted || !supported ? textMuted : textNormal;
 }
 
 export function setSwitchToDesktop(enabled: boolean, supported: boolean = false) {
@@ -441,8 +441,8 @@ export function setSwitchToDesktop(enabled: boolean, supported: boolean = false)
 }
 
 export function updateButtons() {
-    setAudioButtonMute(selfUser.currentAudioMuted(), selfUser.isSharing());
-    setVideoButtonMute(selfUser.currentVideoMuted(), selfUser.isSharing());
+    setAudioButtonMute(selfUser.currentAudioMuted(), !audioInputSelect.disabled, selfUser.isSharing());
+    setVideoButtonMute(selfUser.currentVideoMuted(), !videoInputSelect.disabled, selfUser.isSharing());
     setSwitchToDesktop(selfUser.isSharing(), isDesktopSharingSupported());
 }
 
@@ -636,7 +636,7 @@ let videoInputDevice: MediaDeviceInfo = undefined;
 export async function loadConferenceSettings() {
     // Audio Input
     audioInputDevices = await getMediaDeviceInfos(deviceTypeAudio, deviceDirectionInput);
-    if (audioInputDevices) {
+    if (audioInputDevices && audioInputDevices.length > 0) {
         if (!audioInputDevice) {
             const micDeviceId = getMicDeviceId();
             audioInputDevice = (micDeviceId ? audioInputDevices.find(audioInputDevice => audioInputDevice.deviceId === micDeviceId) : audioInputDevices[0]) ?? audioInputDevices[0];
@@ -648,7 +648,7 @@ export async function loadConferenceSettings() {
     }
     // Audio Output
     audioOutputDevices = await getMediaDeviceInfos(deviceTypeAudio, deviceDirectionOutput);
-    if (audioOutputDevices) {
+    if (audioOutputDevices && audioOutputDevices.length > 0) {
         if (!audioOutputDevice) {
             const speakerDeviceId = getSpeakerDeviceId();
             audioOutputDevice = (speakerDeviceId ? audioOutputDevices.find(audioOutputDevice => audioOutputDevice.deviceId === speakerDeviceId) : audioOutputDevices[0]) ?? audioOutputDevices[0];
@@ -661,7 +661,7 @@ export async function loadConferenceSettings() {
     }
     // Video Input
     videoInputDevices = await getMediaDeviceInfos(deviceTypeVideo, deviceDirectionInput);
-    if (videoInputDevices) {
+    if (videoInputDevices && videoInputDevices.length > 0) {
         if (!videoInputDevice) {
             const cameraDeviceId = getCameraDeviceId();
             videoInputDevice = (cameraDeviceId ? videoInputDevices.find(videoInputDevice => videoInputDevice.deviceId === cameraDeviceId) : videoInputDevices[0]) ?? videoInputDevices[0];
@@ -671,6 +671,7 @@ export async function loadConferenceSettings() {
     } else {
         videoInputSelect.disabled = true;
     }
+    updateButtons();
 }
 
 export function applyConferenceSettings() {
@@ -736,5 +737,5 @@ function init(room: Room) {
     }
     createCamTrack();
     createAudioTrack();
-    loadConferenceSettings();
+    loadConferenceSettings().catch(console.error);
 }

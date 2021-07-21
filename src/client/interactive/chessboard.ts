@@ -10,36 +10,51 @@ import {chessExportButton, chessImportButton, interactiveBarChess} from "../stat
 
 const jsChessEngine = require('js-chess-engine');
 
+enum ChessSquareColor {
+    NORMAL_WHITE = "white",
+    NORMAL_GRAY = "gray",
+    POSSIBLE = "lightgreen",
+    OWN = "blue",
+    MOVE = "green",
+    KICK = "red",
+    CASTLING = "yellow", //TODO Doesn't seem to be implemented in the chess engine to show the tower as a possible field
+    CHECK = "orange",
+    CHECK_CANT_MOVE = "orangered"
+}
+
 const borderSize: number = 20;
 const borderSizeHalf: number = borderSize / 2;
 const borderSizeQuarter: number = borderSize / 4;
 const borderSizeDouble: number = borderSize * 2;
 
-function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any, moves: string[] = null) {
-    drawBorder(canvas, context);
+function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, history: { [key: string]: any }[], configuration: any, moves: string[], possibleMoves: { [key: string]: string[] }, turned: boolean) {
+    drawBorder(canvas, context, turned);
     drawBoard(canvas, context);
-    drawMoves(canvas, context, configuration.pieces, moves);
-    drawConfiguration(canvas, context, configuration);
-    drawPieces(canvas, context, configuration.pieces);
+    drawMoves(canvas, context, configuration.pieces, moves, possibleMoves, turned);
+    drawCheck(canvas, context, configuration, possibleMoves, turned);
+    drawPieces(canvas, context, configuration.pieces, turned);
+    drawHistory(canvas, context, history);
     drawResult(canvas, context, configuration);
 }
 
-function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+function drawBorder(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, turned: boolean) {
     context.save();
     context.fillStyle = "burlywood";
     context.fillRect(0, 0, canvas.width, canvas.height);
     const maxLength = getMaxLength(canvas, 0);
     const squareLength = maxLength / 8;
     context.fillStyle = "black";
+    context.font = "15px Arial sans-serif";
     for (let i = 0; i < 8; i++) {
         const pos = i * squareLength;
-        // Draw Border Text
-        const rowText = rows[i];
+        // Draw Numbers
+        const rowText = rows[turned ? 7 - i : i];
         const textMetricsRow = context.measureText(rowText);
         const rowPos = pos + squareLength / 2 + borderSize - borderSizeQuarter * i;
         context.fillText(rowText, borderSizeQuarter, rowPos);
         context.fillText(rowText, maxLength - textMetricsRow.width - borderSizeQuarter, rowPos);
-        const colText = cols[i];
+        // Draw Characters
+        const colText = cols[turned ? 7 - i : i];
         const textMetricsCol = context.measureText(colText);
         const colPos = pos + squareLength / 2 + borderSize - borderSizeQuarter * i - textMetricsCol.width;
         context.fillText(colText, colPos, borderSize - borderSizeQuarter);
@@ -59,11 +74,11 @@ function cropCanvas(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
 function drawBoard(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     context.save();
     cropCanvas(canvas, context);
-    context.fillStyle = "white";
+    context.fillStyle = ChessSquareColor.NORMAL_WHITE;
     const maxLength = getMaxLength(canvas);
     context.fillRect(0, 0, maxLength, maxLength);
     const squareLength = maxLength / 8;
-    context.fillStyle = "gray";
+    context.fillStyle = ChessSquareColor.NORMAL_GRAY;
     for (let x = 0; x < 8; x++) {
         for (let y = 0; y < 8; y++) {
             if (x % 2 === y % 2) {
@@ -78,7 +93,26 @@ function drawBoard(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D)
     context.restore();
 }
 
-function drawConfiguration(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any) {
+function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: any, moves: string[], possibleMoves: { [key: string]: string[] }, turned: boolean) {
+    context.save();
+    cropCanvas(canvas, context);
+    const maxLength = getMaxLength(canvas);
+    const squareLength: number = maxLength / 8;
+    if (possibleMoves) {
+        for (const move of Object.keys(possibleMoves)) {
+            drawSquare(context, squareLength, move, ChessSquareColor.POSSIBLE, turned);
+        }
+    }
+    if (moves) {
+        drawSquare(context, squareLength, currentField, ChessSquareColor.OWN, turned);
+        for (const move of moves) {
+            drawSquare(context, squareLength, move, getMoveColor(pieces, move), turned);
+        }
+    }
+    context.restore();
+}
+
+function drawCheck(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any, possibleMoves: { [key: string]: string[] }, turned: boolean) {
     if (!configuration?.check) {
         return;
     }
@@ -86,42 +120,31 @@ function drawConfiguration(canvas: HTMLCanvasElement, context: CanvasRenderingCo
     cropCanvas(canvas, context);
     const maxLength = getMaxLength(canvas);
     const squareLength: number = maxLength / 8;
-    context.fillStyle = "orange";
     const king: string = configuration.turn === ChessColor.WHITE ? "K" : "k";
     const field: string = Object.entries(configuration.pieces).find(entry => entry[1] === king)[0];
-    const [fieldX, fieldY] = getCoordinates(field);
+    if (field) {
+        const color = possibleMoves && Object.keys(possibleMoves).includes(field) ? ChessSquareColor.CHECK : ChessSquareColor.CHECK_CANT_MOVE;
+        drawSquare(context, squareLength, field, color, turned);
+    }
+    context.restore();
+}
+
+function drawSquare(context: CanvasRenderingContext2D, squareLength: number, field: string, color: string, turned: boolean) {
+    context.fillStyle = color;
+    const [fieldX, fieldY] = getCoordinates(field, turned);
     context.fillRect(fieldX * squareLength, fieldY * squareLength, squareLength, squareLength);
-    context.restore();
 }
 
-function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: any, moves: string[]) {
-    if (!moves || moves.length === 0) {
-        return;
-    }
-    context.save();
-    cropCanvas(canvas, context);
-    const maxLength = getMaxLength(canvas);
-    const squareLength: number = maxLength / 8;
-    context.fillStyle = "blue";
-    const [currentFieldX, currentFieldY] = getCoordinates(currentField);
-    context.fillRect(currentFieldX * squareLength, currentFieldY * squareLength, squareLength, squareLength);
-    for (const move of moves) {
-        context.fillStyle = getMoveColor(pieces, move);
-        const [fieldX, fieldY] = getCoordinates(move);
-        context.fillRect(fieldX * squareLength, fieldY * squareLength, squareLength, squareLength);
-    }
-    context.restore();
-}
-
-function drawPieces(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: { [key: string]: string }) {
+function drawPieces(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, pieces: { [key: string]: string }, turned: boolean) {
     context.save();
     cropCanvas(canvas, context);
     const maxLength = getMaxLength(canvas);
     const squareLength = maxLength / 8;
     context.fillStyle = "black";
+    context.font = "15px Arial sans-serif";
     for (const field in pieces) {
         const piece: string = pieces[field];
-        const [x, y] = getCoordinates(field);
+        const [x, y] = getCoordinates(field, turned);
         const textMetrics = context.measureText(piece);
         const textPosX: number = (x + 0.5) * squareLength - (textMetrics.width / 2);
         const textPosY: number = (y + 0.5) * squareLength;
@@ -131,6 +154,45 @@ function drawPieces(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
         context.drawImage(images[piece], imgPosX, imgPosY, squareLength, squareLength);
     }
     context.restore();
+}
+
+function drawHistory(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, history: { [key: string]: any }[]) {
+    context.save();
+    context.fillStyle = "black";
+    context.font = "50px Menlo monospace underline";
+    const posX: number = canvas.width * 3 / 4 - canvas.width / 7;
+    let posY = 50;
+    context.fillText("History", posX - 50, posY);
+    posY += 50;
+    context.font = "25px Menlo monospace";
+    let lastPieceCount: number = null;
+    let lastMove = null;
+    const reversedHistory = JSON.parse(JSON.stringify(history)).reverse();
+    for (const move of reversedHistory) {
+        const pieceCount: number = Object.keys(move.configuration.pieces).length;
+        const pieceLost: boolean = lastPieceCount && pieceCount < lastPieceCount;
+        lastPieceCount = pieceCount;
+        posY += drawHistoryMove(context, lastMove, posX, posY, pieceLost);
+        lastMove = move;
+    }
+    drawHistoryMove(context, lastMove, posX, posY, false);
+    context.restore();
+}
+
+function drawHistoryMove(context: CanvasRenderingContext2D, move: any, posX: number, posY: number, pieceLost: boolean): number {
+    if (!move) {
+        return 0;
+    }
+    const from: string = move.from;
+    // const to: string = move.to + (pieceLost ? "*" : "");
+    const to: string = move.to;
+    const text: string = from + ":" + to;
+    const textMetricsFrom = context.measureText(from);
+    const textMetricsTo = context.measureText(to);
+    const textMetrics = context.measureText(text);
+    const textHeight: number = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent;
+    context.fillText(text, posX - textMetrics.width + textMetricsTo.width, posY);
+    return textHeight + 20;
 }
 
 function drawResult(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any) {
@@ -159,11 +221,11 @@ function isPieceWhite(piece: string): boolean {
 function getMoveColor(pieces: any, move: string): string {
     const piece: string = pieces[move];
     if (!piece) {
-        return "green";
+        return ChessSquareColor.MOVE;
     }
     const isCurrentBlack: boolean = isPieceBlack(pieces[currentField]);
     const isBlack: boolean = isPieceBlack(piece);
-    return isCurrentBlack === isBlack ? "yellow" : "red";
+    return isCurrentBlack === isBlack ? ChessSquareColor.CASTLING : ChessSquareColor.KICK;
 }
 
 function getMaxLength(canvas: HTMLCanvasElement, offset: number = borderSizeDouble): number {
@@ -173,13 +235,19 @@ function getMaxLength(canvas: HTMLCanvasElement, offset: number = borderSizeDoub
 const cols: string[] = ["A", "B", "C", "D", "E", "F", "G", "H"];
 const rows: string[] = ["8", "7", "6", "5", "4", "3", "2", "1"];
 
-function getField(col: number, row: number): string {
+function getField(col: number, row: number, turned: boolean): string {
+    if (turned) {
+        return cols[7 - col] + rows[7 - row];
+    }
     return cols[col] + rows[row];
 }
 
-function getCoordinates(field: string): [number, number] {
+function getCoordinates(field: string, turned: boolean): [number, number] {
     if (!field || field.length !== 2) {
         return null;
+    }
+    if (turned) {
+        return [7 - cols.indexOf(field.charAt(0)), 7 - rows.indexOf(field.charAt(1))];
     }
     return [cols.indexOf(field.charAt(0)), rows.indexOf(field.charAt(1))];
 }
@@ -221,10 +289,25 @@ function getCursorPosition(canvas: HTMLCanvasElement, event: MouseEvent): [numbe
 
 let currentField: string = null;
 let currentMoves: string[] = null;
+let allMoves: { [key: string]: string[] } = null;
+let ourHistory: { [key: string]: any }[] = null;
 
 function setCurrentMoves(field: string, moves: string[] = null) {
     currentField = field;
     currentMoves = moves;
+}
+
+function setAllMoves(moves: { [key: string]: string[] }) {
+    allMoves = moves;
+}
+
+function setOurHistory(history: { [key: string]: any }[]) {
+    ourHistory = history;
+}
+
+function updateGame() {
+    setAllMoves(ourGame.moves());
+    setOurHistory(ourGame.getHistory());
 }
 
 let ourGame;
@@ -251,6 +334,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
 
     onInteraction() {
         if (!ourGame) {
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.room.send(MessageType.CHESS_INTERACTION);
             console.debug("Requesting ChessState...");
             this.show();
@@ -262,7 +346,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         }
     }
 
-    private initListeners() {
+    private initListeners() { //TODO Implement option to offer a draw if half moves is greater than 100 (50 move rule) and implement the 75 move rule
         this.canvas.addEventListener('mousedown', (event) => this.onClick(event));
         this.room.onMessage(MessageType.CHESS_INIT, gameId => {
             if (!gameId) {
@@ -273,14 +357,18 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
             ourGameId = gameId;
             ourChessState = this.room.state.chessStates[gameId];
             ourGame = new jsChessEngine.Game(JSON.parse(ourChessState.configuration));
+            updateGame();
         });
-        this.room.onMessage(MessageType.CHESS_UPDATE, (message) => ourGame = new jsChessEngine.Game(message));
+        this.room.onMessage(MessageType.CHESS_UPDATE, (message) => {
+            ourGame = new jsChessEngine.Game(message);
+            updateGame();
+        });
         this.room.onMessage(MessageType.CHESS_MOVE, message => {
             if (!ourGame || ourGameId !== message?.gameId) {
                 return;
             }
             ourGame.move(message.from, message.to);
-            ourGame.moves();
+            updateGame();
         });
         chessImportButton.addEventListener("click", () => this.loadGameFromClipboard());
     }
@@ -305,7 +393,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
 
     loop() {
         if (ourChessState) {
-            redraw(this.canvas, this.context, JSON.parse(ourChessState.configuration), currentMoves);
+            redraw(this.canvas, this.context, ourHistory, JSON.parse(ourChessState.configuration), currentMoves, allMoves, ourChessState.playerBlack === this.room.sessionId);
         }
     }
 
@@ -347,7 +435,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         const squareLength: number = maxLength / 8;
         const fieldX: number = Math.floor(cursorX / squareLength);
         const fieldY: number = Math.floor(cursorY / squareLength);
-        const field: string = getField(fieldX, fieldY);
+        const field: string = getField(fieldX, fieldY, ourChessState.playerBlack === this.room.sessionId);
         if (!field) {
             return;
         }
