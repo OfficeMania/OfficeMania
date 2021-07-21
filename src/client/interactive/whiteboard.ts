@@ -37,6 +37,7 @@ export class Whiteboard extends Interactive{
     mousedown = (e) => this.mouseDown(e, this)
     mouseup = (e) => this.mouseUp(e, this)
     mouseenter = (e) => this.mouseEnter(e, this)
+    clearCommand = () => this.clearPressed(this)
 
     resized = () => this.resize(this);
 
@@ -50,7 +51,6 @@ export class Whiteboard extends Interactive{
         this.room = getRoom();
         this.players = getPlayers();
 
-        this.clearButton.addEventListener("click", () => this.clearPressed(this));
         this.clearButton.style.top = "30%"
         this.clearButton.style.left = "20%"
 
@@ -77,6 +77,7 @@ export class Whiteboard extends Interactive{
         this.canvas.removeEventListener('mousedown',this.mousedown);
         this.canvas.removeEventListener('mouseup',this.mouseup);
         this.canvas.removeEventListener('mouseenter',this.mouseenter);
+        this.clearButton.removeEventListener("click", this.clearCommand);
 
         window.removeEventListener('resize', this.resized);
 
@@ -105,6 +106,7 @@ export class Whiteboard extends Interactive{
         this.canvas.addEventListener('mousedown',this.mousedown);
         this.canvas.addEventListener('mouseup',this.mouseup);
         this.canvas.addEventListener('mouseenter',this.mouseenter);
+        this.clearButton.addEventListener("click", this.clearCommand);
 
         //size changed
         window.addEventListener('resize', this.resized);
