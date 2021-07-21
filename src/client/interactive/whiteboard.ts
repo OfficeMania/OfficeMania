@@ -242,8 +242,7 @@ export class Whiteboard extends Interactive{
 
         this.drawLine(whiteboard.oldX, whiteboard.oldY, whiteboard.x, whiteboard.y, whiteboard)
 
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.oldX, whiteboard.oldY])
-        console.log(whiteboard.oldX, whiteboard.oldY)
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
     }
 
     makeLine(firstX: number, firstY: number, secondX: number, secondY: number, ctx) {
@@ -267,22 +266,20 @@ export class Whiteboard extends Interactive{
 
 
     mouseUp(e, whiteboard: Whiteboard) {
-        this.setPosition(e, whiteboard);
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
-        console.log(whiteboard.oldX, whiteboard.oldY)
     }
 
     mouseDown(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
-        this.setPosition(e, whiteboard);
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.oldX, whiteboard.oldY])
-        console.log(whiteboard.oldX, whiteboard.oldY)
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
     }
 
     mouseEnter(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
+        if (e.buttons !== 1) return;
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
     }
 
 
