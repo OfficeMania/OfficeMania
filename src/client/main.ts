@@ -14,6 +14,7 @@ import {
     setCharacter,
     setCollisionInfo,
     setCurrentVersion,
+    setMapInfo,
     setOurPlayer,
     setPlayers,
     setRoom,
@@ -67,8 +68,8 @@ import { updateDoors } from "./interactive/door";
 import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen";
 
 export var characters: { [key: string]: HTMLImageElement } = {}
-const START_POSITION_X = -13;
-const START_POSITION_Y = -8;
+export const START_POSITION_X = -13;
+export const START_POSITION_Y = -8;
 const MS_PER_UPDATE = 10;
 const MS_PER_UPDATE2 = 15;
 
@@ -280,6 +281,7 @@ async function main() {
     //load map from server
     const mapJson = await fetch("/map/Map.json").then((response) => response.json());
     const map: MapInfo = await convertMapData(mapJson, room, background);
+    setMapInfo(map);
 
     let currentMap = new MapInfo(map.layers, map.tileSets, map.canvas, map.resolution, map.textures, map.lowestX, map.lowestY, map.highestY, map.highestX);
 

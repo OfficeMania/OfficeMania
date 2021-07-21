@@ -1,5 +1,5 @@
 import {Interactive} from "./interactive"
-import {getOurPlayer, getRoom} from "./../util"
+import {getCorrectedPlayerCoordinates, getOurPlayer, getRoom} from "./../util"
 import {MapInfo, solidInfo, TileSet, Chunk} from "./../map"
 import { Player } from "../player";
 import {Room} from "colyseus.js";
@@ -28,9 +28,6 @@ export class Door extends Interactive {
     texture: HTMLImageElement;
     tileSet: TileSet;
     private room: Room<State>;
-    //TODO no hardcoding
-    xCorrection: number = -38;
-    yCorrection: number = -83;
     static doors: Door[] = [];
     chunkStartX: number;
     chunkStartY: number;
@@ -77,7 +74,8 @@ export class Door extends Interactive {
 
     onInteraction(): void {
         let player = getOurPlayer();
-        this.startInteraction(player.scaledX - this.xCorrection, player.scaledY - this.yCorrection, player.id);
+        let [x,y] = getCorrectedPlayerCoordinates(player);
+        this.startInteraction(x, y, player.id);
     }
 
     calculateX (correction: number) {

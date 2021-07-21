@@ -1,7 +1,7 @@
 import {Client, Room} from "colyseus.js";
 import {State} from "../common";
 import {Player, STEP_SIZE} from "./player";
-import {solidInfo} from "./map";
+import {MapInfo, solidInfo} from "./map";
 import {
     Direction,
     KEY_CAMERA_DEVICE_ID,
@@ -12,7 +12,7 @@ import {
     KEY_USERNAME,
     MessageType
 } from "../common/util";
-import {characters} from "./main";
+import {characters, START_POSITION_X} from "./main";
 import {panelButtonsInteraction, usernameInput} from "./static";
 
 export enum InputMode {
@@ -26,6 +26,7 @@ export type PlayerRecord = { [key: string]: Player }
 
 let _room: Room<State> = undefined;
 let _collisionInfo: solidInfo[][] = undefined;
+let _mapInfo: MapInfo = undefined;
 let _ourPlayer: Player = undefined;
 let _players: PlayerRecord = undefined;
 let _chatEnabled: boolean = false;
@@ -36,6 +37,14 @@ export function setRoom(room: Room<State>) {
 
 export function getRoom(): Room<State> {
     return _room;
+}
+
+export function setMapInfo(mapInfo: MapInfo) {
+    _mapInfo = mapInfo;
+}
+
+export function getMapInfo(): MapInfo {
+    return _mapInfo;
 }
 
 export function setCollisionInfo(collisionInfo: solidInfo[][]) {
@@ -182,6 +191,8 @@ export function getCookie(key: string) {
     return document.cookie.match('(^|;)\\s*' + key + '\\s*=\\s*([^;]+)')?.pop() || '';
 }
 
+//const xCorrection = Math.abs(_mapInfo.lowestX - _mapInfo.highestX) - START_POSITION_X;
+//const yCorrection = Math.abs(_mapInfo.lowestX - _mapInfo.highestX) - START_POSITION_X;
 const xCorrection = -38;
 const yCorrection = -83;
 
