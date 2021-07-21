@@ -7,6 +7,7 @@ import {MessageType} from "../../common/util";
 import {checkInputMode} from "../main";
 import {ChessColor, getOppositeChessColor} from "../../common/handler/chesshandler";
 import {chessExportButton, chessImportButton, interactiveBarChess} from "../static";
+import { createTextChangeRange } from "typescript";
 
 const jsChessEngine = require('js-chess-engine');
 
@@ -399,6 +400,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
     }
 
     leave() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.hideButtons();
         this.hide();
         this.canvas.onmousedown = null;

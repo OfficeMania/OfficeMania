@@ -564,3 +564,8 @@ body {
     visibility: visible;
     transition: 0.5s;
 }
+
+@font-face {
+    font-family: MobileFont;
+    src: url(../assets/fonts/MobileFont.ttf);
+}
