@@ -2,6 +2,7 @@ import {Room} from "colyseus.js";
 import {State} from "../../common";
 import {
     createCloseInteractionButton,
+    getOurPlayer,
     getPlayers,
     getRoom,
     loadImage,
@@ -12,6 +13,7 @@ import {ArraySchema} from "@colyseus/schema";
 import {MessageType} from "../../common/util";
 import {Interactive} from "./interactive";
 import {checkInputMode} from "../main";
+import { createIndexSignature } from "typescript";
 
 export class Whiteboard extends Interactive{
 
@@ -101,7 +103,10 @@ export class Whiteboard extends Interactive{
     }
 
     show(){
-
+        for(var i = 0; i < this.room.state.whiteboard.at(this.wID).whiteboardPlayer[getOurPlayer().id].paths.length; i++){
+            console.log(this.room.state.whiteboard.at(this.wID).whiteboardPlayer[getOurPlayer().id].paths[i]);
+        }
+        console.log("––––––––––")
         this.canvas.addEventListener('mousemove',this.mousemove);
         this.canvas.addEventListener('mousedown',this.mousedown);
         this.canvas.addEventListener('mouseup',this.mouseup);
@@ -191,24 +196,23 @@ export class Whiteboard extends Interactive{
 
         for (var i: number = start; i + 3 < max; i++) {
             if (paths[i] === -1) {
-                i = i + 1
-                j = 1;
+                j = 0;
                 continue;
             } else if (paths[i + 1] === -1) {
-                i = i + 2
-                j = 1;
+                i = i + 1
+                j = 0;
                 continue;
             } else if (paths[i + 2] === -1) {
-                i = i + 3
-                j = 1;
+                i = i + 2
+                j = 0;
                 continue;
             } else if (paths[i + 3] === -1) {
-                i = i + 4
-                j = 1;
+                i = i + 3
+                j = 0;
                 continue;
             }
             if (j === 0) {
-                whiteboard.makeLine(paths[i], paths[i + 1], paths[i + 2], paths[i + 3], whiteboard, ctx);
+                whiteboard.makeLine(paths[i], paths[i + 1], paths[i + 2], paths[i + 3], ctx);
                 j++;
             } else {
                 j = 0;
@@ -237,9 +241,10 @@ export class Whiteboard extends Interactive{
         this.drawLine(whiteboard.oldX, whiteboard.oldY, whiteboard.x, whiteboard.y, whiteboard)
 
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.oldX, whiteboard.oldY])
+        console.log(whiteboard.oldX, whiteboard.oldY)
     }
 
-    makeLine(firstX: number, firstY: number, secondX: number, secondY: number, whiteboard: Whiteboard, ctx) {
+    makeLine(firstX: number, firstY: number, secondX: number, secondY: number, ctx) {
         ctx.moveTo(firstX, firstY); // from
         ctx.lineTo(secondX, secondY); // to
     }
@@ -263,17 +268,19 @@ export class Whiteboard extends Interactive{
         this.setPosition(e, whiteboard);
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
+        console.log(whiteboard.oldX, whiteboard.oldY)
     }
 
     mouseDown(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
         this.setPosition(e, whiteboard);
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.oldX, whiteboard.oldY])
+        console.log(whiteboard.oldX, whiteboard.oldY)
     }
 
     mouseEnter(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
     }
 
 
