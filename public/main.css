@@ -20,7 +20,7 @@ body {
 
 .background {
     background-position: var(--bg-offset-x) var(--bg-offset-y);
-    background-image: url('../assets/templates/background_grass_3.png');
+    background-image: url('../assets/templates/background_grass_4.png');
     background-repeat: repeat;
 }
 
