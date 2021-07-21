@@ -163,6 +163,9 @@ export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters:
             ctx.fillStyle = "rgba(255, 255, 255, 1)";
             ctx.fillText(player.name, Math.round((width / 2) + player.positionX - ourPlayer.positionX) + 24, Math.round((height / 2) + player.positionY - ourPlayer.positionY) + 12)
         } else {
+            //offset background so that it stays with the map
+            document.documentElement.style.setProperty("--bg-offset-x", "" + (-player.positionX % 64) + "px");
+            document.documentElement.style.setProperty("--bg-offset-y", "" + (-player.positionY % 64) + "px");
             //draw yourself always at the same position
             ctx.drawImage(characters[player.character], player.spriteX, player.spriteY, playerWidth, playerHeight, Math.round(width / 2), Math.round(height / 2), playerWidth, playerHeight);
 

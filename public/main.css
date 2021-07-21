@@ -7,6 +7,8 @@
     --bg-primary-op: #23232e8e;
     --bg-secondary: #141418;
     --transition-speed: 600ms;
+    --bg-offset-x: 0;
+    --bg-offset-y: 0;
 }
 
 body {
@@ -14,6 +16,12 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     overflow: hidden;
+}
+
+.background {
+    background-position: var(--bg-offset-x) var(--bg-offset-y);
+    background-image: url('../assets/templates/background_grass_3.png');
+    background-repeat: repeat;
 }
 
 .unselectable {
