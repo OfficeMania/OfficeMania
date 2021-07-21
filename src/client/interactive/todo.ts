@@ -3,7 +3,7 @@ import {State} from "../../common";
 import {MessageType} from "../../common/util";
 import {Interactive} from "./interactive";
 import {setInputMode} from "../input";
-import {createCloseInteractionButton, getRoom, InputMode, removeCloseInteractionButton} from "../util";
+import {createCloseInteractionButton, getOurPlayer, getRoom, InputMode, removeCloseInteractionButton} from "../util";
 import { checkInputMode } from "../main";
 
 export class Todo extends Interactive {
@@ -12,6 +12,8 @@ export class Todo extends Interactive {
     static todoId: number = 0;
     content: string = "";
     ctx: CanvasRenderingContext2D;
+    contentBeforeEdit : string = "";
+
     inputLam = (e) => {
         this.getInput(e)
     };
@@ -43,6 +45,7 @@ export class Todo extends Interactive {
             return;
         }
         this.content = this.room.state.todoState[this.id.toString()].content;
+        this.contentBeforeEdit = this.content;
         this.room.send(MessageType.LIST_USE, this.id.toString())
         this.ctx.textAlign = "left";
         this.canvas.style.visibility = "visible";
@@ -58,6 +61,10 @@ export class Todo extends Interactive {
         removeCloseInteractionButton();
         document.removeEventListener("keydown", this.inputLam);
 
+        if (this.content !== this.contentBeforeEdit) {
+            this.content = this.content + " '@" + getOurPlayer().name + "'";
+        }
+        
         this.syncServer();
         this.room.send(MessageType.LIST_STOPUSE, this.id.toString());
 
