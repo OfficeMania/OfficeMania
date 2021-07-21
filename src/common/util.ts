@@ -28,6 +28,7 @@ export enum MessageType {
     OPEN_DOOR = "openDoor",
     // PlayerHandler
     MOVE = "move",
+    SYNC = "sync",
     UPDATE_CHARACTER = "updateCharacter",
     UPDATE_USERNAME = "updateUsername",
     UPDATE_PARTICIPANT_ID = "updateParticipantId",

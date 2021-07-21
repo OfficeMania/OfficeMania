@@ -1,6 +1,6 @@
 import {Player, syncOwnPosition, updateOwnPosition, updatePosition} from "./player";
 import {Room} from "colyseus.js";
-import {InputMode, PlayerRecord} from "./util";
+import {getOurPlayer, InputMode, PlayerRecord} from "./util";
 import {choosePlayerSprites} from "./drawplayer";
 import {solidInfo} from "./map";
 import { getInputMode } from "./input";
@@ -52,7 +52,6 @@ export function playerLoop(ourPlayer: Player, players: PlayerRecord, room: Room,
     if (!lastSecond || now - lastSecond >= 100) {
         lastSecond = now;
         syncOwnPosition(ourPlayer, room);
-        // console.log(ourPlayer.scaledX + 16, ourPlayer.scaledY + 67)
     }
 }
 
