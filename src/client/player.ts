@@ -101,6 +101,8 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
     
                     player.scaledY++;
                     room.send(MessageType.MOVE, Direction.DOWN);
+                } else {
+                    player.facing = Direction.DOWN
                 }
             } else {
                 player.facing = Direction.DOWN
@@ -126,6 +128,9 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     player.scaledY--;
                     room.send(MessageType.MOVE, Direction.UP);
                 }
+                else {
+                    player.facing = Direction.UP
+                }
             } else {
                 player.facing = Direction.UP
             }
@@ -146,6 +151,9 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     player.scaledX--;
                     room.send(MessageType.MOVE, Direction.LEFT);
                 }
+                else {
+                    player.facing = Direction.LEFT
+                }
             } else {
                 player.facing = Direction.LEFT
             }
@@ -164,6 +172,9 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
     
                     player.scaledX++;
                     room.send(MessageType.MOVE, Direction.RIGHT);
+                }
+                else {
+                    player.facing = Direction.RIGHT
                 }
             } else {
                 player.facing = Direction.RIGHT
