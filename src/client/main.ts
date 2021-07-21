@@ -46,6 +46,7 @@ import {
     background,
     camButton,
     canvas,
+    doors,
     characterPreview,
     characterSelect,
     interactiveCanvas,
@@ -274,6 +275,9 @@ async function main() {
     setCollisionInfo(collisionInfo);
     // console.log(collisionInfo);
 
+    doors.height = currentMap.canvas.height;
+    doors.width = currentMap.canvas.width;
+
     //retrieve lowest coords
     lowestX = currentMap.lowestX;
     lowestY = currentMap.lowestY;
@@ -324,10 +328,6 @@ async function main() {
         //calculate everything regarding the player
         playerLoop(ourPlayer, players, room, now, canvas, ctx, collisionInfo);
 
-        //check if a doorState changed
-        updateDoors(collisionInfo);
-
-
         /*
          * Repaint the scene
          */
@@ -353,6 +353,10 @@ async function main() {
 
         //TODO: draw background on canvas - need to make movestuff here
         ctx.drawImage(background, posX - Math.floor(width / 2), posY - Math.floor(height / 2), width, height, 0, 0, width, height);
+        ctx.drawImage(doors, posX - Math.floor(width / 2), posY - Math.floor(height / 2), width, height, 0, 0, width, height);
+
+        //check if a doorState changed
+        updateDoors(collisionInfo);
 
         ctx.save();
 

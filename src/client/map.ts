@@ -111,7 +111,7 @@ class Layer {
 }
 
 //only important for infinite maps
-class Chunk {
+export class Chunk {
 
     private readonly _posX: number;
     private readonly _posY: number;
