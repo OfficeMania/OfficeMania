@@ -365,9 +365,6 @@ async function main() {
         //check if interaction is nearby
         checkInteractionNearby();
 
-        //DESIGN TODO: when something on the map changes: drawMap
-
-        //TODO: draw background on canvas - need to make movestuff here
         ctx.drawImage(background, posX - Math.floor(width / 2), posY - Math.floor(height / 2), width, height, 0, 0, width, height);
         ctx.drawImage(doors, posX - Math.floor(width / 2), posY - Math.floor(height / 2), width, height, 0, 0, width, height);
 
@@ -391,6 +388,7 @@ async function main() {
     }
     //loadingScreen.style.display = "none";
     setShowLoadingscreen(false);
+    interactiveCanvas.style.visibility = "hidden";
     checkInputMode();
         // Start game loop
     requestAnimationFrame(loop);
