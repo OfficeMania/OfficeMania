@@ -67,19 +67,15 @@ export class WaterCooler extends Interactive{
 
     print(text: string) {
         this.ctx.textAlign = "left";
-        this.ctx.fillStyle = "white";
+        this.ctx.fillStyle = "black";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle = "black";
-        this.ctx.lineWidth = 10;
-        this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.stroke();
+        this.ctx.fillStyle = "rgb(0, 4, 120)";
+        this.ctx.fillRect(5, 5, this.canvas.width - 10, this.canvas.height - 10);
 
-        this.ctx.fillStyle = "black";
-        this.ctx.font = "25px sans-serif"; //monospaced so you now how musch characters are ok for one line
+        this.ctx.fillStyle = "white";
+        this.ctx.font = "50px MobileFont"; 
         this.ctx.lineWidth = 3;
 
-        //TODO center the text?
-        //TODO make a \n every x chars
         var subs = text.split('\n');
         let i = 0;
         while(subs[i] && i < 12) {
