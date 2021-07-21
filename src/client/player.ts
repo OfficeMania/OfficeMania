@@ -209,10 +209,9 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
     * syncs the position with the server about every second.
     */
     if (player.standing > 0 && player.standing % 50 === 0) {
-        player.scaledX = room.state.players[player.id].x;
-        player.scaledY = room.state.players[player.id].y;
-        player.positionX = player.scaledX * STEP_SIZE
-        player.positionY = player.scaledY * STEP_SIZE
+        if(!(player.scaledX === room.state.players[player.id].x && player.scaledY === room.state.players[player.id].y)){
+            room.send(MessageType.SYNC, [player.scaledX, player.scaledY])
+        }
     }
 
 }
@@ -230,10 +229,7 @@ export function syncOwnPosition(player: Player, room: Room) {
         if (posDiffers < 10) {
             posDiffers++;
         } else {
-            player.scaledX = room.state.players[player.id].x;
-            player.scaledY = room.state.players[player.id].y;
-            player.positionX = player.scaledX * STEP_SIZE
-            player.positionY = player.scaledY * STEP_SIZE
+            room.send(MessageType.SYNC, [player.scaledX, player.scaledY])
         }
     } else {
         posDiffers = 0;

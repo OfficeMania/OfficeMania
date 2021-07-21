@@ -1,6 +1,6 @@
 import {Handler} from "./handler";
 import {Client, Room} from "colyseus";
-import {PlayerData, State, WhiteboardPlayerState} from "../rooms/schema/state";
+import {PlayerData, State} from "../rooms/schema/state";
 import {Direction, MessageType} from "../util";
 
 export class PlayerHandler implements Handler {
@@ -14,6 +14,8 @@ export class PlayerHandler implements Handler {
     onCreate(options: any) {
         //receives movement from all the clients
         this.room.onMessage(MessageType.MOVE, ((client, message) => onMove(this.room, client, message)));
+        //recives sync message
+        this.room.onMessage(MessageType.SYNC, ((client, message) => onSync(this.room, client, message)));
         //receives character changes
         this.room.onMessage(MessageType.UPDATE_CHARACTER, (client, message) => this.room.state.players[client.sessionId].character = message);
         //receives name changes
@@ -44,24 +46,27 @@ export class PlayerHandler implements Handler {
 }
 
 function onMove(room: Room<State>, client: Client, message: Direction) {
-    if (room.state.players[client.sessionId].cooldown <= 0) {
-        switch (message) {
-            case Direction.DOWN: {
-                room.state.players[client.sessionId].y++;
-                break;
-            }
-            case Direction.UP: {
-                room.state.players[client.sessionId].y--;
-                break;
-            }
-            case Direction.LEFT: {
-                room.state.players[client.sessionId].x--;
-                break;
-            }
-            case Direction.RIGHT: {
-                room.state.players[client.sessionId].x++;
-                break;
-            }
+    switch (message) {
+        case Direction.DOWN: {
+            room.state.players[client.sessionId].y++;
+            break;
+        }
+        case Direction.UP: {
+            room.state.players[client.sessionId].y--;
+            break;
+        }
+        case Direction.LEFT: {
+            room.state.players[client.sessionId].x--;
+            break;
+        }
+        case Direction.RIGHT: {
+            room.state.players[client.sessionId].x++;
+            break;
         }
     }
+}
+
+function onSync(room: Room<State>, client: Client, message: number[]){
+    room.state.players[client.sessionId].x = message[0];
+    room.state.players[client.sessionId].y = message[1];
 }
