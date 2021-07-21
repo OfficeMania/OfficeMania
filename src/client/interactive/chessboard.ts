@@ -13,13 +13,13 @@ const jsChessEngine = require('js-chess-engine');
 enum ChessSquareColor {
     NORMAL_WHITE = "white",
     NORMAL_GRAY = "gray",
-    POSSIBLE = "lightgreen",
-    OWN = "blue",
-    MOVE = "green",
-    KICK = "red",
-    CASTLING = "yellow", //TODO Doesn't seem to be implemented in the chess engine to show the tower as a possible field
-    CHECK = "orange",
-    CHECK_CANT_MOVE = "orangered"
+    POSSIBLE = "rgba(144, 238, 144, 0.75)",
+    OWN = "rgba(0, 0, 255, 0.75)",
+    MOVE = "rgba(0, 255, 0, 0.75)",
+    KICK = "rgba(255, 0, 0, 0.75)",
+    CASTLING = "rgba(255, 255, 0, 0.75)", //TODO Doesn't seem to be implemented in the chess engine to show the tower as a possible field
+    CHECK = "rgba(255, 165, 0, 0.75)",
+    CHECK_CANT_MOVE = "rgba(255, 69, 0, 0.75)"
 }
 
 const borderSize: number = 20;
@@ -98,15 +98,16 @@ function drawMoves(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D,
     cropCanvas(canvas, context);
     const maxLength = getMaxLength(canvas);
     const squareLength: number = maxLength / 8;
-    if (possibleMoves) {
-        for (const move of Object.keys(possibleMoves)) {
-            drawSquare(context, squareLength, move, ChessSquareColor.POSSIBLE, turned);
-        }
-    }
     if (moves) {
         drawSquare(context, squareLength, currentField, ChessSquareColor.OWN, turned);
         for (const move of moves) {
             drawSquare(context, squareLength, move, getMoveColor(pieces, move), turned);
+        }
+    } else {
+        if (possibleMoves) {
+            for (const move of Object.keys(possibleMoves)) {
+                drawSquare(context, squareLength, move, ChessSquareColor.POSSIBLE, turned);
+            }
         }
     }
     context.restore();
