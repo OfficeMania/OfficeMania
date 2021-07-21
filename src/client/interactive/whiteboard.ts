@@ -179,6 +179,8 @@ export class Whiteboard extends Interactive{
 
         whiteboard.stretchX = 1280 / rect.width
         whiteboard.stretchY = 720 / rect.height
+
+        whiteboard.clearButton.style.top = rect.top + "px";
     }
 
     drawOthers(clientID: string, whiteboard: Whiteboard) {
