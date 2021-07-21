@@ -531,7 +531,7 @@ export function nearbyPlayerCheck() {
         if (player.id === ourPlayer.id) {
             continue;
         }
-        if (!ourRoomId && ourRoomId !== 0) {
+        if (!ourRoomId && ourRoomId !== 0) { //TODO ist this too many or too much? - jedenfalls ist es quatsch.
             playersAway.push(player.participantId);
             continue;
         }

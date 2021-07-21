@@ -224,7 +224,7 @@ export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionI
         const progress = i / length;
         const x = currentX(progress);
         const y = currentY(progress);
-        if (collisionInfo[x][y]?.isSolid) {
+        if (collisionInfo[x][y]?.isSolid || collisionInfo[x][y]?.content?.proofIfClosed()) {
             return false;
         }
     }
