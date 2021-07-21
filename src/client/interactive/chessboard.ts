@@ -296,7 +296,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         }
     }
 
-    private initListeners() {
+    private initListeners() { //TODO Implement option to offer a draw if half moves is greater than 100 (50 move rule) and implement the 75 move rule
         this.canvas.addEventListener('mousedown', (event) => this.onClick(event));
         this.room.onMessage(MessageType.CHESS_INIT, gameId => {
             if (!gameId) {
