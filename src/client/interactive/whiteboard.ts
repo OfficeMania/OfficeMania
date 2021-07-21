@@ -103,10 +103,6 @@ export class Whiteboard extends Interactive{
     }
 
     show(){
-        for(var i = 0; i < this.room.state.whiteboard.at(this.wID).whiteboardPlayer[getOurPlayer().id].paths.length; i++){
-            console.log(this.room.state.whiteboard.at(this.wID).whiteboardPlayer[getOurPlayer().id].paths[i]);
-        }
-        console.log("––––––––––")
         this.canvas.addEventListener('mousemove',this.mousemove);
         this.canvas.addEventListener('mousedown',this.mousedown);
         this.canvas.addEventListener('mouseup',this.mouseup);
