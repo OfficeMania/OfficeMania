@@ -4,6 +4,7 @@ function $<T extends HTMLElement>(a: string) {
     return <T>document.getElementById(a);
 }
 
+export const loadingCat = $<HTMLCanvasElement>("loading-cat");
 export const loadingScreen = $<HTMLCanvasElement>("loading-screen");
 export const panelButtonsInteraction = $<HTMLDivElement>("panel-buttons-interaction");
 export const helpFooter = $<HTMLDivElement>("help-footer");

@@ -547,10 +547,20 @@ body {
 
 #loading-screen {
     position: fixed;
-    transition: all 0.5s ease-out;
+    transition: 0.5s;
     background-color: #d0be9c;
     visibility: visible;
     display: flex;
     height: 100%;
     width: 100%;
+}
+
+#loading-cat {
+    position: fixed;
+    bottom: 0vh;
+    right: 0vh; 
+    margin-bottom: 60px; 
+    height: 10%;
+    visibility: visible;
+    transition: 0.5s;
 }

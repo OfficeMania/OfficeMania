@@ -60,8 +60,8 @@ import {
     usersButton,
     version
 } from "./static";
-import {initLoading, setShowLoadingscreen} from "./loadingscreen";
 import { updateDoors } from "./interactive/door";
+import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen";
 
 export var characters: { [key: string]: HTMLImageElement } = {}
 const START_POSITION_X = -13;
@@ -223,6 +223,7 @@ function checkWelcomeScreen() {
 // async is necessary here, because we use 'await' to resolve the promises
 async function main() {
     checkWelcomeScreen();
+    initLoadingScreenLoading();
     /*
      * We communicate to our server via WebSockets (ws-protocol instead of http)
      */
@@ -250,7 +251,6 @@ async function main() {
 
     //loads all the character information
     await loadCharacter();
-    initLoading();
     checkInputMode();
 
     /*
