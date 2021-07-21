@@ -58,7 +58,10 @@ import {
     shareButton,
     usernameInput,
     usersButton,
-    version
+    version,
+    usernameInputWelcome,
+    welcomeOkButton,
+    welcomeModal
 } from "./static";
 import { updateDoors } from "./interactive/door";
 import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen";
@@ -96,6 +99,7 @@ usersButton.addEventListener("click", () => toggleShowParticipantsTab());
 settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
 
+welcomeOkButton.addEventListener("click", () => applySettingsWelcome());
 
 
 const observer = new MutationObserver(mutations => mutations.forEach(checkInputMode));
@@ -105,6 +109,8 @@ observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
 
 export function checkInputMode() {
     if (settingsModal.style.display && !settingsModal.style.display.match(/none/)) {
+        setInputMode(InputMode.IGNORE);
+    } else if (welcomeModal.style.display && !welcomeModal.style.display.match(/none/)) {
         setInputMode(InputMode.IGNORE);
     } else if (!interactiveCanvas.style.visibility.match(/hidden/)) {
         setInputMode(InputMode.INTERACTION);
@@ -207,9 +213,16 @@ function applySettings() {
     applyConferenceSettings();
 }
 
+function applySettingsWelcome() {
+    if (usernameInputWelcome.value) {
+        setUsername(usernameInputWelcome.value);
+    }
+    setInputMode(InputMode.NORMAL);
+}
+
 function showWelcomeScreen() {
     // @ts-ignore
-    $("#welcome-modal").modal();
+    $("#welcome-modal").modal();    
 }
 
 function checkWelcomeScreen() {
@@ -222,7 +235,6 @@ function checkWelcomeScreen() {
 
 // async is necessary here, because we use 'await' to resolve the promises
 async function main() {
-    checkWelcomeScreen();
     initLoadingScreenLoading();
     /*
      * We communicate to our server via WebSockets (ws-protocol instead of http)
@@ -245,6 +257,8 @@ async function main() {
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
     setRoom(room);
     setOurPlayer(ourPlayer);
+
+    checkWelcomeScreen();
 
     getUsernameIntern = () => ourPlayer.name;
     getCharacterIntern = () => ourPlayer.character;
@@ -375,7 +389,7 @@ async function main() {
     }
     //loadingScreen.style.display = "none";
     setShowLoadingscreen(false);
-    setInputMode(InputMode.NORMAL);
+    checkInputMode();
         // Start game loop
     requestAnimationFrame(loop);
 }

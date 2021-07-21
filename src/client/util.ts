@@ -13,7 +13,7 @@ import {
     MessageType
 } from "../common/util";
 import {characters} from "./main";
-import {panelButtonsInteraction} from "./static";
+import {panelButtonsInteraction, usernameInput} from "./static";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -252,7 +252,10 @@ export async function loadCharacter() {
     if (username && username !== "") {
         setUsername(username);
     } else {
-        setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy");
+        /*let playerNameInput = document.getElementById("name-form").submit();
+        console.log(playerNameInput.elements[0].value);
+        setUsername(playerNameInput.elements[0].value);*/
+        //setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy");
     }
 
     //loads character sprite paths from the server (from movement)

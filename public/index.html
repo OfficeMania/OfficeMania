@@ -124,6 +124,12 @@
                     </div>
                     <div class="modal-body">
                         <div id="welcome-body">
+                            <form id="name-form">
+                                <label for="input-welcome-username">Please enter your Username:</label>
+                                <input type="text" id="input-welcome-username" name="username" autocomplete="off">
+                                
+                            </form>
+                            <hr>
                             <span>Move around with the Arrow Keys or </span>
                             <img src="../assets/img/transparent_32x32.png" alt="W-Key" class="key key-small" style="background-position: calc(3 * -32px) calc(4 * -32px);">
                             <img src="../assets/img/transparent_32x32.png" alt="A-Key" class="key key-small" style="background-position: calc(2 * -32px) -32px;">
@@ -145,7 +151,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button id="button-welcome-ok" aria-label="Apply and Exit" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <input type="button" value="OK" id="button-welcome-ok" aria-label="Apply and Exit" class="btn btn-default" data-dismiss="modal">
                     </div>
                 </div>
             </div>
