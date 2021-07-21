@@ -27,12 +27,13 @@ const borderSizeHalf: number = borderSize / 2;
 const borderSizeQuarter: number = borderSize / 4;
 const borderSizeDouble: number = borderSize * 2;
 
-function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any, moves: string[], possibleMoves: { [key: string]: string[] }, turned: boolean) {
+function redraw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, history: { [key: string]: any }[], configuration: any, moves: string[], possibleMoves: { [key: string]: string[] }, turned: boolean) {
     drawBorder(canvas, context, turned);
     drawBoard(canvas, context);
     drawMoves(canvas, context, configuration.pieces, moves, possibleMoves, turned);
     drawCheck(canvas, context, configuration, possibleMoves, turned);
     drawPieces(canvas, context, configuration.pieces, turned);
+    drawHistory(canvas, context, history);
     drawResult(canvas, context, configuration);
 }
 
@@ -155,6 +156,45 @@ function drawPieces(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D
     context.restore();
 }
 
+function drawHistory(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, history: { [key: string]: any }[]) {
+    context.save();
+    context.fillStyle = "black";
+    context.font = "50px Menlo monospace underline";
+    const posX: number = canvas.width * 3 / 4 - canvas.width / 7;
+    let posY = 50;
+    context.fillText("History", posX - 50, posY);
+    posY += 50;
+    context.font = "25px Menlo monospace";
+    let lastPieceCount: number = null;
+    let lastMove = null;
+    const reversedHistory = JSON.parse(JSON.stringify(history)).reverse();
+    for (const move of reversedHistory) {
+        const pieceCount: number = Object.keys(move.configuration.pieces).length;
+        const pieceLost: boolean = lastPieceCount && pieceCount < lastPieceCount;
+        lastPieceCount = pieceCount;
+        posY += drawHistoryMove(context, lastMove, posX, posY, pieceLost);
+        lastMove = move;
+    }
+    drawHistoryMove(context, lastMove, posX, posY, false);
+    context.restore();
+}
+
+function drawHistoryMove(context: CanvasRenderingContext2D, move: any, posX: number, posY: number, pieceLost: boolean): number {
+    if (!move) {
+        return 0;
+    }
+    const from: string = move.from;
+    // const to: string = move.to + (pieceLost ? "*" : "");
+    const to: string = move.to;
+    const text: string = from + ":" + to;
+    const textMetricsFrom = context.measureText(from);
+    const textMetricsTo = context.measureText(to);
+    const textMetrics = context.measureText(text);
+    const textHeight: number = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent;
+    context.fillText(text, posX - textMetrics.width + textMetricsTo.width, posY);
+    return textHeight + 20;
+}
+
 function drawResult(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, configuration: any) {
     if (configuration?.isFinished) {
         const winner: ChessColor = getOppositeChessColor(configuration.turn);
@@ -250,6 +290,7 @@ function getCursorPosition(canvas: HTMLCanvasElement, event: MouseEvent): [numbe
 let currentField: string = null;
 let currentMoves: string[] = null;
 let allMoves: { [key: string]: string[] } = null;
+let ourHistory: { [key: string]: any }[] = null;
 
 function setCurrentMoves(field: string, moves: string[] = null) {
     currentField = field;
@@ -258,6 +299,15 @@ function setCurrentMoves(field: string, moves: string[] = null) {
 
 function setAllMoves(moves: { [key: string]: string[] }) {
     allMoves = moves;
+}
+
+function setOurHistory(history: { [key: string]: any }[]) {
+    ourHistory = history;
+}
+
+function updateGame() {
+    setAllMoves(ourGame.moves());
+    setOurHistory(ourGame.getHistory());
 }
 
 let ourGame;
@@ -307,18 +357,18 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
             ourGameId = gameId;
             ourChessState = this.room.state.chessStates[gameId];
             ourGame = new jsChessEngine.Game(JSON.parse(ourChessState.configuration));
-            setAllMoves(ourGame.moves());
+            updateGame();
         });
         this.room.onMessage(MessageType.CHESS_UPDATE, (message) => {
             ourGame = new jsChessEngine.Game(message);
-            setAllMoves(ourGame.moves());
+            updateGame();
         });
         this.room.onMessage(MessageType.CHESS_MOVE, message => {
             if (!ourGame || ourGameId !== message?.gameId) {
                 return;
             }
             ourGame.move(message.from, message.to);
-            setAllMoves(ourGame.moves());
+            updateGame();
         });
         chessImportButton.addEventListener("click", () => this.loadGameFromClipboard());
     }
@@ -343,7 +393,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
 
     loop() {
         if (ourChessState) {
-            redraw(this.canvas, this.context, JSON.parse(ourChessState.configuration), currentMoves, allMoves, ourChessState.playerBlack === this.room.sessionId);
+            redraw(this.canvas, this.context, ourHistory, JSON.parse(ourChessState.configuration), currentMoves, allMoves, ourChessState.playerBlack === this.room.sessionId);
         }
     }
 
