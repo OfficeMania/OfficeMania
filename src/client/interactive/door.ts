@@ -356,36 +356,36 @@ export class Door extends Interactive {
         this.delay++;
     }
 
-    private drawDoorIntern(resolution: number, sxOpenVertical: number, bxTimes: number, ty: number, byTimes: number, tyMinus: number, byMinusTimes: number, tyMinus2: number, byMinus2Times: number, sxOpenHorizontalLeft: number, sxOpenHorizontalRight: number, bxPlusTimes: number, tyPlus: number, byPlusTimes: number, bxMinusTimes: number) {
+    private drawDoorIntern(resolution: number, sxVertical: number, dx: number, ty: number, byTimes: number, tyMinus: number, byMinusTimes: number, tyMinus2: number, byMinus2Times: number, sxOpenHorizontalLeft: number, sxOpenHorizontalRight: number, bxPlusTimes: number, tyPlus: number, byPlusTimes: number, bxMinusTimes: number) {
         switch (this.direction) {
             case DoorDirection.NORTH: {
-                this.drawVertical(resolution, sxOpenVertical, bxTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
+                this.drawVertical(resolution, sxVertical, dx, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
                 break;
             }
             case DoorDirection.EAST: {
-                this.drawHorizontal(resolution, sxOpenHorizontalLeft, sxOpenHorizontalRight, bxTimes, bxPlusTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
+                this.drawHorizontal(resolution, sxOpenHorizontalLeft, sxOpenHorizontalRight, dx, bxPlusTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
                 break;
             }
             case DoorDirection.SOUTH: {
-                this.drawVertical(resolution, sxOpenVertical, bxTimes, ty, byTimes, tyMinus, byMinusTimes, tyPlus, byPlusTimes);
+                this.drawVertical(resolution, sxVertical, dx, tyPlus, byPlusTimes, ty, byTimes, tyMinus, byMinusTimes);
                 break;
             }
             case DoorDirection.WEST: {
-                this.drawHorizontal(resolution, sxOpenHorizontalRight, sxOpenHorizontalLeft, bxTimes, bxMinusTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
+                this.drawHorizontal(resolution, sxOpenHorizontalRight, sxOpenHorizontalLeft, dx, bxMinusTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
                 break;
             }
         }
     }
 
-    private drawHorizontal(resolution: number, sxLeft: number, sxRight: number, dxLeft: number, dxRight: number, sy1: number, dy1: number, sy2: number, dy2: number, sy3: number, dy3: number) {
-        this.drawVertical(resolution, sxLeft, dxLeft, sy1, dy1, sy2, dy2, sy3, dy3);
-        this.drawVertical(resolution, sxRight, dxRight, sy1, dy1, sy2, dy2, sy3, dy3);
+    private drawHorizontal(resolution: number, sxLeft: number, sxRight: number, dxLeft: number, dxRight: number, syBottom: number, dyBottom: number, syMiddle: number, dyMiddle: number, syTop: number, dyTop: number) {
+        this.drawVertical(resolution, sxLeft, dxLeft, syBottom, dyBottom, syMiddle, dyMiddle, syTop, dyTop); // Draw left Part of the Door
+        this.drawVertical(resolution, sxRight, dxRight, syBottom, dyBottom, syMiddle, dyMiddle, syTop, dyTop); // Draw right Part of the Door
     }
 
-    private drawVertical(length: number, sx: number, dx: number, sy1: number, dy1: number, sy2: number, dy2: number, sy3: number, dy3: number) {
-        this.ctx.drawImage(this.texture, sx, sy1, length, length, dx, dy1, length, length);
-        this.ctx.drawImage(this.texture, sx, sy2, length, length, dx, dy2, length, length);
-        this.ctx.drawImage(this.texture, sx, sy3, length, length, dx, dy3, length, length);
+    private drawVertical(length: number, sx: number, dx: number, syBottom: number, dyBottom: number, syMiddle: number, dyMiddle: number, syTop: number, dyTop: number) {
+        this.ctx.drawImage(this.texture, sx, syBottom, length, length, dx, dyBottom, length, length); // Draw bottom Part of the Door
+        this.ctx.drawImage(this.texture, sx, syMiddle, length, length, dx, dyMiddle, length, length); // Draw middle Part of the Door
+        this.ctx.drawImage(this.texture, sx, syTop, length, length, dx, dyTop, length, length); // Draw top Part of the Door
     }
 
 }
