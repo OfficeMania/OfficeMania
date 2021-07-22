@@ -274,6 +274,13 @@ function fillSolidInfos(map: MapInfo) {
                             }
                         } else if (isContentLayer && value !== 0) {
                             const interactive: Interactive = getInteractive(value, basePosX, basePosY, room, map);
+                            if(interactive && interactive.name === "Door" && interactive.direction === DoorDirection.NORTH) {
+                                setSolidInfoMap(solidInfoMap, basePosX, basePosY - 2, (solidInfo) => solidInfo.setContent(interactive));
+                            } else if(interactive && interactive.name === "Door" && interactive.direction === DoorDirection.SOUTH) {
+                                setSolidInfoMap(solidInfoMap, basePosX, basePosY + 2, (solidInfo) => solidInfo.setContent(interactive));
+                            } else if(interactive && interactive.name === "whiteboard") {
+                                setSolidInfoMap(solidInfoMap, basePosX + 2, basePosY, (solidInfo) => solidInfo.setContent(interactive));
+                            }
                             setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setContent(interactive));
                         } else if (isConferenceRoomsLayer && value === 1) {
                             setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setIsConferenceRoom(true));

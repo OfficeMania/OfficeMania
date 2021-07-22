@@ -1,5 +1,6 @@
 import {Direction} from "../../common/util";
 import { interactiveCanvas } from "../static";
+import { DoorDirection } from "./door";
 
 
 
@@ -13,6 +14,7 @@ export class Interactive {
     private _maxPlayer: number;
     canvas: HTMLCanvasElement;
     input: Direction[] = [null];
+    direction: DoorDirection;
 
     constructor(name: string, singleton: boolean = true, maxPlayer: number = 1) {
         this._name = name;
