@@ -164,83 +164,61 @@ export class Door extends Interactive {
         }
     }
 
-    openDoor(id: string) {
-        if (id === this.playerId) {
-            this.isClosed = false;
-            this.room.send(MessageType.OPEN_DOOR, this.posX + "" + this.posY);
-        } else {
-            //TODO Klopfton im Raum abspielen (also bei Spielern, die sich aktuell in der RaumID des Raumes befinden)
-            console.log("Klopf, klopf");
-        }
+    unlockDoor() {
+        this.isClosed = false;
+        this.room.send(MessageType.OPEN_DOOR, this.posX + "" + this.posY);
+    }
+
+    knockDoor(id: string) {
+        //TODO Klopfton im Raum abspielen (also bei Spielern, die sich aktuell in der RaumID des Raumes befinden)
+        console.log("Klopf, klopf from:", id);
     }
 
     startInteraction(playerX: number, playerY: number, playerId: string) {
-
         switch (this.direction) {
-
             case DoorDirection.NORTH: {
-
                 if (playerY < this.posY) {
-
-                    this.openDoor(playerId);
+                    this.knockDoor(playerId);
                 } else {
-
                     if (this.isClosed) {
-
-                        this.openDoor(playerId);
+                        this.unlockDoor();
                     } else {
-
                         this.lockDoor(playerId);
                     }
                 }
                 break;
             }
             case DoorDirection.EAST: {
-
                 if (playerX > this.posX) {
-
-                    this.openDoor(playerId);
+                    this.knockDoor(playerId);
                 } else {
-
                     if (this.isClosed) {
-
-                        this.openDoor(playerId);
+                        this.unlockDoor();
                     } else {
-
                         this.lockDoor(playerId);
                     }
                 }
                 break;
             }
             case DoorDirection.SOUTH: {
-
                 if (playerY > this.posY) {
-
-                    this.openDoor(playerId);
+                    this.knockDoor(playerId);
                 } else {
-
                     if (this.isClosed) {
-
-                        this.openDoor(playerId);
+                        this.unlockDoor();
                     } else {
-
                         this.lockDoor(playerId);
                     }
                 }
                 break;
             }
             case DoorDirection.WEST: {
-
                 if (playerX < this.posX) {
-
-                    this.openDoor(playerId);
+                    this.knockDoor(playerId);
                 } else {
-
                     if (this.isClosed) {
-
-                        this.openDoor(playerId);
+                        this.unlockDoor();
                     } else {
-
                         this.lockDoor(playerId);
                     }
                 }
