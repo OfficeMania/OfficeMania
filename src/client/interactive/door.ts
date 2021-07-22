@@ -1,12 +1,10 @@
 import {Interactive} from "./interactive"
 import {getCorrectedPlayerCoordinates, getOurPlayer, getRoom} from "./../util"
-import {MapInfo, solidInfo, TileSet, Chunk} from "./../map"
-import { Player } from "../player";
+import {Chunk, MapInfo, solidInfo, TileSet} from "./../map"
 import {Room} from "colyseus.js";
 import {State} from "../../common";
 import {MessageType} from "../../common/util";
-import { DoorState } from "../../common/rooms/schema/state";
-import { doors } from "../../client/static";
+import {doors} from "../../client/static";
 
 export enum DoorDirection {
     UNKNOWN,
@@ -74,15 +72,16 @@ export class Door extends Interactive {
 
     onInteraction(): void {
         let player = getOurPlayer();
-        let [x,y] = getCorrectedPlayerCoordinates(player);
+        let [x, y] = getCorrectedPlayerCoordinates(player);
         this.startInteraction(x, y, player.id);
     }
 
-    calculateX (correction: number) {
+    calculateX(correction: number) {
 
         return (this.posX + correction) / 2 + this.map.lowestX;
     }
-    calculateY (correction: number) {
+
+    calculateY(correction: number) {
 
         return (this.posY + correction) / 2 + this.map.lowestY;
     }
@@ -106,7 +105,7 @@ export class Door extends Interactive {
 
         this.chunkX = this.chunkCorrection(this.chunkX);
         this.chunkY = this.chunkCorrection(this.chunkY);
-    
+
         this.chunkStartX = Math.floor(x / 16) * 16;
         this.chunkStartY = Math.floor(y / 16) * 16;
 
@@ -117,7 +116,7 @@ export class Door extends Interactive {
 
                     if (this.chunkStartX === chunk.posX && this.chunkStartY === chunk.posY) {
 
-                        if(!chunk.tileSetForElement[this.chunkX][this.chunkY]){ //why are there two doors with this?
+                        if (!chunk.tileSetForElement[this.chunkX][this.chunkY]) { //why are there two doors with this?
                             // console.log("ehhhh");
                             return;
                         } else {
@@ -133,7 +132,7 @@ export class Door extends Interactive {
 
                     if (this.chunkStartX === groundChunk.posX && this.chunkStartY === groundChunk.posY) {
 
-                        if(!groundChunk.tileSetForElement[this.chunkX][this.chunkY]){ //why are there two doors with this?
+                        if (!groundChunk.tileSetForElement[this.chunkX][this.chunkY]) { //why are there two doors with this?
                             // console.log("ehhhh");
                         } else {
                             this.groundTileset = groundChunk.tileSetForElement[this.chunkX][this.chunkY];
@@ -174,8 +173,8 @@ export class Door extends Interactive {
             this.isClosed = false;
             this.room.send(MessageType.OPEN_DOOR, this.posX + "" + this.posY);
         } else {
-           //TODO Klopfton im Raum abspielen (also bei Spielern, die sich aktuell in der RaumID des Raumes befinden)
-           console.log("Klopf, klopf");
+            //TODO Klopfton im Raum abspielen (also bei Spielern, die sich aktuell in der RaumID des Raumes befinden)
+            console.log("Klopf, klopf");
         }
     }
 
@@ -265,8 +264,8 @@ export class Door extends Interactive {
             this.syncDelay++;
         }
         const doorState = this.room.state.doorStates[this.posX + "" + this.posY];
-        if(this.lastIsClosed !== this.isClosed) {
-            if(doorState?.isClosed === true && this.inAnimation === false) {
+        if (this.lastIsClosed !== this.isClosed) {
+            if (doorState?.isClosed === true && this.inAnimation === false) {
                 this.animationCounter = 4;
                 this.inAnimation = true;
                 this.syncDelay = 1;
@@ -308,98 +307,98 @@ export class Door extends Interactive {
                 switch (this.direction) {
 
                     case DoorDirection.SOUTH: {
-    
-                        this.ctx.clearRect((this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+
+                        this.ctx.clearRect((this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution - this.map.resolution, this.map.resolution, this.map.resolution * 3);
-    
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + this.animationCounter * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
-    
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + this.animationCounter * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] -this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+
+                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + this.animationCounter * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution - this.map.resolution, this.map.resolution, this.map.resolution);
-    
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + this.animationCounter * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] + this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution + this.map.resolution, this.map.resolution, this.map.resolution);
                         break;
                     }
                     case DoorDirection.EAST: {
-    
-                        this.ctx.clearRect((this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
+
+                        this.ctx.clearRect((this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution * 2, this.map.resolution * 3);
-    
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + this.animationCounter * 2 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + this.animationCounter * 2 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + (this.animationCounter * 2 - 1) * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
-                            
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + (this.animationCounter * 2 - 1) * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
-    
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + (this.animationCounter * 2 - 1) * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
-    
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 2 * this.animationCounter * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
                         break;
                     }
                     case DoorDirection.NORTH: {
-    
-                        this.ctx.clearRect((this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+
+                        this.ctx.clearRect((this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution - 2 * this.map.resolution, this.map.resolution, this.map.resolution * 3);
-    
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + this.animationCounter * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
-    
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + this.animationCounter * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution - this.map.resolution, this.map.resolution, this.map.resolution);
-    
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + this.animationCounter * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution - 2 * this.map.resolution, this.map.resolution, this.map.resolution);
                         break;
                     }
                     case DoorDirection.WEST: {
-    
-                        this.ctx.clearRect((this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
+
+                        this.ctx.clearRect((this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution * 2, this.map.resolution * 3);
-    
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + this.animationCounter * 2 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + this.animationCounter * 2 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + (this.animationCounter * 2 - 1) * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
-                            
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + (this.animationCounter * 2 - 1) * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
-    
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + (this.animationCounter * 2 - 1) * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
-    
+
                         this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 2 * this.animationCounter * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
+                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
                             (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
                         break;
                     }
@@ -408,93 +407,93 @@ export class Door extends Interactive {
         }
         if (this.firstTimeDrawn === false) {
 
-                switch (this.direction) {
+            switch (this.direction) {
 
-                    case DoorDirection.NORTH: {
+                case DoorDirection.NORTH: {
 
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 4 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
-    
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 4 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 4 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        break;
-                    }
-                    case DoorDirection.EAST: {
-                        
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 8 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 8 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 7 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
-                            
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 7 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 4 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
 
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 7 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 4 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
 
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 8 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        break;
-                    }
-                    case DoorDirection.SOUTH: {
-
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 4 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 4 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] -this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 4 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] +this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) + 1) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        break;
-                    }
-                    case DoorDirection.WEST: {
-
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 8 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 8 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 7 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
-                            
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 7 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
-
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 7 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
-
-                        this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 8 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
-                            this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution, 
-                            (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
-                        break;
-                    }
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 4 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
+                    break;
                 }
+                case DoorDirection.EAST: {
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 8 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 8 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 7 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 7 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 7 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 8 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
+                    break;
+                }
+                case DoorDirection.SOUTH: {
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 4 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 4 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 4 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] + this.map.resolution,
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) + 1) * this.map.resolution, this.map.resolution, this.map.resolution);
+                    break;
+                }
+                case DoorDirection.WEST: {
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 8 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 8 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 7 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 7 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - this.map.resolution,
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution, this.map.resolution, this.map.resolution);
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 7 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY] - 2 * this.map.resolution,
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution, this.map.resolution, this.map.resolution);
+
+                    this.ctx.drawImage(this.texture, this.chunk.tileSetX[this.chunkX][this.chunkY] + 8 * this.map.resolution, this.chunk.tileSetY[this.chunkX][this.chunkY],
+                        this.map.resolution, this.map.resolution, (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution,
+                        (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution, this.map.resolution, this.map.resolution);
+                    break;
+                }
+            }
             this.firstTimeDrawn = true;
         }
         if (this.delay === 5) {
