@@ -287,10 +287,6 @@ export class Door extends Interactive {
         const tx = this.chunk.tileSetX[this.chunkX][this.chunkY];
         const ty = this.chunk.tileSetY[this.chunkX][this.chunkY];
         //
-        const tyMinus = ty - resolution;
-        const tyMinus2 = ty - resolution * 2;
-        const tyPlus = ty + resolution;
-        //
         const bx = this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2);
         const by = this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2);
         //
@@ -298,15 +294,10 @@ export class Door extends Interactive {
         const bxMinusTimes = (bx - 1) * resolution;
         const bxPlusTimes = (bx + 1) * resolution;
         //
-        const byTimes = by * resolution;
-        const byMinusTimes = (by - 1) * resolution;
-        const byMinus2Times = (by - 2) * resolution;
-        const byPlusTimes = (by + 1) * resolution;
-        //
-        const top = new DoorPart(tyMinus2, byMinus2Times);
-        const middle = new DoorPart(tyMinus, byMinusTimes);
-        const bottom = new DoorPart(ty, byTimes);
-        const bottomDeep = new DoorPart(tyPlus, byPlusTimes);
+        const bottomDeep = new DoorPart(ty + resolution, (by + 1) * resolution);
+        const bottom = new DoorPart(ty, by * resolution);
+        const middle = new DoorPart(ty - resolution, (by - 1) * resolution);
+        const top = new DoorPart(ty - resolution * 2, (by - 2) * resolution);
         if (this.inAnimation && this.syncIndex && this.delay === 5) {
             this.syncDelay = 0;
             if (this.isClosed) {
@@ -328,19 +319,19 @@ export class Door extends Interactive {
                 const sxOpenHorizontalRight = tx + (this.animationCounter * 2) * resolution;
                 switch (this.direction) {
                     case DoorDirection.NORTH: {
-                        this.ctx.clearRect(bxTimes, byMinus2Times, resolution, resolution * 3);
+                        this.ctx.clearRect(bxTimes, top.dy, resolution, resolution * 3);
                         break;
                     }
                     case DoorDirection.EAST: {
-                        this.ctx.clearRect(bxTimes, byMinus2Times, resolution * 2, resolution * 3);
+                        this.ctx.clearRect(bxTimes, top.dy, resolution * 2, resolution * 3);
                         break;
                     }
                     case DoorDirection.SOUTH: {
-                        this.ctx.clearRect(bxTimes, byMinusTimes, resolution, resolution * 3);
+                        this.ctx.clearRect(bxTimes, middle.dy, resolution, resolution * 3);
                         break;
                     }
                     case DoorDirection.WEST: {
-                        this.ctx.clearRect(bxMinusTimes, byMinus2Times, resolution * 2, resolution * 3);
+                        this.ctx.clearRect(bxMinusTimes, top.dy, resolution * 2, resolution * 3);
                         break;
                     }
                 }
