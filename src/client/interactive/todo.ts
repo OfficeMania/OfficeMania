@@ -62,7 +62,7 @@ export class Todo extends Interactive {
         document.removeEventListener("keydown", this.inputLam);
 
         if (this.content !== this.contentBeforeEdit) {
-            this.content = this.content + " '@" + getOurPlayer().name + "'";
+            this.content = this.content + "\n    '@" + getOurPlayer().name + "'";
         }
         
         this.syncServer();
@@ -78,9 +78,8 @@ export class Todo extends Interactive {
     }
 
     getInput(e:KeyboardEvent){
-        //TDOD dont draw more then 12 lines
         let i = 0;
-        while(this.inputs[i]){
+        while(this.inputs[i] && this.checkForSpace(e)){
             if(this.inputs[i] === e.key){
                 if(this.marker === this.content.length){
                     this.content = this.content.concat(e.key);
@@ -93,7 +92,7 @@ export class Todo extends Interactive {
             }
             i++;
         }
-        if(e.key === "Enter") {
+        if(e.key === "Enter" && this.checkForSpace(e)) {
             if(this.marker === this.content.length){
                 this.content = this.content.concat("\n");
             } else {
@@ -125,6 +124,28 @@ export class Todo extends Interactive {
         }
         this.paint();
         this.syncServer();
+    }
+
+    checkForSpace(e:KeyboardEvent): boolean{
+        //TODO
+            var subs = this.content.split('\n');
+            let i = 0;
+            let lineCounter = 0;
+            let last: string;
+            while(subs[i]) {
+                let times = Math.floor(subs[i].length / 70);
+                lineCounter += times + 1;
+                last = subs[i].slice(70 * times, subs[i].length)
+                i++;
+            }
+        if(e.key === "Enter" && lineCounter < 12) {
+            return true;
+        }else if (e.key === "Enter") {
+            return false;
+        } else if(lineCounter < 12 /*|| last.length < 69 */||lineCounter === 12 && last.length < 69) {
+            return true;
+        }
+        return false;
     }
 
     paint() {
@@ -159,23 +180,16 @@ export class Todo extends Interactive {
 
         let i = 0;
         let j = 0;
-        while(subs[i] && j < 12) {
-            if(subs[i].length > 70){
-                for (let k = 0; k < subs[i].length; k++) {
-                    if(k % 70 === 0 && k !== 0) {
-                        this.ctx.fillText("text", 0, 0);
-                    }else if(subs[i].length - k < 70) {
-                        this.ctx.fillText(subs[i].slice(k, subs[i].length), 100, 100 + (50 * j));
-                        j++;
-                    }
+        while(subs[i]) {
+            let times = Math.floor(subs[i].length / 70);
+            for(let k = 0; k <= times; k++) {
+                if(k === times){
+                    this.ctx.fillText(subs[i].slice(70 * k, subs[i].length), 100, 100 + (50 * j));
+                    j++;
+                } else {
+                    this.ctx.fillText(subs[i].slice(70 * k, (70 * k) + 70), 100, 100 + (50 * j));
+                    j++;
                 }
-                console.log("sehr langer abschnitt");
-                let text1 = subs[i].slice(0, 70);
-                this.ctx.fillText(text1, 100, 100 + (50 * j));
-                j++;
-            } else{
-                this.ctx.fillText(subs[i], 100, 100 + (50*j));
-                j++;
             }
             i++;
         }
