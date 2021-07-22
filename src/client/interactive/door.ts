@@ -303,6 +303,10 @@ export class Door extends Interactive {
         const byMinus2Times = (by - 2) * resolution;
         const byPlusTimes = (by + 1) * resolution;
         //
+        const top = new DoorPart(tyMinus2, byMinus2Times);
+        const middle = new DoorPart(tyMinus, byMinusTimes);
+        const bottom = new DoorPart(ty, byTimes);
+        const bottomDeep = new DoorPart(tyPlus, byPlusTimes);
         if (this.inAnimation && this.syncIndex && this.delay === 5) {
             this.syncDelay = 0;
             if (this.isClosed) {
@@ -340,14 +344,14 @@ export class Door extends Interactive {
                         break;
                     }
                 }
-                this.drawDoorIntern(resolution, sxOpenVertical, bxTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times, sxOpenHorizontalLeft, sxOpenHorizontalRight, bxPlusTimes, tyPlus, byPlusTimes, bxMinusTimes);
+                this.drawDoorIntern(resolution, sxOpenVertical, sxOpenHorizontalLeft, sxOpenHorizontalRight, bxTimes, bxMinusTimes, bxPlusTimes, bottomDeep, bottom, middle, top);
             }
         }
         if (!this.firstTimeDrawn) {
             const sxOpenVertical = tx + 4 * resolution;
             const sxOpenHorizontalLeft = tx + 7 * resolution;
             const sxOpenHorizontalRight = tx + 8 * resolution;
-            this.drawDoorIntern(resolution, sxOpenVertical, bxTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times, sxOpenHorizontalLeft, sxOpenHorizontalRight, bxPlusTimes, tyPlus, byPlusTimes, bxMinusTimes);
+            this.drawDoorIntern(resolution, sxOpenVertical, sxOpenHorizontalLeft, sxOpenHorizontalRight, bxTimes, bxMinusTimes, bxPlusTimes, bottomDeep, bottom, middle, top);
             this.firstTimeDrawn = true;
         }
         if (this.delay === 5) {
@@ -356,36 +360,36 @@ export class Door extends Interactive {
         this.delay++;
     }
 
-    private drawDoorIntern(resolution: number, sxVertical: number, dx: number, ty: number, byTimes: number, tyMinus: number, byMinusTimes: number, tyMinus2: number, byMinus2Times: number, sxOpenHorizontalLeft: number, sxOpenHorizontalRight: number, bxPlusTimes: number, tyPlus: number, byPlusTimes: number, bxMinusTimes: number) {
+    private drawDoorIntern(resolution: number, sxVertical: number, sxHorizontalLeft: number, sxHorizontalRight: number, dxMiddle: number, dxLeft: number, dxRight: number, bottomDeep: DoorPart, bottom: DoorPart, middle: DoorPart, top: DoorPart) {
         switch (this.direction) {
             case DoorDirection.NORTH: {
-                this.drawVertical(resolution, sxVertical, dx, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
+                this.drawVertical(resolution, sxVertical, dxMiddle, bottom, middle, top);
                 break;
             }
             case DoorDirection.EAST: {
-                this.drawHorizontal(resolution, sxOpenHorizontalLeft, sxOpenHorizontalRight, dx, bxPlusTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
+                this.drawHorizontal(resolution, sxHorizontalLeft, sxHorizontalRight, dxMiddle, dxRight, bottom, middle, top);
                 break;
             }
             case DoorDirection.SOUTH: {
-                this.drawVertical(resolution, sxVertical, dx, tyPlus, byPlusTimes, ty, byTimes, tyMinus, byMinusTimes);
+                this.drawVertical(resolution, sxVertical, dxMiddle, bottomDeep, bottom, middle);
                 break;
             }
             case DoorDirection.WEST: {
-                this.drawHorizontal(resolution, sxOpenHorizontalRight, sxOpenHorizontalLeft, dx, bxMinusTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
+                this.drawHorizontal(resolution, sxHorizontalLeft, sxHorizontalRight, dxLeft, dxMiddle, bottom, middle, top);
                 break;
             }
         }
     }
 
-    private drawHorizontal(resolution: number, sxLeft: number, sxRight: number, dxLeft: number, dxRight: number, syBottom: number, dyBottom: number, syMiddle: number, dyMiddle: number, syTop: number, dyTop: number) {
-        this.drawVertical(resolution, sxLeft, dxLeft, syBottom, dyBottom, syMiddle, dyMiddle, syTop, dyTop); // Draw left Part of the Door
-        this.drawVertical(resolution, sxRight, dxRight, syBottom, dyBottom, syMiddle, dyMiddle, syTop, dyTop); // Draw right Part of the Door
+    private drawHorizontal(resolution: number, sxLeft: number, sxRight: number, dxLeft: number, dxRight: number, bottom: DoorPart, middle: DoorPart, top: DoorPart) {
+        this.drawVertical(resolution, sxLeft, dxLeft, bottom, middle, top); // Draw left Part of the Door
+        this.drawVertical(resolution, sxRight, dxRight, bottom, middle, top); // Draw right Part of the Door
     }
 
-    private drawVertical(length: number, sx: number, dx: number, syBottom: number, dyBottom: number, syMiddle: number, dyMiddle: number, syTop: number, dyTop: number) {
-        this.ctx.drawImage(this.texture, sx, syBottom, length, length, dx, dyBottom, length, length); // Draw bottom Part of the Door
-        this.ctx.drawImage(this.texture, sx, syMiddle, length, length, dx, dyMiddle, length, length); // Draw middle Part of the Door
-        this.ctx.drawImage(this.texture, sx, syTop, length, length, dx, dyTop, length, length); // Draw top Part of the Door
+    private drawVertical(length: number, sx: number, dx: number, bottom: DoorPart, middle: DoorPart, top: DoorPart) {
+        this.ctx.drawImage(this.texture, sx, bottom.sy, length, length, dx, bottom.dy, length, length); // Draw bottom Part of the Door
+        this.ctx.drawImage(this.texture, sx, middle.sy, length, length, dx, middle.dy, length, length); // Draw middle Part of the Door
+        this.ctx.drawImage(this.texture, sx, top.sy, length, length, dx, top.dy, length, length); // Draw top Part of the Door
     }
 
 }
@@ -396,4 +400,32 @@ export function updateDoors() {
         value.update();
         value.drawDoor();
     });
+}
+
+class DoorPart {
+
+    private _sy: number;
+    private _dy: number;
+
+    constructor(sx: number, dy: number) {
+        this._sy = sx;
+        this._dy = dy;
+    }
+
+    get sy(): number {
+        return this._sy;
+    }
+
+    set sy(value: number) {
+        this._sy = value;
+    }
+
+    get dy(): number {
+        return this._dy;
+    }
+
+    set dy(value: number) {
+        this._dy = value;
+    }
+
 }
