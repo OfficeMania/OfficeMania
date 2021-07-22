@@ -283,13 +283,15 @@ export class Door extends Interactive {
     drawDoor() {
         let lastCounter = this.animationCounter;
         const resolution = this.map.resolution;
-        const dx = (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * resolution;
-        const dy = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * resolution;
+        const baseX = this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2);
+        const baseY = this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2);
+        const dx = baseX * resolution;
+        const dy = baseY * resolution;
         const tileSetYElement = this.chunk.tileSetY[this.chunkX][this.chunkY];
         const sy = tileSetYElement - resolution;
-        const x = (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * resolution;
-        const y = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * resolution;
-        const dyEast = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * resolution;
+        const x = (baseX - 1) * resolution;
+        const y = (baseY - 2) * resolution;
+        const dyEast = (baseY - 1) * resolution;
         const doubleMapResolution = resolution * 2;
         const syEast = tileSetYElement - doubleMapResolution;
         const tileSetXElement = this.chunk.tileSetX[this.chunkX][this.chunkY];
@@ -413,9 +415,7 @@ export class Door extends Interactive {
 
                     this.ctx.drawImage(this.texture, sxVertical, sy, resolution, resolution, dx, dyEast, resolution, resolution);
 
-                    const dySouth = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) + 1) * resolution;
-
-                    this.ctx.drawImage(this.texture, sxVertical, tileSetYElement + resolution, resolution, resolution, dx, dySouth, resolution, resolution);
+                    this.ctx.drawImage(this.texture, sxVertical, tileSetYElement + resolution, resolution, resolution, dx, (baseY + 1) * resolution, resolution, resolution);
                     break;
                 }
                 case DoorDirection.WEST: {
