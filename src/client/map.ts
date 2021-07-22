@@ -304,19 +304,19 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
     switch (value) {
         //doors
         case 1: {
-            return createDoor(DoorDirection.NORTH, basePosX, basePosY, room, map);
+            return new Door(DoorDirection.NORTH, basePosX, basePosY, map);
         }
         case 2: {
-            return createDoor(DoorDirection.EAST, basePosX, basePosY, room, map);
+            return new Door(DoorDirection.EAST, basePosX, basePosY, map);
         }
         case 3: {
-            return createDoor(DoorDirection.SOUTH, basePosX, basePosY, room, map);
+            return new Door(DoorDirection.SOUTH, basePosX, basePosY, map);
         }
         case 4: {
-            return createDoor(DoorDirection.WEST, basePosX, basePosY, room, map);
+            return new Door(DoorDirection.WEST, basePosX, basePosY, map);
         }
         case 5: {
-            return createDoor(DoorDirection.ALWAYS_OPEN, basePosX, basePosY, room, map);
+            return new Door(DoorDirection.ALWAYS_OPEN, basePosX, basePosY, map);
         }
         //pongtable
         case 6: {
@@ -351,10 +351,6 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         }
     }
     return null;
-}
-
-function createDoor(direction: DoorDirection, basePosX: number, basePosY: number, room: Room<State>, map: MapInfo): Door {
-    return new Door(direction, basePosX, basePosY, map);
 }
 
 //saves the paths from the templates
