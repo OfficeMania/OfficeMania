@@ -74,7 +74,6 @@ export class Door extends Interactive {
         let player = getOurPlayer();
         let [x, y] = getCorrectedPlayerCoordinates(player);
         this.startInteraction(x, y, player.id);
-        console.debug(`direction=${this.direction},texture=${this.texture.src}`); //TODO REMOVE
     }
 
     calculateX(correction: number) {
@@ -276,7 +275,7 @@ export class Door extends Interactive {
         const bottom = new DoorPart(ty, by * resolution);
         const middle = new DoorPart(ty - resolution, (by - 1) * resolution);
         const top = new DoorPart(ty - resolution * 2, (by - 2) * resolution);
-        if (this.inAnimation && this.syncIndex && this.delay === 5) {
+        if (this.inAnimation && this.syncIndex && this.delay === 5) { //TODO Do not sync door animation with server? Just animate it on message/event...
             this.syncDelay = 0;
             if (this.isClosed) {
                 this.animationCounter--;
