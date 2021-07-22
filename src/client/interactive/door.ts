@@ -323,7 +323,8 @@ export class Door extends Interactive {
                         break;
                     }
                     case DoorDirection.EAST: {
-                        this.ctx.clearRect(bxTimes, top.dy, resolution * 2, resolution * 3);
+                        // this.ctx.clearRect(bxTimes, top.dy, resolution * 2, resolution * 3);
+                        this.ctx.clearRect(bxMinusTimes, top.dy, resolution * 2, resolution * 3);
                         break;
                     }
                     case DoorDirection.SOUTH: {
@@ -358,7 +359,8 @@ export class Door extends Interactive {
                 break;
             }
             case DoorDirection.EAST: {
-                this.drawHorizontal(resolution, sxHorizontalLeft, sxHorizontalRight, dxMiddle, dxRight, bottom, middle, top);
+                // this.drawHorizontal(resolution, sxHorizontalLeft, sxHorizontalRight, dxMiddle, dxRight, bottom, middle, top);
+                this.drawHorizontal(resolution, sxHorizontalLeft, sxHorizontalRight, dxLeft, dxMiddle, bottom, middle, top);
                 break;
             }
             case DoorDirection.SOUTH: {
