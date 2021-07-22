@@ -1,7 +1,7 @@
 import {Room} from "colyseus.js";
 import {solidInfo} from "./map"
 import {Direction, MessageType} from "../common/util";
-import { getCorrectedPlayerCoordinates } from "./util";
+import {getCorrectedPlayerCoordinates} from "./util";
 //import { lowestX, lowestY } from "./main"
 
 
@@ -78,7 +78,7 @@ export function updatePosition(player: Player, room: Room) {
 }
 
 export function updateOwnPosition(player: Player, room: Room, collisionInfo: solidInfo[][]) {
-    let [x,y] = getCorrectedPlayerCoordinates(player);
+    let [x, y] = getCorrectedPlayerCoordinates(player);
 
     //initiates movement in one direction and blocks the other directions till the next tile
     if (player.priorDirections.length > 0) {
@@ -86,17 +86,17 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
             if ((collisionInfo[x][y + 1] === undefined ||
                 !collisionInfo[x][y + 1].isSolid) &&         //dont go in direction if there are objects
                 (collisionInfo[x + 1][y + 1] === undefined ||
-                !collisionInfo[x + 1][y + 1].isSolid)) {
+                    !collisionInfo[x + 1][y + 1].isSolid)) {
                 let content = collisionInfo[x][y + 1].content;
                 let content2 = collisionInfo[x + 1][y + 1].content;
-                if(content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door"
+                if (content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door"
                     || content2 && content2.name === "Door" && !content2.proofIfClosed() || !content2 || content2.name !== "Door") {
                     player.moveDirection = Direction.DOWN
                     player.facing = Direction.DOWN
-    
+
                     player.lastScaledY.pop()
                     player.lastScaledY.unshift(player.scaledY) //stores the previous position
-    
+
                     player.scaledY++;
                     room.send(MessageType.MOVE, Direction.DOWN);
                 } else {
@@ -111,22 +111,21 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                 ((collisionInfo[x][y - 1] === undefined ||
                     !collisionInfo[x][y - 1].isSolid) &&         //dont go in direction if there are objects
                     (collisionInfo[x + 1][y - 1] === undefined ||
-                    !collisionInfo[x + 1][y - 1].isSolid))) {         //dont go in direction if there are objects
+                        !collisionInfo[x + 1][y - 1].isSolid))) {         //dont go in direction if there are objects
                 //if there is a door
                 let content = collisionInfo[x][y - 1].content;
                 let content2 = collisionInfo[x + 1][y - 1].content;
-                if(content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door"
-                    || content2 && content2.name === "Door" && !content2.proofIfClosed() || !content2 || content2.name !== "Door"){
+                if (content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door"
+                    || content2 && content2.name === "Door" && !content2.proofIfClosed() || !content2 || content2.name !== "Door") {
                     player.moveDirection = Direction.UP
                     player.facing = Direction.UP
-    
+
                     player.lastScaledY.pop()
                     player.lastScaledY.unshift(player.scaledY) //stores the previous position
-    
+
                     player.scaledY--;
                     room.send(MessageType.MOVE, Direction.UP);
-                }
-                else {
+                } else {
                     player.facing = Direction.UP
                 }
             } else {
@@ -136,20 +135,19 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
         if (player.priorDirections[0] === Direction.LEFT && player.moveDirection === null) {
             if (x > 0 &&
                 (collisionInfo[x - 1][y] === undefined ||
-                !collisionInfo[x - 1][y].isSolid)) {         //dont go in direction if there are objects
+                    !collisionInfo[x - 1][y].isSolid)) {         //dont go in direction if there are objects
                 //if there is a door
                 let content = collisionInfo[x - 1][y].content;
-                if(content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door"){
+                if (content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door") {
                     player.moveDirection = Direction.LEFT
                     player.facing = Direction.LEFT
-    
+
                     player.lastScaledX.pop()
                     player.lastScaledX.unshift(player.scaledX) //stores the previous position
-    
+
                     player.scaledX--;
                     room.send(MessageType.MOVE, Direction.LEFT);
-                }
-                else {
+                } else {
                     player.facing = Direction.LEFT
                 }
             } else {
@@ -161,17 +159,16 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                 !collisionInfo[x + 2][y].isSolid) {         //dont go in direction if there are objects
                 //if there is a door
                 let content = collisionInfo[x + 2][y].content;
-                if(content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door"){
+                if (content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door") {
                     player.moveDirection = Direction.RIGHT
                     player.facing = Direction.RIGHT
-    
+
                     player.lastScaledX.pop()
                     player.lastScaledX.unshift(player.scaledX) //stores the previous position
-    
+
                     player.scaledX++;
                     room.send(MessageType.MOVE, Direction.RIGHT);
-                }
-                else {
+                } else {
                     player.facing = Direction.RIGHT
                 }
             } else {
@@ -207,7 +204,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
     * syncs the position with the server about every second.
     */
     if (player.standing > 0 && player.standing % 50 === 0) {
-        if(!(player.scaledX === room.state.players[player.id].x && player.scaledY === room.state.players[player.id].y)){
+        if (!(player.scaledX === room.state.players[player.id].x && player.scaledY === room.state.players[player.id].y)) {
             room.send(MessageType.SYNC, [player.scaledX, player.scaledY])
         }
     }
