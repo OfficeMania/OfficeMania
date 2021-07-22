@@ -282,14 +282,15 @@ export class Door extends Interactive {
 
     drawDoor() {
         let lastCounter = this.animationCounter;
-        const dx = (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * this.map.resolution;
-        const dy = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * this.map.resolution;
+        const resolution = this.map.resolution;
+        const dx = (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2)) * resolution;
+        const dy = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2)) * resolution;
         const tileSetYElement = this.chunk.tileSetY[this.chunkX][this.chunkY];
-        const sy = tileSetYElement - this.map.resolution;
-        const x = (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution;
-        const y = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution;
-        const dyEast = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution;
-        const doubleMapResolution = this.map.resolution * 2;
+        const sy = tileSetYElement - resolution;
+        const x = (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * resolution;
+        const y = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * resolution;
+        const dyEast = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * resolution;
+        const doubleMapResolution = resolution * 2;
         const syEast = tileSetYElement - doubleMapResolution;
         const tileSetXElement = this.chunk.tileSetX[this.chunkX][this.chunkY];
         if (this.inAnimation === true && this.syncIndex == true && this.delay === 5) {
@@ -310,67 +311,66 @@ export class Door extends Interactive {
 
             if (lastCounter !== this.animationCounter) {
 
-                const sx = tileSetXElement + this.animationCounter * this.map.resolution;
-                const sxEast = tileSetXElement + this.animationCounter * 2 * this.map.resolution;
-                const sxEast2 = tileSetXElement + (this.animationCounter * 2 - 1) * this.map.resolution;
-                const sxEast3 = tileSetXElement + 2 * this.animationCounter * this.map.resolution;
-                const tripleMapResolution = this.map.resolution * 3;
+                const sxVertical = tileSetXElement + this.animationCounter * resolution;
+                const sxHorizontal = tileSetXElement + this.animationCounter * doubleMapResolution;
+                const sxHorizontal2 = tileSetXElement + (this.animationCounter * 2 - 1) * resolution;
+                const tripleMapResolution = resolution * 3;
                 switch (this.direction) {
 
                     case DoorDirection.SOUTH: {
 
-                        this.ctx.clearRect(dx, dy - this.map.resolution, this.map.resolution, tripleMapResolution);
+                        this.ctx.clearRect(dx, dy - resolution, resolution, tripleMapResolution);
 
-                        this.ctx.drawImage(this.texture, sx, tileSetYElement, this.map.resolution, this.map.resolution, dx, dy, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxVertical, tileSetYElement, resolution, resolution, dx, dy, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sx, sy, this.map.resolution, this.map.resolution, dx, dy - this.map.resolution, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxVertical, sy, resolution, resolution, dx, dy - resolution, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sx, tileSetYElement + this.map.resolution, this.map.resolution, this.map.resolution, dx, dy + this.map.resolution, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxVertical, tileSetYElement + resolution, resolution, resolution, dx, dy + resolution, resolution, resolution);
                         break;
                     }
                     case DoorDirection.EAST: {
 
                         this.ctx.clearRect(x, y, doubleMapResolution, tripleMapResolution);
 
-                        this.ctx.drawImage(this.texture, sxEast, sy, this.map.resolution, this.map.resolution, dx, dyEast, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxHorizontal, sy, resolution, resolution, dx, dyEast, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sxEast, syEast, this.map.resolution, this.map.resolution, dx, y, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxHorizontal, syEast, resolution, resolution, dx, y, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sxEast2, tileSetYElement, this.map.resolution, this.map.resolution, x, dy, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxHorizontal2, tileSetYElement, resolution, resolution, x, dy, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sxEast2, sy, this.map.resolution, this.map.resolution, x, dyEast, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxHorizontal2, sy, resolution, resolution, x, dyEast, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sxEast2, syEast, this.map.resolution, this.map.resolution, x, y, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxHorizontal2, syEast, resolution, resolution, x, y, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sxEast3, tileSetYElement, this.map.resolution, this.map.resolution, dx, dy, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxHorizontal, tileSetYElement, resolution, resolution, dx, dy, resolution, resolution);
                         break;
                     }
                     case DoorDirection.NORTH: {
 
-                        this.ctx.clearRect(dx, dy - doubleMapResolution, this.map.resolution, tripleMapResolution);
+                        this.ctx.clearRect(dx, dy - doubleMapResolution, resolution, tripleMapResolution);
 
-                        this.ctx.drawImage(this.texture, sx, tileSetYElement, this.map.resolution, this.map.resolution, dx, dy, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxVertical, tileSetYElement, resolution, resolution, dx, dy, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sx, sy, this.map.resolution, this.map.resolution, dx, dy - this.map.resolution, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxVertical, sy, resolution, resolution, dx, dy - resolution, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sx, syEast, this.map.resolution, this.map.resolution, dx, dy - doubleMapResolution, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxVertical, syEast, resolution, resolution, dx, dy - doubleMapResolution, resolution, resolution);
                         break;
                     }
                     case DoorDirection.WEST: {
 
                         this.ctx.clearRect(x, y, doubleMapResolution, tripleMapResolution);
 
-                        this.ctx.drawImage(this.texture, sxEast, sy, this.map.resolution, this.map.resolution, dx, dyEast, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxHorizontal, sy, resolution, resolution, dx, dyEast, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sxEast, syEast, this.map.resolution, this.map.resolution, dx, y, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxHorizontal, syEast, resolution, resolution, dx, y, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sxEast2, tileSetYElement, this.map.resolution, this.map.resolution, x, dy, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxHorizontal2, tileSetYElement, resolution, resolution, x, dy, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sxEast2, sy, this.map.resolution, this.map.resolution, x, dyEast, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxHorizontal2, sy, resolution, resolution, x, dyEast, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sxEast2, syEast, this.map.resolution, this.map.resolution, x, y, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxHorizontal2, syEast, resolution, resolution, x, y, resolution, resolution);
 
-                        this.ctx.drawImage(this.texture, sxEast3, tileSetYElement, this.map.resolution, this.map.resolution, dx, dy, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sxHorizontal, tileSetYElement, resolution, resolution, dx, dy, resolution, resolution);
                         break;
                     }
                 }
@@ -378,59 +378,59 @@ export class Door extends Interactive {
         }
         if (this.firstTimeDrawn === false) {
 
-            const sxNorth = tileSetXElement + 4 * this.map.resolution;
-            const sxEast = tileSetXElement + 8 * this.map.resolution;
-            const sxEast2 = tileSetXElement + 7 * this.map.resolution;
+            const sxVertical = tileSetXElement + 2 * doubleMapResolution;
+            const sxHorizontal = tileSetXElement + 4 * doubleMapResolution;
+            const sxHorizontal2 = tileSetXElement + 7 * resolution;
             switch (this.direction) {
 
                 case DoorDirection.NORTH: {
 
-                    this.ctx.drawImage(this.texture, sxNorth, tileSetYElement, this.map.resolution, this.map.resolution, dx, dy, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxVertical, tileSetYElement, resolution, resolution, dx, dy, resolution, resolution);
 
-                    this.ctx.drawImage(this.texture, sxNorth, sy, this.map.resolution, this.map.resolution, dx, dyEast, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxVertical, sy, resolution, resolution, dx, dyEast, resolution, resolution);
 
-                    this.ctx.drawImage(this.texture, sxNorth, syEast, this.map.resolution, this.map.resolution, dx, y, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxVertical, syEast, resolution, resolution, dx, y, resolution, resolution);
                     break;
                 }
                 case DoorDirection.EAST: {
 
-                    this.ctx.drawImage(this.texture, sxEast, sy, this.map.resolution, this.map.resolution, dx, dyEast, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxHorizontal, sy, resolution, resolution, dx, dyEast, resolution, resolution);
 
-                    this.ctx.drawImage(this.texture, sxEast, syEast, this.map.resolution, this.map.resolution, dx, y, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxHorizontal, syEast, resolution, resolution, dx, y, resolution, resolution);
 
-                    this.ctx.drawImage(this.texture, sxEast2, tileSetYElement, this.map.resolution, this.map.resolution, x, dy, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxHorizontal2, tileSetYElement, resolution, resolution, x, dy, resolution, resolution);
 
-                    this.ctx.drawImage(this.texture, sxEast2, sy, this.map.resolution, this.map.resolution, x, dyEast, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxHorizontal2, sy, resolution, resolution, x, dyEast, resolution, resolution);
 
-                    this.ctx.drawImage(this.texture, sxEast2, syEast, this.map.resolution, this.map.resolution, x, y, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxHorizontal2, syEast, resolution, resolution, x, y, resolution, resolution);
 
-                    this.ctx.drawImage(this.texture, sxEast, tileSetYElement, this.map.resolution, this.map.resolution, dx, dy, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxHorizontal, tileSetYElement, resolution, resolution, dx, dy, resolution, resolution);
                     break;
                 }
                 case DoorDirection.SOUTH: {
 
-                    this.ctx.drawImage(this.texture, sxNorth, tileSetYElement, this.map.resolution, this.map.resolution, dx, dy, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxVertical, tileSetYElement, resolution, resolution, dx, dy, resolution, resolution);
 
-                    this.ctx.drawImage(this.texture, sxNorth, sy, this.map.resolution, this.map.resolution, dx, dyEast, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxVertical, sy, resolution, resolution, dx, dyEast, resolution, resolution);
 
-                    const dySouth = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) + 1) * this.map.resolution;
+                    const dySouth = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) + 1) * resolution;
 
-                    this.ctx.drawImage(this.texture, sxNorth, tileSetYElement + this.map.resolution, this.map.resolution, this.map.resolution, dx, dySouth, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxVertical, tileSetYElement + resolution, resolution, resolution, dx, dySouth, resolution, resolution);
                     break;
                 }
                 case DoorDirection.WEST: {
 
-                    this.ctx.drawImage(this.texture, sxEast, sy, this.map.resolution, this.map.resolution, dx, dyEast, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxHorizontal, sy, resolution, resolution, dx, dyEast, resolution, resolution);
 
-                    this.ctx.drawImage(this.texture, sxEast, syEast, this.map.resolution, this.map.resolution, dx, y, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxHorizontal, syEast, resolution, resolution, dx, y, resolution, resolution);
 
-                    this.ctx.drawImage(this.texture, sxEast2, tileSetYElement, this.map.resolution, this.map.resolution, x, dy, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxHorizontal2, tileSetYElement, resolution, resolution, x, dy, resolution, resolution);
 
-                    this.ctx.drawImage(this.texture, sxEast2, sy, this.map.resolution, this.map.resolution, x, dyEast, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxHorizontal2, sy, resolution, resolution, x, dyEast, resolution, resolution);
 
-                    this.ctx.drawImage(this.texture, sxEast2, syEast, this.map.resolution, this.map.resolution, x, y, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxHorizontal2, syEast, resolution, resolution, x, y, resolution, resolution);
 
-                    this.ctx.drawImage(this.texture, sxEast, tileSetYElement, this.map.resolution, this.map.resolution, dx, dy, this.map.resolution, this.map.resolution);
+                    this.ctx.drawImage(this.texture, sxHorizontal, tileSetYElement, resolution, resolution, dx, dy, resolution, resolution);
                     break;
                 }
             }
