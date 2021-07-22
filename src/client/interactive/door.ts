@@ -1,10 +1,10 @@
 import {Interactive} from "./interactive"
-import {getCorrectedPlayerCoordinates, getOurPlayer, getRoom} from "./../util"
-import {Chunk, MapInfo, solidInfo, TileSet} from "./../map"
+import {getCorrectedPlayerCoordinates, getOurPlayer, getRoom} from "../util"
+import {Chunk, MapInfo, solidInfo, TileSet} from "../map"
 import {Room} from "colyseus.js";
 import {State} from "../../common";
 import {MessageType} from "../../common/util";
-import {doors} from "../../client/static";
+import {doors} from "../static";
 
 export enum DoorDirection {
     UNKNOWN,
@@ -149,11 +149,7 @@ export class Door extends Interactive {
     proofIfClosed() {
 
         this.sync;
-        if (this.isClosed) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.isClosed;
     }
 
     lockDoor(id: string) {
@@ -293,7 +289,8 @@ export class Door extends Interactive {
         const x = (this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2) - 1) * this.map.resolution;
         const y = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 2) * this.map.resolution;
         const dyEast = (this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2) - 1) * this.map.resolution;
-        const syEast = tileSetYElement - 2 * this.map.resolution;
+        const doubleMapResolution = this.map.resolution * 2;
+        const syEast = tileSetYElement - doubleMapResolution;
         const tileSetXElement = this.chunk.tileSetX[this.chunkX][this.chunkY];
         if (this.inAnimation === true && this.syncIndex == true && this.delay === 5) {
             this.syncDelay = 0;
@@ -317,11 +314,12 @@ export class Door extends Interactive {
                 const sxEast = tileSetXElement + this.animationCounter * 2 * this.map.resolution;
                 const sxEast2 = tileSetXElement + (this.animationCounter * 2 - 1) * this.map.resolution;
                 const sxEast3 = tileSetXElement + 2 * this.animationCounter * this.map.resolution;
+                const tripleMapResolution = this.map.resolution * 3;
                 switch (this.direction) {
 
                     case DoorDirection.SOUTH: {
 
-                        this.ctx.clearRect(dx, dy - this.map.resolution, this.map.resolution, this.map.resolution * 3);
+                        this.ctx.clearRect(dx, dy - this.map.resolution, this.map.resolution, tripleMapResolution);
 
                         this.ctx.drawImage(this.texture, sx, tileSetYElement, this.map.resolution, this.map.resolution, dx, dy, this.map.resolution, this.map.resolution);
 
@@ -332,7 +330,7 @@ export class Door extends Interactive {
                     }
                     case DoorDirection.EAST: {
 
-                        this.ctx.clearRect(x, y, this.map.resolution * 2, this.map.resolution * 3);
+                        this.ctx.clearRect(x, y, doubleMapResolution, tripleMapResolution);
 
                         this.ctx.drawImage(this.texture, sxEast, sy, this.map.resolution, this.map.resolution, dx, dyEast, this.map.resolution, this.map.resolution);
 
@@ -349,18 +347,18 @@ export class Door extends Interactive {
                     }
                     case DoorDirection.NORTH: {
 
-                        this.ctx.clearRect(dx, dy - 2 * this.map.resolution, this.map.resolution, this.map.resolution * 3);
+                        this.ctx.clearRect(dx, dy - doubleMapResolution, this.map.resolution, tripleMapResolution);
 
                         this.ctx.drawImage(this.texture, sx, tileSetYElement, this.map.resolution, this.map.resolution, dx, dy, this.map.resolution, this.map.resolution);
 
                         this.ctx.drawImage(this.texture, sx, sy, this.map.resolution, this.map.resolution, dx, dy - this.map.resolution, this.map.resolution, this.map.resolution);
 
-                        this.ctx.drawImage(this.texture, sx, syEast, this.map.resolution, this.map.resolution, dx, dy - 2 * this.map.resolution, this.map.resolution, this.map.resolution);
+                        this.ctx.drawImage(this.texture, sx, syEast, this.map.resolution, this.map.resolution, dx, dy - doubleMapResolution, this.map.resolution, this.map.resolution);
                         break;
                     }
                     case DoorDirection.WEST: {
 
-                        this.ctx.clearRect(x, y, this.map.resolution * 2, this.map.resolution * 3);
+                        this.ctx.clearRect(x, y, doubleMapResolution, tripleMapResolution);
 
                         this.ctx.drawImage(this.texture, sxEast, sy, this.map.resolution, this.map.resolution, dx, dyEast, this.map.resolution, this.map.resolution);
 
