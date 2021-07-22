@@ -183,6 +183,8 @@ function onConnectionSuccess() {
     selfUser.participantId = conference.myUserId();
     // console.debug("participantId:", selfUser.participantId)
     serverRoom.send(MessageType.UPDATE_PARTICIPANT_ID, selfUser.participantId);
+    createCamTrack();
+    createAudioTrack();
 }
 
 /**
@@ -735,7 +737,5 @@ function init(room: Room) {
     if (speakerDeviceId) {
         setAudioOutputDevice(speakerDeviceId);
     }
-    createCamTrack();
-    createAudioTrack();
     loadConferenceSettings().catch(console.error);
 }
