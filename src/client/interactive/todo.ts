@@ -48,7 +48,7 @@ export class Todo extends Interactive {
             this.ctx.font = "25px DejaVu Sans Mono";
             this.ctx.lineWidth = 3;
             this.ctx.fillText("Someone else is using these sticky notes.", 100, 100);
-            this.ctx.fillText("Please come back later or use other stikcy notes.", 100, 150);
+            this.ctx.fillText("Please come back later or use other sticky notes.", 100, 150);
             checkInputMode();
         } else{
             this.content = this.room.state.todoState[this.id.toString()].content;
