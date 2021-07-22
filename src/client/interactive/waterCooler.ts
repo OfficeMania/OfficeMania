@@ -10,8 +10,22 @@ export class WaterCooler extends Interactive{
     lastOutputs: string[];
 
     //TODO WaterCoolerOutputs
-    outputs = ["DAMN, I wanted sparkling water!", "Glug glug glug", "Splash!", "Refreshing...", "You feel refreshed", "OH NO! I spilled...", "Thirsty...", "Water! What a great taste.", "H2O", "A bottle of water can't quench the thirst of a bird but Tou-can", "Ice cold...", "Cling", "I hope I win thirst price", "There is nothing more refreshing than a cold beverage!", "Why did the worker at the Pepsi factory get fired? He tested positive for Coke!", "How do you make holy water? You boil the hell out of it!", "What? Im just a water dispenser...", "Hi, how are you? Water you doing today?"
-
+    outputs = ["DAMN, I wanted sparkling water!",
+    "Glug glug glug", "Splash!", "Refreshing...",
+    "You feel refreshed", "OH NO! I spilled...",
+    "Thirsty...",
+    "Water! What a great taste.",
+    "H2O",
+    "A bottle of water can't quench the thirst of a bird but Tou-can",
+    "Ice cold...",
+    "Cling",
+    "I hope I win thirst price",
+    "There is nothing more refreshing than a cold beverage!",
+    "Why did the worker at the Pepsi factory get fired? He tested positive for Coke!",
+    "How do you make holy water? You boil the hell out of it!",
+    "What? Im just a water dispenser...",
+    "Hi, how are you? Water you doing today?",
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     ];
 
     constructor(){
@@ -78,10 +92,21 @@ export class WaterCooler extends Interactive{
 
         var subs = text.split('\n');
         let i = 0;
-        while(subs[i] && i < 12) {
-            this.ctx.fillText(subs[i], 100, 100 + (50*i));
+        let j = 0;
+        while(i < subs.length) {
+            let times = Math.floor(subs[i]?.length / 40);
+            for(let k = 0; k <= times; k++) {
+                if(k === times){
+                    this.ctx.fillText(subs[i]?.slice(40 * k, subs[i]?.length), 100, 100 + (50 * j));
+                    j++;
+                } else {
+                    this.ctx.fillText(subs[i]?.slice(40 * k, (40 * k) + 40), 100, 100 + (50 * j));
+                    j++;
+                }
+            }
             i++;
         }
+
     }
 
     getRandomInt(min:number, max: number){

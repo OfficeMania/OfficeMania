@@ -93,8 +93,18 @@ export class CoffeeMachine extends Interactive {
 
         var subs = text.split('\n');
         let i = 0;
-        while(subs[i] && i < 12) {
-            this.ctx.fillText(subs[i], 100, 100 + (50*i));
+        let j = 0;
+        while(i < subs.length) {
+            let times = Math.floor(subs[i]?.length / 40);
+            for(let k = 0; k <= times; k++) {
+                if(k === times){
+                    this.ctx.fillText(subs[i]?.slice(40 * k, subs[i]?.length), 100, 100 + (50 * j));
+                    j++;
+                } else {
+                    this.ctx.fillText(subs[i]?.slice(40 * k, (40 * k) + 40), 100, 100 + (50 * j));
+                    j++;
+                }
+            }
             i++;
         }
     }

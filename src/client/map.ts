@@ -201,7 +201,6 @@ const LAYER_NAME_DOORS: string = "Doors";
 function fillSolidInfos(map: MapInfo) {
 
     let solidInfoMap: solidInfo[][];
-    console.log("Lowest Y: " + map.lowestY + " Higheste Y: " + map.highestY);
     const height = Math.abs(map.lowestY - map.highestY) + 32; //TODO why 32? Is this the same for every map
     const width = Math.abs(map.lowestX - map.highestX) + 32;
     const mapStartX = map.lowestX;
