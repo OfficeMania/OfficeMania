@@ -84,9 +84,9 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
     if (player.priorDirections.length > 0) {
         if (player.priorDirections[0] === Direction.DOWN && player.moveDirection === null) {
             if ((collisionInfo[x][y + 1] === undefined ||
-                collisionInfo[x][y + 1].isSolid === false) &&         //dont go in direction if there are objects
+                !collisionInfo[x][y + 1].isSolid) &&         //dont go in direction if there are objects
                 (collisionInfo[x + 1][y + 1] === undefined ||
-                    collisionInfo[x + 1][y + 1].isSolid === false)) {
+                !collisionInfo[x + 1][y + 1].isSolid)) {
                 let content = collisionInfo[x][y + 1].content;
                 let content2 = collisionInfo[x + 1][y + 1].content;
                 if(content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door"
@@ -109,9 +109,9 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
         if (player.priorDirections[0] === Direction.UP && player.moveDirection === null) {
             if (y > 0 &&
                 ((collisionInfo[x][y - 1] === undefined ||
-                    collisionInfo[x][y - 1].isSolid === false) &&         //dont go in direction if there are objects
+                    !collisionInfo[x][y - 1].isSolid) &&         //dont go in direction if there are objects
                     (collisionInfo[x + 1][y - 1] === undefined ||
-                        collisionInfo[x + 1][y - 1].isSolid === false))) {         //dont go in direction if there are objects
+                    !collisionInfo[x + 1][y - 1].isSolid))) {         //dont go in direction if there are objects
                 //if there is a door
                 let content = collisionInfo[x][y - 1].content;
                 let content2 = collisionInfo[x + 1][y - 1].content;
@@ -136,7 +136,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
         if (player.priorDirections[0] === Direction.LEFT && player.moveDirection === null) {
             if (x > 0 &&
                 (collisionInfo[x - 1][y] === undefined ||
-                    collisionInfo[x - 1][y].isSolid === false)) {         //dont go in direction if there are objects
+                !collisionInfo[x - 1][y].isSolid)) {         //dont go in direction if there are objects
                 //if there is a door
                 let content = collisionInfo[x - 1][y].content;
                 if(content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door"){
@@ -158,7 +158,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
         }
         if (player.priorDirections[0] === Direction.RIGHT && player.moveDirection === null) {
             if (collisionInfo[x + 2][y] === undefined ||
-                collisionInfo[x + 2][y].isSolid === false) {         //dont go in direction if there are objects
+                !collisionInfo[x + 2][y].isSolid) {         //dont go in direction if there are objects
                 //if there is a door
                 let content = collisionInfo[x + 2][y].content;
                 if(content && content.name === "Door" && !content.proofIfClosed() || !content || content.name !== "Door"){

@@ -261,12 +261,12 @@ export class Door extends Interactive {
         }
         const doorState = this.room.state.doorStates[this.posX + "" + this.posY];
         if (this.lastIsClosed !== this.isClosed) {
-            if (doorState?.isClosed === true && this.inAnimation === false) {
+            if (doorState?.isClosed && !this.inAnimation) {
                 this.animationCounter = 4;
                 this.inAnimation = true;
                 this.syncDelay = 1;
                 this.syncIndex = false;
-            } else if (doorState?.isClosed === false && this.inAnimation === false) {
+            } else if (!doorState?.isClosed && !this.inAnimation) {
                 this.animationCounter = 0;
                 this.inAnimation = true;
                 this.syncDelay = 1;
@@ -293,9 +293,9 @@ export class Door extends Interactive {
         const doubleMapResolution = resolution * 2;
         const syEast = tileSetYElement - doubleMapResolution;
         const tileSetXElement = this.chunk.tileSetX[this.chunkX][this.chunkY];
-        if (this.inAnimation === true && this.syncIndex == true && this.delay === 5) {
+        if (this.inAnimation && this.syncIndex && this.delay === 5) {
             this.syncDelay = 0;
-            if (this.isClosed === true) {
+            if (this.isClosed) {
                 this.animationCounter--;
                 if (this.animationCounter < 1) {
                     this.inAnimation = false;
@@ -376,7 +376,7 @@ export class Door extends Interactive {
                 }
             }
         }
-        if (this.firstTimeDrawn === false) {
+        if (!this.firstTimeDrawn) {
 
             const sxVertical = tileSetXElement + 2 * doubleMapResolution;
             const sxHorizontal = tileSetXElement + 4 * doubleMapResolution;

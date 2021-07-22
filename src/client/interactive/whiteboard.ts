@@ -2,7 +2,6 @@ import {Room} from "colyseus.js";
 import {State} from "../../common";
 import {
     createCloseInteractionButton,
-    getOurPlayer,
     getPlayers,
     getRoom,
     loadImage,
@@ -13,7 +12,6 @@ import {ArraySchema} from "@colyseus/schema";
 import {MessageType} from "../../common/util";
 import {Interactive} from "./interactive";
 import {checkInputMode} from "../main";
-import { createIndexSignature } from "typescript";
 
 export class Whiteboard extends Interactive{
 
@@ -66,7 +64,7 @@ export class Whiteboard extends Interactive{
     }
 
     onInteraction(){
-        if (this.isVisible === true) {
+        if (this.isVisible) {
             this.hide()
         } else {
             this.show()
