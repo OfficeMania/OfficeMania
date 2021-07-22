@@ -56,7 +56,7 @@ export class Door extends Interactive {
         this.map = map;
         this.room = getRoom();
         let id = posX + "" + posY;
-        this.room.send(MessageType.NEW_DOOR, id);
+        this.room.send(MessageType.DOOR_NEW, id);
         this.setTexture();
         Door.doors.push(this);
         this.ctx = doors.getContext("2d");
@@ -159,13 +159,13 @@ export class Door extends Interactive {
             this.playerId = id;
             this.isClosed = true;
             let message = [this.posX + "" + this.posY, this.playerId]
-            this.room.send(MessageType.CLOSE_DOOR, message);
+            this.room.send(MessageType.DOOR_LOCK, message);
         }
     }
 
     unlockDoor() {
         this.isClosed = false;
-        this.room.send(MessageType.OPEN_DOOR, this.posX + "" + this.posY);
+        this.room.send(MessageType.DOOR_UNLOCK, this.posX + "" + this.posY);
     }
 
     knockDoor(id: string) {

@@ -23,9 +23,9 @@ export enum MessageType {
     CHESS_LEAVE = "chess-leave",
     CHESS_END = "chess-end",
     // DoorHandler
-    NEW_DOOR = "newDoor",
-    CLOSE_DOOR = "closeDoor",
-    OPEN_DOOR = "openDoor",
+    DOOR_NEW = "door-new",
+    DOOR_LOCK = "door-lock",
+    DOOR_UNLOCK = "door-unlock",
     // PlayerHandler
     MOVE = "move",
     SYNC = "sync",

@@ -12,9 +12,9 @@ export class DoorHandler implements Handler {
     }
 
     onCreate(options: any) {
-        this.room.onMessage(MessageType.NEW_DOOR, ((client, message) => onNewDoor(this.room, client, message)));
-        this.room.onMessage(MessageType.OPEN_DOOR, ((client, message) => onOpenDoor(this.room, client, message)));
-        this.room.onMessage(MessageType.CLOSE_DOOR, ((client, message) => onCloseDoor(this.room, client, message)));
+        this.room.onMessage(MessageType.DOOR_NEW, ((client, message) => onNew(this.room, client, message)));
+        this.room.onMessage(MessageType.DOOR_LOCK, ((client, message) => onLock(this.room, client, message)));
+        this.room.onMessage(MessageType.DOOR_UNLOCK, ((client, message) => onUnlock(this.room, client, message)));
     }
 
     onJoin(client: Client) {
@@ -36,7 +36,7 @@ export class DoorHandler implements Handler {
 
 }
 
-function onNewDoor(room: Room<State>, client: Client, message) {
+function onNew(room: Room<State>, client: Client, message) {
     if (!room.state.doorStates[message]) {
         room.state.doorStates[message] = new DoorState();
         room.state.doorStates[message].isClosed = false;
@@ -44,12 +44,12 @@ function onNewDoor(room: Room<State>, client: Client, message) {
     }
 }
 
-function onOpenDoor(room: Room<State>, client: Client, message) { //message = id
-    room.state.doorStates[message].isClosed = false;
-    room.state.doorStates[message].playerId = "";
-}
-
-function onCloseDoor(room: Room<State>, client: Client, message) { //message = [id, playerId]
+function onLock(room: Room<State>, client: Client, message) { //message = [id, playerId]
     room.state.doorStates[message[0]].isClosed = true;
     room.state.doorStates[message[0]].playerId = message[1];
+}
+
+function onUnlock(room: Room<State>, client: Client, message) { //message = id
+    room.state.doorStates[message].isClosed = false;
+    room.state.doorStates[message].playerId = "";
 }

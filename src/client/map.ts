@@ -4,14 +4,14 @@ import {Interactive} from "./interactive/interactive"
 import {Door, DoorDirection} from "./interactive/door";
 import {PingPongTable} from "./interactive/pingpongtable";
 import {State} from "../common";
-import {MessageType} from "../common/util";
 import {Whiteboard} from "./interactive/whiteboard";
 import {Todo} from "./interactive/todo";
 import {CoffeeMachine} from "./interactive/coffeeMachine";
 import {VendingMachine} from "./interactive/vendingMachine";
 import {ChessBoard} from "./interactive/chessboard";
-import { WaterCooler } from "./interactive/waterCooler";
-import { Computer } from "./interactive/computer";
+import {WaterCooler} from "./interactive/waterCooler";
+import {Computer} from "./interactive/computer";
+import {MessageType} from "../common/util";
 
 export {convertMapData, MapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -355,7 +355,7 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
 }
 
 function createDoor(direction: DoorDirection, basePosX: number, basePosY: number, room: Room<State>, map: MapInfo): Door {
-    room.send(MessageType.NEW_DOOR, basePosX + "." + basePosY);
+    room.send(MessageType.DOOR_NEW, basePosX + "." + basePosY);
     return new Door(direction, basePosX, basePosY, map);
 }
 
