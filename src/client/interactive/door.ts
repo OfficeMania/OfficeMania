@@ -255,28 +255,30 @@ export class Door extends Interactive {
     }
 
     sync() {
-        this.lastIsClosed = this.room.state.doorStates[this.posX + "" + this.posY].isClosed;
-        this.playerId = this.room.state.doorStates[this.posX + "" + this.posY].playerId;
+        const doorState = this.room.state.doorStates[this.posX + "" + this.posY];
+        this.lastIsClosed = doorState?.isClosed;
+        this.playerId = doorState?.playerId;
     }
 
     update() {
         if (this.syncDelay > 0) {
             this.syncDelay++;
         }
+        const doorState = this.room.state.doorStates[this.posX + "" + this.posY];
         if(this.lastIsClosed !== this.isClosed) {
-            if(this.room.state.doorStates[this.posX + "" + this.posY].isClosed === true && this.inAnimation === false) {
+            if(doorState?.isClosed === true && this.inAnimation === false) {
                 this.animationCounter = 4;
                 this.inAnimation = true;
                 this.syncDelay = 1;
                 this.syncIndex = false;
-            } else if (this.room.state.doorStates[this.posX + "" + this.posY].isClosed === false && this.inAnimation === false) {
+            } else if (doorState?.isClosed === false && this.inAnimation === false) {
                 this.animationCounter = 0;
                 this.inAnimation = true;
                 this.syncDelay = 1;
                 this.syncIndex = false;
             }
         }
-        this.isClosed = this.room.state.doorStates[this.posX + "" + this.posY].isClosed;
+        this.isClosed = doorState?.isClosed;
         if (this.syncDelay === 20) {
             this.syncIndex = true;
             this.syncDelay = 0;
