@@ -180,6 +180,9 @@ export class Whiteboard extends Interactive{
     }
 
     drawOthers(clientID: string, whiteboard: Whiteboard) {
+        if(Whiteboard.currentWhiteboard !== this.wID){
+            return;
+        }
         var max: number = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths.length;
         var start: number = whiteboard.whiteboardPlayer[clientID]
         var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths;
