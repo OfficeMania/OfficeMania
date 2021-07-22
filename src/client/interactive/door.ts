@@ -174,54 +174,17 @@ export class Door extends Interactive {
     }
 
     startInteraction(playerX: number, playerY: number, playerId: string) {
-        switch (this.direction) {
-            case DoorDirection.NORTH: {
-                if (playerY < this.posY) {
-                    this.knockDoor(playerId);
-                } else {
-                    if (this.isClosed) {
-                        this.unlockDoor();
-                    } else {
-                        this.lockDoor(playerId);
-                    }
-                }
-                break;
-            }
-            case DoorDirection.EAST: {
-                if (playerX > this.posX) {
-                    this.knockDoor(playerId);
-                } else {
-                    if (this.isClosed) {
-                        this.unlockDoor();
-                    } else {
-                        this.lockDoor(playerId);
-                    }
-                }
-                break;
-            }
-            case DoorDirection.SOUTH: {
-                if (playerY > this.posY) {
-                    this.knockDoor(playerId);
-                } else {
-                    if (this.isClosed) {
-                        this.unlockDoor();
-                    } else {
-                        this.lockDoor(playerId);
-                    }
-                }
-                break;
-            }
-            case DoorDirection.WEST: {
-                if (playerX < this.posX) {
-                    this.knockDoor(playerId);
-                } else {
-                    if (this.isClosed) {
-                        this.unlockDoor();
-                    } else {
-                        this.lockDoor(playerId);
-                    }
-                }
-                break;
+        const isVertical: boolean = this.direction === DoorDirection.NORTH || this.direction === DoorDirection.SOUTH;
+        const isBigger: boolean = this.direction === DoorDirection.EAST || this.direction === DoorDirection.SOUTH;
+        const player = isVertical ? playerY : playerX;
+        const pos = isVertical ? this.posY : this.posX;
+        if (isBigger ? player > pos : player < pos) {
+            this.knockDoor(playerId);
+        } else {
+            if (this.isClosed) {
+                this.unlockDoor();
+            } else {
+                this.lockDoor(playerId);
             }
         }
     }
