@@ -40,28 +40,37 @@ export class Todo extends Interactive {
 
     onInteraction(){
         if(this.room.state.todoState[this.id.toString()].isUsed){
-            //TODO output for user
-            console.log("used");
-            return;
-        }
-        this.content = this.room.state.todoState[this.id.toString()].content;
-        this.contentBeforeEdit = this.content;
-        this.room.send(MessageType.LIST_USE, this.id.toString())
-        this.ctx.textAlign = "left";
-        this.canvas.style.visibility = "visible";
-        createCloseInteractionButton(() => this.leave());
-        this.marker = this.content.length;
-        this.paint();
-        checkInputMode();
+            this.canvas.style.visibility = "visible";
+            createCloseInteractionButton(() => this.leave());
+            this.paint();
 
-        document.addEventListener("keydown", this.inputLam);
+            this.ctx.fillStyle = "black";
+            this.ctx.font = "25px DejaVu Sans Mono";
+            this.ctx.lineWidth = 3;
+            this.ctx.fillText("Someone else is using these sticky notes.", 100, 100);
+            this.ctx.fillText("Please come back later or use other stikcy notes.", 100, 150);
+            checkInputMode();
+        } else{
+            this.content = this.room.state.todoState[this.id.toString()].content;
+            this.contentBeforeEdit = this.content;
+            this.room.send(MessageType.LIST_USE, this.id.toString())
+            this.ctx.textAlign = "left";
+            this.canvas.style.visibility = "visible";
+            createCloseInteractionButton(() => this.leave());
+            this.marker = this.content.length;
+            this.paint();
+            this.drawText();
+            checkInputMode();
+    
+            document.addEventListener("keydown", this.inputLam);
+        }
     }
 
     leave(){
         removeCloseInteractionButton();
         document.removeEventListener("keydown", this.inputLam);
 
-        if (this.content !== this.contentBeforeEdit) {
+        if (this.content !== this.contentBeforeEdit && this.content !== "") {
             this.content = this.content + "\n    '@" + getOurPlayer().name + "'";
         }
         
@@ -88,6 +97,7 @@ export class Todo extends Interactive {
                 }
                 this.marker++;
                 this.paint();
+                this.drawText();
                 return;
             }
             i++;
@@ -123,26 +133,26 @@ export class Todo extends Interactive {
             }
         }
         this.paint();
+        this.drawText();
         this.syncServer();
     }
 
     checkForSpace(e:KeyboardEvent): boolean{
-        //TODO
             var subs = this.content.split('\n');
             let i = 0;
             let lineCounter = 0;
             let last: string;
-            while(subs[i]) {
-                let times = Math.floor(subs[i].length / 70);
+            while(i < subs.length) {
+                let times = Math.floor(subs[i]?.length / 70);
                 lineCounter += times + 1;
-                last = subs[i].slice(70 * times, subs[i].length)
+                last = subs[i]?.slice(70 * times, subs[i]?.length)
                 i++;
             }
         if(e.key === "Enter" && lineCounter < 12) {
             return true;
         }else if (e.key === "Enter") {
             return false;
-        } else if(lineCounter < 12 /*|| last.length < 69 */||lineCounter === 12 && last.length < 69) {
+        } else if(lineCounter < 12 ||lineCounter === 12 && last.length < 69) {
             return true;
         }
         return false;
@@ -159,8 +169,6 @@ export class Todo extends Interactive {
         this.ctx.fillRect(5, (this.canvas.height / 2), (this.canvas.width / 2) - 5, (this.canvas.height / 2) - 5);
         this.ctx.fillStyle = "rgb(188, 247, 247)";
         this.ctx.fillRect((this.canvas.width/ 2), (this.canvas.height / 2), (this.canvas.width / 2) - 5, (this.canvas.height / 2) - 5);
-
-        this.drawText();
     }
 
     drawText(){
@@ -180,14 +188,14 @@ export class Todo extends Interactive {
 
         let i = 0;
         let j = 0;
-        while(subs[i]) {
-            let times = Math.floor(subs[i].length / 70);
+        while(i < subs.length) {
+            let times = Math.floor(subs[i]?.length / 70);
             for(let k = 0; k <= times; k++) {
                 if(k === times){
-                    this.ctx.fillText(subs[i].slice(70 * k, subs[i].length), 100, 100 + (50 * j));
+                    this.ctx.fillText(subs[i]?.slice(70 * k, subs[i]?.length), 100, 100 + (50 * j));
                     j++;
                 } else {
-                    this.ctx.fillText(subs[i].slice(70 * k, (70 * k) + 70), 100, 100 + (50 * j));
+                    this.ctx.fillText(subs[i]?.slice(70 * k, (70 * k) + 70), 100, 100 + (50 * j));
                     j++;
                 }
             }
