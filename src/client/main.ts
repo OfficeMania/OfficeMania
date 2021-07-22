@@ -68,8 +68,8 @@ import { updateDoors } from "./interactive/door";
 import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen";
 
 export var characters: { [key: string]: HTMLImageElement } = {}
-export const START_POSITION_X = -13;
-export const START_POSITION_Y = -8;
+export const START_POSITION_X = 5;
+export const START_POSITION_Y = -10;
 const MS_PER_UPDATE = 10;
 const MS_PER_UPDATE2 = 15;
 

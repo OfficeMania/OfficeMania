@@ -193,8 +193,8 @@ export function getCookie(key: string) {
 
 //const xCorrection = Math.abs(_mapInfo.lowestX - _mapInfo.highestX) - START_POSITION_X;
 //const yCorrection = Math.abs(_mapInfo.lowestX - _mapInfo.highestX) - START_POSITION_X;
-const xCorrection = -38;
-const yCorrection = -83;
+const xCorrection = -74;
+const yCorrection = -79;
 
 export function getCorrectedPlayerFacingCoordinates(player: Player): [number, number] {
     let deltaX = 0;
