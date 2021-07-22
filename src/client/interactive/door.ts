@@ -74,6 +74,7 @@ export class Door extends Interactive {
         let player = getOurPlayer();
         let [x, y] = getCorrectedPlayerCoordinates(player);
         this.startInteraction(x, y, player.id);
+        console.debug(`direction=${this.direction},texture=${this.texture.src}`); //TODO REMOVE
     }
 
     calculateX(correction: number) {
@@ -295,15 +296,12 @@ export class Door extends Interactive {
         //
         const bxTimes = bx * resolution;
         const bxMinusTimes = (bx - 1) * resolution;
+        const bxPlusTimes = (bx + 1) * resolution;
         //
         const byTimes = by * resolution;
         const byMinusTimes = (by - 1) * resolution;
         const byMinus2Times = (by - 2) * resolution;
         const byPlusTimes = (by + 1) * resolution;
-        //
-        const byTimesMinus = byTimes - resolution;
-        const byTimesMinus2 = byTimes - resolution * 2;
-        const byTimesPlus = byTimes + resolution;
         //
         if (this.inAnimation && this.syncIndex && this.delay === 5) {
             this.syncDelay = 0;
@@ -321,56 +319,35 @@ export class Door extends Interactive {
                 }
             }
             if (lastCounter !== this.animationCounter) {
-                const txPlusACTimes = tx + this.animationCounter * resolution;
-                const txPlusAC2Times = tx + (this.animationCounter * 2) * resolution;
-                const txPlusAC2MinusTimes = tx + (this.animationCounter * 2 - 1) * resolution;
+                const sxOpenVertical = tx + this.animationCounter * resolution;
+                const sxOpenHorizontalLeft = tx + (this.animationCounter * 2 - 1) * resolution;
+                const sxOpenHorizontalRight = tx + (this.animationCounter * 2) * resolution;
                 switch (this.direction) {
                     case DoorDirection.NORTH: {
-                        this.ctx.clearRect(bxTimes, byTimesMinus2, resolution, resolution * 3);
-                        // this.drawVerticalBase(bxTimes, byTimes - doubleMapResolution, byTimes, resolution, txPlusACTimes, ty, tsy1Minus);
-                        this.ctx.drawImage(this.texture, txPlusACTimes, ty, resolution, resolution, bxTimes, byTimes, resolution, resolution);
-                        this.ctx.drawImage(this.texture, txPlusACTimes, tyMinus, resolution, resolution, bxTimes, byTimesMinus, resolution, resolution);
-                        this.ctx.drawImage(this.texture, txPlusACTimes, tyMinus2, resolution, resolution, bxTimes, byTimesMinus2, resolution, resolution);
+                        this.ctx.clearRect(bxTimes, byMinus2Times, resolution, resolution * 3);
                         break;
                     }
-                    case DoorDirection.EAST:
-                    case DoorDirection.WEST: {
-                        this.ctx.clearRect(bxMinusTimes, byMinus2Times, resolution * 2, resolution * 3);
-                        this.drawHorizontal(resolution, txPlusAC2Times, txPlusAC2MinusTimes, bxTimes, bxMinusTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
+                    case DoorDirection.EAST: {
+                        this.ctx.clearRect(bxTimes, byMinus2Times, resolution * 2, resolution * 3);
                         break;
                     }
                     case DoorDirection.SOUTH: {
-                        this.ctx.clearRect(bxTimes, byTimesMinus, resolution, resolution * 3);
-                        // this.drawVerticalBase(bxTimes, byTimes - resolution, byTimes, resolution, txPlusACTimes, ty, tsy1Minus);
-                        this.ctx.drawImage(this.texture, txPlusACTimes, ty, resolution, resolution, bxTimes, byTimes, resolution, resolution);
-                        this.ctx.drawImage(this.texture, txPlusACTimes, tyMinus, resolution, resolution, bxTimes, byTimesMinus, resolution, resolution);
-                        this.ctx.drawImage(this.texture, txPlusACTimes, tyPlus, resolution, resolution, bxTimes, byTimesPlus, resolution, resolution);
+                        this.ctx.clearRect(bxTimes, byMinusTimes, resolution, resolution * 3);
+                        break;
+                    }
+                    case DoorDirection.WEST: {
+                        this.ctx.clearRect(bxMinusTimes, byMinus2Times, resolution * 2, resolution * 3);
                         break;
                     }
                 }
+                this.drawDoorIntern(resolution, sxOpenVertical, bxTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times, sxOpenHorizontalLeft, sxOpenHorizontalRight, bxPlusTimes, tyPlus, byPlusTimes, bxMinusTimes);
             }
         }
         if (!this.firstTimeDrawn) {
-            const txPlus4 = tx + 4 * resolution;
-            const txPlus7 = tx + 7 * resolution;
-            const txPlus8 = tx + 8 * resolution;
-            switch (this.direction) {
-                case DoorDirection.NORTH: {
-                    this.drawThree(resolution, txPlus4, bxTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
-                    break;
-                }
-                case DoorDirection.EAST:
-                case DoorDirection.WEST: {
-                    this.drawHorizontal(resolution, txPlus8, txPlus7, bxTimes, bxMinusTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
-                    break;
-                }
-                case DoorDirection.SOUTH: {
-                    this.ctx.drawImage(this.texture, txPlus4, ty, resolution, resolution, bxTimes, byTimes, resolution, resolution);
-                    this.ctx.drawImage(this.texture, txPlus4, tyMinus, resolution, resolution, bxTimes, byMinusTimes, resolution, resolution);
-                    this.ctx.drawImage(this.texture, txPlus4, tyPlus, resolution, resolution, bxTimes, byPlusTimes, resolution, resolution);
-                    break;
-                }
-            }
+            const sxOpenVertical = tx + 4 * resolution;
+            const sxOpenHorizontalLeft = tx + 7 * resolution;
+            const sxOpenHorizontalRight = tx + 8 * resolution;
+            this.drawDoorIntern(resolution, sxOpenVertical, bxTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times, sxOpenHorizontalLeft, sxOpenHorizontalRight, bxPlusTimes, tyPlus, byPlusTimes, bxMinusTimes);
             this.firstTimeDrawn = true;
         }
         if (this.delay === 5) {
@@ -379,21 +356,36 @@ export class Door extends Interactive {
         this.delay++;
     }
 
-    private drawVerticalBase(dx: number, clearY: number, dy: number, resolution: number, sxVertical: number, tileSetYElement: number, sy: number) {
-        this.ctx.clearRect(dx, clearY, resolution, resolution * 3);
-        this.ctx.drawImage(this.texture, sxVertical, tileSetYElement, resolution, resolution, dx, dy, resolution, resolution);
-        this.ctx.drawImage(this.texture, sxVertical, sy, resolution, resolution, dx, dy - resolution, resolution, resolution);
+    private drawDoorIntern(resolution: number, sxOpenVertical: number, bxTimes: number, ty: number, byTimes: number, tyMinus: number, byMinusTimes: number, tyMinus2: number, byMinus2Times: number, sxOpenHorizontalLeft: number, sxOpenHorizontalRight: number, bxPlusTimes: number, tyPlus: number, byPlusTimes: number, bxMinusTimes: number) {
+        switch (this.direction) {
+            case DoorDirection.NORTH: {
+                this.drawVertical(resolution, sxOpenVertical, bxTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
+                break;
+            }
+            case DoorDirection.EAST: {
+                this.drawHorizontal(resolution, sxOpenHorizontalLeft, sxOpenHorizontalRight, bxTimes, bxPlusTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
+                break;
+            }
+            case DoorDirection.SOUTH: {
+                this.drawVertical(resolution, sxOpenVertical, bxTimes, ty, byTimes, tyMinus, byMinusTimes, tyPlus, byPlusTimes);
+                break;
+            }
+            case DoorDirection.WEST: {
+                this.drawHorizontal(resolution, sxOpenHorizontalRight, sxOpenHorizontalLeft, bxTimes, bxMinusTimes, ty, byTimes, tyMinus, byMinusTimes, tyMinus2, byMinus2Times);
+                break;
+            }
+        }
     }
 
-    private drawHorizontal(resolution: number, sx11: number, sx12: number, dx1: number, dx2: number, sy1: number, dy1: number, sy2: number, dy2: number, sy3: number, dy3: number) {
-        this.drawThree(resolution, sx11, dx1, sy1, dy1, sy2, dy2, sy3, dy3);
-        this.drawThree(resolution, sx12, dx2, sy1, dy1, sy2, dy2, sy3, dy3);
+    private drawHorizontal(resolution: number, sxLeft: number, sxRight: number, dxLeft: number, dxRight: number, sy1: number, dy1: number, sy2: number, dy2: number, sy3: number, dy3: number) {
+        this.drawVertical(resolution, sxLeft, dxLeft, sy1, dy1, sy2, dy2, sy3, dy3);
+        this.drawVertical(resolution, sxRight, dxRight, sy1, dy1, sy2, dy2, sy3, dy3);
     }
 
-    private drawThree(resolution: number, sx1: number, dx1: number, sy1: number, dy1: number, sy2: number, dy2: number, sy3: number, dy3: number) {
-        this.ctx.drawImage(this.texture, sx1, sy1, resolution, resolution, dx1, dy1, resolution, resolution);
-        this.ctx.drawImage(this.texture, sx1, sy2, resolution, resolution, dx1, dy2, resolution, resolution);
-        this.ctx.drawImage(this.texture, sx1, sy3, resolution, resolution, dx1, dy3, resolution, resolution);
+    private drawVertical(length: number, sx: number, dx: number, sy1: number, dy1: number, sy2: number, dy2: number, sy3: number, dy3: number) {
+        this.ctx.drawImage(this.texture, sx, sy1, length, length, dx, dy1, length, length);
+        this.ctx.drawImage(this.texture, sx, sy2, length, length, dx, dy2, length, length);
+        this.ctx.drawImage(this.texture, sx, sy3, length, length, dx, dy3, length, length);
     }
 
 }
