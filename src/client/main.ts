@@ -47,9 +47,9 @@ import {
     background,
     camButton,
     canvas,
-    doors,
     characterPreview,
     characterSelect,
+    doors,
     interactiveCanvas,
     muteButton,
     settingsApplyButton,
@@ -58,14 +58,14 @@ import {
     settingsOkButton,
     shareButton,
     usernameInput,
+    usernameInputWelcome,
     usersButton,
     version,
-    usernameInputWelcome,
-    welcomeOkButton,
-    welcomeModal
+    welcomeModal,
+    welcomeOkButton
 } from "./static";
-import { updateDoors } from "./interactive/door";
-import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen";
+import {updateDoors} from "./interactive/door";
+import {initLoadingScreenLoading, setShowLoadingscreen} from "./loadingscreen";
 
 export var characters: { [key: string]: HTMLImageElement } = {}
 export const START_POSITION_X = 5;
@@ -223,7 +223,7 @@ function applySettingsWelcome() {
 
 function showWelcomeScreen() {
     // @ts-ignore
-    $("#welcome-modal").modal();    
+    $("#welcome-modal").modal();
 }
 
 function checkWelcomeScreen() {
@@ -369,7 +369,7 @@ async function main() {
         ctx.drawImage(doors, posX - Math.floor(width / 2), posY - Math.floor(height / 2), width, height, 0, 0, width, height);
 
         //check if a doorState changed
-        updateDoors(collisionInfo);
+        updateDoors();
 
         ctx.save();
 
