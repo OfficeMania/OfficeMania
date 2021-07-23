@@ -141,45 +141,38 @@ export function choosePlayerSprites(room: Room, player: Player, ownPlayer: Playe
 const playerWidth: number = 48;
 const playerHeight: number = 96;
 
-export function drawPlayer(ourPlayer: Player, players: PlayerRecord, characters: { [key: string]: HTMLImageElement }, ctx: CanvasRenderingContext2D, width: number, height: number) {
-    // Draw each player
-    Object.values(players).forEach((player: Player, i: number) => {
-        let text;
-        //choose the correct sprite
-        if (ourPlayer.id !== player.id) {
-            //draw everyone else on their position relatively to you
-            if (characters[player.character]) {
-                ctx.drawImage(characters[player.character], player.spriteX, player.spriteY, playerWidth, playerHeight, Math.round((width / 2) + player.positionX - ourPlayer.positionX), Math.round((height / 2) + player.positionY - ourPlayer.positionY), playerWidth, playerHeight);
-            }
-
-            //draw name
-            ctx.font = '18px Arial';
-            ctx.textAlign = "center";
-
-            text = ctx.measureText(player.name);
-            ctx.fillStyle = "rgba(100, 100, 100, 0.5)";
-            ctx.fillRect(Math.round((width / 2) + player.positionX - ourPlayer.positionX) - text.width / 2 + 20, Math.round((height / 2) + player.positionY - ourPlayer.positionY) - 4, text.width + 8, 24);
-
-            ctx.fillStyle = "rgba(255, 255, 255, 1)";
-            ctx.fillText(player.name, Math.round((width / 2) + player.positionX - ourPlayer.positionX) + 24, Math.round((height / 2) + player.positionY - ourPlayer.positionY) + 12)
-        } else {
-            //offset background so that it stays with the map
-            document.documentElement.style.setProperty("--bg-offset-x", "" + (-player.positionX % 256) + "px");
-            document.documentElement.style.setProperty("--bg-offset-y", "" + (-player.positionY % 256) + "px");
-            //draw yourself always at the same position
-            ctx.drawImage(characters[player.character], player.spriteX, player.spriteY, playerWidth, playerHeight, Math.round(width / 2), Math.round(height / 2), playerWidth, playerHeight);
-
-            //draw name
-            ctx.font = '18px Arial';
-            ctx.textAlign = "center";
-
-            text = ctx.measureText(player.name);
-            ctx.fillStyle = "rgba(100, 100, 100, 0.5)";
-            ctx.fillRect(Math.round(width / 2) - text.width / 2 + 20, Math.round(height / 2) - 4, text.width + 8, 24);
-
-            ctx.fillStyle = "rgba(255, 255, 255, 1)";
-            ctx.fillText(player.name, Math.round(width / 2) + 24, Math.round(height / 2) + 12)
-
-        }
+export function drawPlayers(ourPlayer: Player, players: PlayerRecord, characters: { [key: string]: HTMLImageElement }, context: CanvasRenderingContext2D, width: number, height: number) {
+    // Draw every else Player
+    Object.values(players).filter(player => player.id !== ourPlayer.id).forEach((player: Player) => {
+        // Draw everyone else on their Position relatively to you
+        const playerX: number = Math.round((width / 2) + player.positionX - ourPlayer.positionX);
+        const playerY: number = Math.round((height / 2) + player.positionY - ourPlayer.positionY);
+        drawPlayer(context, characters, player, playerX, playerY);
     });
+    // Draw our Player
+    moveBackground(context, ourPlayer);
+    // Draw yourself always at the same Position
+    drawPlayer(context, characters, ourPlayer, Math.round(width / 2), Math.round(height / 2));
+}
+
+function moveBackground(context: CanvasRenderingContext2D, player: Player) {
+    // Offset Background so that it stays with the Map
+    document.documentElement.style.setProperty("--bg-offset-x", "" + (-player.positionX % 256) + "px");
+    document.documentElement.style.setProperty("--bg-offset-y", "" + (-player.positionY % 256) + "px");
+}
+
+function drawPlayer(context: CanvasRenderingContext2D, characters: { [key: string]: HTMLImageElement }, player: Player, playerX: number, playerY: number) {
+    if (characters[player.character]) {
+        // Draw Player Character
+        context.drawImage(characters[player.character], player.spriteX, player.spriteY, playerWidth, playerHeight, playerX, playerY, playerWidth, playerHeight);
+    }
+    context.font = '18px Arial';
+    context.textAlign = "center";
+    // Draw Player Name Box
+    const textMetrics = context.measureText(player.name);
+    context.fillStyle = "rgba(100, 100, 100, 0.5)";
+    context.fillRect(playerX - textMetrics.width / 2 + 20, playerY - 4, textMetrics.width + 8, 24);
+    // Draw Player Name
+    context.fillStyle = "rgba(255, 255, 255, 1)";
+    context.fillText(player.name, playerX + 24, playerY + 12);
 }

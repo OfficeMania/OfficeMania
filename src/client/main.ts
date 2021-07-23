@@ -42,7 +42,7 @@ import {
     loadInputFunctions,
     setInputMode
 } from "./input";
-import {drawPlayer} from "./drawplayer"
+import {drawPlayers} from "./draw-player"
 import {
     background,
     camButton,
@@ -374,7 +374,7 @@ async function main() {
         ctx.save();
 
         // Draw each player
-        drawPlayer(ourPlayer, players, characters, ctx, width, height);
+        drawPlayers(ourPlayer, players, characters, ctx, width, height);
 
         ctx.restore();
 
