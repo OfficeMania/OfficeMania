@@ -4,9 +4,10 @@ import cors from "cors";
 import compression from "compression";
 import path from 'path';
 import {Server} from "colyseus";
+import { Buffer } from 'buffer';
 
 import {TURoom} from "../common/rooms/turoom";
-import {SERVER_PORT} from "./config";
+import {IS_DEV, SERVER_PORT} from "./config";
 
 const app = express();
 
@@ -18,6 +19,37 @@ app.use(express.json());
 
 // compress all responses
 app.use(compression());
+
+// https://stackoverflow.com/questions/23616371/basic-http-authentication-with-node-and-express-4
+app.use((req, res, next) => {
+    if (IS_DEV) {
+        return next();
+    }
+
+    // -----------------------------------------------------------------------
+    // authentication middleware
+
+    const auth = {
+        login: 'officemania',
+        password: 'sec-sep21-project'
+    };
+
+    // parse login and password from headers
+    const b64auth = (req.headers.authorization || '').split(' ')[1] || ''
+    const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':')
+
+    // Verify login and password are set and correct
+    if (login && password && login === auth.login && password === auth.password) {
+        // Access granted...
+        return next()
+    }
+
+    // Access denied...
+    res.set('WWW-Authenticate', 'Basic realm="OfficeMania"') // change this
+    res.status(401).send('Authentication required.') // custom message
+
+    // -----------------------------------------------------------------------
+});
 
 // Create game server
 const gameServer = new Server({
