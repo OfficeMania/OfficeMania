@@ -9,21 +9,55 @@ function calculateAnimation(player: Player) {
     let direction: Direction;
     let mode: string;
     if (player.moveDirection === null) {
+        direction = player.facing;
+        mode = "standing";
         player.standing++;
         if (player.standing >= 10) {
             player.moving = 0
+            //player.animationStep = (player.standing % 60) / 10 |0;
+
+
+            //standing animation
+            if (player.standing % 300 <= 40) {
+                player.animationStep = 0;
+            } else if (player.standing % 300 <= 80) {
+                player.animationStep = 1;
+            } else if (player.standing % 300 <= 120) {
+                player.animationStep = 2;
+            } else if (player.standing % 300 <= 160) {
+                player.animationStep = 3;
+            } else if (player.standing % 300 <= 200) {
+                player.animationStep = 4;
+            } else {
+                player.animationStep = 5;
+            }
         } else {
             player.moving++
         }
-        player.animationStep = (player.standing % 60) / 10 |0;
-        direction = player.facing;
-        mode = "standing";
     } else {
-        player.standing = 0;
-        player.moving++;
-        player.animationStep = (player.moving % 60) / 10 |0;
         direction = player.moveDirection;
         mode = "moving";
+        player.standing = 0;
+        player.moving++;
+        //player.animationStep = (player.moving % 60) / 10 |0;
+
+
+        //moving animation
+        if (player.moving % 60 <= 10) {
+            player.animationStep = 0;
+        } else if (player.moving % 60 <= 20) {
+            player.animationStep = 1;
+        } else if (player.moving % 60 <= 30) {
+            player.animationStep = 2;
+        } else if (player.moving % 60 <= 40) {
+            player.animationStep = 3;
+        } else if (player.moving % 60 <= 50) {
+            player.animationStep = 4;
+        } else {
+            player.animationStep = 5;
+        }
+
+
     }
     player.animationName = `${mode}-${direction}`;
 }
@@ -43,7 +77,11 @@ function calculateOtherPlayer(player: Player, room: Room<State>) {
             player.facing = Direction.UP
         }
     }
-    player.moveDirection = null;
+    if (player.positionX === room.state.players[player.id].x * STEP_SIZE && player.positionY === room.state.players[player.id].y * STEP_SIZE) {
+        player.moveDirection = null;
+    } else {
+        player.moveDirection = player.facing;
+    }
 }
 
 /*
