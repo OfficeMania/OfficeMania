@@ -14,6 +14,8 @@ import {
 } from "../common/util";
 import {characters} from "./main";
 import {panelButtonsInteraction} from "./static";
+import {createAnimatedSpriteSheet} from "./graphic/animated-sprite-sheet";
+import AnimationData, {createAnimationData} from "./graphic/animation-data";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -133,8 +135,8 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                     facing: Direction.DOWN,
                     standing: 0,
                     moving: 0,
-                    spriteX: 144,
-                    spriteY: 0,
+                    animationName: undefined,
+                    animationStep: 0,
                     whiteboard: 0
                 };
                 players[sessionId] = player;
@@ -255,6 +257,10 @@ export function payRespect() {
     console.log("F's in chat")
 }
 
+//sprite dimensions (from movement)
+const playerWidth: number = 48;
+const playerHeight: number = 2 * playerWidth;
+
 export async function loadCharacter() {
     //load or ask for name
     const username = getUsername();
@@ -267,9 +273,14 @@ export async function loadCharacter() {
         //setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy");
     }
 
+    //loads character animations
+    const characterAnimationsJson: { [key: string]: any } = await fetch("/assets/animation/character-animations.json").then((response) => response.json());
+    const characterAnimations: { [key: string]: AnimationData } = createAnimationData(characterAnimationsJson);
+
     //loads character sprite paths from the server (from movement)
     for (const path of getRoom().state.playerSpritePaths) {
-        characters[path] = await loadImage("/img/characters/" + path);
+        //characters[path] = await loadImage("/img/characters/" + path);
+        characters[path] = await createAnimatedSpriteSheet(await loadImage("/img/characters/" + path), characterAnimations, playerWidth, playerHeight);
     }
 
     //load character

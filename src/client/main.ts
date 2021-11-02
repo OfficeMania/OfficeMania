@@ -66,8 +66,9 @@ import {
 } from "./static";
 import {updateDoors} from "./interactive/door";
 import {initLoadingScreenLoading, setShowLoadingscreen} from "./loadingscreen";
+import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 
-export var characters: { [key: string]: HTMLImageElement } = {}
+export const characters: { [key: string]: AnimatedSpriteSheet } = {}
 export const START_POSITION_X = 5;
 export const START_POSITION_Y = -10;
 const MS_PER_UPDATE = 10;

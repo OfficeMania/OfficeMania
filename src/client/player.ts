@@ -36,8 +36,8 @@ export interface Player {
     facing: Direction;             //direction facing to calculate sprite while standing still
     standing: number;           //time standing still
     moving: number;             //time moving to calculate sprite
-    spriteX: number;            //posX to locate sprite
-    spriteY: number;            //posY to locate sprite
+    animationName: string;      // current animation
+    animationStep: number;      // current animation step
     whiteboard: number;
 }
 

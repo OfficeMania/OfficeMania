@@ -3,108 +3,32 @@ import {Player, STEP_SIZE} from "./player";
 import {PlayerRecord} from "./util";
 import {State} from "../common";
 import {Direction} from "../common/util";
+import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 
-function playerMovingAnimation(player: Player, direction: string, width: number, height: number) {
-    player.standing = 0;
-    player.moving++;
-    let x = 0;
-
-    //choose direction
-    switch (direction) {
-        case Direction.RIGHT: {
-            break;
-        }
-        case Direction.UP: {
-            x += 6 * width
-            break;
-        }
-        case Direction.LEFT: {
-            x += 12 * width
-            break;
-        }
-        case Direction.DOWN: {
-            x += 18 * width
-            break;
-        }
-    }
-
-    //moving animation
-    if (player.moving % 60 <= 10) {
-        //do nothing
-    } else if (player.moving % 60 <= 20) {
-        x += width;
-    } else if (player.moving % 60 <= 30) {
-        x += 2 * width;
-    } else if (player.moving % 60 <= 40) {
-        x += 3 * width;
-    } else if (player.moving % 60 <= 50) {
-        x += 4 * width;
-    } else {
-        x += 5 * width;
-    }
-
-    player.spriteX = x
-    player.spriteY = 2 * height
-}
-
-function playerStandingAnimation(player: Player, width: number, height: number) {
-    player.standing++;
-
-    //only activates if player is standing long enough
-    if (player.standing >= 10) {
-        player.moving = 0
-        player.spriteY = height;
-        let x = 0;
-
-        //choose direction
-        switch (player.facing) {
-            case Direction.RIGHT: {
-                break;
-            }
-            case Direction.UP: {
-                x += 6 * width
-                break;
-            }
-            case Direction.LEFT: {
-                x += 12 * width
-                break;
-            }
-            case Direction.DOWN: {
-                x += 18 * width
-                break;
-            }
-        }
-
-        //standing animation
-        if (player.standing % 300 <= 40) {
-            //do nothing
-        } else if (player.standing % 300 <= 80) {
-            x += width;
-        } else if (player.standing % 300 <= 120) {
-            x += 2 * width;
-        } else if (player.standing % 300 <= 160) {
-            x += 3 * width;
-        } else if (player.standing % 300 <= 200) {
-            x += 4 * width;
-        } else {
-            x += 5 * width;
-        }
-
-        player.spriteX = x;
-    } else {
-        player.moving++
-    }
-}
-
-function chooseOwnPlayerSprite(player: Player) {
+function calculateAnimation(player: Player) {
+    let direction: Direction;
+    let mode: string;
     if (player.moveDirection === null) {
-        playerStandingAnimation(player, playerWidth, playerHeight);
+        player.standing++;
+        if (player.standing >= 10) {
+            player.moving = 0
+        } else {
+            player.moving++
+        }
+        player.animationStep = (player.standing % 60) / 10 |0;
+        direction = player.facing;
+        mode = "standing";
     } else {
-        playerMovingAnimation(player, player.moveDirection, playerWidth, playerHeight);
+        player.standing = 0;
+        player.moving++;
+        player.animationStep = (player.moving % 60) / 10 |0;
+        direction = player.moveDirection;
+        mode = "moving";
     }
+    player.animationName = `${mode}-${direction}`;
 }
 
-function chooseOtherPlayerSprite(player: Player, room: Room<State>) {
+function calculateOtherPlayer(player: Player, room: Room<State>) {
     //sets facing direction to choose sprites
     if (Math.abs(player.positionX - room.state.players[player.id].x * STEP_SIZE) > Math.abs(player.positionY - room.state.players[player.id].y * STEP_SIZE)) {
         if (player.positionX < room.state.players[player.id].x * STEP_SIZE) {
@@ -119,29 +43,20 @@ function chooseOtherPlayerSprite(player: Player, room: Room<State>) {
             player.facing = Direction.UP
         }
     }
-    if (player.positionX === room.state.players[player.id].x * STEP_SIZE && player.positionY === room.state.players[player.id].y * STEP_SIZE) {
-        playerStandingAnimation(player, playerWidth, playerHeight);
-    } else {
-        playerMovingAnimation(player, player.facing, playerWidth, playerHeight);
-    }
+    player.moveDirection = null;
 }
 
 /*
  * Chooses the Player sprite depending on walking direction and duration of walking/standing
  */
 export function choosePlayerSprites(room: Room, player: Player, ownPlayer: Player) {
-    if (ownPlayer === player) {
-        chooseOwnPlayerSprite(player);
-    } else {
-        chooseOtherPlayerSprite(player, room);
+    if (ownPlayer !== player) {
+        calculateOtherPlayer(player, room);
     }
+    calculateAnimation(player);
 }
 
-//sprite dimensions (from movement)
-const playerWidth: number = 48;
-const playerHeight: number = 96;
-
-export function drawPlayers(ourPlayer: Player, players: PlayerRecord, characters: { [key: string]: HTMLImageElement }, context: CanvasRenderingContext2D, width: number, height: number) {
+export function drawPlayers(ourPlayer: Player, players: PlayerRecord, characters: { [key: string]: AnimatedSpriteSheet }, context: CanvasRenderingContext2D, width: number, height: number) {
     // Draw every else Player
     Object.values(players).filter(player => player.id !== ourPlayer.id).forEach((player: Player) => {
         // Draw everyone else on their Position relatively to you
@@ -161,10 +76,10 @@ function moveBackground(context: CanvasRenderingContext2D, player: Player) {
     document.documentElement.style.setProperty("--bg-offset-y", "" + (-player.positionY % 256) + "px");
 }
 
-function drawPlayer(context: CanvasRenderingContext2D, characters: { [key: string]: HTMLImageElement }, player: Player, playerX: number, playerY: number) {
-    if (characters[player.character]) {
-        // Draw Player Character
-        context.drawImage(characters[player.character], player.spriteX, player.spriteY, playerWidth, playerHeight, playerX, playerY, playerWidth, playerHeight);
+function drawPlayer(context: CanvasRenderingContext2D, characters: { [key: string]: AnimatedSpriteSheet }, player: Player, playerX: number, playerY: number) {
+    const character: AnimatedSpriteSheet = characters[player.character];
+    if (character) { // Draw Player Character
+        character.drawAnimationStep(context, player.animationName, player.animationStep, playerX, playerY);
     }
     context.font = '18px Arial';
     context.textAlign = "center";
