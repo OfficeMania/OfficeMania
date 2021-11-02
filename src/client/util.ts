@@ -12,8 +12,8 @@ import {
     KEY_USERNAME,
     MessageType
 } from "../common/util";
-import {characters, START_POSITION_X} from "./main";
-import {panelButtonsInteraction, usernameInput} from "./static";
+import {characters} from "./main";
+import {panelButtonsInteraction} from "./static";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -85,10 +85,8 @@ export function getChatEnabled(): boolean {
  */
 export function loadImage(url: string): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
-        let image = new Image();
-        image.addEventListener("load", () => {
-            resolve(image);
-        });
+        const image = new Image();
+        image.addEventListener("load", () => resolve(image));
         image.src = url;
     });
 }
