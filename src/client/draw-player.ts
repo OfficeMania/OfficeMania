@@ -6,58 +6,32 @@ import {Direction} from "../common/util";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 
 function calculateAnimation(player: Player) {
-    let direction: Direction;
     let mode: string;
+    let direction: Direction;
     if (player.moveDirection === null) {
-        direction = player.facing;
+        // standing animation
         mode = "standing";
+        direction = player.facing;
         player.standing++;
         if (player.standing >= 10) {
             player.moving = 0
-            //player.animationStep = (player.standing % 60) / 10 |0;
-
-
-            //standing animation
-            if (player.standing % 300 <= 40) {
-                player.animationStep = 0;
-            } else if (player.standing % 300 <= 80) {
-                player.animationStep = 1;
-            } else if (player.standing % 300 <= 120) {
-                player.animationStep = 2;
-            } else if (player.standing % 300 <= 160) {
-                player.animationStep = 3;
-            } else if (player.standing % 300 <= 200) {
-                player.animationStep = 4;
+            const number = player.standing % 300;
+            if (number < 200) {
+                player.animationStep = number / 40 |0;
             } else {
                 player.animationStep = 5;
             }
         } else {
             player.moving++
+            return;
         }
     } else {
-        direction = player.moveDirection;
+        // moving animation
         mode = "moving";
+        direction = player.moveDirection;
         player.standing = 0;
         player.moving++;
-        //player.animationStep = (player.moving % 60) / 10 |0;
-
-
-        //moving animation
-        if (player.moving % 60 <= 10) {
-            player.animationStep = 0;
-        } else if (player.moving % 60 <= 20) {
-            player.animationStep = 1;
-        } else if (player.moving % 60 <= 30) {
-            player.animationStep = 2;
-        } else if (player.moving % 60 <= 40) {
-            player.animationStep = 3;
-        } else if (player.moving % 60 <= 50) {
-            player.animationStep = 4;
-        } else {
-            player.animationStep = 5;
-        }
-
-
+        player.animationStep = (player.moving % 60) / 10 |0;
     }
     player.animationName = `${mode}-${direction}`;
 }
