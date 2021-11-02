@@ -320,7 +320,7 @@ export function getSpeakerDeviceId(): string {
     return localStorage.getItem(KEY_SPEAKER_DEVICE_ID);
 }
 
-export function setCameraDeviceId (value: string) {
+export function setCameraDeviceId(value: string) {
     localStorage.setItem(KEY_CAMERA_DEVICE_ID, value);
 }
 
@@ -328,7 +328,7 @@ export function getCameraDeviceId(): string {
     return localStorage.getItem(KEY_CAMERA_DEVICE_ID);
 }
 
-export function setCurrentVersion (value: number) {
+export function setCurrentVersion(value: number) {
     localStorage.setItem(KEY_CURRENT_VERSION, String(value));
 }
 

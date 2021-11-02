@@ -192,7 +192,9 @@ function loadCharacterSettings() {
 }
 
 function onSettingsOpen() {
-    if(currentInteraction === null){interactiveCanvas.style.visibility = "hidden";}
+    if (currentInteraction === null) {
+        interactiveCanvas.style.visibility = "hidden";
+    }
     currentInteraction?.hide();
     loadSettings();
     setInputMode(InputMode.IGNORE);
@@ -387,11 +389,12 @@ async function main() {
         // Repeat game loop
         requestAnimationFrame(loop);
     }
+
     //loadingScreen.style.display = "none";
     setShowLoadingscreen(false);
     interactiveCanvas.style.visibility = "hidden";
     checkInputMode();
-        // Start game loop
+    // Start game loop
     requestAnimationFrame(loop);
 }
 
