@@ -1,8 +1,8 @@
 import SpriteSheet from "./sprite-sheet";
 import AnimationData from "./animation-data";
 
-export async function createAnimatedSpriteSheet(image: HTMLImageElement, animations: { [key: string]: AnimationData }): Promise<AnimatedSpriteSheet> {
-    return new AnimatedSpriteSheet(await createImageBitmap(image), animations);
+export async function createAnimatedSpriteSheet(image: HTMLImageElement, animations: { [key: string]: AnimationData }, tileWidth: number = undefined, tileHeight: number = undefined): Promise<AnimatedSpriteSheet> {
+    return new AnimatedSpriteSheet(await createImageBitmap(image), animations, tileWidth, tileHeight);
 }
 
 export default class AnimatedSpriteSheet extends SpriteSheet {
