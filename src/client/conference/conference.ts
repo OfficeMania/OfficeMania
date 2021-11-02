@@ -41,7 +41,7 @@ function $<T extends HTMLElement>(a: string) {
     return <T>document.getElementById(a);
 }
 
-// Constants - test2
+// Constants
 
 const trackTypeAudio = "audio";
 const trackTypeVideo = "video";
