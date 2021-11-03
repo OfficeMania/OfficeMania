@@ -7,37 +7,82 @@
   \____/|_| |_| |_|\___\___|_|  |_|\__,_|_| |_|_|\__,_|
 ```
 
-Welcome to the Softwareentwicklungspraktikum 2021 as part of the **OfficeMania** project!
+Welcome to the **OfficeMania** project!
 
 ## Description
 
-This repository contains a template that can be used as a basis for the SEP 2021. Its main purpose is to simplify the hassle of setting up a JS-project from scratch, so you have more time to focus on the planning and implementation phase of the project.
+OfficeMania is an interactive open-source meeting soloution made for you! Talk to people just as in real life, hold private meetings with interactive elements and play some pong; nearly everything is possible.
 
-You might find the size of the template overwhelming at first, but let me assure you that most files are either configuration files, that are not relevant for you and are probably auto-generated, or are code files, that we extensively documented. In case you still have questions regarding elements in this template, do not hesitate to contact us - but please first take your time and try to understand them yourself.
+In the following you can find a summary of all dependencies we used.
 
-[TypeScript](https://www.typescriptlang.org/) is used as the programming language both client- and server-wide. The server is based on [Node.js](https://nodejs.org/en/) (with [Express.js](https://expressjs.com/de/)) and the client scripts are generated using [webpack](https://webpack.js.org/); source code can be shared between client and server (src/common) so that, for example, client- and server-validations don't have to be written twice. Since you are creating a game-like application, an [authorative server](https://www.gabrielgambetta.com/client-server-game-architecture.html) needs to synchronize its state with the clients. This communication is done using [Colyseus](https://www.colyseus.io/). Lastly, [Jest](https://jestjs.io/) can be used for testing. All dependencies are managed using [npm](https://www.npmjs.com/).
+[TypeScript](https://www.typescriptlang.org/) is used as the programming language both client- and server-wide. The server is based on [Node.js](https://nodejs.org/en/) (with [Express.js](https://expressjs.com/de/)) and the client scripts are generated using [webpack](https://webpack.js.org/); source code can be shared between client and server (src/common) so that, for example, client- and server-validations don't have to be written twice. Since OfficeManis is a game-like application, an [authorative server](https://www.gabrielgambetta.com/client-server-game-architecture.html) needs to synchronize its state with the clients. This communication is done using [Colyseus](https://www.colyseus.io/). Lastly, [Jest](https://jestjs.io/) can be used for testing. All dependencies are managed using [npm](https://www.npmjs.com/). The videochat is handled through [jit.si](https://www.jitsi.org/).
 
-## Installation
+## Installation in WSL (Windows Subsystem for Linux) with VSCode and git over HTTPS (no VPN nessecary)
 
-Please install the following software :
+Set up WSL in Windows 10 version 2004 and higher (Build 19041 and higher) or Windows 11:
 
-- [Node.js + npm](https://nodejs.org/en/) (Node-Version: 14.13.0 and npm-Version: 6.14.8)
+Search for PowerShell and start is as Administrator by right-clicking it. Type:
 
-  Node.js is used as our backend and is bundled with its dependency manager npm
+```
+$ wsl --install
+```
 
-- TypeScript (Version 4.1.3)
+Go to the Microsoft Store and install "Ubuntu". Restart your Computer.
+Then open Ubuntu and set it up following the given instructions.
 
-  TypeScript is basically JavaScript if it were designed in more than two weeks. Its main benefit is (like the name suggests) its improved type system. Install it system-wide by running the npm command:
+Create an access token in the GitLab Webinterface under Profile > Edit Profile > Access Tokens. Copy it and store it safely, because it will only be shown once.
+
+Open the Ubuntu app and clone the OfficeMania git repository via HTTPS into a location in the Linux filesystem. To get there, go to ~ and create a folder.
+
+```
+$ cd ~
+$ git config --global credential.helper store
+$ git config --global user.name "Your Name"
+$ git config --global user.email "y.name@tu-braunschweig.de"
+$ git clone https://git.rz.tu-bs.de/systemsicherheit/teamprojekt/officemania.git
+```
+
+Use as Username your y-Number and as Password your freshly created access token.
+
+Now, download [VSCode](https://code.visualstudio.com/) for Windows. Go to the Extension menu and install "Remote - WSL". Close VSCode and restart it using the Ubuntu terminal:
+
+```
+$ code
+```
+Make sure that you are connected remotely to WSL by checking the bottom left corner of your screen. It should say ">< WSL: Ubuntu". If not, go to the Remote-Explorer and right-click Ubuntu and select "Connect to WSL".
+
+Go to File > Open Folder... and select the folder "officemania" you just cloned. You are ready to go!
+
+
+To run a local server please install the following software using the Ubuntu terminal:
+
+- [Node.js + npm](https://nodejs.org/en/) via
 
   ```
-  $ npm install -g tsc
+  $ curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+  $ sudo apt install -y nodejs
   ```
 
-  NOTE: If the installation fails, do **not** use sudo, but instead change your npm home folder [like this](https://stackoverflow.com/a/21712034).
+  Test your installation with:
+
+  ```
+  $ node --version
+  $ npm --version
+  ```
+
+  Node.js is used as our backend and is bundled with its dependency manager npm.
+
+- TypeScript
+
+  TypeScript is basically JavaScript if it were designed in more than two weeks. Its main benefit is (like the name suggests) its improved type system. Install it by running the npm command:
+
+  ```
+  $ npm install typescript --save-dev
+  ```
 
 - Project Dependencies
 
-  Install all dependencies referenced in the `package.json` to the `node_modules` directory in your current project folder by running the npm command:
+  Install all dependencies referenced in the `package.json` to the `node_modules` directory in the officemania project folder by running the npm command:
 
   ```
   $ npm install
@@ -46,10 +91,10 @@ Please install the following software :
 After installing the dependencies, you can test the installation by running
 
 ```
-npm start
+$ npm start
 ```
 
-from the project folder. To check whether the installation was successfull open http://localhost:3000/index.html in multiple tabs in your browser. The site should display an image where - for each tab - a right-moving rectangle is displayed. Once you close a tab, one rectangle should be removed in all other tabs.
+from the project folder. To check whether the installation was successfull open http://localhost:3000/ and discover the world of OfficeMania!
 
 ## Usage
 
