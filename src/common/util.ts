@@ -48,7 +48,7 @@ export enum MessageType {
     LIST_UPDATE = "listUpdate",
     //MachineHandler
     MACHINE_INTERACT = "machineInteract",
-    MACHINE_COFFEE = "machineCoffe",
+    MACHINE_COFFEE = "machineCoffee",
     MACHINE_WATER = "machineWater",
     MACHINE_VENDING = "machineVending",
 }

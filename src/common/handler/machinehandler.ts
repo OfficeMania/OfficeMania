@@ -100,6 +100,7 @@ export class MachineHandler implements Handler {
     }
 
     searchText(room: Room<State>, client: Client, message: MachineType) {
+        console.log("searching");
         let text: string;
         
         if (message === MachineType.COFFEE) {
