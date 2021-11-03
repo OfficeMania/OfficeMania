@@ -45,7 +45,10 @@ export enum MessageType {
     LIST_CREATE = "listCreate",
     LIST_USE = "listUse",
     LIST_STOPUSE = "listStopUse",
-    LIST_UPDATE = "listUpdate"
+    LIST_UPDATE = "listUpdate",
+    //CoffeeMachineHandler
+    COFFEE_INTERACT = "coffeeInteract",
+    COFFEE_MESSAGE = "coffeeMessage"
 }
 export enum GameMode {
     SINGLE = 1,
