@@ -6,6 +6,8 @@ export default interface User {
 
 const users: User[] = [];
 
+createUser("officemania", "officemania", "sec-sep21-project"); // TODO Remove this and use proper user storage
+
 export function findUserById(id: string): User {
     return users.find(user => user.id === id);
 }
