@@ -17,7 +17,7 @@ In the following you can find a summary of all dependencies we used.
 
 [TypeScript](https://www.typescriptlang.org/) is used as the programming language both client- and server-wide. The server is based on [Node.js](https://nodejs.org/en/) (with [Express.js](https://expressjs.com/de/)) and the client scripts are generated using [webpack](https://webpack.js.org/); source code can be shared between client and server (src/common) so that, for example, client- and server-validations don't have to be written twice. Since OfficeManis is a game-like application, an [authorative server](https://www.gabrielgambetta.com/client-server-game-architecture.html) needs to synchronize its state with the clients. This communication is done using [Colyseus](https://www.colyseus.io/). Lastly, [Jest](https://jestjs.io/) can be used for testing. All dependencies are managed using [npm](https://www.npmjs.com/). The videochat is handled through [jit.si](https://www.jitsi.org/).
 
-## Installation in WSL (Windows Subsystem for Linux) with VSCode and git over HTTPS (no VPN nessecary)
+## Installation in WSL (Windows Subsystem for Linux) with VSCode and git over HTTPS (no VPN necessary)
 
 Set up WSL in Windows 10 version 2004 and higher (Build 19041 and higher) or Windows 11:
 
