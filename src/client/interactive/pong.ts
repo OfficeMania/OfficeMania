@@ -10,7 +10,7 @@ export class Pong {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
     p: HTMLParagraphElement;
-    //PlayerIDs test
+    //PlayerIDs
     playerA: PongPlayer;
     playerB: PongPlayer;
 
