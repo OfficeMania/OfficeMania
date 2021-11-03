@@ -13,6 +13,7 @@ import {IS_DEV, SERVER_PORT} from "./config";
 import User, {findUserById, isValidPassword} from "./user";
 
 const LocalStrategy = require("passport-local").Strategy;
+const flash = require("connect-flash");
 const connectionEnsureLogin = require("connect-ensure-login");
 
 const app = express();
@@ -60,6 +61,8 @@ passport.deserializeUser((id: string, done) => done(null, findUserById(id)));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(flash());
 
 app.post("/login", passport.authenticate("local", {
         successRedirect: "/",
