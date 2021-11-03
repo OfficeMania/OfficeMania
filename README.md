@@ -19,9 +19,41 @@ In the following you can find a summary of all dependencies we used.
 
 ## Installation in WSL (Windows Subsystem for Linux) with VSCode and git over HTTPS (no VPN necessary)
 
+**TL;TR**
+
+- Install Nodejs and typescript in WSL.
+
+  ```
+  $ curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+  $ sudo apt install -y nodejs
+  $ npm install typescript --save-dev
+  ```
+- Clone OfficeMania into a location in the Linux filesystem.
+
+  ```
+  $ cd ~
+  $ git config --global credential.helper store
+  $ git config --global user.name "Your Name"
+  $ git config --global user.email "y.name@tu-braunschweig.de"
+  $ git clone https://git.rz.tu-bs.de/systemsicherheit/teamprojekt/officemania.git
+  ```
+
+- Get the "Remote - WSL"-Extension for VSCode. In the project folder run:
+
+  ```
+  $ npm install
+  $ npm start
+  ```
+ 
+- Done!
+
+
+**Detailed version**
+
+
 Set up WSL in Windows 10 version 2004 and higher (Build 19041 and higher) or Windows 11:
 
-Search for PowerShell and start is as Administrator by right-clicking it. Type:
+Search for PowerShell and start it as Administrator by right-clicking it. To install WSL, type:
 
 ```
 $ wsl --install
@@ -30,7 +62,7 @@ $ wsl --install
 Go to the Microsoft Store and install "Ubuntu". Restart your Computer.
 Then open Ubuntu and set it up following the given instructions.
 
-Create an access token in the GitLab Webinterface under Profile > Edit Profile > Access Tokens. Copy it and store it safely, because it will only be shown once.
+Create an access token in the GitLab web interface under Profile > Edit Profile > Access Tokens. Copy it and store it safely, because it will only be shown once.
 
 Open the Ubuntu app and clone the OfficeMania git repository via HTTPS into a location in the Linux filesystem. To get there, go to ~ and create a folder.
 
