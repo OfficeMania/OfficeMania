@@ -80,7 +80,11 @@ app.get('/logout', (req, res) => {
 });
 
 // Expose public directory
-app.use("/", connectionEnsureLogin.ensureLoggedIn(), express.static("public"));
+if (IS_DEV) {
+    app.use("/", express.static("public"));
+} else {
+    app.use("/", connectionEnsureLogin.ensureLoggedIn(), express.static("public"));
+}
 
 // Create game server
 const gameServer = new Server({
