@@ -10,7 +10,7 @@ import {Server} from "colyseus";
 
 import {TURoom} from "../common/rooms/turoom";
 import {IS_DEV, SERVER_PORT} from "./config";
-import User, {findUserById, isValidPassword} from "./user";
+import User, {createUser, findUserById, isValidPassword} from "./user";
 
 const LocalStrategy = require("passport-local").Strategy;
 const flash = require("connect-flash");
@@ -71,9 +71,8 @@ app.post("/login", passport.authenticate("local", {
     })
 );
 
-app.get('/login', (req, res) => {
-    res.sendFile(path.join(process.cwd(), "public", "login.html"));
-});
+app.get("/login.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.css")));
+app.get('/login', (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.html")));
 
 app.get('/logout', (req, res) => {
     req.logout();
