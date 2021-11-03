@@ -9,6 +9,7 @@ import {PlayerHandler} from "../handler/playerhandler";
 import {WhiteboardHandler} from "../handler/whiteboardhandler";
 import {TodoListHandler} from "../handler/todoListhandler";
 import {ChessHandler} from "../handler/chesshandler";
+import { CoffeeHandler } from "../handler/coffeehandler";
 
 const path = require('path');
 
@@ -18,7 +19,8 @@ const playerHandler: PlayerHandler = new PlayerHandler();
 const pongHandler: PongHandler = new PongHandler();
 const whiteboardHandler: WhiteboardHandler = new WhiteboardHandler();
 const todoListHandler: TodoListHandler = new TodoListHandler();
-const handlers: Handler[] = [chessHandler, doorHandler, playerHandler, pongHandler, whiteboardHandler, todoListHandler];
+const coffeHandler: CoffeeHandler = new CoffeeHandler();
+const handlers: Handler[] = [chessHandler, doorHandler, playerHandler, pongHandler, whiteboardHandler, todoListHandler, coffeHandler];
 
 /*
  * See: https://docs.colyseus.io/server/room/
