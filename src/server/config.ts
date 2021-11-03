@@ -1,9 +1,9 @@
 /*
  * You can place general (server-)configurations here
  */
-const IS_DEV = process.env.NODE_ENV !== 'production';
+export const IS_DEV = process.env.NODE_ENV !== 'production';
 
-const SERVER_PORT = Number(process.env.PORT) || 3000;
-const WEBPACK_PORT = 8085; // For dev environment only
+export const SESSION_SECRET = process.env.SESSION_SECRET || "USE_A_SECURE_RANDOM_KEY";
 
-export { IS_DEV, SERVER_PORT, WEBPACK_PORT };
+export const SERVER_PORT = Number(process.env.PORT) || 3000;
+export const WEBPACK_PORT = 8085; // For dev environment only

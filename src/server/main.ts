@@ -8,7 +8,7 @@ import passport from "passport";
 import {Server} from "colyseus";
 
 import {TURoom} from "../common/rooms/turoom";
-import {IS_DEV, SERVER_PORT} from "./config";
+import {IS_DEV, SERVER_PORT, SESSION_SECRET} from "./config";
 import User, {createUser, findUserById, isValidPassword} from "./user";
 
 const LocalStrategy = require("passport-local").Strategy;
@@ -31,7 +31,7 @@ app.use(compression());
 
 // Use express sessions
 app.use(session({
-    secret: process.env.SESSION_SECRET || "USE_A_SECURE_RANDOM_KEY",
+    secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {maxAge: 60 * 60 * 1000} // 1 hour
