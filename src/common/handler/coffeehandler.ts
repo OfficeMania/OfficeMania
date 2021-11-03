@@ -7,7 +7,7 @@ import { Handler } from "./handler";
 export class CoffeeHandler implements Handler {
 
     counter: number = 0;
-    lastOutputs: string[];
+    lastOutputs: number[];
     room: Room<State>;
     //TODO Giulia does not good english speaking
     //TODO More options
@@ -38,13 +38,9 @@ export class CoffeeHandler implements Handler {
         this.room = room;
     }
     onCreate(options: any) {
-        console.log("created listener")
         this.room.onMessage(MessageType.COFFEE_INTERACT, (client, message) => this.searchText(this.room, client))
-        //change size of backlog here
         this.lastOutputs = [];
-        for (let i = 0; i < 3; i++) {
-            this.lastOutputs[i] = "";
-        }
+        this.lastOutputs[0] = -1;
     }
     onJoin() {
 
@@ -58,19 +54,34 @@ export class CoffeeHandler implements Handler {
 
     searchText(room: Room<State>, client: Client) {
 
-        let text;
         let index = this.getRandomInt(0, this.outputs.length + 1);
+        /**
+         * console.log("previous outputs:")
+         * this.lastOutputs.forEach(element => {
+         *     console.log(this.outputs[element])
+         * });
+         */
 
-        if (this.lastOutputs.includes(text)) {
+        if (this.lastOutputs.includes(index)) {
+            /**
+             * console.log("duplicate, recalculating");
+             * console.log("dupe: " + this.outputs[index]);
+             */
             this.searchText(room, client);
             return;
         }
 
+
+        this.lastOutputs.unshift(index);
+
+        //CHANGE SIZE OF BACKLOG HERE
+        
+        this.lastOutputs.length > 3 && this.lastOutputs.pop();
+
+        let text: string;
         text = this.outputs[index];
 
-        this.lastOutputs.unshift(text);
-        this.lastOutputs.length > 3 && this.lastOutputs.pop();
-        this.room.send(client, MessageType.COFFEE_MESSAGE, text);
+        client.send(MessageType.COFFEE_MESSAGE, text);
     }
 
     getRandomInt(min:number, max: number){
