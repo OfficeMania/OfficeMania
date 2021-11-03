@@ -42,7 +42,18 @@ app.use(session({
 // Set passport strategy
 if (LDAP_OPTIONS) { // Use LdapStrategy
     console.debug("Using LdapStrategy");
-    passport.use(new LdapStrategy(LDAP_OPTIONS));
+    passport.use(new LdapStrategy(
+      LDAP_OPTIONS,
+      (user, done) => {
+      done(null, user);
+    }
+  ));
+    passport.serializeUser((user, done) => {
+      done(null, user);
+  });
+    passport.deserializeUser((user, done) => {
+      done(null, user);
+  });
 } else { // Use LocalStrategy
     console.debug("Using LocalStrategy");
     passport.use(new LocalStrategy(
