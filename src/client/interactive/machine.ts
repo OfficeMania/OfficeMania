@@ -43,7 +43,6 @@ export class Machine extends Interactive {
     }
 
     initPrinting() {
-        console.log(this.type);
         this.room.onMessage(this.type, (message) => {
             this.ctx.textAlign = "left";
             this.ctx.fillStyle = "black";
