@@ -8,10 +8,12 @@ import passport from "passport";
 import {Server} from "colyseus";
 
 import {TURoom} from "../common/rooms/turoom";
-import {IS_DEV, SERVER_PORT, SESSION_SECRET} from "./config";
+import {IS_DEV, LDAP_OPTIONS, SERVER_PORT, SESSION_SECRET} from "./config";
 import User, {createUser, findUserById, isValidPassword} from "./user";
 
 const LocalStrategy = require("passport-local").Strategy;
+const LdapStrategy = require("passport-ldapauth").Strategy;
+
 const flash = require("connect-flash");
 const connectionEnsureLogin = require("connect-ensure-login");
 
@@ -38,32 +40,38 @@ app.use(session({
 }));
 
 // Set passport strategy
-passport.use(new LocalStrategy(
-    function (username, password, done) {
-        if (IS_DEV) {
-            done(null, createUser(username, username));
-            return;
+if (LDAP_OPTIONS) { // Use LdapStrategy
+    console.debug("Using LdapStrategy");
+    passport.use(new LdapStrategy(LDAP_OPTIONS));
+} else { // Use LocalStrategy
+    console.debug("Using LocalStrategy");
+    passport.use(new LocalStrategy(
+        function (username, password, done) {
+            if (IS_DEV) {
+                done(null, createUser(username, username));
+                return;
+            }
+            const user: User = findUserById(username);
+            if (!user) {
+                done(null, false, {message: "Incorrect username."}); //TODO Later we don't want to report wrong username OR password, just that one of both was wrong
+                return;
+            }
+            if (!isValidPassword(user, password)) {
+                done(null, false, {message: "Incorrect password."}); //TODO Later we don't want to report wrong username OR password, just that one of both was wrong
+            }
+            done(null, user);
         }
-        const user: User = findUserById(username);
-        if (!user) {
-            done(null, false, {message: "Incorrect username."}); //TODO Later we don't want to report wrong username OR password, just that one of both was wrong
-            return;
-        }
-        if (!isValidPassword(user, password)) {
-            done(null, false, {message: "Incorrect password."}); //TODO Later we don't want to report wrong username OR password, just that one of both was wrong
-        }
-        done(null, user);
-    }
-));
-passport.serializeUser((user: User, done) => done(null, user.username));
-passport.deserializeUser((id: string, done) => done(null, findUserById(id)));
+    ));
+    passport.serializeUser((user: User, done) => done(null, user.username));
+    passport.deserializeUser((id: string, done) => done(null, findUserById(id)));
+}
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(flash());
 
-app.post("/login", passport.authenticate("local", {
+app.post("/login", passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", {
         successRedirect: "/",
         failureRedirect: "/login",
         failureFlash: true
