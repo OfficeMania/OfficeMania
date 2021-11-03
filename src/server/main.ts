@@ -10,7 +10,7 @@ import {Server} from "colyseus";
 
 import {TURoom} from "../common/rooms/turoom";
 import {IS_DEV, SERVER_PORT} from "./config";
-import User, {createUser, findUserById} from "./user";
+import User, {findUserById, isValidPassword} from "./user";
 
 const LocalStrategy = require("passport-local").Strategy;
 
@@ -47,11 +47,14 @@ passport.use(new LocalStrategy(
             return;
         }
         const user: User = findUserById(username);
-        if (user) {
-            done(null, user);
-        } else {
-            done(null, false, {message: "Incorrect username or password."});
+        if (!user) {
+            done(null, false, {message: "Incorrect username."}); //TODO Later we don't want to report wrong username OR password, just that one of both was wrong
+            return;
         }
+        if (!isValidPassword(user, password)) {
+            done(null, false, {message: "Incorrect password."}); //TODO Later we don't want to report wrong username OR password, just that one of both was wrong
+        }
+        done(null, user);
     }
 ));
 passport.serializeUser((user: User, done) => done(null, user.username));
