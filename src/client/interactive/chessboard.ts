@@ -9,7 +9,7 @@ import {ChessColor, getOppositeChessColor} from "../../common/handler/chesshandl
 import {chessExportButton, chessImportButton, interactiveBarChess} from "../static";
 import { createTextChangeRange } from "typescript";
 
-const jsChessEngine = require('js-chess-engine');
+const jsChessEngine = require('js-chess-engine'); //@Paul
 
 enum ChessSquareColor {
     NORMAL_WHITE = "white",
