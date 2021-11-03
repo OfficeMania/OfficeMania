@@ -13,6 +13,7 @@ import {IS_DEV, SERVER_PORT} from "./config";
 import User, {findUserById, isValidPassword} from "./user";
 
 const LocalStrategy = require("passport-local").Strategy;
+const connectionEnsureLogin = require("connect-ensure-login");
 
 const app = express();
 
@@ -24,9 +25,6 @@ app.use(express.json());
 
 // Compress all responses
 app.use(compression());
-
-//
-app.use(express.static("public"));
 
 // Use express sessions
 app.use(session({
@@ -69,13 +67,18 @@ app.post("/login", passport.authenticate("local", {
         failureFlash: true
     })
 );
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(process.cwd(), "public", "login.html"));
+});
+
 app.get('/logout', (req, res) => {
     req.logout();
     res.redirect('/');
 });
-app.get('/login', (req, res) => {
-    res.sendFile(path.join(process.cwd(), "public", "login.html"));
-});
+
+// Expose public directory
+app.use("/", connectionEnsureLogin.ensureLoggedIn(), express.static("public"));
 
 // Create game server
 const gameServer = new Server({
