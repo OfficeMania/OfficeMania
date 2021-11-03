@@ -1,13 +1,18 @@
 import http from "http";
 import express from "express";
+import session from "express-session";
 import cors from "cors";
 import compression from "compression";
+import bodyParser from "body-parser";
 import path from 'path';
+import passport from "passport";
 import {Server} from "colyseus";
-import { Buffer } from 'buffer';
 
 import {TURoom} from "../common/rooms/turoom";
 import {IS_DEV, SERVER_PORT} from "./config";
+import User, {createUser, findUserById} from "./user";
+
+const LocalStrategy = require("passport-local").Strategy;
 
 const app = express();
 
@@ -17,38 +22,56 @@ app.use(cors());
 // Enable JSON-parsing / processing
 app.use(express.json());
 
-// compress all responses
+// Compress all responses
 app.use(compression());
 
-// https://stackoverflow.com/questions/23616371/basic-http-authentication-with-node-and-express-4
-app.use((req, res, next) => {
-    if (IS_DEV) {
-        return next();
+//
+app.use(express.static("public"));
+
+// Use express sessions
+app.use(session({
+    secret: process.env.SESSION_SECRET || "USE_A_SECURE_RANDOM_KEY",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {maxAge: 60 * 60 * 1000} // 1 hour
+}));
+
+// Enable body-parsing
+app.use(bodyParser.urlencoded({extended: false}));
+
+// Set passport strategy
+passport.use(new LocalStrategy(
+    function (username, password, done) {
+        if (IS_DEV) {
+            done(null, createUser(username, username));
+            return;
+        }
+        const user: User = findUserById(username);
+        if (user) {
+            done(null, user);
+        } else {
+            done(null, false, {message: "Incorrect username or password."});
+        }
     }
+));
+passport.serializeUser((user: User, done) => done(null, user.username));
+passport.deserializeUser((id: string, done) => done(null, findUserById(id)));
 
-    // -----------------------------------------------------------------------
-    // authentication middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
-    const auth = {
-        login: 'officemania',
-        password: 'sec-sep21-project'
-    };
-
-    // parse login and password from headers
-    const b64auth = (req.headers.authorization || '').split(' ')[1] || ''
-    const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':')
-
-    // Verify login and password are set and correct
-    if (login && password && login === auth.login && password === auth.password) {
-        // Access granted...
-        return next()
-    }
-
-    // Access denied...
-    res.set('WWW-Authenticate', 'Basic realm="OfficeMania"') // change this
-    res.status(401).send('Authentication required.') // custom message
-
-    // -----------------------------------------------------------------------
+app.post("/login", passport.authenticate("local", {
+        successRedirect: "/",
+        failureRedirect: "/login",
+        failureFlash: true
+    })
+);
+app.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
+});
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(process.cwd(), "public", "login.html"));
 });
 
 // Create game server
@@ -63,7 +86,7 @@ const gameServer = new Server({
 
 // "Mount" the public folder as the root of the website
 //app.use('/', serveIndex(path.join(process.cwd(), "public"), {'icons': true}));
-app.use('/', express.static(path.join(process.cwd(), "public")));
+//app.use('/', express.static(path.join(process.cwd(), "public")));
 
 /*
  * "Mount" the assets/img directory under "[host]/img"
