@@ -1,46 +1,20 @@
+import { Client, Room } from "colyseus.js";
 import {Interactive} from "./interactive";
 import {getInputMode, setInputMode} from "../input";
-import {createCloseInteractionButton, InputMode, removeCloseInteractionButton} from "../util";
+import {createCloseInteractionButton, getRoom, InputMode, removeCloseInteractionButton, } from "../util";
+import { MessageType } from "../../common/util";
 import { checkInputMode } from "../main";
+import { State } from "../../common";
 
 export class CoffeeMachine extends Interactive {
 
-    counter: number = 0;
     ctx: CanvasRenderingContext2D;
-    lastOutputs: string[];
-
-    //TODO Giulia does not good english speaking
-    //TODO More options
-    outputs = ["Please refill water.",
-        "Please enter the secret code.",
-        "Who stole all the coffee beans?",
-        "Why is the coffee always empty?",
-        "Machine is calcified. Please clean.",
-        "Only sparkling water available. \nNo more coffee for you.",
-        "You already had ten cups of coffee today. \nJunkie!",
-        "Please select sufficient amount of milk!",
-        "Lorem ipsum.",
-        "Lisää kahvia! \n(automatically translated to finnish)",
-        "Pleas kofee fill now to get koffe.",
-        "Do change the filter, please?",
-        "Please refill coffee beans.",
-        "Please refill sugar.",
-        "Please refill uranium oxide.",
-        "Display broken. \nCould not display error message.",
-        "Look! Behind you! Turn around now!",
-        //"Have you ever had a dreams, thats... you- erm- you hads- you'd- you would- you could- you'd do- \nyou would- you want's- you- you could do so- you- you'd do- you could- you- you wanted- \nyou want them to do you so much you could do anything?",
-        "Please restart.",
-        "Try again, loser!",
-        "Please try turning off and on again."
-    ];
+    room: Room<State>;
 
     constructor(){
         super("Coffee Machine", false, 1);
         this.ctx = this.canvas.getContext("2d");
-        this.lastOutputs = [];
-        for (let i = 0; i < 3; i++) {
-            this.lastOutputs[i] = "";
-        }
+        this.room = getRoom();
     }
 
     loop() {}
@@ -51,28 +25,13 @@ export class CoffeeMachine extends Interactive {
             this.canvas.getContext("2d").textAlign = "center";
             createCloseInteractionButton(() => this.leave());
             checkInputMode();
-            this.searchText();
+            this.room.send(MessageType.COFFEE_INTERACT);
+            this.print();
         }
         else this.leave();
         
     }
 
-    searchText() {
-
-        let text;
-        let index = this.getRandomInt(0, this.outputs.length + 1);
-
-        if (this.lastOutputs.includes(text)) {
-            this.searchText();
-            return;
-        }
-
-        text = this.outputs[index];
-
-        this.lastOutputs.unshift(text);
-        this.lastOutputs.length > 3 && this.lastOutputs.pop();
-        this.print(text);
-    }
 
     leave() {
         removeCloseInteractionButton();
@@ -80,38 +39,36 @@ export class CoffeeMachine extends Interactive {
         setInputMode(InputMode.NORMAL);
     }
 
-    print(text: string) {
-        this.ctx.textAlign = "left";
-        this.ctx.fillStyle = "black";
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle = "rgb(0, 4, 120)";
-        this.ctx.fillRect(5, 5, this.canvas.width - 10, this.canvas.height - 10);
+    print() {
+        this.room.onMessage(MessageType.COFFEE_MESSAGE, (message) => {
+            this.room.onMessage(MessageType.COFFEE_MESSAGE, () => {console.log("No message expected")});
+            this.ctx.textAlign = "left";
+            this.ctx.fillStyle = "black";
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.fillStyle = "rgb(0, 4, 120)";
+            this.ctx.fillRect(5, 5, this.canvas.width - 10, this.canvas.height - 10);
 
-        this.ctx.fillStyle = "white";
-        this.ctx.font = "50px MobileFont"; 
-        this.ctx.lineWidth = 3;
+            this.ctx.fillStyle = "white";
+            this.ctx.font = "50px MobileFont"; 
+            this.ctx.lineWidth = 3;
 
-        var subs = text.split('\n');
-        let i = 0;
-        let j = 0;
-        while(i < subs.length) {
-            let times = Math.floor(subs[i]?.length / 40);
-            for(let k = 0; k <= times; k++) {
-                if(k === times){
-                    this.ctx.fillText(subs[i]?.slice(40 * k, subs[i]?.length), 100, 100 + (50 * j));
-                    j++;
-                } else {
-                    this.ctx.fillText(subs[i]?.slice(40 * k, (40 * k) + 40), 100, 100 + (50 * j));
-                    j++;
+            var subs = message.split('\n');
+            let i = 0;
+            let j = 0;
+            while(i < subs.length) {
+                let times = Math.floor(subs[i]?.length / 40);
+                for(let k = 0; k <= times; k++) {
+                    if(k === times){
+                        this.ctx.fillText(subs[i]?.slice(40 * k, subs[i]?.length), 100, 100 + (50 * j));
+                        j++;
+                    } else {
+                        this.ctx.fillText(subs[i]?.slice(40 * k, (40 * k) + 40), 100, 100 + (50 * j));
+                        j++;
+                    }
                 }
+                i++;
             }
-            i++;
-        }
-    }
-
-    getRandomInt(min:number, max: number){
-        min = Math.ceil(min) + 1;
-        max = Math.floor(max) ;
-        return (Math.floor(Math.random() * (max - min)) + min) - 1;
+        })
+        
     }
 }
