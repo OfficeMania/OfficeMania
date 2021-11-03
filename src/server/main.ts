@@ -3,7 +3,6 @@ import express from "express";
 import session from "express-session";
 import cors from "cors";
 import compression from "compression";
-import bodyParser from "body-parser";
 import path from 'path';
 import passport from "passport";
 import {Server} from "colyseus";
@@ -21,6 +20,9 @@ const app = express();
 // Enable cors
 app.use(cors());
 
+// Enable body parsing
+app.use(express.urlencoded({extended: false}));
+
 // Enable JSON-parsing / processing
 app.use(express.json());
 
@@ -34,9 +36,6 @@ app.use(session({
     saveUninitialized: true,
     cookie: {maxAge: 60 * 60 * 1000} // 1 hour
 }));
-
-// Enable body-parsing
-app.use(bodyParser.urlencoded({extended: false}));
 
 // Set passport strategy
 passport.use(new LocalStrategy(
