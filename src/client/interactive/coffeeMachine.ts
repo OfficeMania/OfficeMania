@@ -1,11 +1,11 @@
-import { Client, Room } from "colyseus.js";
+import { Room } from "colyseus.js";
 import {Interactive} from "./interactive";
 import {getInputMode, setInputMode} from "../input";
 import {createCloseInteractionButton, getRoom, InputMode, removeCloseInteractionButton, } from "../util";
 import { MessageType } from "../../common/util";
 import { checkInputMode } from "../main";
 import { State } from "../../common";
-
+import { MachineType} from "../../common/handler/machinehandler";
 export class CoffeeMachine extends Interactive {
 
     ctx: CanvasRenderingContext2D;
@@ -15,6 +15,7 @@ export class CoffeeMachine extends Interactive {
         super("Coffee Machine", false, 1);
         this.ctx = this.canvas.getContext("2d");
         this.room = getRoom();
+        this.initPrinting();
     }
 
     loop() {}
@@ -25,8 +26,7 @@ export class CoffeeMachine extends Interactive {
             this.canvas.getContext("2d").textAlign = "center";
             createCloseInteractionButton(() => this.leave());
             checkInputMode();
-            this.room.send(MessageType.COFFEE_INTERACT);
-            this.print();
+            this.room.send(MessageType.MACHINE_INTERACT, MachineType.COFFEE);
         }
         else this.leave();
         
@@ -39,9 +39,8 @@ export class CoffeeMachine extends Interactive {
         setInputMode(InputMode.NORMAL);
     }
 
-    print() {
-        this.room.onMessage(MessageType.COFFEE_MESSAGE, (message) => {
-            this.room.onMessage(MessageType.COFFEE_MESSAGE, () => {console.log("No message expected")});
+    initPrinting() {
+        this.room.onMessage(MessageType.MACHINE_COFFEE, (message) => {
             this.ctx.textAlign = "left";
             this.ctx.fillStyle = "black";
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
