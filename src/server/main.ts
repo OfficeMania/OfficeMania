@@ -168,7 +168,7 @@ gameServer.define("turoom", TURoom).enableRealtimeListing();
  *
  * See: https://docs.colyseus.io/tools/monitor/
  */
-//app.use("/colyseus", monitor());
+//app.use("/colyseus", monitor()); //TODO Enable this and secure it via authentication/authorization
 
 // Start the server
 gameServer
