@@ -132,7 +132,11 @@ const gameServer = new Server({
  * In an HTML-document you can load the images via:
  *   <img src="/img/[image-name]" />
  */
-app.use("/img", express.static(path.join(process.cwd(), "assets", "img"), { maxAge: 31536000000 }));
+app.use(
+    "/img",
+    connectionEnsureLogin.ensureLoggedIn(),
+    express.static(path.join(process.cwd(), "assets", "img"), { maxAge: 31536000000 })
+);
 
 /*
  * "Mount" the assets/map directory under "[host]/map"
@@ -142,17 +146,25 @@ app.use("/map", express.static(path.join(process.cwd(), "assets", "map")));
 /*
  * "Mount" the assets/lib directory under "[host]/lib"
  */
-app.use("/lib", express.static(path.join(process.cwd(), "assets", "lib"), { maxAge: 86400000 }));
+app.use(
+    "/lib",
+    connectionEnsureLogin.ensureLoggedIn(),
+    express.static(path.join(process.cwd(), "assets", "lib"), { maxAge: 86400000 })
+);
 
 /*
  * "Mount" the assets/templates directory under "[host]/templates"
  */
-app.use("/templates", express.static(path.join(process.cwd(), "assets", "templates"), { maxAge: 31536000000 }));
+app.use(
+    "/templates",
+    connectionEnsureLogin.ensureLoggedIn(),
+    express.static(path.join(process.cwd(), "assets", "templates"), { maxAge: 31536000000 })
+);
 
 /*
  * "Mount" the assets directory under "[host]/assets"
  */
-app.use("/assets", express.static(path.join(process.cwd(), "assets")));
+app.use("/assets", connectionEnsureLogin.ensureLoggedIn(), express.static(path.join(process.cwd(), "assets")));
 
 /*
  * "Mount" the directory where the client JavaScript is generated to (dist/client)
@@ -161,7 +173,7 @@ app.use("/assets", express.static(path.join(process.cwd(), "assets")));
  * In an HTML-document you can load the scripts via:
  *   <script src="/js/[script-name]"></script>
  */
-app.use("/js", express.static(path.join(process.cwd(), "js", "client")));
+app.use("/js", connectionEnsureLogin.ensureLoggedIn(), express.static(path.join(process.cwd(), "js", "client")));
 
 // Register the TURoom (defined in src/common/rooms/turoom.ts)
 gameServer.define("turoom", TURoom).enableRealtimeListing();
@@ -171,7 +183,7 @@ gameServer.define("turoom", TURoom).enableRealtimeListing();
  *
  * See: https://docs.colyseus.io/tools/monitor/
  */
-//app.use("/colyseus", monitor()); //TODO Enable this and secure it via authentication/authorization
+//app.use("/colyseus", connectionEnsureLogin.ensureLoggedIn(), monitor()); //TODO Enable this and secure it via authentication/authorization
 
 // Start the server
 gameServer
