@@ -88,7 +88,7 @@ app.use(flash());
 app.post(
     "/login",
     passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", {
-        successRedirect: "/",
+        successReturnToOrRedirect: "/",
         failureRedirect: "/login",
         failureFlash: true,
     })
