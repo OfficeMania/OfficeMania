@@ -44,7 +44,6 @@ export class MachineHandler implements Handler {
     outputsVending = ["You really enjoyed your sip. \nBut then you dropped your bottle :(",
     "Want s'more Coke? Pay up.",
     "The coins are too grimy.",
-    "... and now they are too shiny.",
     /*"butts lol"*/
     "Well I don't remember you inserting that money...",
     "Was that a dollar, or a penny?",
@@ -54,6 +53,7 @@ export class MachineHandler implements Handler {
     "Out of order.",
     ];
     lastOutputsV: number[];
+    specialDiaVInd2 = "... and now they are too shiny.";
 
 
     outputsWater = ["DAMN, I wanted sparkling water!",
@@ -148,8 +148,11 @@ export class MachineHandler implements Handler {
         return this.outputsCoffee[index];;
     }
     searchTextVending(room: Room<State>, client: Client): string  {
+        //Special condition for dialogue
+        if(this.lastOutputsV[0] === 2) {
+            return this.specialDiaVInd2;
+        }
         let index = this.getRandomInt(0, this.outputsVending.length);
-
         if (this.lastOutputsV.includes(index)) {
 
             let text = this.searchTextVending(room, client);
