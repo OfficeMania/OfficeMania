@@ -85,6 +85,13 @@ app.use(passport.session());
 
 app.use(flash());
 
+if (IS_DEV) {
+    app.use((req, res, next) => {
+        req.isAuthenticated = () => true;
+        next();
+    });
+}
+
 app.post(
     "/login",
     passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", {
@@ -103,11 +110,7 @@ app.get("/logout", (req, res) => {
 });
 
 // Expose public directory
-if (IS_DEV) {
-    app.use("/", express.static("public"));
-} else {
-    app.use("/", connectionEnsureLogin.ensureLoggedIn(), express.static("public"));
-}
+app.use("/", connectionEnsureLogin.ensureLoggedIn(), express.static("public"));
 
 // Create game server
 const gameServer = new Server({
