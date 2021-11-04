@@ -24,6 +24,7 @@ export class Machine extends Interactive {
     loop() {}
 
     onInteraction() {
+        //TODO: would love to have inputmode check server side, not yet doable
         if(getInputMode() !== InputMode.INTERACTION) {
             this.canvas.style.visibility = "visible";
             this.canvas.getContext("2d").textAlign = "center";
