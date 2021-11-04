@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "npm init template for bootstrapping an empty Colyseus project",
   "scripts": {
-    "start-webpack": "set TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" && webpack -w --config webpack.config.js",
+    "start-webpack": "cross-env TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" && webpack -w --config webpack.config.ts",
     "start-ts-node-dev": "ts-node-dev --project ./src/server/tsconfig.json src/server/main.ts",
     "start-win": "concurrently \"set TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" && webpack -w\" \"ts-node-dev --project ./src/server/tsconfig.json src/server/main.ts\"",
     "build-webpack": "TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" && webpack --config webpack.config.ts",
