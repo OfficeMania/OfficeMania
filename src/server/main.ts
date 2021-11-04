@@ -171,5 +171,7 @@ gameServer.define("turoom", TURoom).enableRealtimeListing();
 //app.use("/colyseus", monitor());
 
 // Start the server
-gameServer.listen(SERVER_PORT);
-console.log(`Listening on http://localhost:${SERVER_PORT}`);
+gameServer
+    .listen(SERVER_PORT)
+    .then(() => console.log(`Listening on http://localhost:${SERVER_PORT}`))
+    .catch(console.error);
