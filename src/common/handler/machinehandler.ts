@@ -53,7 +53,7 @@ export class MachineHandler implements Handler {
     "Out of order.",
     ];
     lastOutputsV: number[];
-    specialDiaVInd2 = "... and now they are too shiny.";
+    specialDiaV = "... and now they are too shiny.";
 
 
     outputsWater = ["DAMN, I wanted sparkling water!",
@@ -122,6 +122,10 @@ export class MachineHandler implements Handler {
 
 
     searchTextCoffee(room: Room<State>, client: Client): string  {
+        
+        //CHANGE SIZE OF BACKLOG HERE
+        this.lastOutputsC.length > 3 && this.lastOutputsC.pop();
+
         let index = this.getRandomInt(0, this.outputsCoffee.length);
         /**
          * console.log("previous outputs:")
@@ -141,16 +145,18 @@ export class MachineHandler implements Handler {
         }
         this.lastOutputsC.unshift(index);
 
-        //CHANGE SIZE OF BACKLOG HERE
-        this.lastOutputsC.length > 3 && this.lastOutputsC.pop();
-
-        
         return this.outputsCoffee[index];;
     }
     searchTextVending(room: Room<State>, client: Client): string  {
+
+        //CHANGE SIZE OF BACKLOG HERE
+        this.lastOutputsV.length > 3 && this.lastOutputsV.pop();
+
         //Special condition for dialogue
+
         if(this.lastOutputsV[0] === 2) {
-            return this.specialDiaVInd2;
+            this.lastOutputsV.unshift(-1);
+            return this.specialDiaV;
         }
         let index = this.getRandomInt(0, this.outputsVending.length);
         if (this.lastOutputsV.includes(index)) {
@@ -158,19 +164,17 @@ export class MachineHandler implements Handler {
             let text = this.searchTextVending(room, client);
             return text;
         }
-        
-        
         this.lastOutputsV.unshift(index);
 
-        //CHANGE SIZE OF BACKLOG HERE
-
-        this.lastOutputsV.length > 3 && this.lastOutputsV.pop();
-        
         return this.outputsVending[index];;
     }
 
 
     searchTextWater(room: Room<State>, client: Client): string  {
+        
+        //CHANGE SIZE OF BACKLOG HERE
+        this.lastOutputsW.length > 3 && this.lastOutputsW.pop();
+        
         let index = this.getRandomInt(0, this.outputsWater.length);
         
         if (this.lastOutputsW.includes(index)) {
@@ -179,9 +183,6 @@ export class MachineHandler implements Handler {
             return text;
         }
         this.lastOutputsW.unshift(index);
-        //CHANGE SIZE OF BACKLOG HERE
-
-        this.lastOutputsW.length > 3 && this.lastOutputsW.pop();
         
         return this.outputsWater[index];;
     }
