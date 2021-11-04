@@ -37,7 +37,7 @@ steps:
     when:
       branch:
         - master
-  
+
   - name: publish-development
     image: plugins/docker
     settings:
@@ -54,54 +54,3 @@ steps:
     when:
       branch:
         - development
-
-  - name: publish-design
-    image: plugins/docker
-    settings:
-      repo:
-        from_secret: docker_repo
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
-      target: DEV
-      tags:
-        - dev-design
-        - commit-${DRONE_COMMIT_SHA:0:8}
-    when:
-      branch:
-        - design
-
-  - name: publish-movement
-    image: plugins/docker
-    settings:
-      repo:
-        from_secret: docker_repo
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
-      target: DEV
-      tags:
-        - dev-movement
-        - commit-${DRONE_COMMIT_SHA:0:8}
-    when:
-      branch:
-        - movement
-
-  - name: publish-video
-    image: plugins/docker
-    settings:
-      repo:
-        from_secret: docker_repo
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
-      target: DEV
-      tags:
-       - dev-video
-       - commit-${DRONE_COMMIT_SHA:0:8}
-    when:
-      branch:
-        - video
