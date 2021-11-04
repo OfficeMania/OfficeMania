@@ -100,7 +100,7 @@ export class MachineHandler implements Handler {
     }
 
     searchText(room: Room<State>, client: Client, message: MachineType) {
-        console.log("searching");
+        //console.log("searching");
         let text: string;
         
         if (message === MachineType.COFFEE) {
@@ -115,7 +115,7 @@ export class MachineHandler implements Handler {
             text = this.searchTextWater(room, client);
             client.send(MessageType.MACHINE_WATER, text);
         }
-        console.log(text);
+        //console.log(text);
         
         
     }
@@ -179,8 +179,6 @@ export class MachineHandler implements Handler {
         //CHANGE SIZE OF BACKLOG HERE
 
         this.lastOutputsW.length > 3 && this.lastOutputsW.pop();
-
-        console.log(index);
         
         return this.outputsWater[index];;
     }
@@ -190,7 +188,6 @@ export class MachineHandler implements Handler {
         min = Math.ceil(min) + 1;
         max = Math.floor(max) ;
         let i = (Math.floor(Math.random() * (max - min)) + min);
-        console.log(i + "wat")
         return (i - 1);
     }
 }

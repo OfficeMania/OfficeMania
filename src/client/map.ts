@@ -6,10 +6,10 @@ import {PingPongTable} from "./interactive/pingpongtable";
 import {State} from "../common";
 import {Whiteboard} from "./interactive/whiteboard";
 import {Todo} from "./interactive/todo";
-import {CoffeeMachine} from "./interactive/coffeeMachine";
-import {VendingMachine} from "./interactive/vendingMachine";
+import {CoffeeMachine} from "./interactive/machines/coffeeMachine";
+import {VendingMachine} from "./interactive/machines/vendingMachine";
 import {ChessBoard} from "./interactive/chessboard";
-import {WaterCooler} from "./interactive/waterCooler";
+import {WaterCooler} from "./interactive/machines/waterCooler";
 import {Computer} from "./interactive/computer";
 
 export {convertMapData, MapInfo, drawMap, fillSolidInfos, solidInfo}

@@ -1,6 +1,6 @@
 
-import { MachineType} from "../../common/handler/machinehandler";
-import { Machine } from "./machine";
+import { MachineType} from "../../../common/handler/machinehandler";
+import { Machine } from "../machine";
 
 export class CoffeeMachine extends Machine {
 
