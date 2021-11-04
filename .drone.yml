@@ -37,6 +37,23 @@ steps:
     when:
       branch:
         - master
+  
+  - name: publish-development
+    image: plugins/docker
+    settings:
+      repo:
+        from_secret: docker_repo
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      target: DEV
+      tags:
+        - development
+        - commit-${DRONE_COMMIT_SHA:0:8}
+    when:
+      branch:
+        - development
 
   - name: publish-design
     image: plugins/docker
