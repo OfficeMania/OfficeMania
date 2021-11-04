@@ -13,7 +13,7 @@ export function findUserById(id: string): User {
 }
 
 export function createUser(id: string, username: string, password: string = undefined): User {
-    const user: User = {id, username, password};
+    const user: User = { id, username, password };
     users.push(user);
     return user;
 }
