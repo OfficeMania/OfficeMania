@@ -28,7 +28,7 @@ In the following you can find a summary of all dependencies we used.
   $ sudo apt install -y nodejs
   $ npm install typescript --save-dev
   ```
-- Clone OfficeMania into a location in the Linux filesystem.
+- Clone OfficeMania into a location in the Linux filesystem using your y-Number and an access token.
 
   ```
   $ cd ~
@@ -81,7 +81,7 @@ Now, download [VSCode](https://code.visualstudio.com/) for Windows. Go to the Ex
 ```
 $ code
 ```
-Make sure that you are connected remotely to WSL by checking the bottom left corner of your screen. It should say ">< WSL: Ubuntu". If not, go to the Remote-Explorer and right-click Ubuntu and select "Connect to WSL".
+Make sure that you are connected remotely to WSL by checking the bottom left corner of your screen. It should say ">< WSL: Ubuntu". If not, go to the Remote-Explorer, right-click Ubuntu and select "Connect to WSL".
 
 Go to File > Open Folder... and select the folder "officemania" you just cloned. You are ready to go!
 
@@ -114,7 +114,7 @@ To run a local server please install the following software using the Ubuntu ter
 
 - Project Dependencies
 
-  Install all dependencies referenced in the `package.json` to the `node_modules` directory in the officemania project folder by running the npm command:
+  Install all dependencies referenced in the `package.json` to the `node_modules` directory by running this npm command from the  officemania project folder:
 
   ```
   $ npm install
@@ -126,7 +126,7 @@ After installing the dependencies, you can test the installation by running
 $ npm start
 ```
 
-from the project folder. To check whether the installation was successfull open http://localhost:3000/ and discover the world of OfficeMania!
+from the project folder. To check whether the installation was successful open http://localhost:3000/ and discover the world of OfficeMania!
 
 ## Usage
 
