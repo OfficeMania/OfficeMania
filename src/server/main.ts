@@ -10,7 +10,7 @@ import { compareSync, hashSync } from "bcrypt";
 import sqlite3, { Database } from "sqlite3";
 
 import { TURoom } from "../common/rooms/turoom";
-import { IS_DEV, LDAP_OPTIONS, SALT_ROUNDS, SERVER_PORT, SESSION_SECRET } from "./config";
+import { DISABLE_SIGNUP, IS_DEV, LDAP_OPTIONS, SALT_ROUNDS, SERVER_PORT, SESSION_SECRET } from "./config";
 import User from "./user";
 
 const LocalStrategy = require("passport-local").Strategy;
@@ -107,25 +107,27 @@ app.post(
         failureFlash: true,
     })
 );
-app.post("/signup", connectionEnsureLogin.ensureLoggedOut(), (req, res, next) => {
-    const username: string = req.body.username;
-    const password: string[] = req.body.password;
-    if (password.length !== 2 || password[0] !== password[1]) {
-        return next(new Error("Passwords do not match"));
-    }
-    database.get("SELECT id, username, password FROM user WHERE username = ?", username, (err, user: User) => {
-        if (user) {
-            return next(new Error("User already exists"));
-        }
-        const passwordHash: string = hashSync(password[0], SALT_ROUNDS);
-        database.run("INSERT INTO user (username, password) VALUES (?, ?);", username, passwordHash);
-        next();
-    });
-});
-
 app.get("/login.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.css")));
 app.get("/login", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.html")));
-app.get("/signup", (req, res) => res.sendFile(path.join(process.cwd(), "public", "signup.html")));
+
+if (!DISABLE_SIGNUP) {
+    app.post("/signup", connectionEnsureLogin.ensureLoggedOut(), (req, res, next) => {
+        const username: string = req.body.username;
+        const password: string[] = req.body.password;
+        if (password.length !== 2 || password[0] !== password[1]) {
+            return next(new Error("Passwords do not match"));
+        }
+        database.get("SELECT id, username, password FROM user WHERE username = ?", username, (err, user: User) => {
+            if (user) {
+                return next(new Error("User already exists"));
+            }
+            const passwordHash: string = hashSync(password[0], SALT_ROUNDS);
+            database.run("INSERT INTO user (username, password) VALUES (?, ?);", username, passwordHash);
+            next();
+        });
+    });
+    app.get("/signup", (req, res) => res.sendFile(path.join(process.cwd(), "public", "signup.html")));
+}
 
 app.get("/logout", (req, res) => {
     req.logout();
