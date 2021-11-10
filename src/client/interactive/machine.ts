@@ -7,6 +7,7 @@ import { checkInputMode } from "../main";
 import { State } from "../../common";
 import { MachineType} from "../../common/handler/machinehandler";
 export class Machine extends Interactive {
+    
 
     ctx: CanvasRenderingContext2D;
     room: Room<State>;
