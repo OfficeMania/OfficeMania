@@ -67,6 +67,7 @@
   },
   "dependencies": {
     "@colyseus/monitor": "^0.12.2",
+    "bcrypt": "^5.0.1",
     "colyseus": "^0.14.0",
     "compression": "^1.7.4",
     "connect-ensure-login": "^0.1.1",
