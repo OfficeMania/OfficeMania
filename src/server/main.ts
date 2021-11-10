@@ -6,16 +6,20 @@ import compression from "compression";
 import path from "path";
 import passport from "passport";
 import { Server } from "colyseus";
+import { compareSync, hashSync } from "bcrypt";
+import sqlite3, { Database } from "sqlite3";
 
 import { TURoom } from "../common/rooms/turoom";
-import { IS_DEV, LDAP_OPTIONS, SERVER_PORT, SESSION_SECRET } from "./config";
-import User, { createUser, findUserById, isValidPassword } from "./user";
+import { DISABLE_SIGNUP, IS_DEV, LDAP_OPTIONS, SALT_ROUNDS, SERVER_PORT, SESSION_SECRET } from "./config";
+import User from "./user";
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
 
 const flash = require("connect-flash");
 const connectionEnsureLogin = require("connect-ensure-login");
+
+const database: Database = new sqlite3.Database("./database.sqlite");
 
 const app = express();
 
@@ -61,23 +65,26 @@ if (LDAP_OPTIONS) {
     console.debug("Using LocalStrategy");
     passport.use(
         new LocalStrategy(function (username, password, done) {
-            if (IS_DEV) {
-                done(null, createUser(username, username));
-                return;
-            }
-            const user: User = findUserById(username);
-            if (!user) {
-                done(null, false, { message: "Incorrect username." }); //TODO Later we don't want to report wrong username OR password, just that one of both was wrong
-                return;
-            }
-            if (!isValidPassword(user, password)) {
-                done(null, false, { message: "Incorrect password." }); //TODO Later we don't want to report wrong username OR password, just that one of both was wrong
-            }
-            done(null, user);
+            database.get("SELECT id, username, password FROM user WHERE username = ?;", username, (err, user: User) => {
+                if (!user || !compareSync(password, user.password)) {
+                    if (!user) {
+                        console.error(`no user found for "${username}"`);
+                    }
+                    return done(null, false, { message: "Username or Password incorrect." });
+                }
+                return done(null, { id: user.id, username: user.username });
+            });
         })
     );
-    passport.serializeUser((user: User, done) => done(null, user.username));
-    passport.deserializeUser((id: string, done) => done(null, findUserById(id)));
+    passport.serializeUser((user: User, done) => done(null, user.id));
+    passport.deserializeUser((id: string, done) => {
+        database.get("SELECT id, username FROM user WHERE id = ?;", id, (err, user: User) => {
+            if (!user) {
+                return done(null, false);
+            }
+            return done(null, user);
+        });
+    });
 }
 
 app.use(passport.initialize());
@@ -95,14 +102,32 @@ if (IS_DEV) {
 app.post(
     "/login",
     passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", {
-        successReturnToOrRedirect: "/",
+        successRedirect: "/",
         failureRedirect: "/login",
         failureFlash: true,
     })
 );
-
 app.get("/login.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.css")));
 app.get("/login", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.html")));
+
+if (!DISABLE_SIGNUP) {
+    app.post("/signup", connectionEnsureLogin.ensureLoggedOut(), (req, res, next) => {
+        const username: string = req.body.username;
+        const password: string[] = req.body.password;
+        if (password.length !== 2 || password[0] !== password[1]) {
+            return next(new Error("Passwords do not match"));
+        }
+        database.get("SELECT id, username, password FROM user WHERE username = ?", username, (err, user: User) => {
+            if (user) {
+                return next(new Error("User already exists"));
+            }
+            const passwordHash: string = hashSync(password[0], SALT_ROUNDS);
+            database.run("INSERT INTO user (username, password) VALUES (?, ?);", username, passwordHash);
+            next();
+        });
+    });
+    app.get("/signup", (req, res) => res.sendFile(path.join(process.cwd(), "public", "signup.html")));
+}
 
 app.get("/logout", (req, res) => {
     req.logout();
