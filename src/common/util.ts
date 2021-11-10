@@ -51,6 +51,9 @@ export enum MessageType {
     MACHINE_COFFEE = "machineCoffee",
     MACHINE_WATER = "machineWater",
     MACHINE_VENDING = "machineVending",
+    //NotesHandler
+    NOTES_CREATE = "notesCreate",
+    NOTES_SET = "notesSet",
 }
 export enum GameMode {
     SINGLE = 1,
