@@ -81,7 +81,7 @@ export var lowestY;
 
 muteButton.addEventListener("click", () => toggleMute("audio"));
 camButton.addEventListener("click", () => toggleMute("video"));
-shareButton.addEventListener("click", () => toggleMute("desktop")); //TODO Maybe make a confirmation dialog to confirm the stopping of a screenshare?
+shareButton.addEventListener("click", () => toggleMute("desktop")); //TODO Maybee make a confirmation dialog to confirm the stopping of a screenshare?
 
 //toggle mute of tracks by type
 function toggleMute(type: string) {
