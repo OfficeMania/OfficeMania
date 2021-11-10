@@ -6,16 +6,20 @@ import compression from "compression";
 import path from "path";
 import passport from "passport";
 import { Server } from "colyseus";
+import bcrypt from "bcrypt";
+import sqlite3, { Database } from "sqlite3";
 
 import { TURoom } from "../common/rooms/turoom";
 import { IS_DEV, LDAP_OPTIONS, SERVER_PORT, SESSION_SECRET } from "./config";
-import User, { createUser, findUserById, isValidPassword } from "./user";
+import User from "./user";
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
 
 const flash = require("connect-flash");
 const connectionEnsureLogin = require("connect-ensure-login");
+
+const database: Database = new sqlite3.Database("./database.sqlite");
 
 const app = express();
 
@@ -61,23 +65,26 @@ if (LDAP_OPTIONS) {
     console.debug("Using LocalStrategy");
     passport.use(
         new LocalStrategy(function (username, password, done) {
-            if (IS_DEV) {
-                done(null, createUser(username, username));
-                return;
-            }
-            const user: User = findUserById(username);
-            if (!user) {
-                done(null, false, { message: "Incorrect username." }); //TODO Later we don't want to report wrong username OR password, just that one of both was wrong
-                return;
-            }
-            if (!isValidPassword(user, password)) {
-                done(null, false, { message: "Incorrect password." }); //TODO Later we don't want to report wrong username OR password, just that one of both was wrong
-            }
-            done(null, user);
+            database.get("SELECT id, username, password FROM user WHERE username = ?", username, (err, user: User) => {
+                if (!user || !bcrypt.compareSync(password, user.password)) {
+                    if (!user) {
+                        console.error(`no user found for "${username}"`);
+                    }
+                    return done(null, false, { message: "Username or Password incorrect." });
+                }
+                return done(null, { id: user.id, username: user.username });
+            });
         })
     );
-    passport.serializeUser((user: User, done) => done(null, user.username));
-    passport.deserializeUser((id: string, done) => done(null, findUserById(id)));
+    passport.serializeUser((user: User, done) => done(null, user.id));
+    passport.deserializeUser((id: string, done) => {
+        database.get("SELECT id, username FROM user WHERE id = ?", id, (err, user: User) => {
+            if (!user) {
+                return done(null, false);
+            }
+            return done(null, user);
+        });
+    });
 }
 
 app.use(passport.initialize());
@@ -95,7 +102,7 @@ if (IS_DEV) {
 app.post(
     "/login",
     passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", {
-        successReturnToOrRedirect: "/",
+        successRedirect: "/",
         failureRedirect: "/login",
         failureFlash: true,
     })
