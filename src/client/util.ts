@@ -12,8 +12,8 @@ import {
     KEY_USERNAME,
     MessageType
 } from "../common/util";
-import {characters} from "./main";
-import {panelButtonsInteraction} from "./static";
+import {characters, checkInputMode} from "./main";
+import {panelButtonsInteraction, welcomeModal} from "./static";
 import {createAnimatedSpriteSheet} from "./graphic/animated-sprite-sheet";
 import AnimationData, {createAnimationData} from "./graphic/animation-data";
 
@@ -267,11 +267,13 @@ export async function loadCharacter() {
     if (username && username !== "") {
         setUsername(username);
     } else {
-        /*let playerNameInput = document.getElementById("name-form").submit();
-        console.log(playerNameInput.elements[0].value);
-        setUsername(playerNameInput.elements[0].value);*/
-        //setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy");
-    }
+        document.getElementById("name-form").addEventListener('submit', function(e) {
+            setUsername(document.getElementById("input-welcome-username").value);
+            e.preventDefault();  
+            $("#welcome-modal").modal("hide");
+            welcomeModal.style.display = "none";
+            checkInputMode();
+        }, false);}
 
     //loads character animations
     const characterAnimationsJson: { [key: string]: any } = await fetch("/assets/animation/character-animations.json").then((response) => response.json());

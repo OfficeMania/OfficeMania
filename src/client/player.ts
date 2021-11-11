@@ -229,5 +229,4 @@ export function syncOwnPosition(player: Player, room: Room) {
     } else {
         posDiffers = 0;
     }
-
 }
