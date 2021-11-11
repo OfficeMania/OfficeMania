@@ -231,10 +231,3 @@ export function syncOwnPosition(player: Player, room: Room) {
     }
 
 }
-
-/*
- * If you run npm test, you will find that no test covers this function.
- */
-export function untestedFunction(a: number, b: number) {
-    return a + b;
-}
