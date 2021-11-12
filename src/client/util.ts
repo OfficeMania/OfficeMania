@@ -13,7 +13,7 @@ import {
     MessageType
 } from "../common/util";
 import {characters, checkInputMode} from "./main";
-import {panelButtonsInteraction, welcomeModal} from "./static";
+import {panelButtonsInteraction, usernameInputWelcome, welcomeModal} from "./static";
 import {createAnimatedSpriteSheet} from "./graphic/animated-sprite-sheet";
 import AnimationData, {createAnimationData} from "./graphic/animation-data";
 
@@ -268,8 +268,9 @@ export async function loadCharacter() {
         setUsername(username);
     } else {
         document.getElementById("name-form").addEventListener('submit', function(e) {
-            setUsername(document.getElementById("input-welcome-username").value);
+            setUsername(usernameInputWelcome.value);
             e.preventDefault();  
+            //janky
             $("#welcome-modal").modal("hide");
             welcomeModal.style.display = "none";
             checkInputMode();
