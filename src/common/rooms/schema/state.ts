@@ -122,6 +122,15 @@ export class TodoState extends Schema {
 
 }
 
+export class NotesState extends Schema {
+
+    @type("string")
+    content: string;
+
+    @type({map: "number"})
+    markers: MapSchema<number> = new MapSchema<number>();
+}
+
 export class ChessState extends Schema {
 
     @type("string")
@@ -175,5 +184,8 @@ export class State extends Schema {
 
     @type({map: ChessState})
     chessStates: MapSchema<ChessState> = new MapSchema<ChessState>();
+
+    @type({map: NotesState})
+    notesStates: MapSchema<NotesState> = new MapSchema<NotesState>();
 
 }
