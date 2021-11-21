@@ -406,6 +406,7 @@ async function convertMapData(mapJson: {[key: string]: any}, room: Room, canvas:
 
     for (const mapJsonLayer of mapJson.layers) {
         const chunks: Chunk[] = [];
+        if(!mapJsonLayer.chunks) continue; //TODO NOT GOOD, quick fix for object layer ignoring
         for (const mapJsonChunk of mapJsonLayer.chunks) {
             chunks.push(new Chunk(mapJsonChunk.x, mapJsonChunk.y, mapJsonChunk.data));
             if (!isSet) {
