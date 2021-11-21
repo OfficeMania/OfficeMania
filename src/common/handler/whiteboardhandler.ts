@@ -16,6 +16,7 @@ export class WhiteboardHandler implements Handler {
 
     onCreate(options: any) {
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (client, message) => onClear(this.room, client, message));
+        this.room.onMessage(MessageType.WHITEBOARD_SAVE, (client, message) => onSave(this.room, client, message));
         this.room.onMessage(MessageType.WHITEBOARD_PATH, (client, message) => onPath(this.room, client, message));
         this.room.onMessage(MessageType.WHITEBOARD_CREATE, (client, message) => onNewWhiteboard(this.room, client, message));
         for(var i = 0; i < whiteboardCount; i++){
@@ -46,6 +47,13 @@ function onNewWhiteboard(room: Room<State>, client: Client, wID: number){
 }
 
 function onClear(room: Room<State>, client: Client, wID: number) {
+    for (const [, player] of room.state.whiteboard.at(wID).whiteboardPlayer) {
+        player.paths = new ArraySchema<number>();
+    }
+    room.broadcast(MessageType.WHITEBOARD_CLEAR, wID, {except: client});
+}
+
+function onSave(room: Room<State>, client: Client, wID: number) {
     for (const [, player] of room.state.whiteboard.at(wID).whiteboardPlayer) {
         player.paths = new ArraySchema<number>();
     }

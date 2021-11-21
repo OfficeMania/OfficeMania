@@ -201,14 +201,31 @@ export class Whiteboard extends Interactive{
         }
         whiteboard.setup(whiteboard.canvas)
     }
+
     save(whiteboard: Whiteboard, message: number) {
         if(whiteboard.wID !== message){
             return;
         }
-        for (var id in whiteboard.whiteboardPlayer) {
-            whiteboard.whiteboardPlayer[id] = 0;
-        }
-        whiteboard.setup(whiteboard.canvas)
+        /*var canvas = <HTMLCanvasElement> document.getElementById('whiteboard');
+        var ctx = canvas.getContext('2d');
+
+        var data = canvas.toDataURL();
+        var prev = window.location.href;
+        window.location.href = data.replace("image/png", "image/octet-stream");
+        window.location.href = prev;*/
+        const canvas = <HTMLCanvasElement> document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const download = document.getElementById('download');
+
+
+        download.addEventListener('click', function(e) {
+            console.log(canvas.toDataURL());
+            const link = document.createElement('a');
+            link.download = 'download.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            //link.delete;
+        });
     }
 
     resize(whiteboard: Whiteboard) {
