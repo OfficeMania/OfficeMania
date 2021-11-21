@@ -8,6 +8,10 @@ import {
     PlayerRecord,
     removeCloseInteractionButton
 } from "../util";
+/*import {
+    saveButton,
+    clearButton
+} from "../static";*/
 import {ArraySchema} from "@colyseus/schema";
 import {MessageType} from "../../common/util";
 import {Interactive} from "./interactive";
@@ -31,14 +35,17 @@ export class Whiteboard extends Interactive{
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
 
-    private clearButton = <HTMLButtonElement>document.getElementById("button-interactive");
+    private clearButton = <HTMLButtonElement>document.getElementById("button-whiteboard-clear");
+
+    private saveButton = <HTMLButtonElement>document.getElementById("button-whiteboard-save");
+
 
     mousemove = (e) => this.draw(e, this)
     mousedown = (e) => this.mouseDown(e, this)
     mouseup = (e) => this.mouseUp(e, this)
     mouseenter = (e) => this.mouseEnter(e, this)
     clearCommand = () => this.clearPressed(this)
-
+    saveCommand = () => this.savePressed(this)
     resized = () => this.resize(this);
 
     constructor() {
@@ -54,20 +61,29 @@ export class Whiteboard extends Interactive{
         this.clearButton.style.top = "30%"
         this.clearButton.style.left = "20%"
 
+        this.saveButton.style.top = "65%"
+        this.saveButton.style.left = "76%"
+
         this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
 
         this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
 
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
 
+        this.room.onMessage(MessageType.WHITEBOARD_SAVE, (message) => this.save(this, message));
+
         this.resize(this);
     }
 
     onInteraction(){
         if (this.isVisible) {
-            this.hide()
+            this.hide();
+            //this.hideButtons;
+            
         } else {
-            this.show()
+            this.show();
+            //this.showButtons();
+           
             createCloseInteractionButton(() => this.leave());
         }
     }
@@ -78,6 +94,7 @@ export class Whiteboard extends Interactive{
         this.canvas.removeEventListener('mouseup',this.mouseup);
         this.canvas.removeEventListener('mouseenter',this.mouseenter);
         this.clearButton.removeEventListener("click", this.clearCommand);
+        this.saveButton.removeEventListener("click", this.saveCommand);
 
         window.removeEventListener('resize', this.resized);
 
@@ -99,13 +116,23 @@ export class Whiteboard extends Interactive{
     leave() {
         this.hide();
     }
-
+    /*private showButtons() {
+        createCloseInteractionButton(() => this.leave());
+        saveButton.style.visibility = "visible";
+        clearButton.style.visibility = "visible";
+    }
+    private hideButtons() {
+        removeCloseInteractionButton();
+        saveButton.style.visibility = "hidden";
+        clearButton.style.visibility = "hidden";
+    }*/
     show(){
         this.canvas.addEventListener('mousemove',this.mousemove);
         this.canvas.addEventListener('mousedown',this.mousedown);
         this.canvas.addEventListener('mouseup',this.mouseup);
         this.canvas.addEventListener('mouseenter',this.mouseenter);
         this.clearButton.addEventListener("click", this.clearCommand);
+        this.saveButton.addEventListener("click", this.saveCommand);
 
         //size changed
         window.addEventListener('resize', this.resized);
@@ -116,6 +143,10 @@ export class Whiteboard extends Interactive{
         this.canvas.style.visibility = "visible";
         this.clearButton.style.visibility = "visible";
 
+        this.saveButton.setAttribute("aria-label", "Clear Whiteboard");
+        this.saveButton.innerHTML = "<em class=\"fas fa-save\"></em>"
+        this.saveButton.style.visibility = "visible";
+
         checkInputMode()
 
         Whiteboard.currentWhiteboard = this.wID
@@ -124,6 +155,7 @@ export class Whiteboard extends Interactive{
         this.setup(this.canvas);
         this.redraw(this);
     }
+    
 
     loop(){}
 
@@ -155,7 +187,21 @@ export class Whiteboard extends Interactive{
         whiteboard.clear(whiteboard, whiteboard.wID);
     }
 
+    savePressed(whiteboard: Whiteboard) {
+        whiteboard.room.send(MessageType.WHITEBOARD_SAVE, whiteboard.wID);
+        whiteboard.save(whiteboard, whiteboard.wID);
+    }
+
     clear(whiteboard: Whiteboard, message: number) {
+        if(whiteboard.wID !== message){
+            return;
+        }
+        for (var id in whiteboard.whiteboardPlayer) {
+            whiteboard.whiteboardPlayer[id] = 0;
+        }
+        whiteboard.setup(whiteboard.canvas)
+    }
+    save(whiteboard: Whiteboard, message: number) {
         if(whiteboard.wID !== message){
             return;
         }
@@ -175,6 +221,7 @@ export class Whiteboard extends Interactive{
         whiteboard.stretchY = 720 / rect.height
 
         whiteboard.clearButton.style.top = rect.top + "px";
+        whiteboard.saveButton.style.top = rect.top + "px";
     }
 
     drawOthers(clientID: string, whiteboard: Whiteboard) {

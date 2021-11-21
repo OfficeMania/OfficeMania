@@ -38,6 +38,7 @@ export enum MessageType {
     PONG_UPDATE = "updatePong",
     // WhiteboardHandler
     WHITEBOARD_CLEAR = "whiteboardClear",
+    WHITEBOARD_SAVE = "whiteboardSave",
     WHITEBOARD_PATH = "whiteboardPath",
     WHITEBOARD_REDRAW = "whiteboardRedraw",
     WHITEBOARD_CREATE = "whiteboardCreate",
