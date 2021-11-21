@@ -37,10 +37,22 @@ export class Notes extends Interactive {
         createCloseInteractionButton(() => this.leave());
 
         this.doLoop = true;
-        this.loop();
+        //this.loop();
+
+        this.room.send(MessageType.NOTES_ENTER, new Message("1", 1))
     }
 
     loop() {
 
     }
+}
+class Message {
+    message: string;
+    id: number;
+    constructor(key: string, id: number) {
+        this.message = key;
+        this.id = id;
+    }
+
+
 }

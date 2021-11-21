@@ -54,7 +54,9 @@ export enum MessageType {
     MACHINE_VENDING = "machineVending",
     //NotesHandler
     NOTES_CREATE = "notesCreate",
+    NOTES_ENTER = "notesEnter",
     NOTES_SET = "notesSet",
+    NOTES_MARKER = "notesMarker",
 }
 export enum GameMode {
     SINGLE = 1,

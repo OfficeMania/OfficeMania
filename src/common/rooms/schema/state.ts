@@ -123,12 +123,15 @@ export class TodoState extends Schema {
 }
 
 export class NotesState extends Schema {
-
+    //content in a single line
     @type("string")
     content: string;
 
     @type({map: "number"})
     markers: MapSchema<number> = new MapSchema<number>();
+    //line lengths
+    @type({array: "number"})
+    lengths: ArraySchema<number> = new ArraySchema<number>();
 }
 
 export class ChessState extends Schema {
