@@ -3,7 +3,15 @@ import { getEntity, sequelize } from "./database";
 import { compare, compareSync } from "bcrypt";
 
 export default class User extends Model {
-    private getPassword() {
+    getId(): string {
+        return this["id"];
+    }
+
+    getUsername(): string {
+        return this["username"];
+    }
+
+    private getPassword(): string {
         return this["password"];
     }
 
