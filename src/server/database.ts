@@ -30,6 +30,7 @@ export async function connectDatabase(): Promise<void> {
 }
 
 export async function disconnectDatabase(): Promise<void> {
+    console.log("Disconnecting from the Database");
     return sequelize.close();
 }
 
@@ -37,6 +38,8 @@ const sequelize: Sequelize = new Sequelize({
     dialect: "sqlite",
     storage: "database_test.sqlite",
 });
+
+process.on("exit", disconnectDatabase);
 
 export async function withTransaction<T>(autoCallback: (t: Transaction) => PromiseLike<T>): Promise<T> {
     return sequelize.transaction(autoCallback);
