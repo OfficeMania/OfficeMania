@@ -10,8 +10,8 @@ import { compareSync, hashSync } from "bcrypt";
 import sqlite3, { Database } from "sqlite3";
 
 import { TURoom } from "../common/rooms/turoom";
-import { DISABLE_SIGNUP, IS_DEV, LDAP_OPTIONS, SALT_ROUNDS, SERVER_PORT, SESSION_SECRET } from "./config";
-import User from "./user";
+import { DEBUG, DISABLE_SIGNUP, IS_DEV, LDAP_OPTIONS, SALT_ROUNDS, SERVER_PORT, SESSION_SECRET } from "./config";
+import User, { findOrCreateUserByUsername } from "./user";
 import { connectDatabase } from "./database";
 
 const LocalStrategy = require("passport-local").Strategy;
@@ -46,7 +46,20 @@ app.use(
     })
 );
 
-connectDatabase().catch(console.error);
+async function initDatabase(): Promise<void> {
+    // TODO Remove this and use proper user creation etc.
+    return findOrCreateUserByUsername("officemania", "sec-sep21-project").then(user => {
+        if (!user) {
+            console.error("Something went wrong when creating the default user");
+        } else if (DEBUG) {
+            console.debug(`Default user successfully found or created`);
+        }
+    });
+}
+
+connectDatabase()
+    .then(() => initDatabase())
+    .catch(console.error);
 
 // Set passport strategy
 if (LDAP_OPTIONS) {
