@@ -34,6 +34,7 @@ export class Whiteboard extends Interactive{
     wID: number = 0;
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
+    //canvas = <HTMLCanvasElement> document.getElementById("whiteboard");
 
     private clearButton = <HTMLButtonElement>document.getElementById("button-whiteboard-clear");
 
@@ -210,7 +211,7 @@ export class Whiteboard extends Interactive{
         // This code will automatically save the current canvas as a .png file. 
 
         // Get the canvas
-        var canvas = <HTMLCanvasElement> document.getElementById("canvas");
+        var canvas = <HTMLCanvasElement> document.getElementById("interactive");
         // Convert the canvas to data
         var image = canvas.toDataURL();
         // Create a link
