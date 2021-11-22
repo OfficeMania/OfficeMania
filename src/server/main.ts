@@ -12,6 +12,7 @@ import sqlite3, { Database } from "sqlite3";
 import { TURoom } from "../common/rooms/turoom";
 import { DISABLE_SIGNUP, IS_DEV, LDAP_OPTIONS, SALT_ROUNDS, SERVER_PORT, SESSION_SECRET } from "./config";
 import User from "./user";
+import { connectDatabase, testDatabase } from "./database";
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
@@ -44,6 +45,10 @@ app.use(
         cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
     })
 );
+
+connectDatabase()
+    .then(() => testDatabase())
+    .catch(console.error);
 
 // Set passport strategy
 if (LDAP_OPTIONS) {
