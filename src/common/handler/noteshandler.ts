@@ -18,6 +18,9 @@ export class NotesHandler implements Handler{
         this.room.onMessage(MessageType.NOTES_CREATE, (client, message) => {this.initNotes(client, message)})
         this.room.onMessage(MessageType.NOTES_ENTER, (client, message) => {this.enterNotes(client, message.message, message.id)})
         this.room.onMessage(MessageType.NOTES_MARKER, (client, message) => {this.modifyMarker(client, message.message, message.id)})
+        this.room.state.notesState.content = "a";
+        this.room.state.notesState.lengths.push(1);
+        console.log("Notes: " + this.room.state.notesState.content + " " + this.room.state.notesState.lengths.at(0));
     }
     onJoin() {
 
@@ -30,21 +33,19 @@ export class NotesHandler implements Handler{
     }
 
     private initNotes(client: Client, id: number) {
-        if (!this.room.state.notesState) {
-            let newState = new NotesState();
-            newState.content = "";
-            this.room.state.notesState = newState;
-        }
-        if (!this.room.state.notesState.markers[client.id]) {
+        if (this.room.state.notesState.markers[client.id] === null) {
             this.room.state.notesState.markers[client.id] = 0;
+            console.log(this.room.state.notesState.markers[client.id])
         }
-        console.log("Notes: " + this.room.state.notesState.content);
     }
 
     private enterNotes(client: Client, key: string, id: number) {
-        if (!this.room.state.notesState.markers[client.id]) {
-            this.room.state.notesState.markers[client.id] = 0;
+        if (key === "backspace" && this.room.state.notesState.markers[client.id] > 0) {
+            this.room.state.notesState.content = this.room.state.notesState.content.substr(0,this.room.state.notesState.markers[client.id] - 1) + this.room.state.notesState.content.substr(this.room.state.notesState.markers[client.id]);
         }
+        this.room.state.notesState.content = this.room.state.notesState.content.substr(0,this.room.state.notesState.markers[client.id]) + key + this.room.state.notesState.content.substr(this.room.state.notesState.markers[client.id]);
+
+
     }
 
     private modifyMarker(client: Client, direction: Direction, id: string) {
