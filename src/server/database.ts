@@ -40,7 +40,7 @@ export async function disconnectDatabase(): Promise<void> {
 
 export const sequelize: Sequelize = new Sequelize({
     dialect: "sqlite",
-    storage: "database_test.sqlite",
+    storage: "database.sqlite",
 });
 
 process.on("exit", disconnectDatabase);
