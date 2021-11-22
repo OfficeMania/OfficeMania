@@ -1,6 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import { getEntity, sequelize } from "./database";
-import { compare, compareSync } from "bcrypt";
+import { compare, compareSync, hash, hashSync } from "bcrypt";
+import { SALT_ROUNDS } from "./config";
 
 export default class User extends Model {
     getId(): string {
@@ -60,18 +61,26 @@ export function findUserByUsername(username: string): Promise<User> {
     return User.findOne({ where: { username } });
 }
 
+function hashPasswordSync(password: string): string {
+    return hashSync(password, SALT_ROUNDS);
+}
+
+function hashPassword(password: string): Promise<string> {
+    return hash(password, SALT_ROUNDS);
+}
+
 export function createUser(username: string, password: string = undefined): Promise<User> {
-    return User.create({ username, password });
+    return User.create({ username, password: hashPassword(password) });
 }
 
 export function findOrCreateUserByUsername(username: string, password: string = undefined): Promise<User> {
-    return User.findOrCreate({ where: { username }, defaults: { password } }).then(getEntity);
+    return User.findOrCreate({ where: { username }, defaults: { password: hashPassword(password) } }).then(getEntity);
 }
 
 function createOfficeManiaUser(): Promise<User> {
-    return createUser("officemania", "$2b$12$.eGqcfCBgcGfTAcz37bn.e0v9c1jgmxeAeIYld/K7XbOVx6f8158.");
+    return createUser("officemania", "sec-sep21-project");
 }
 
 function createTestUser(): Promise<User> {
-    return createUser("Test Username", "Invalid Bcrypt Password Hash");
+    return createUser("Test Username", "gezrougfnbvc4wgvriugwiuerocvfzrqfziugwzufur");
 }
