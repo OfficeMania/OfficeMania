@@ -188,7 +188,7 @@ export class State extends Schema {
     @type({map: ChessState})
     chessStates: MapSchema<ChessState> = new MapSchema<ChessState>();
 
-    @type({map: NotesState})
-    notesStates: MapSchema<NotesState> = new MapSchema<NotesState>();
+    @type(NotesState)
+    notesState: NotesState = new NotesState();
 
 }

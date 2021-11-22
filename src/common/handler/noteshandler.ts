@@ -30,25 +30,42 @@ export class NotesHandler implements Handler{
     }
 
     private initNotes(client: Client, id: number) {
-        if (!this.room.state.notesStates[id]) {
+        if (!this.room.state.notesState) {
             let newState = new NotesState();
             newState.content = "";
-            this.room.state.notesStates[id] = newState;
+            this.room.state.notesState = newState;
         }
-        if (!this.room.state.notesStates[id].markers[client]) {
-            this.room.state.notesStates[id].markers[client] = "0";
+        if (!this.room.state.notesState.markers[client.id]) {
+            this.room.state.notesState.markers[client.id] = 0;
         }
-        console.log("Notes: " + this.room.state.notesStates[id].content);
+        console.log("Notes: " + this.room.state.notesState.content);
     }
 
     private enterNotes(client: Client, key: string, id: number) {
-        if (!this.room.state.notesStates[id].markers[client.id]) {
-            this.room.state.notesStates[id].markers[client.id] = 0;
+        if (!this.room.state.notesState.markers[client.id]) {
+            this.room.state.notesState.markers[client.id] = 0;
         }
     }
 
     private modifyMarker(client: Client, direction: Direction, id: string) {
-
+        if (direction === Direction.UP) {
+            //TODO
+        }
+        if (direction === Direction.DOWN) {
+            //TODO
+        }
+        if (direction === Direction.LEFT) {
+            if (this.room.state.notesState.markers[client.id] === 0) {
+                return;
+            }
+            this.room.state.notesState.markers[client.id]--;
+        }
+        if (direction === Direction.RIGHT) {
+            if (this.room.state.notesState.content.length - 1 === this.room.state.notesState.markers[client.id]) {
+                return;
+            }
+            this.room.state.notesState.markers[client.id]++;
+        }
     }
     private checkNotes(client: Client, id: number) {
         
