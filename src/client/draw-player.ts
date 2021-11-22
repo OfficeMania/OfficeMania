@@ -8,9 +8,10 @@ import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 function calculateAnimation(player: Player) {
     let mode: string;
     let direction: Direction;
-    if (player.moveDirection === null) {
+    if (player.moveDirection === null || player.changeDirection) {
         // standing animation
         mode = "standing";
+        player.changeDirection = false;
         direction = player.facing;
         player.standing++;
         if (player.standing >= 10) {
