@@ -76,11 +76,3 @@ export function createUser(username: string, password: string = undefined): Prom
 export function findOrCreateUserByUsername(username: string, password: string = undefined): Promise<User> {
     return User.findOrCreate({ where: { username }, defaults: { password: hashPassword(password) } }).then(getEntity);
 }
-
-function createOfficeManiaUser(): Promise<User> {
-    return createUser("officemania", "sec-sep21-project");
-}
-
-function createTestUser(): Promise<User> {
-    return createUser("Test Username", "gezrougfnbvc4wgvriugwiuerocvfzrqfziugwzufur");
-}
