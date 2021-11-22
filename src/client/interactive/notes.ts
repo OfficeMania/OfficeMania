@@ -29,7 +29,7 @@ export class Notes extends Interactive {
         this.markers.set(this.id, "");
         this.room = getRoom();
         this.room.send(MessageType.NOTES_CREATE, this.id);
-        this.room.send(MessageType.NOTES_SET, [this.id, ""]);
+        //this.room.send(MessageType.NOTES_SET, [this.id, ""]);
     }
 
     onInteraction() {
