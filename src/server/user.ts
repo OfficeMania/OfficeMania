@@ -4,25 +4,21 @@ import { compare, compareSync, hash, hashSync } from "bcrypt";
 import { SALT_ROUNDS } from "./config";
 
 export default class User extends Model {
-    getId(): string {
-        return this["id"];
-    }
-
-    getUsername(): string {
-        return this["username"];
-    }
-
     private getPassword(): string {
         return this["password"];
     }
 
-    compareSync(password: string): boolean {
+    public compareSync(password: string): boolean {
         return compareSync(password, this.getPassword());
     }
 
-    compare(password: string): Promise<boolean> {
+    public compare(password: string): Promise<boolean> {
         return compare(password, this.getPassword());
     }
+}
+
+export function getUsername(user: User): string {
+    return user["username"];
 }
 
 User.init(

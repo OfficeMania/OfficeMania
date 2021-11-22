@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize";
+import { Model, Sequelize } from "sequelize";
 import { createNamespace, Namespace } from "cls-hooked";
 import { Transaction } from "sequelize/dist/lib/transaction";
 import { DEBUG } from "./config";
@@ -51,4 +51,8 @@ export async function withTransaction<T>(autoCallback: (t: Transaction) => Promi
 
 export function getEntity<T>(array: [T, boolean]): T {
     return array[0];
+}
+
+export function getId(entity: Model): string {
+    return entity["id"];
 }

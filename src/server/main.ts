@@ -9,8 +9,8 @@ import { Server } from "colyseus";
 
 import { TURoom } from "../common/rooms/turoom";
 import { DEBUG, DISABLE_SIGNUP, IS_DEV, LDAP_OPTIONS, SERVER_PORT, SESSION_SECRET } from "./config";
-import User, { createUser, findOrCreateUserByUsername, findUserById, findUserByUsername } from "./user";
-import { connectDatabase } from "./database";
+import User, { createUser, findOrCreateUserByUsername, findUserById, findUserByUsername, getUsername } from "./user";
+import { connectDatabase, getId } from "./database";
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
@@ -85,12 +85,12 @@ if (LDAP_OPTIONS) {
                         }
                         return done(null, false, { message: "Username or Password incorrect." });
                     }
-                    return done(null, { id: user.getId(), username: user.getUsername() });
+                    return done(null, { id: getId(user), username: getUsername(user) });
                 })
                 .catch(error => done(error, null));
         })
     );
-    passport.serializeUser((user: User, done) => done(null, user.getId()));
+    passport.serializeUser((user: User, done) => done(null, getId(user)));
     passport.deserializeUser((id: string, done) =>
         findUserById(id)
             .then(user => done(null, user))
