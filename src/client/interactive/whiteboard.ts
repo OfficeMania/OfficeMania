@@ -206,26 +206,21 @@ export class Whiteboard extends Interactive{
         if(whiteboard.wID !== message){
             return;
         }
-        /*var canvas = <HTMLCanvasElement> document.getElementById('whiteboard');
-        var ctx = canvas.getContext('2d');
 
-        var data = canvas.toDataURL();
-        var prev = window.location.href;
-        window.location.href = data.replace("image/png", "image/octet-stream");
-        window.location.href = prev;*/
-        const canvas = <HTMLCanvasElement> document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const download = document.getElementById('download');
+        // This code will automatically save the current canvas as a .png file. 
 
-
-        download.addEventListener('click', function(e) {
-            console.log(canvas.toDataURL());
-            const link = document.createElement('a');
-            link.download = 'download.png';
-            link.href = canvas.toDataURL();
-            link.click();
-            //link.delete;
-        });
+        // Get the canvas
+        var canvas = <HTMLCanvasElement> document.getElementById("canvas");
+        // Convert the canvas to data
+        var image = canvas.toDataURL();
+        // Create a link
+        var aDownloadLink = document.createElement('a');
+        // Add the name of the file to the link
+        aDownloadLink.download = 'canvas_image.png';
+        // Attach the data to the link
+        aDownloadLink.href = image;
+        // Get the code to click the download link
+        aDownloadLink.click();
     }
 
     resize(whiteboard: Whiteboard) {
