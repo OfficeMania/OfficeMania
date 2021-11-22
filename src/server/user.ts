@@ -66,9 +66,11 @@ function hashPassword(password: string): Promise<string> {
 }
 
 export function createUser(username: string, password: string = undefined): Promise<User> {
-    return User.create({ username, password: hashPassword(password) });
+    return User.create({ username, password: hashPasswordSync(password) });
 }
 
 export function findOrCreateUserByUsername(username: string, password: string = undefined): Promise<User> {
-    return User.findOrCreate({ where: { username }, defaults: { password: hashPassword(password) } }).then(getEntity);
+    return User.findOrCreate({ where: { username }, defaults: { password: hashPasswordSync(password) } }).then(
+        getEntity
+    );
 }
