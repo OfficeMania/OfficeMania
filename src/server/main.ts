@@ -12,7 +12,7 @@ import sqlite3, { Database } from "sqlite3";
 import { TURoom } from "../common/rooms/turoom";
 import { DISABLE_SIGNUP, IS_DEV, LDAP_OPTIONS, SALT_ROUNDS, SERVER_PORT, SESSION_SECRET } from "./config";
 import User from "./user";
-import { connectDatabase, testDatabase } from "./database";
+import { connectDatabase } from "./database";
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
@@ -46,9 +46,7 @@ app.use(
     })
 );
 
-connectDatabase()
-    .then(() => testDatabase())
-    .catch(console.error);
+connectDatabase().catch(console.error);
 
 // Set passport strategy
 if (LDAP_OPTIONS) {

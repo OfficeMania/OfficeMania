@@ -12,21 +12,36 @@ enum SyncMode {
     FORCE = "Force syncing",
 }
 
+async function authenticateDatabase(): Promise<void> {
+    return sequelize
+        .authenticate()
+        .then(() => console.log("Connection to the Database has been established successfully"));
+}
+
 async function syncDatabase(syncMode: SyncMode = SyncMode.DEFAULT): Promise<void> {
     return User.sync({ force: syncMode === SyncMode.FORCE, alter: syncMode === SyncMode.ALTER }).then(value => {
         if (!value) {
             console.error(`Something went wrong when ${syncMode.toString().toLowerCase()} the Database`);
         } else if (DEBUG) {
-            console.log(`${syncMode} the Database was successful`);
+            console.debug(`${syncMode} the Database was successful`);
         }
     });
 }
 
-export async function connectDatabase(): Promise<void> {
-    return sequelize
-        .authenticate()
-        .then(() => console.log("Connection to the Database has been established successfully."))
-        .then(() => syncDatabase(SyncMode.DEFAULT));
+async function initDatabase(): Promise<void> {
+    return withTransaction(() => Promise.all([createOfficeManiaUser(), createTestUser()])).then(users => {
+        if (!users || users.length !== 2) {
+            console.error("Something went wrong when creating the default users");
+        } else if (DEBUG) {
+            console.debug("Default users were created successfully");
+        }
+    });
+}
+
+export async function connectDatabase(syncMode: SyncMode = SyncMode.DEFAULT): Promise<void> {
+    return authenticateDatabase()
+        .then(() => syncDatabase(syncMode))
+        .then(() => initDatabase());
 }
 
 export async function disconnectDatabase(): Promise<void> {
@@ -75,18 +90,18 @@ User.init(
     }
 );
 
-async function createTestUser(): Promise<User> {
-    return User.create({ username: "Test Username", password: "Test Password 2" });
+async function createOfficeManiaUser(): Promise<[User, boolean]> {
+    return User.findOrCreate({
+        where: { username: "officemania" },
+        defaults: {
+            password: "$2b$12$.eGqcfCBgcGfTAcz37bn.e0v9c1jgmxeAeIYld/K7XbOVx6f8158.",
+        },
+    });
 }
 
-async function createTestUserWithTransaction(): Promise<User> {
-    return withTransaction(createTestUser);
-}
-
-export async function testDatabase(): Promise<void> {
-    console.debug("Testing the Database...");
-    return syncDatabase(SyncMode.FORCE)
-        .then(() => createTestUserWithTransaction())
-        .then(value => value["dataValues"])
-        .then(console.log);
+async function createTestUser(): Promise<[User, boolean]> {
+    return User.findOrCreate({
+        where: { username: "Test Username" },
+        defaults: { password: "Invalid Bcrypt Password" },
+    });
 }
