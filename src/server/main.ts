@@ -6,12 +6,10 @@ import compression from "compression";
 import path from "path";
 import passport from "passport";
 import { Server } from "colyseus";
-import { compareSync, hashSync } from "bcrypt";
-import sqlite3, { Database } from "sqlite3";
 
 import { TURoom } from "../common/rooms/turoom";
-import { DEBUG, DISABLE_SIGNUP, IS_DEV, LDAP_OPTIONS, SALT_ROUNDS, SERVER_PORT, SESSION_SECRET } from "./config";
-import User, { findOrCreateUserByUsername } from "./user";
+import { DEBUG, DISABLE_SIGNUP, IS_DEV, LDAP_OPTIONS, SERVER_PORT, SESSION_SECRET } from "./config";
+import User, { createUser, findOrCreateUserByUsername, findUserById, findUserByUsername } from "./user";
 import { connectDatabase } from "./database";
 
 const LocalStrategy = require("passport-local").Strategy;
@@ -19,8 +17,6 @@ const LdapStrategy = require("passport-ldapauth").Strategy;
 
 const flash = require("connect-flash");
 const connectionEnsureLogin = require("connect-ensure-login");
-
-const database: Database = new sqlite3.Database("./database.sqlite");
 
 const app = express();
 
@@ -81,26 +77,25 @@ if (LDAP_OPTIONS) {
     console.debug("Using LocalStrategy");
     passport.use(
         new LocalStrategy(function (username, password, done) {
-            database.get("SELECT id, username, password FROM user WHERE username = ?;", username, (err, user: User) => {
-                if (!user || !compareSync(password, user.password)) {
-                    if (!user) {
-                        console.error(`no user found for "${username}"`);
+            findUserByUsername(username)
+                .then(user => {
+                    if (!user || !user.compareSync(password)) {
+                        if (!user) {
+                            console.error(`No user found for username "${username}"`);
+                        }
+                        return done(null, false, { message: "Username or Password incorrect." });
                     }
-                    return done(null, false, { message: "Username or Password incorrect." });
-                }
-                return done(null, { id: user.id, username: user.username });
-            });
+                    return done(null, { id: user.getId(), username: user.getUsername() });
+                })
+                .catch(error => done(error, null));
         })
     );
-    passport.serializeUser((user: User, done) => done(null, user.id));
-    passport.deserializeUser((id: string, done) => {
-        database.get("SELECT id, username FROM user WHERE id = ?;", id, (err, user: User) => {
-            if (!user) {
-                return done(null, false);
-            }
-            return done(null, user);
-        });
-    });
+    passport.serializeUser((user: User, done) => done(null, user.getId()));
+    passport.deserializeUser((id: string, done) =>
+        findUserById(id)
+            .then(user => done(null, user))
+            .catch(error => done(error, null))
+    );
 }
 
 app.use(passport.initialize());
@@ -133,14 +128,15 @@ if (!DISABLE_SIGNUP) {
         if (password.length !== 2 || password[0] !== password[1]) {
             return next(new Error("Passwords do not match"));
         }
-        database.get("SELECT id, username, password FROM user WHERE username = ?", username, (err, user: User) => {
-            if (user) {
-                return next(new Error("User already exists"));
-            }
-            const passwordHash: string = hashSync(password[0], SALT_ROUNDS);
-            database.run("INSERT INTO user (username, password) VALUES (?, ?);", username, passwordHash);
-            next();
-        });
+        findUserByUsername(username)
+            .then(user => {
+                if (user) {
+                    throw new Error("User already exists");
+                }
+                return createUser(username, password[0]);
+            })
+            .then(next)
+            .catch(next);
     });
     app.get("/signup", (req, res) => res.sendFile(path.join(process.cwd(), "public", "signup.html")));
 }
