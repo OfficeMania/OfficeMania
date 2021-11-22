@@ -109,3 +109,11 @@ async function createTestUser(): Promise<[User, boolean]> {
         defaults: { password: "Invalid Bcrypt Password" },
     });
 }
+
+function getFirst<T>(array: [T, boolean]): T {
+    return array[0];
+}
+
+async function findOrCreateUserByUsername(username: string, defaults: any): Promise<User> {
+    return User.findOrCreate({ where: { username }, defaults }).then(getFirst);
+}
