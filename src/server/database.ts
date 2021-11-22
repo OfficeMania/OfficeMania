@@ -30,10 +30,14 @@ async function syncDatabase(syncMode: SyncMode = SyncMode.DEFAULT): Promise<void
 
 async function initDatabase(): Promise<void> {
     return withTransaction(() => Promise.all([createOfficeManiaUser(), createTestUser()])).then(users => {
+        const usersCreated: number = users.reduce(
+            (previousValue, currentValue) => previousValue + (currentValue[1] ? 1 : 0),
+            0
+        );
         if (!users || users.length !== 2) {
             console.error("Something went wrong when creating the default users");
         } else if (DEBUG) {
-            console.debug("Default users were created successfully");
+            console.debug(`${usersCreated} missing default user${usersCreated === 1 ? " was" : "s were"} created`);
         }
     });
 }
