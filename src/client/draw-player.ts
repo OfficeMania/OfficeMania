@@ -12,7 +12,10 @@ function calculateAnimation(player: Player) {
         // standing animation
         mode = "standing";
         // sprite had time to turn before moving, so changeDirection can be false
-        player.changeDirection = false;
+        if (player.changeDirection && player.waitBeforeMoving > 0) {
+            player.changeDirection = false;
+        }
+        player.waitBeforeMoving--;
         direction = player.facing;
         player.standing++;
         if (player.standing >= 10) {
