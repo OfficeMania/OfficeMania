@@ -108,7 +108,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     } else {
                         player.previousDirection = Direction.DOWN;
                         player.changeDirection = true;
-                        player.waitBeforeMoving = 2;
+                        player.waitBeforeMoving = 3;
                     }
                 } else {
                     player.facing = Direction.DOWN
@@ -142,7 +142,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     } else {
                         player.previousDirection = Direction.UP;
                         player.changeDirection = true;
-                        player.waitBeforeMoving = 2;
+                        player.waitBeforeMoving = 3;
                     }
                 } else {
                     player.facing = Direction.UP
@@ -172,7 +172,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     } else {
                         player.previousDirection = Direction.LEFT;
                         player.changeDirection = true;
-                        player.waitBeforeMoving = 2;
+                        player.waitBeforeMoving = 3;
                     }
                 } else {
                     player.facing = Direction.LEFT
@@ -201,7 +201,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     } else {
                         player.previousDirection = Direction.RIGHT;
                         player.changeDirection = true;
-                        player.waitBeforeMoving = 2;
+                        player.waitBeforeMoving = 3;
                     }
                 } else {
                     player.facing = Direction.RIGHT
