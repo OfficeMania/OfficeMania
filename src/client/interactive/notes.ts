@@ -8,7 +8,7 @@ import { Interactive } from "./interactive";
 
 export class Notes extends Interactive {
 
-    static inputs = [" ", "A", "a", "B", "b", "C", "c", "D", "d", "E", "e", "F", "f", "G", "g", "H", "h", "I", "i", "J", "j", "K", "k", "L", "l",
+    inputs = [" ", "A", "a", "B", "b", "C", "c", "D", "d", "E", "e", "F", "f", "G", "g", "H", "h", "I", "i", "J", "j", "K", "k", "L", "l",
     "M", "m", "N", "n", "O", "o", "P", "p", "Q", "q", "R", "r", "S", "s", "T", "t", "U", "u", "V", "v", "W", "w", "X", "x", "Y", "y", "Z", "z",
     "Ä", "ä", "Ü", "ü", "Ö", "ö", "-", "_", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "'", "#", "+", "=", "*", "/", ".", ":", ",", ";",
     "?", "!", "%", "&", "(", ")", "<", ">", "|", "Backspace", "Enter", "ArrowLeft", "ArrowRight"];
@@ -23,7 +23,13 @@ export class Notes extends Interactive {
     room: Room<State>;
     ourPlayer;
     inputLam = (e) => {
-        this.room.send(MessageType.NOTES_ENTER, e.key);
+        if (this.inputs.includes(e.key)) {
+            this.room.send(MessageType.NOTES_ENTER, e.key);
+        }
+        else {
+            //console.log("Cannot type " + e.key);
+        }
+        
         //console.log("sent request to add key");
     }
     constructor() {
