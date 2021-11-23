@@ -98,7 +98,8 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
 
                     player.lastScaledY.pop()
                     player.lastScaledY.unshift(player.scaledY) //stores the previous position
-
+                    
+                    // turn without moving when not facing down
                     if (player.previousDirection === player.facing) {
                         player.scaledY++;
                         room.send(MessageType.MOVE, Direction.DOWN);
@@ -130,7 +131,8 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
 
                     player.lastScaledY.pop()
                     player.lastScaledY.unshift(player.scaledY) //stores the previous position
-
+                    
+                    // turn without moving when not facing up
                     if (player.previousDirection === player.facing) {    
                         player.scaledY--;
                         room.send(MessageType.MOVE, Direction.UP);
@@ -158,7 +160,8 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
 
                     player.lastScaledX.pop()
                     player.lastScaledX.unshift(player.scaledX) //stores the previous position
-
+                    
+                    // turn without moving when not facing left
                     if (player.previousDirection === player.facing) {
                         player.scaledX--;
                         room.send(MessageType.MOVE, Direction.LEFT);
@@ -185,7 +188,8 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
 
                     player.lastScaledX.pop()
                     player.lastScaledX.unshift(player.scaledX) //stores the previous position
-
+                    
+                    // turn without moving when not facing right
                     if (player.previousDirection === player.facing) {
                         player.scaledX++;
                         room.send(MessageType.MOVE, Direction.RIGHT);
@@ -203,18 +207,18 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
         }
     }
     //moves to the next tile
-    if (player.moveDirection ) {
+    if (player.moveDirection && !player.changeDirection) {
         player.moveTime++;
-        if (player.moveDirection === Direction.DOWN && !player.changeDirection) {
+        if (player.moveDirection === Direction.DOWN) {
             player.positionY += PLAYER_MOVEMENT_PER_TICK;
-        } else if (player.moveDirection === Direction.UP && !player.changeDirection) {
+        } else if (player.moveDirection === Direction.UP) {
             player.positionY -= PLAYER_MOVEMENT_PER_TICK;
-        } else if (player.moveDirection === Direction.LEFT && !player.changeDirection) {
+        } else if (player.moveDirection === Direction.LEFT) {
             player.positionX -= PLAYER_MOVEMENT_PER_TICK;
-        } else if (player.moveDirection === Direction.RIGHT && !player.changeDirection) {
+        } else if (player.moveDirection === Direction.RIGHT) {
             player.positionX += PLAYER_MOVEMENT_PER_TICK;
         }
-        if (player.moveTime === FRAMES_PER_MOVE && !player.changeDirection) {
+        if (player.moveTime === FRAMES_PER_MOVE) {
             //centers the player every whole step
             player.positionX = player.scaledX * STEP_SIZE
             player.positionY = player.scaledY * STEP_SIZE
