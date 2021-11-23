@@ -28,7 +28,7 @@ import {
 
 let inputMode: InputMode = InputMode.IGNORE;
 
-export const interactionIgnore: string[] = ["sticky notes"];
+export const interactionIgnore: string[] = ["sticky notes", "notes"];
 
 export let currentInteraction: Interactive = null;
 
