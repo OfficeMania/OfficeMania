@@ -8,10 +8,10 @@ import {
     PlayerRecord,
     removeCloseInteractionButton
 } from "../util";
-/*import {
+import {
     saveButton,
     clearButton
-} from "../static";*/
+} from "../static";
 import {ArraySchema} from "@colyseus/schema";
 import {MessageType} from "../../common/util";
 import {Interactive} from "./interactive";
@@ -34,11 +34,10 @@ export class Whiteboard extends Interactive{
     wID: number = 0;
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
-    //canvas = <HTMLCanvasElement> document.getElementById("whiteboard");
 
-    private clearButton = <HTMLButtonElement>document.getElementById("button-whiteboard-clear");
+    //private clearButton = <HTMLButtonElement>document.getElementById("button-whiteboard-clear");
 
-    private saveButton = <HTMLButtonElement>document.getElementById("button-whiteboard-save");
+    //private saveButton = <HTMLButtonElement>document.getElementById("button-whiteboard-save");
 
 
     mousemove = (e) => this.draw(e, this)
@@ -59,11 +58,11 @@ export class Whiteboard extends Interactive{
         this.room = getRoom();
         this.players = getPlayers();
 
-        this.clearButton.style.top = "30%"
-        this.clearButton.style.left = "20%"
+        clearButton.style.top = "30%"
+        clearButton.style.left = "20%"
 
-        this.saveButton.style.top = "65%"
-        this.saveButton.style.left = "76%"
+        saveButton.style.top = "65%"
+        saveButton.style.left = "76%"
 
         this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
 
@@ -94,8 +93,8 @@ export class Whiteboard extends Interactive{
         this.canvas.removeEventListener('mousedown',this.mousedown);
         this.canvas.removeEventListener('mouseup',this.mouseup);
         this.canvas.removeEventListener('mouseenter',this.mouseenter);
-        this.clearButton.removeEventListener("click", this.clearCommand);
-        this.saveButton.removeEventListener("click", this.saveCommand);
+        clearButton.removeEventListener("click", this.clearCommand);
+        saveButton.removeEventListener("click", this.saveCommand);
 
         window.removeEventListener('resize', this.resized);
 
@@ -103,9 +102,9 @@ export class Whiteboard extends Interactive{
 
         this.isVisible = false;
         this.canvas.style.visibility = "hidden";
-        this.clearButton.style.visibility = "hidden";
-        this.clearButton.setAttribute("aria-label", "");
-        this.clearButton.innerHTML ="";
+        clearButton.style.visibility = "hidden";
+        clearButton.setAttribute("aria-label", "");
+        clearButton.innerHTML ="";
 
         checkInputMode()
 
@@ -132,21 +131,21 @@ export class Whiteboard extends Interactive{
         this.canvas.addEventListener('mousedown',this.mousedown);
         this.canvas.addEventListener('mouseup',this.mouseup);
         this.canvas.addEventListener('mouseenter',this.mouseenter);
-        this.clearButton.addEventListener("click", this.clearCommand);
-        this.saveButton.addEventListener("click", this.saveCommand);
+        clearButton.addEventListener("click", this.clearCommand);
+        saveButton.addEventListener("click", this.saveCommand);
 
         //size changed
         window.addEventListener('resize', this.resized);
 
-        this.clearButton.setAttribute("aria-label", "Clear Whiteboard");
-        this.clearButton.innerHTML = "<em class=\"fa fa-trash\"></em>"
+        clearButton.setAttribute("aria-label", "Clear Whiteboard");
+        clearButton.innerHTML = "<em class=\"fa fa-trash\"></em>"
         this.isVisible = true;
         this.canvas.style.visibility = "visible";
-        this.clearButton.style.visibility = "visible";
+        clearButton.style.visibility = "visible";
 
-        this.saveButton.setAttribute("aria-label", "Clear Whiteboard");
-        this.saveButton.innerHTML = "<em class=\"fas fa-save\"></em>"
-        this.saveButton.style.visibility = "visible";
+        saveButton.setAttribute("aria-label", "Clear Whiteboard");
+        saveButton.innerHTML = "<em class=\"fas fa-save\"></em>"
+        saveButton.style.visibility = "visible";
 
         checkInputMode()
 
@@ -233,8 +232,8 @@ export class Whiteboard extends Interactive{
         whiteboard.stretchX = 1280 / rect.width
         whiteboard.stretchY = 720 / rect.height
 
-        whiteboard.clearButton.style.top = rect.top + "px";
-        whiteboard.saveButton.style.top = rect.top + "px";
+        clearButton.style.top = rect.top + "px";
+        saveButton.style.top = rect.top + "px";
     }
 
     drawOthers(clientID: string, whiteboard: Whiteboard) {
