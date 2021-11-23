@@ -35,11 +35,6 @@ export class Whiteboard extends Interactive{
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
 
-    //private clearButton = <HTMLButtonElement>document.getElementById("button-whiteboard-clear");
-
-    //private saveButton = <HTMLButtonElement>document.getElementById("button-whiteboard-save");
-
-
     mousemove = (e) => this.draw(e, this)
     mousedown = (e) => this.mouseDown(e, this)
     mouseup = (e) => this.mouseUp(e, this)
@@ -105,6 +100,9 @@ export class Whiteboard extends Interactive{
         clearButton.style.visibility = "hidden";
         clearButton.setAttribute("aria-label", "");
         clearButton.innerHTML ="";
+        saveButton.style.visibility = "hidden";
+        saveButton.setAttribute("aria-label", "");
+        saveButton.innerHTML ="";
 
         checkInputMode()
 
