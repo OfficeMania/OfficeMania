@@ -285,7 +285,7 @@ export class Whiteboard extends Interactive{
 
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
-        ctx.strokeStyle = 'color';
+        ctx.strokeStyle = 'black';
 
         ctx.beginPath(); // begin
 
