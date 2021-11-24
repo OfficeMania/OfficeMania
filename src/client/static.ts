@@ -35,3 +35,5 @@ export const background = $<HTMLCanvasElement>("background");
 export const doors = $<HTMLCanvasElement>("doors");
 export const saveButton = $<HTMLButtonElement>("button-whiteboard-save");
 export const clearButton = $<HTMLButtonElement>("button-whiteboard-clear");
+export const eraserButton = $<HTMLButtonElement>("button-whiteboard-eraser");
+export const penButton = $<HTMLButtonElement>("button-whiteboard-pen");

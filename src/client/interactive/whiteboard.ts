@@ -10,7 +10,9 @@ import {
 } from "../util";
 import {
     saveButton,
-    clearButton
+    clearButton,
+    eraserButton,
+    penButton
 } from "../static";
 import {ArraySchema} from "@colyseus/schema";
 import {MessageType} from "../../common/util";
@@ -19,6 +21,7 @@ import {checkInputMode} from "../main";
 
 export class Whiteboard extends Interactive{
 
+    private isPen: boolean = true;
     private isVisible: boolean = false;
     private x: number = 0;
     private y: number = 0;
@@ -35,12 +38,16 @@ export class Whiteboard extends Interactive{
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
 
-    mousemove = (e) => this.draw(e, this)
+    mousemove = (e) => this.useTool(e, this) //TODO
     mousedown = (e) => this.mouseDown(e, this)
     mouseup = (e) => this.mouseUp(e, this)
     mouseenter = (e) => this.mouseEnter(e, this)
     clearCommand = () => this.clearPressed(this)
     saveCommand = () => this.savePressed(this)
+    drawCommand = () => this.drawPressed(this)
+    eraseCommand = () => this.erasePressed(this)
+
+
     resized = () => this.resize(this);
 
     constructor() {
@@ -59,6 +66,13 @@ export class Whiteboard extends Interactive{
         saveButton.style.top = "65%"
         saveButton.style.left = "76%"
 
+        eraserButton.style.top = "55%"
+        eraserButton.style.left = "55%"
+
+        penButton.style.top = "33%"
+        penButton.style.left = "33%"
+
+
         this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
 
         this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
@@ -66,6 +80,10 @@ export class Whiteboard extends Interactive{
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
 
         this.room.onMessage(MessageType.WHITEBOARD_SAVE, (message) => this.save(this, message));
+
+        this.room.onMessage(MessageType.WHITEBOARD_DRAW, (message) => this.draw());
+        
+        this.room.onMessage(MessageType.WHITEBOARD_ERASE, (message) => this.erase());
 
         this.resize(this);
     }
@@ -90,6 +108,8 @@ export class Whiteboard extends Interactive{
         this.canvas.removeEventListener('mouseenter',this.mouseenter);
         clearButton.removeEventListener("click", this.clearCommand);
         saveButton.removeEventListener("click", this.saveCommand);
+        eraserButton.removeEventListener("click", this.eraseCommand);
+        penButton.removeEventListener("click", this.drawCommand);
 
         window.removeEventListener('resize', this.resized);
 
@@ -103,6 +123,12 @@ export class Whiteboard extends Interactive{
         saveButton.style.visibility = "hidden";
         saveButton.setAttribute("aria-label", "");
         saveButton.innerHTML ="";
+        eraserButton.style.visibility = "hidden";
+        eraserButton.setAttribute("aria-label", "");
+        eraserButton.innerHTML ="";
+        penButton.style.visibility = "hidden";
+        penButton.setAttribute("aria-label", "");
+        penButton.innerHTML ="";
 
         checkInputMode()
 
@@ -131,6 +157,8 @@ export class Whiteboard extends Interactive{
         this.canvas.addEventListener('mouseenter',this.mouseenter);
         clearButton.addEventListener("click", this.clearCommand);
         saveButton.addEventListener("click", this.saveCommand);
+        eraserButton.addEventListener("click", this.eraseCommand);
+        penButton.addEventListener("click", this.drawCommand);
 
         //size changed
         window.addEventListener('resize', this.resized);
@@ -144,6 +172,14 @@ export class Whiteboard extends Interactive{
         saveButton.setAttribute("aria-label", "Clear Whiteboard");
         saveButton.innerHTML = "<em class=\"fas fa-save\"></em>"
         saveButton.style.visibility = "visible";
+//TODO: clear whiteboard 
+        eraserButton.setAttribute("aria-label", "Clear Whiteboard");
+        eraserButton.innerHTML = "<em class=\"fas fa-eraser\"></em>"
+        eraserButton.style.visibility = "visible";
+
+        penButton.setAttribute("aria-label", "Clear Whiteboard");
+        penButton.innerHTML = "<em class=\"fas fa-pen\"></em>"
+        penButton.style.visibility = "visible";
 
         checkInputMode()
 
@@ -190,6 +226,16 @@ export class Whiteboard extends Interactive{
         whiteboard.save(whiteboard, whiteboard.wID);
     }
 
+    drawPressed(whiteboard: Whiteboard) {
+        whiteboard.room.send(MessageType.WHITEBOARD_DRAW, whiteboard.wID);
+        whiteboard.draw();
+    }
+
+    erasePressed(whiteboard: Whiteboard) {
+        whiteboard.room.send(MessageType.WHITEBOARD_ERASE, whiteboard.wID);
+        whiteboard.erase();
+    }
+
     clear(whiteboard: Whiteboard, message: number) {
         if(whiteboard.wID !== message){
             return;
@@ -232,9 +278,11 @@ export class Whiteboard extends Interactive{
 
         clearButton.style.top = rect.top + "px";
         saveButton.style.top = rect.top + "px";
+        eraserButton.style.top = rect.top + "px";
+        penButton.style.top = rect.top + "px";
     }
 
-    drawOthers(clientID: string, whiteboard: Whiteboard) {
+    drawOthers(clientID: string, whiteboard: Whiteboard) { //TODO Nach de redraw wird die glöschte linie wieder sichtbar
         if(Whiteboard.currentWhiteboard !== this.wID){
             return;
         }
@@ -289,7 +337,25 @@ export class Whiteboard extends Interactive{
         whiteboard.y = (e.clientY - whiteboard.offsetY) * whiteboard.stretchY;
     }
 
-    private draw(e, whiteboard: Whiteboard) {
+    private useTool(e, whiteboard: Whiteboard) {
+        if (e.buttons !== 1) return;
+        var color
+        if (this.isPen) {
+            //use pen
+            color = "black"          
+        } else {
+            //use eraser
+            color = "white"          
+        }
+        //draw to the canvas
+        whiteboard.setPosition(e, whiteboard);
+        this.drawLine(whiteboard.oldX, whiteboard.oldY, whiteboard.x, whiteboard.y, whiteboard, color)
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
+    }
+
+    /*private draw(e, whiteboard: Whiteboard) {
+
+
         // mouse left button must be pressed
         if (e.buttons !== 1) return;
         whiteboard.setPosition(e, whiteboard);
@@ -297,6 +363,14 @@ export class Whiteboard extends Interactive{
         this.drawLine(whiteboard.oldX, whiteboard.oldY, whiteboard.x, whiteboard.y, whiteboard)
 
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
+    }*/
+
+    private draw () {
+        this.isPen = true;
+    }
+
+    private erase() {
+        this.isPen = false;
     }
 
     makeLine(firstX: number, firstY: number, secondX: number, secondY: number, ctx) {
@@ -304,13 +378,13 @@ export class Whiteboard extends Interactive{
         ctx.lineTo(secondX, secondY); // to
     }
 
-    drawLine(firstX: number, firstY: number, secondX: number, secondY: number, whiteboard: Whiteboard) {
+    drawLine(firstX: number, firstY: number, secondX: number, secondY: number, whiteboard: Whiteboard, color) {
         var ctx = whiteboard.canvas.getContext("2d");
         ctx.beginPath(); // begin
 
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
-        ctx.strokeStyle = 'black';
+        ctx.strokeStyle = color;
 
         ctx.moveTo(firstX, firstY); // from
         ctx.lineTo(secondX, secondY); // to
