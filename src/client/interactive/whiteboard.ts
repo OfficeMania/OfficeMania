@@ -60,11 +60,11 @@ export class Whiteboard extends Interactive{
         this.room = getRoom();
         this.players = getPlayers();
 
-        clearButton.style.top = "30%"
-        clearButton.style.left = "20%"
+        clearButton.style.top = "35%"       //Todo Toolbar
+        clearButton.style.left = "25%"
 
-        saveButton.style.top = "65%"
-        saveButton.style.left = "76%"
+        saveButton.style.top = "60%"
+        saveButton.style.left = "70%"
 
         eraserButton.style.top = "55%"
         eraserButton.style.left = "55%"
@@ -91,11 +91,10 @@ export class Whiteboard extends Interactive{
     onInteraction(){
         if (this.isVisible) {
             this.hide();
-            //this.hideButtons;
-            
+                      
         } else {
             this.show();
-            //this.showButtons();
+
            
             createCloseInteractionButton(() => this.leave());
         }
@@ -140,16 +139,8 @@ export class Whiteboard extends Interactive{
     leave() {
         this.hide();
     }
-    /*private showButtons() {
-        createCloseInteractionButton(() => this.leave());
-        saveButton.style.visibility = "visible";
-        clearButton.style.visibility = "visible";
-    }
-    private hideButtons() {
-        removeCloseInteractionButton();
-        saveButton.style.visibility = "hidden";
-        clearButton.style.visibility = "hidden";
-    }*/
+    
+
     show(){
         this.canvas.addEventListener('mousemove',this.mousemove);
         this.canvas.addEventListener('mousedown',this.mousedown);
@@ -169,15 +160,15 @@ export class Whiteboard extends Interactive{
         this.canvas.style.visibility = "visible";
         clearButton.style.visibility = "visible";
 
-        saveButton.setAttribute("aria-label", "Clear Whiteboard");
+        saveButton.setAttribute("aria-label", "Save Whiteboard");
         saveButton.innerHTML = "<em class=\"fas fa-save\"></em>"
         saveButton.style.visibility = "visible";
 //TODO: clear whiteboard 
-        eraserButton.setAttribute("aria-label", "Clear Whiteboard");
+        eraserButton.setAttribute("aria-label", "Erase Whiteboard");
         eraserButton.innerHTML = "<em class=\"fas fa-eraser\"></em>"
         eraserButton.style.visibility = "visible";
 
-        penButton.setAttribute("aria-label", "Clear Whiteboard");
+        penButton.setAttribute("aria-label", "Draw Whiteboard");
         penButton.innerHTML = "<em class=\"fas fa-pen\"></em>"
         penButton.style.visibility = "visible";
 
@@ -260,7 +251,7 @@ export class Whiteboard extends Interactive{
         // Create a link
         var aDownloadLink = document.createElement('a');
         // Add the name of the file to the link
-        aDownloadLink.download = 'canvas_image.png';
+        aDownloadLink.download = 'whiteboard_image.png';
         // Attach the data to the link
         aDownloadLink.href = image;
         // Get the code to click the download link
@@ -294,7 +285,7 @@ export class Whiteboard extends Interactive{
 
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
-        ctx.strokeStyle = 'black';
+        ctx.strokeStyle = 'color';
 
         ctx.beginPath(); // begin
 
