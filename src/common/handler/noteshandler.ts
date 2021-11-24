@@ -93,40 +93,64 @@ export class NotesHandler implements Handler{
                     this.room.state.notesState.content = content.substring(0,this.room.state.notesState.markers[client.id]) + key + content.substring(this.room.state.notesState.markers[client.id]);
                 }
                 console.log(this.room.state.notesState.content);
-                this.moveEverything(Direction.RIGHT, this.room.state.notesState.markers.get(client.id));
+                this.moveEverything(Direction.RIGHT, marker);
                 console.log(this.room.state.notesState.markers.get(client.id))
 
         }
         
         //TODO: Special cases for enter, left, right arrow, delete, end?, pos1?
-        //TODO: check for overflowing lines
+        //TODO: check for overflowing lines --> client
         
     }
 
     //handles moving all the markers, correcting the line lengths
     //direction: true = added a key, false: removed a key
     //frompos: position of marker before insertion/deletion 
-    private moveEverything (direction: Direction, fromPos: number){
+    private moveEverything(direction: Direction, fromPos: number){
         
         let countingPos = 0;
         let counter = 0;
+        let old: number[] = [];
+        this.room.state.notesState.lengths.forEach((l) => {old.push(l)});
+        let didIt = false;
         //console.log(fromPos)
-        this.room.state.notesState.lengths.forEach((length) => {
-            if (countingPos + length >= fromPos) {
-                //console.log("found in " + counter)
-                if (direction === Direction.RIGHT) {
-                    this.room.state.notesState.lengths.setAt(counter, length + 1);  
+        if (direction === Direction.DOWN) {
+            this.room.state.notesState.lengths.forEach(() => {this.room.state.notesState.lengths.pop();});
+            console.log("moving down");
+             old.forEach((l) => {
+                if (countingPos <= fromPos) {
+                    if (countingPos + l > fromPos) {
+                        this.room.state.notesState.lengths.push((fromPos - countingPos));
+                        counter++;
+                        this.room.state.notesState.lengths.push(l - (fromPos - countingPos));
+                    }
                 }
-                else if (direction === Direction.LEFT) {
-                    this.room.state.notesState.lengths.setAt(counter, length - 1);
+                else {
+                    this.room.state.notesState.lengths.push(l);
                 }
-                else if (direction === Direction.DOWN)
-                //this.room.state.notesState.lengths.forEach((i) => {console.log(i)});
-                return;
-            }
-            //console.log("hi")
-            counter++;
-        });
+                countingPos += l;
+                counter++;
+             });
+        }
+        else {
+            this.room.state.notesState.lengths.forEach((length) => {
+                if (countingPos + length >= fromPos) {
+                    //console.log("found in " + counter)
+                    if (direction === Direction.RIGHT) {
+                        this.room.state.notesState.lengths.setAt(counter, length + 1);  
+                    }
+                    else if (direction === Direction.LEFT) {
+                        this.room.state.notesState.lengths.setAt(counter, length - 1);
+                    }              
+                    return;
+                }
+                countingPos += length;
+                //console.log("hi")
+                counter++;
+            });
+        }
+        
+        
         this.room.state.notesState.markers.forEach((marker, clientid, map) => {
             if (marker >= fromPos) {
                 this.modifyMarker(marker, clientid, direction);
