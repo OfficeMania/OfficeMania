@@ -27,7 +27,7 @@ export class Notes extends Interactive {
             this.room.send(MessageType.NOTES_ENTER, e.key);
         }
         else {
-            //console.log("Cannot type " + e.key);
+            console.log("Cannot type " + e.key);
         }
         
         //console.log("sent request to add key");
@@ -53,11 +53,13 @@ export class Notes extends Interactive {
 
         //this.room.send(MessageType.NOTES_ENTER, "B");
         document.addEventListener("keydown", this.inputLam);
+        this.room.state.notesState.onChange = () => {
+            this.paint();
+            this.drawText();
+        };
     }
 
-    loop() {
-        this.paint();
-        this.drawText();
+    loop() { 
     }
 
     leave() {
@@ -65,6 +67,7 @@ export class Notes extends Interactive {
         this.canvas.style.visibility = "hidden";
         checkInputMode();
         document.removeEventListener("keydown", this.inputLam);
+        this.room.state.notesState.onChange = () => {};
     }
     paint() {
         this.ctx.fillStyle = "black";
@@ -98,8 +101,30 @@ export class Notes extends Interactive {
 
         let i = 0;
         let j = 0;
+        let lineheight = 30;
         while(i < subs.length) {
-            this.ctx.fillText(subs[i], 100, 100 + (50 * j));
+            let l = subs[i].length;
+            let c = 1;
+            while (l > 0) {
+                if (l > 80) {
+                    this.ctx.fillText(subs[i].substr(80 * (c - 1), 80), 100, 100 + (lineheight * j));
+                    j++;
+                    c++;
+                }
+                else {
+                    this.ctx.fillText(subs[i].substr(80 * (c - 1)), 100, 100 + (lineheight * j));
+                }
+                l -= 80;
+
+            }/*
+            if (subs[i].length > 80) {
+                this.ctx.fillText(subs[i].substr(0, 79), 100, 100 + (lineheight * j));
+                j++;
+                this.ctx.fillText(subs[i].substr(79), 100, 100 + (lineheight * j));
+            }
+            else {
+                this.ctx.fillText(subs[i], 100, 100 + (lineheight * j));
+            }*/
             j++;
             i++;
         }
