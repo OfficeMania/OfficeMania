@@ -1,5 +1,5 @@
 import { checkInputMode } from "./main";
-import { textchatBar } from "./static";
+import { textchatBar, textchatContainer } from "./static";
 
 
 let showTextchat = false;
@@ -8,6 +8,9 @@ export function toggleTextchatBar() {
     //console.log("hi")
     if(getShowTextchatBar()) setShowTextchatBar(false);
     else setShowTextchatBar(true);
+    let a = document.createElement('p');
+    a.innerText = "Hallo";
+    textchatBar.prepend(a);
     checkInputMode();
 }
 
@@ -17,10 +20,10 @@ export function getShowTextchatBar(): boolean{
 
 function setShowTextchatBar(set: boolean) {
     if(set) {
-        textchatBar.classList.add("hover");
+        textchatContainer.classList.add("hover");
     }
     else {
-        textchatBar.classList.remove("hover");
+        textchatContainer.classList.remove("hover");
     }
     showTextchat = set;
 }

@@ -644,3 +644,17 @@ body {
     margin-left: 3%;
     height: 40px;
 }
+#messages-bar {
+    width: 90%;
+    overflow-wrap: anywhere;
+    margin: 5%;
+    height: calc(100% - 90px);
+    display: flex;
+    flex-direction: column-reverse;
+    align-content: flex-start;
+
+}
+#messages-bar p{
+    color: white;
+    overflow: visible;
+}
