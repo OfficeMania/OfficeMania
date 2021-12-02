@@ -131,6 +131,9 @@ body {
 #button-users:hover span:after {
     content: '  Users';
 }
+#button-textchat:hover span::after {
+    content: '  Chat';
+}
 
 #button-help:hover span:after {
     content: '  Help';
@@ -453,6 +456,14 @@ body {
     margin: 5px 10px 5px 0;
 }
 
+#textchat-container {
+    position: fixed;
+    background-color: var(--bg-primary-op);
+
+    transition: width 600ms ease, height 500ms ease;
+    overflow: hidden;
+}
+
 #chat-container {
     position: fixed;
     bottom: 0;
@@ -490,6 +501,16 @@ body {
     #player-online-list {
         flex-direction: row;
     }
+
+    #textchat-container {
+        bottom: 0;
+        width: 100vm;
+        height: 5rem;
+    }
+
+    #textchat-container {
+        flex-direction: row;
+    }
 }
 
 /* Large screens */
@@ -516,6 +537,30 @@ body {
 
     #player-online-container.hover.vertical-animation {
         height: calc(100vh - 64px);
+    }
+
+    #textchat-container {
+        right: 0;
+    }
+
+    #textchat-container.horizontal-animation {
+        bottom: 0;
+        width: 0;
+        height: calc(100vh - 64px);
+    }
+
+    #textchat-container.vertical-animation {
+        top: 64px;
+        width: 36rem;
+        height: 0;
+    }
+
+    #textchat-container.hover.horizontal-animation {
+        width: 36rem;
+    }
+
+    #textchat-container.hover.vertical-animation {
+        height: calc(100vh -64px);
     }
 
 }
@@ -568,4 +613,11 @@ body {
 @font-face {
     font-family: MobileFont;
     src: url(../assets/fonts/MobileFont.ttf);
+}
+
+#typing-field {
+    resize: none;
+    width: 100%;
+    position:fixed;
+    bottom: 0;
 }
