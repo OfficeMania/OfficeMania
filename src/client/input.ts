@@ -123,7 +123,7 @@ export function loadInputFunctions() {
             }
         }
         if (inputMode === InputMode.IGNORE || (inputMode === InputMode.INTERACTION && interactionIgnore.includes(checkInteraction()?.content?.name))){
-            console.log("exiting");
+            //console.log("exiting");
             return;
         }
         const ourPlayer = getOurPlayer();

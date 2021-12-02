@@ -13,6 +13,9 @@ export function toggleTextchatBar() {
     textchatBar.prepend(a);
     checkInputMode();
 }
+export function sendMessage(message: string) {
+    console.log(message);
+}
 
 export function getShowTextchatBar(): boolean{
     return showTextchat;

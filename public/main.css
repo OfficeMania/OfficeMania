@@ -646,12 +646,14 @@ body {
 }
 #messages-bar {
     width: 90%;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     margin: 5%;
-    height: calc(100% - 90px);
+    margin-bottom: 0%;
+    height: calc(100% - 70px);
     display: flex;
     flex-direction: column-reverse;
     align-content: flex-start;
+    overflow: auto;
 
 }
 #messages-bar p{
