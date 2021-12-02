@@ -5,7 +5,7 @@ import { textchatBar } from "./static";
 let showTextchat = false;
 export var inFocus = false; 
 export function toggleTextchatBar() {
-    console.log("hi")
+    //console.log("hi")
     if(getShowTextchatBar()) setShowTextchatBar(false);
     else setShowTextchatBar(true);
     checkInputMode();

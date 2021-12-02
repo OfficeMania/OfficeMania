@@ -65,6 +65,7 @@ body {
 }
 
 #panel-buttons button,
+#textchat-bar button,
 #interactive-bar button {
     height: 40px;
     width: 40px;
@@ -81,11 +82,13 @@ body {
 }
 
 #panel-buttons button:hover,
+#textchat-bar button:hover,
 #interactive-bar button:hover {
     transition: 0.5s;
 }
 
 #panel-buttons button span,
+#textchat-bar button span,
 #interactive-bar span {
     display: none;
     position: absolute;
@@ -98,11 +101,13 @@ body {
 }
 
 #panel-buttons button:hover span,
+#textchat-bar button:hover span,
 #interactive-bar button:hover span {
     display: block;
 }
 
 #panel-buttons button span:after,
+#textchat-bar button span:after,
 #interactive-bar button span:after {
     transition: 0.5s;
     right: 0;
@@ -140,7 +145,18 @@ body {
 }
 
 #close:hover span:after {
-    content: '  Close'
+    content: '  Close';
+}
+
+#button-send:hover span:after {
+    content: '  Send';
+}
+
+#button-send {
+    position: relative;
+    padding-right: 5px;
+    left: 84.3%;
+    bottom: 5px;
 }
 
 #button-chess-export:hover span:after {
@@ -464,6 +480,12 @@ body {
     overflow: hidden;
 }
 
+#textchat-bar {
+    position: absolute;
+    bottom:0px;
+    width: 100%;
+}
+
 #chat-container {
     position: fixed;
     bottom: 0;
@@ -617,7 +639,8 @@ body {
 
 #typing-field {
     resize: none;
-    width: 100%;
-    position:fixed;
-    bottom: 0;
+    width: 80%;
+    position: inherit;
+    margin-left: 3%;
+    height: 40px;
 }
