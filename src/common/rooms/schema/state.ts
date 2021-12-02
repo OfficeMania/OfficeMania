@@ -147,6 +147,19 @@ export class ChessState extends Schema {
 
 }
 
+export class ChatState extends Schema {
+    //for later modularity
+    @type({array: "string"})
+    participants: ArraySchema<string> = new ArraySchema<string>();
+
+    @type({array: "string"})
+    contents: ArraySchema<string> = new ArraySchema<string>();
+
+    //SOMEHOW NEEDED, onchange doesnt recognise changing of arrayschema
+    @type("boolean")
+    change: boolean;
+}
+
 /*
  * The state of a room. Each variable that is annotated with a @type decorator
  * automatically gets synced with the clients.
@@ -190,5 +203,8 @@ export class State extends Schema {
 
     @type(NotesState)
     notesState: NotesState = new NotesState();
+
+    @type(ChatState)
+    chatState: ChatState = new ChatState();
 
 }

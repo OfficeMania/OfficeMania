@@ -57,9 +57,6 @@ import {
     settingsModal,
     settingsOkButton,
     shareButton,
-    textchatArea,
-    textchatButton,
-    textchatSendButton,
     usernameInput,
     usernameInputWelcome,
     usersButton,
@@ -70,7 +67,7 @@ import {
 import {updateDoors} from "./interactive/door";
 import {initLoadingScreenLoading, setShowLoadingscreen} from "./loadingscreen";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
-import { getInFocus, sendMessage, setInFocus, toggleTextchatBar } from "./textchat";
+import { getInFocus, initChatListener } from "./textchat";
 
 export const characters: { [key: string]: AnimatedSpriteSheet } = {}
 export const START_POSITION_X = 5;
@@ -97,17 +94,13 @@ function toggleMute(type: string) {
     updateButtons();
 }
 
+
+
 // Settings
 
 settingsButton.addEventListener("click", () => onSettingsOpen());
 usersButton.addEventListener("click", () => toggleShowParticipantsTab());
-textchatButton.addEventListener("click", () => toggleTextchatBar());
-textchatArea.onfocus = function(){setInFocus(true)};
-textchatArea.onblur = function() {setInFocus(false)};
-textchatSendButton.addEventListener("click", () => {
-    sendMessage(textchatArea.value);
-    textchatArea.value = "";
-});
+
 
 settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
@@ -279,6 +272,11 @@ async function main() {
 
     getUsernameIntern = () => ourPlayer.name;
     getCharacterIntern = () => ourPlayer.character;
+
+    //INITIATE CHAT
+
+    initChatListener();
+
 
     //loads all the character information
     await loadCharacter();

@@ -59,6 +59,8 @@ export enum MessageType {
     NOTES_ENTER = "notesEnter",
     NOTES_SET = "notesSet",
     NOTES_MARKER = "notesMarker",
+    //ChatHandler
+    CHAT_SEND = "chatSend",
 }
 export enum GameMode {
     SINGLE = 1,
