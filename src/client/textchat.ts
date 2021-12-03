@@ -26,6 +26,9 @@ export function initChatListener() {
     });
     textchatMenuButton.addEventListener("click", () => toggleChatMenu());
     textchatDropdownBar
+    getRoom().onMessage(MessageType.CHAT_LOG, (message) => {
+        console.log(message);
+    })
     
     //write chatlog in client 
     let counter = 0;

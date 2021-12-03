@@ -28,6 +28,9 @@ export class ChatHandler implements Handler {
 }
 function onSend(room: Room, client: Client, message: string) {
     console.log("Message recieved: " + message);
+    if(message === "gimmelog") {
+        client.send(MessageType.CHAT_LOG, room.state.chatState);
+    }
     room.state.chatState.contents.push(makeMessage(room, client, message));
 
     /*room.state.chatState.contents.forEach(e => {
