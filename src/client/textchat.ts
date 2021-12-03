@@ -2,6 +2,7 @@ import { MessageType } from "../common/util";
 import { checkInputMode } from "./main";
 import { textchatArea, textchatBar, textchatButton, textchatContainer, textchatDropdownBar, textchatMenuButton, textchatSendButton } from "./static";
 import { getRoom } from "./util";
+import { ChatState } from "../common/handler/chatHandler";
 
 //tracks if button/shortcut have been pressed
 let _showTextchat = false;
@@ -10,6 +11,8 @@ let _showTextchat = false;
 var _inFocus = false; 
 
 var _menuOpen = false;
+
+var _clientLogs = new Map();
 
 //initializes all needed functions for the chat
 export function initChatListener() {
@@ -21,27 +24,29 @@ export function initChatListener() {
     textchatArea.onblur = function() {setInFocus(false)};
     
     textchatSendButton.addEventListener("click", () => {
-        sendMessage(textchatArea.value);
+        sendMessage(textchatArea.value, 0);
         textchatArea.value = "";
     });
     textchatMenuButton.addEventListener("click", () => toggleChatMenu());
     textchatDropdownBar
     getRoom().onMessage(MessageType.CHAT_LOG, (message) => {
         console.log(message);
-    })
+    });
+
     
-    //write chatlog in client 
+    
+    /*//write chatlog in client 
     let counter = 0;
     getRoom().state.chatState.contents.forEach((e) => {
         console.log("gogo " + counter)
         writeMessage(counter);
         counter++;
-    });
+    });*/
 
     //primitive updating of the chat
-    getRoom().state.chatState.onChange = () => {
-
-        writeMessage();
+    getRoom().onMessage(MessageType.CHAT_NEW, (message) => {
+        //TODO Decode message for key
+        writeMessage(message);
 
         //FOR LATER USE, WITH MULTIPLE GROUPS
         /**
@@ -53,7 +58,7 @@ export function initChatListener() {
             }
         });
         */
-    };
+    });
 }
 
 //getter for _inFocus
@@ -63,14 +68,11 @@ export function getInFocus() {
 
 //write message from contents at position x, if not specified, last will be written
 //will need to accept key/position of chatgroupstate
-function writeMessage(pos: number = -1) {
-    let room = getRoom();
-    let con = room.state.chatState.contents;
-    if (pos === -1) {
-        pos = con.length - 1;
-    }
+function writeMessage(message: string) {
+    let pos = message.substr(0, 1);
     let messageLine = document.createElement('p');
-    let messageString = con.at(pos);
+    let messageString = message.substr(1);
+    console.log(messageString);
     let formattedMessage = "(" + messageString.substring(0,5) + ") " + messageString.substring(6)
     messageLine.innerText = formattedMessage;
     textchatBar.prepend(messageLine);
@@ -90,10 +92,10 @@ function toggleTextchatBar() {
 }
 
 //sends text message to server (if its not empty)
-function sendMessage(message: string) {
+function sendMessage(message: string, pos: number) {
     //console.log(message);
     if (message && message !== "") {
-        getRoom().send(MessageType.CHAT_SEND, message);
+        getRoom().send(MessageType.CHAT_SEND, pos + message);
     }
 }
 

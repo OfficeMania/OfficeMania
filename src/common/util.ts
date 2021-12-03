@@ -62,6 +62,7 @@ export enum MessageType {
     //ChatHandler
     CHAT_SEND = "chatSend",
     CHAT_LOG = "chatLog",
+    CHAT_NEW = "chatNew",
 }
 export enum GameMode {
     SINGLE = 1,
