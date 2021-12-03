@@ -27,8 +27,10 @@ export function initChatListener() {
     textchatMenuButton.addEventListener("click", () => toggleChatMenu());
     textchatDropdownBar
     
+    //write chatlog in client 
     let counter = 0;
     getRoom().state.chatState.contents.forEach((e) => {
+        console.log("gogo " + counter)
         writeMessage(counter);
         counter++;
     });
@@ -57,16 +59,16 @@ export function getInFocus() {
 }
 //write message from contents at position x, if not specified, last will be written
 //will need to accept key/position of chatgroupstate
-function writeMessage(pos?:number) {
+function writeMessage(pos: number = -1) {
     let room = getRoom();
     let con = room.state.chatState.contents;
-    if (!pos) {
+    if (pos === -1) {
         pos = con.length - 1;
     }
     let a = document.createElement('p');
     a.innerText = con.at(pos);
     textchatBar.prepend(a);
-    console.log("writing message");
+    console.log("writing message" + pos);
 }
 function setInFocus(set){
     _inFocus = set;
