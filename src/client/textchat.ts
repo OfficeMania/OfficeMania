@@ -60,6 +60,7 @@ export function initChatListener() {
 export function getInFocus() {
     return _inFocus;
 }
+
 //write message from contents at position x, if not specified, last will be written
 //will need to accept key/position of chatgroupstate
 function writeMessage(pos: number = -1) {
@@ -68,15 +69,18 @@ function writeMessage(pos: number = -1) {
     if (pos === -1) {
         pos = con.length - 1;
     }
-    let a = document.createElement('p');
-    a.innerText = con.at(pos);
-    textchatBar.prepend(a);
+    let messageLine = document.createElement('p');
+    let messageString = con.at(pos);
+    let formattedMessage = "(" + messageString.substring(0,5) + ") " + messageString.substring(6)
+    messageLine.innerText = formattedMessage;
+    textchatBar.prepend(messageLine);
     console.log("writing message" + pos);
 }
+
 function setInFocus(set){
     _inFocus = set;
     checkInputMode();
-} 
+}  
 
 //toggles chat visibility
 function toggleTextchatBar() {

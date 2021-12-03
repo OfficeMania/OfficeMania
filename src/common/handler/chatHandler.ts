@@ -41,14 +41,20 @@ function onSend(room: Room, client: Client, message: string) {
     room.state.chatState.change = !room.state.chatState.change;
     
 }
+
 //message assembly for storage
 function makeMessage(room: Room, client: Client, message: string): string{
     let m: string = "";
-    m = room.state.players[client.sessionId].name;
     const date = new Date();
-
-    m += ":" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + "-";
+    m += addZero(date.getHours()) + ":" + addZero(date.getMinutes()) + ":" + room.state.players[client.sessionId].name + ": ";
     m += message;
     //console.log(m);
     return m;
 }
+
+
+function addZero(i) {
+    if (i < 10) {i = "0" + i}
+    return i;
+}
+  
