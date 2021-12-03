@@ -637,6 +637,24 @@ body {
     src: url(../assets/fonts/MobileFont.ttf);
 }
 
+#menu-bar {
+    position: absolute;
+    width: 100%;
+}
+#button-chat-menu {
+    width: 100%;
+}
+#dropdown-bar {
+    width: 100%;
+    height: 500%;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+#dropdown-bar button {
+    width: 100%;
+}
 #typing-field {
     resize: none;
     width: 80%;

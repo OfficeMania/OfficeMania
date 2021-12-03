@@ -1,6 +1,6 @@
 import { MessageType } from "../common/util";
 import { checkInputMode } from "./main";
-import { textchatArea, textchatBar, textchatButton, textchatContainer, textchatSendButton } from "./static";
+import { textchatArea, textchatBar, textchatButton, textchatContainer, textchatDropdownBar, textchatMenuButton, textchatSendButton } from "./static";
 import { getRoom } from "./util";
 
 //tracks if button/shortcut have been pressed
@@ -8,6 +8,8 @@ let _showTextchat = false;
 
 //tracks if client is using text area, for changing of inputmode
 var _inFocus = false; 
+
+var _menuOpen = false;
 
 //initializes all needed functions for the chat
 export function initChatListener() {
@@ -22,7 +24,8 @@ export function initChatListener() {
         sendMessage(textchatArea.value);
         textchatArea.value = "";
     });
-
+    textchatMenuButton.addEventListener("click", () => toggleChatMenu());
+    textchatDropdownBar
     //TODO::: GET CHAT FROM STATE WHEN LOADING IN FOR THE FIRST TIME
 
 
@@ -86,6 +89,15 @@ function setShowTextchatBar(set: boolean) {
         textchatContainer.classList.remove("hover");
     }
     _showTextchat = set;
+}
+function toggleChatMenu(){
+    if(_menuOpen) {
+        textchatDropdownBar.style.visibility = "hidden";
+    }
+    else {
+        textchatDropdownBar.style.visibility = "";
+    }
+    _menuOpen = !_menuOpen;
 }
 
 function onStateChange(){
