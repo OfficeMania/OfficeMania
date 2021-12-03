@@ -640,20 +640,14 @@ body {
 #menu-bar {
     position: absolute;
     width: 100%;
+    background-color: black;
 }
-#button-chat-menu {
-    width: 100%;
+#select-textchat{
+    float: left;
+    width: 90%;
 }
-#dropdown-bar {
-    width: 100%;
-    height: 500%;
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-}
-#dropdown-bar button {
-    width: 100%;
+#button-create-chat {
+    width: auto;
 }
 #typing-field {
     resize: none;

@@ -1,7 +1,7 @@
 import { MessageType } from "../common/util";
 import { checkInputMode } from "./main";
-import { textchatArea, textchatBar, textchatButton, textchatContainer, textchatDropdownBar, textchatMenuButton, textchatSendButton } from "./static";
-import { getRoom } from "./util";
+import { textchatArea, textchatBar, textchatButton, textchatContainer, textchatCreateButton, textchatSelect, textchatMenuButton, textchatSendButton } from "./static";
+import { getOurPlayer, getRoom } from "./util";
 import { ChatState } from "../common/handler/chatHandler";
 
 //tracks if button/shortcut have been pressed
@@ -18,7 +18,23 @@ var _clientLogs = new Map();
 export function initChatListener() {
 
     textchatButton.addEventListener("click", () => toggleTextchatBar());
-
+    while (textchatSelect.firstChild){
+        textchatSelect.firstChild.remove();
+    }
+    console.log("hello");
+    const option = document.createElement("option"); 
+    option.innerText = "globul";
+    option.value = "ungabunga";
+    textchatSelect.append(option);
+    getRoom().state.players.forEach((value, key) => {
+        if (key === getOurPlayer().id) {
+            return;
+        }
+        const option = document.createElement("option"); 
+        option.innerText = getRoom().state.players[key].name;
+        option.value = key;
+        textchatSelect.append(option);
+    })
     //changing of inputmode if text area is in use or not
     textchatArea.onfocus = function(){setInFocus(true)};
     textchatArea.onblur = function() {setInFocus(false)};
@@ -27,10 +43,12 @@ export function initChatListener() {
         sendMessage(textchatArea.value, 0);
         textchatArea.value = "";
     });
-    textchatMenuButton.addEventListener("click", () => toggleChatMenu());
-    textchatDropdownBar
+    
     getRoom().onMessage(MessageType.CHAT_LOG, (message) => {
         console.log(message);
+    });
+    textchatCreateButton.addEventListener("click", () => {
+        
     });
 
     
@@ -113,16 +131,6 @@ function setShowTextchatBar(set: boolean) {
         textchatContainer.classList.remove("hover");
     }
     _showTextchat = set;
-}
-
-function toggleChatMenu(){
-    if(_menuOpen) {
-        textchatDropdownBar.style.visibility = "hidden";
-    }
-    else {
-        textchatDropdownBar.style.visibility = "";
-    }
-    _menuOpen = !_menuOpen;
 }
 
 function onStateChange(){

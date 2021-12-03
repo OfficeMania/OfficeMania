@@ -67,9 +67,9 @@ export class ChatHandler implements Handler {
             });
         }     
     }
-    onLog(client: Client, message?: number){
-        if(message) {
-            client.send(this.chats[message]);
+    onLog(client: Client, position?: number){
+        if(position) {
+            client.send(this.chats[position]);
         }
         else {
             //Send all chats as arrayschema
