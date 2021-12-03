@@ -26,16 +26,17 @@ export function initChatListener() {
     });
     textchatMenuButton.addEventListener("click", () => toggleChatMenu());
     textchatDropdownBar
-    //TODO::: GET CHAT FROM STATE WHEN LOADING IN FOR THE FIRST TIME
-
+    
+    let counter = 0;
+    getRoom().state.chatState.contents.forEach((e) => {
+        writeMessage(counter);
+        counter++;
+    });
 
     //primitive updating of the chat
     getRoom().state.chatState.onChange = () => {
-        let room = getRoom();
-        let con = room.state.chatState.contents;
-        let a = document.createElement('p');
-        a.innerText = con.at(con.length - 1);
-        textchatBar.prepend(a);
+
+        writeMessage();
 
         //FOR LATER USE, WITH MULTIPLE GROUPS
         /**
@@ -54,7 +55,19 @@ export function initChatListener() {
 export function getInFocus() {
     return _inFocus;
 }
-
+//write message from contents at position x, if not specified, last will be written
+//will need to accept key/position of chatgroupstate
+function writeMessage(pos?:number) {
+    let room = getRoom();
+    let con = room.state.chatState.contents;
+    if (!pos) {
+        pos = con.length - 1;
+    }
+    let a = document.createElement('p');
+    a.innerText = con.at(pos);
+    textchatBar.prepend(a);
+    console.log("writing message");
+}
 function setInFocus(set){
     _inFocus = set;
     checkInputMode();
@@ -90,6 +103,7 @@ function setShowTextchatBar(set: boolean) {
     }
     _showTextchat = set;
 }
+
 function toggleChatMenu(){
     if(_menuOpen) {
         textchatDropdownBar.style.visibility = "hidden";
