@@ -85,9 +85,9 @@ export class ChatHandler implements Handler {
             //TODO
             return;
         }
-        console.log("Message received:", message);
+        console.debug("Message received:", message);
         const chatId: string = chatMessage.chatId || this.globalChat.id;
-        console.log("chatId:", chatId);
+        console.debug("chatId:", chatId);
         const chat: Chat = this.byChatId(chatId);
         if (!chat) {
             //TODO
@@ -99,11 +99,19 @@ export class ChatHandler implements Handler {
             client.send(MessageType.CHAT_LOG, chat);
         }
         */
+        const userId: string = getUserId(client);
+        if (!chat.users.includes(userId)) {
+            chat.users.push(userId);
+        }
         const serverMessage: ChatMessage = makeMessage(this.room, client, chatMessage);
         chat.messages.push(serverMessage);
-        chat.messages.forEach(chatMessage => console.log("chatMessage:", JSON.stringify(chatMessage)));
+        //chat.messages.forEach(chatMessage => console.log("chatMessage:", JSON.stringify(chatMessage)));
         if (chatId === this.globalChat.id) {
             this.room.clients.forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
+        } else {
+            this.room.clients
+                .filter(client => chat.users.includes(getUserId(client)))
+                .forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
         }
     }
 
@@ -113,29 +121,31 @@ export class ChatHandler implements Handler {
             const chat: Chat = this.byChatId(chatId);
             client.send(MessageType.CHAT_LOG, JSON.stringify(chat.messages));
         } else {
-            const userId: string = this.room.state.players[client.sessionId].name;
+            const userId: string = getUserId(client);
             console.log("Request log for User:", userId);
             const chats: Chat[] = this.byUserId(userId);
             if (!chats.includes(this.globalChat)) {
-                chats.push(this.globalChat);
+                chats.unshift(this.globalChat);
             }
             client.send(MessageType.CHAT_LOG, JSON.stringify(chats.flatMap(chat => chat.messages)));
         }
     }
 
     onChatUpdate(client: Client) {
-        const userId: string = this.room.state.players[client.sessionId].name;
+        const userId: string = getUserId(client);
         console.log("Request chat update for User:", userId);
         const chats: Chat[] = this.byUserId(userId);
-        if (!chats.includes(this.globalChat)) {
-            chats.push(this.globalChat);
-        }
+        chats.unshift(this.globalChat);
         const chatDTOs: ChatDTO[] = chats.map(chat => ({
             id: chat.id,
             name: chat.name,
         }));
         client.send(MessageType.CHAT_UPDATE, JSON.stringify(chatDTOs));
     }
+}
+
+function getUserId(client: Client): string {
+    return client.sessionId;
 }
 
 //message assembly for storage
