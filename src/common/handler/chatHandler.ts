@@ -2,6 +2,7 @@ import { Client, Room } from "colyseus";
 import { ArraySchema, Schema, type } from "@colyseus/schema";
 import { MessageType } from "../util";
 import { Handler } from "./handler";
+import { State } from "../rooms/schema/state";
 
 export interface ChatMessage {
     pos: number;
@@ -23,22 +24,22 @@ export class ChatState extends Schema {
 }
 
 export class ChatHandler implements Handler {
-    room: Room;
-    chats: ArraySchema<ChatState> = new ArraySchema<ChatState>();
+    room: Room<State>;
+    globalChat: ChatState;
 
-    init(room: Room) {
+    private chats(): ArraySchema<ChatState> {
+        return this.room.state.chatStates;
+    }
+
+    init(room: Room<State>) {
         this.room = room;
-        let a = new ChatState();
-        this.chats.push(a);
     }
 
     onCreate(options?: any) {
-        this.room.onMessage(MessageType.CHAT_SEND, (client: Client, message: ChatMessage) => {
-            this.onSend(client, message);
-        });
-        this.room.onMessage(MessageType.CHAT_LOG, (client: Client, message: number) => {
-            this.onLog(client, message);
-        });
+        this.globalChat = new ChatState();
+        this.chats().push(this.globalChat);
+        this.room.onMessage(MessageType.CHAT_SEND, (client, message) => this.onSend(client, message));
+        this.room.onMessage(MessageType.CHAT_LOG, (client, message) => this.onLog(client, message));
     }
 
     onJoin() {}
@@ -51,20 +52,22 @@ export class ChatHandler implements Handler {
         const message: string = chatMessage.message;
         console.log("Message recieved: " + message);
         if (message === "gimmelog") {
-            client.send(MessageType.CHAT_LOG, this.room.state.chatState);
+            //client.send(MessageType.CHAT_LOG, this.room.state.chatStates);
         }
         const pos: number = chatMessage.pos;
         console.log(pos);
-        if (!this.chats.at(pos)) {
+        if (!this.chats().at(pos)) {
             //TODO
             return;
         }
         let newMessage = makeMessage(this.room, client, message.substr(1));
-        this.chats.at(pos).contents.push(newMessage);
+        this.chats().at(pos).contents.push(newMessage);
 
-        this.chats.at(pos).contents.forEach(e => {
-            console.log("content: " + e);
-        });
+        this.chats()
+            .at(pos)
+            .contents.forEach(e => {
+                console.log("content: " + e);
+            });
         if (pos === 0) {
             this.room.clients.forEach(client => {
                 client.send(MessageType.CHAT_NEW, pos + newMessage);
@@ -74,7 +77,7 @@ export class ChatHandler implements Handler {
 
     onLog(client: Client, position?: number) {
         if (position) {
-            client.send(this.chats[position]);
+            client.send(this.chats()[position]);
         } else {
             //Send all chats as arrayschema
         }
