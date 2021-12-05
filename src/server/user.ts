@@ -51,16 +51,14 @@ export default class User extends Model {
     private upgradePasswordOnce(): boolean {
         const password: string = this.getPassword();
         const version: PasswordVersion = this.getPasswordVersion();
+        const nextVersion: PasswordVersion = version + 1;
         switch (version) {
             case PasswordVersion.NONE:
                 return false;
             case PasswordVersion.PLAIN:
-                this.setPassword(hashPasswordSync(password));
-                this.setPasswordVersion(PasswordVersion.BCRYPT);
-                return true;
             case PasswordVersion.BCRYPT:
-                this.setPassword(encryptPassword(password));
-                this.setPasswordVersion(PasswordVersion.ENCRYPTED_BCRYPT);
+                this.setPassword(serializePassword(password, nextVersion));
+                this.setPasswordVersion(nextVersion);
                 return true;
             case PasswordVersion.ENCRYPTED_BCRYPT:
                 return false;
@@ -127,10 +125,6 @@ export function findUserByUsername(username: string): Promise<User> {
     return User.findOne({ where: { username } });
 }
 
-function hashPasswordSync(password: string): string {
-    return hashSync(password, BCRYPT_SALT_ROUNDS);
-}
-
 function encryptPassword(password: string): string {
     return CryptoJS.AES.encrypt(password, PASSWORD_SECRET).toString();
 }
@@ -162,7 +156,7 @@ function serializePassword(password: string, version: PasswordVersion): string {
             return password;
         case PasswordVersion.BCRYPT:
         case PasswordVersion.ENCRYPTED_BCRYPT:
-            const passwordHash: string = hashPasswordSync(password);
+            const passwordHash: string = hashSync(password, BCRYPT_SALT_ROUNDS);
             if (version === PasswordVersion.BCRYPT) {
                 return passwordHash;
             }
