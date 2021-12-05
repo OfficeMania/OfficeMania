@@ -64,7 +64,7 @@ export function initChatListener() {
     };
 
     textchatSendButton.addEventListener("click", () => {
-        sendMessage(textchatArea.value, "global");
+        sendMessage(textchatArea.value, undefined);
         textchatArea.value = "";
     });
 

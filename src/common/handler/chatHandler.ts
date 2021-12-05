@@ -86,7 +86,7 @@ export class ChatHandler implements Handler {
             return;
         }
         console.log("Message received:", message);
-        const chatId: string = chatMessage.chatId;
+        const chatId: string = chatMessage.chatId || this.globalChat.id;
         console.log("chatId:", chatId);
         const chat: Chat = this.byChatId(chatId);
         if (!chat) {
