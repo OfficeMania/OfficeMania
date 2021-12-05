@@ -17,8 +17,16 @@ export default class User extends Model {
         return this["password"];
     }
 
+    private setPassword(password: string): void {
+        this["password"] = password;
+    }
+
     private getPasswordVersion(): PasswordVersion {
         return this["passwordVersion"];
+    }
+
+    private setPasswordVersion(version: PasswordVersion): void {
+        this["passwordVersion"] = version;
     }
 
     public checkPassword(password: string): boolean {
