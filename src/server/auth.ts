@@ -15,22 +15,22 @@ export function setupAuth(app: Express): void {
         });
     }
     app.post(
-        "/login",
+        "/auth/login",
         passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", {
             successRedirect: "/",
-            failureRedirect: "/login",
+            failureRedirect: "/auth/login",
             failureFlash: true,
         })
     );
-    app.get("/login.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.css")));
-    app.get("/login", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.html")));
+    app.get("/auth/login.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.css")));
+    app.get("/auth/login", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.html")));
 
     if (!DISABLE_SIGNUP) {
-        app.post("/signup", connectionEnsureLogin.ensureLoggedOut(), (req, res, next) => {
+        app.post("/auth/signup", connectionEnsureLogin.ensureLoggedOut(), (req, res, next) => {
             const username: string = req.body.username;
             const password: string[] = req.body.password;
             if (password.length !== 2 || password[0] !== password[1]) {
-                return res.redirect("/login");
+                return res.redirect("/auth/login");
             }
             findUserByUsername(username).then(user => {
                 if (user) {
@@ -38,12 +38,12 @@ export function setupAuth(app: Express): void {
                 }
                 return createUser(username, password[0]);
             });
-            return res.redirect("/login");
+            return res.redirect("/auth/login");
         });
-        app.get("/signup", (req, res) => res.sendFile(path.join(process.cwd(), "public", "signup.html")));
+        app.get("/auth/signup", (req, res) => res.sendFile(path.join(process.cwd(), "public", "signup.html")));
     }
 
-    app.get("/logout", (req, res) => {
+    app.get("/auth/logout", (req, res) => {
         req.logout();
         res.redirect("/");
     });

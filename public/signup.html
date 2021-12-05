@@ -17,7 +17,7 @@
         </script>
     </head>
     <body>
-        <form name="signup" action="/signup" method="post" onsubmit="return validateForm()">
+        <form name="signup" action="/auth/signup" method="post" onsubmit="return validateForm()">
             <div class="container">
                 <div>
                     <label for="username"><strong>Username</strong></label>
@@ -37,7 +37,7 @@
                 </div>
                 <div>
                     <input type="submit" value="Sign Up" />
-                    <button onclick="window.location='/login';">Login</button>
+                    <button onclick="window.location='/auth/login';">Login</button>
                 </div>
             </div>
         </form>

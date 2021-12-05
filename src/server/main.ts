@@ -12,6 +12,7 @@ import { DEBUG, LDAP_OPTIONS, SERVER_PORT, SESSION_SECRET } from "./config";
 import User, { findOrCreateUserByUsername, findUserById, findUserByUsername, getUsername } from "./user";
 import { connectDatabase, getId } from "./database";
 import { setupAuth } from "./auth";
+import { LoggedInOptions, LoggedOutOptions } from "connect-ensure-login";
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
@@ -106,31 +107,11 @@ app.use(flash());
 
 setupAuth(app);
 
-if (!DISABLE_SIGNUP) {
-    app.post("/signup", connectionEnsureLogin.ensureLoggedOut(), (req, res, next) => {
-        const username: string = req.body.username;
-        const password: string[] = req.body.password;
-        if (password.length !== 2 || password[0] !== password[1]) {
-            return res.redirect("/login");
-        }
-        findUserByUsername(username).then(user => {
-            if (user) {
-                return;
-            }
-            return createUser(username, password[0]);
-        });
-        return res.redirect("/login");
-    });
-    app.get("/signup", (req, res) => res.sendFile(path.join(process.cwd(), "public", "signup.html")));
-}
-
-app.get("/logout", (req, res) => {
-    req.logout();
-    res.redirect("/");
-});
+const loggedOutOptions: LoggedOutOptions = { redirectTo: "/auth/login" };
+const loggedInOptions: LoggedInOptions = { ...loggedOutOptions };
 
 // Expose public directory
-app.use("/", connectionEnsureLogin.ensureLoggedIn(), express.static("public"));
+app.use("/", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), express.static("public"));
 
 // Create game server
 const gameServer = new Server({
@@ -154,7 +135,7 @@ const gameServer = new Server({
  */
 app.use(
     "/img",
-    connectionEnsureLogin.ensureLoggedIn(),
+    connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
     express.static(path.join(process.cwd(), "assets", "img"), { maxAge: 31536000000 })
 );
 
@@ -168,7 +149,7 @@ app.use("/map", express.static(path.join(process.cwd(), "assets", "map")));
  */
 app.use(
     "/lib",
-    connectionEnsureLogin.ensureLoggedIn(),
+    connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
     express.static(path.join(process.cwd(), "assets", "lib"), { maxAge: 86400000 })
 );
 
@@ -177,14 +158,18 @@ app.use(
  */
 app.use(
     "/templates",
-    connectionEnsureLogin.ensureLoggedIn(),
+    connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
     express.static(path.join(process.cwd(), "assets", "templates"), { maxAge: 31536000000 })
 );
 
 /*
  * "Mount" the assets directory under "[host]/assets"
  */
-app.use("/assets", connectionEnsureLogin.ensureLoggedIn(), express.static(path.join(process.cwd(), "assets")));
+app.use(
+    "/assets",
+    connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
+    express.static(path.join(process.cwd(), "assets"))
+);
 
 /*
  * "Mount" the directory where the client JavaScript is generated to (dist/client)
@@ -193,7 +178,11 @@ app.use("/assets", connectionEnsureLogin.ensureLoggedIn(), express.static(path.j
  * In an HTML-document you can load the scripts via:
  *   <script src="/js/[script-name]"></script>
  */
-app.use("/js", connectionEnsureLogin.ensureLoggedIn(), express.static(path.join(process.cwd(), "js", "client")));
+app.use(
+    "/js",
+    connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
+    express.static(path.join(process.cwd(), "js", "client"))
+);
 
 // Register the TURoom (defined in src/common/rooms/turoom.ts)
 gameServer.define("turoom", TURoom).enableRealtimeListing();
@@ -203,7 +192,7 @@ gameServer.define("turoom", TURoom).enableRealtimeListing();
  *
  * See: https://docs.colyseus.io/tools/monitor/
  */
-//app.use("/colyseus", connectionEnsureLogin.ensureLoggedIn(), monitor()); //TODO Enable this and secure it via authentication/authorization
+//app.use("/colyseus", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), monitor()); //TODO Enable this and secure it via authentication/authorization
 
 // Start the server
 gameServer
