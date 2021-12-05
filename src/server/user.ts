@@ -1,6 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import { getEntity, sequelize } from "./database";
-import { compare, compareSync, hash, hashSync } from "bcrypt";
+import { compareSync, hashSync } from "bcrypt";
 import { SALT_ROUNDS } from "./config";
 
 export default class User extends Model {
@@ -10,10 +10,6 @@ export default class User extends Model {
 
     public compareSync(password: string): boolean {
         return compareSync(password, this.getPassword());
-    }
-
-    public compare(password: string): Promise<boolean> {
-        return compare(password, this.getPassword());
     }
 }
 
@@ -59,10 +55,6 @@ export function findUserByUsername(username: string): Promise<User> {
 
 function hashPasswordSync(password: string): string {
     return hashSync(password, SALT_ROUNDS);
-}
-
-function hashPassword(password: string): Promise<string> {
-    return hash(password, SALT_ROUNDS);
 }
 
 export function createUser(username: string, password: string = undefined): Promise<User> {
