@@ -73,9 +73,8 @@ export function initChatListener() {
     });*/
 
     //primitive updating of the chat
-    getRoom().onMessage(MessageType.CHAT_NEW, (message: ChatMessage) => {
-        //TODO Decode message for key
-        writeMessage(message);
+    getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => {
+        onMessage(message);
 
         //FOR LATER USE, WITH MULTIPLE GROUPS
         /**
@@ -97,7 +96,7 @@ export function getInFocus() {
 
 //write message from contents at position x, if not specified, last will be written
 //will need to accept key/position of chatgroupstate
-function writeMessage(chatMessage: ChatMessage) {
+function onMessage(chatMessage: ChatMessage) {
     const chatId: string = chatMessage.chatId;
     const message: string = chatMessage.message;
     console.debug("message:", message);

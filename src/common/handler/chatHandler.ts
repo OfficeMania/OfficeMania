@@ -91,7 +91,7 @@ export class ChatHandler implements Handler {
         chat.messages.push(serverMessage);
         chat.messages.forEach(chatMessage => console.log("chatMessage:", JSON.stringify(chatMessage)));
         if (chatId === "global") {
-            this.room.clients.forEach(client => client.send(MessageType.CHAT_NEW, serverMessage));
+            this.room.clients.forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
         }
     }
 
