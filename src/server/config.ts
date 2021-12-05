@@ -11,6 +11,7 @@ export const WEBPACK_PORT = 8085; // For dev environment only
 
 export const SALT_ROUNDS = 12;
 
+export const FORCE_LOGIN: boolean = !!process.env.FORCE_LOGIN;
 export const DISABLE_SIGNUP = process.env.DISABLE_SIGNUP || true;
 
 export const LDAP_OPTIONS = null;
