@@ -126,17 +126,15 @@ if (!DISABLE_SIGNUP) {
         const username: string = req.body.username;
         const password: string[] = req.body.password;
         if (password.length !== 2 || password[0] !== password[1]) {
-            return next(new Error("Passwords do not match"));
+            return res.redirect("/login");
         }
-        findUserByUsername(username)
-            .then(user => {
-                if (user) {
-                    throw new Error("User already exists");
-                }
-                return createUser(username, password[0]);
-            })
-            .then(next)
-            .catch(next);
+        findUserByUsername(username).then(user => {
+            if (user) {
+                return;
+            }
+            return createUser(username, password[0]);
+        });
+        return res.redirect("/login");
     });
     app.get("/signup", (req, res) => res.sendFile(path.join(process.cwd(), "public", "signup.html")));
 }
