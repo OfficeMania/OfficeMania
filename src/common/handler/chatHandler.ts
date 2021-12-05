@@ -116,6 +116,9 @@ export class ChatHandler implements Handler {
             const userId: string = this.room.state.players[client.sessionId].name;
             console.log("Request log for User:", userId);
             const chats: Chat[] = this.byUserId(userId);
+            if (!chats.includes(this.globalChat)) {
+                chats.push(this.globalChat);
+            }
             client.send(MessageType.CHAT_LOG, JSON.stringify(chats.flatMap(chat => chat.messages)));
         }
     }

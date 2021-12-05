@@ -49,9 +49,9 @@ function updateChat(chatDTO: ChatDTO): void {
 //initializes all needed functions for the chat
 export function initChatListener() {
     textchatButton.addEventListener("click", () => toggleTextchatBar());
-    
+
     console.log("hello");
-    
+
     updateChatUsers();
     //update textchatSelect on click
     textchatSelect.addEventListener("click", () => updateChatUsers());
