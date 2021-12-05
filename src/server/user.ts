@@ -9,6 +9,7 @@ enum PasswordVersion {
     PLAIN,
     BCRYPT,
     ENCRYPTED_BCRYPT,
+    LATEST = ENCRYPTED_BCRYPT,
 }
 
 export default class User extends Model {
@@ -16,16 +17,28 @@ export default class User extends Model {
         return this["password"];
     }
 
-    private decryptPassword(): string {
-        return CryptoJS.AES.decrypt(this.getPassword(), PASSWORD_SECRET).toString(CryptoJS.enc.Utf8);
+    private getPasswordVersion(): PasswordVersion {
+        return this["passwordVersion"];
     }
 
-    private compareSync(password: string): boolean {
-        return compareSync(password, this.decryptPassword());
-    }
-
-    public isValid(password: string): boolean {
-        return this.compareSync(password);
+    public checkPassword(password: string): boolean {
+        const version: PasswordVersion = this.getPasswordVersion();
+        switch (version) {
+            case PasswordVersion.NONE:
+                return true;
+            case PasswordVersion.PLAIN:
+                return password === this.getPassword();
+            case PasswordVersion.BCRYPT:
+            case PasswordVersion.ENCRYPTED_BCRYPT:
+                let passwordHash: string = this.getPassword();
+                if (version === PasswordVersion.ENCRYPTED_BCRYPT) {
+                    passwordHash = CryptoJS.AES.decrypt(passwordHash, PASSWORD_SECRET).toString(CryptoJS.enc.Utf8);
+                    console.debug("passwordHash:", passwordHash);
+                }
+                return compareSync(password, passwordHash);
+            default:
+                throw new Error(`Unsupported Password Version: ${version}`);
+        }
     }
 }
 
@@ -50,6 +63,11 @@ User.init(
         password: {
             type: DataTypes.STRING,
             allowNull: true,
+        },
+        passwordVersion: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            field: "password_version",
         },
     },
     {
@@ -77,13 +95,39 @@ function encryptPassword(password: string): string {
     return CryptoJS.AES.encrypt(password, PASSWORD_SECRET).toString();
 }
 
-export function createUser(username: string, password: string = undefined): Promise<User> {
-    return User.create({ username, password: encryptPassword(hashPasswordSync(password)) });
+export function createUser(
+    username: string,
+    password: string = undefined,
+    passwordVersion: PasswordVersion = PasswordVersion.LATEST
+): Promise<User> {
+    return User.create({ username, password: serializePassword(password, passwordVersion), passwordVersion });
 }
 
-export function findOrCreateUserByUsername(username: string, password: string = undefined): Promise<User> {
+export function findOrCreateUserByUsername(
+    username: string,
+    password: string = undefined,
+    passwordVersion: PasswordVersion = PasswordVersion.LATEST
+): Promise<User> {
     return User.findOrCreate({
         where: { username },
-        defaults: { password: encryptPassword(hashPasswordSync(password)) },
+        defaults: { password: serializePassword(password, passwordVersion), passwordVersion },
     }).then(getEntity);
+}
+
+function serializePassword(password: string, version: PasswordVersion): string {
+    switch (version) {
+        case PasswordVersion.NONE:
+            return;
+        case PasswordVersion.PLAIN:
+            return password;
+        case PasswordVersion.BCRYPT:
+        case PasswordVersion.ENCRYPTED_BCRYPT:
+            const passwordHash: string = hashPasswordSync(password);
+            if (version === PasswordVersion.BCRYPT) {
+                return passwordHash;
+            }
+            return encryptPassword(passwordHash);
+        default:
+            throw new Error(`Unsupported Password Version: ${version}`);
+    }
 }
