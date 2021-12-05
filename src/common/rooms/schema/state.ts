@@ -1,5 +1,4 @@
 import { ArraySchema, MapSchema, Schema, type } from "@colyseus/schema";
-import { ChatState } from "../../handler/chatHandler";
 
 export class ConferenceData extends Schema {
     @type("string")
@@ -176,7 +175,4 @@ export class State extends Schema {
 
     @type(NotesState)
     notesState: NotesState = new NotesState();
-
-    @type({ array: ChatState })
-    chatStates: ArraySchema<ChatState> = new ArraySchema<ChatState>();
 }

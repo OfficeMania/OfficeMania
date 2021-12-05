@@ -1,34 +1,49 @@
 import { Client, Room } from "colyseus";
-import { ArraySchema, Schema, type } from "@colyseus/schema";
-import { MessageType } from "../util";
+import { generateUUIDv4, MessageType } from "../util";
 import { Handler } from "./handler";
 import { State } from "../rooms/schema/state";
 
 export interface ChatMessage {
-    pos: number;
+    timestamp?: string;
+    name?: string;
+    chatId: string;
     message: string;
 }
 
-//Schema for sending to client
-export class ChatState extends Schema {
-    //for later modularity
-    @type({ array: "string" })
-    participants: ArraySchema<string> = new ArraySchema<string>();
+export class Chat {
+    private readonly _id: string;
+    private _users: string[];
+    private readonly _messages: ChatMessage[] = [];
 
-    @type({ array: "string" })
-    contents: ArraySchema<string> = new ArraySchema<string>();
+    constructor(id: string = generateUUIDv4()) {
+        this._id = id;
+    }
 
-    //position in array (reference for client)
-    @type("number")
-    pos: number;
+    get id(): string {
+        return this._id;
+    }
+
+    get users(): string[] {
+        return this._users;
+    }
+
+    set users(value: string[]) {
+        this._users = value;
+    }
+
+    get messages(): ChatMessage[] {
+        return this._messages;
+    }
 }
 
 export class ChatHandler implements Handler {
     room: Room<State>;
-    globalChat: ChatState;
+    readonly chats: Chat[] = [];
 
-    private chats(): ArraySchema<ChatState> {
-        return this.room.state.chatStates;
+    globalChat: Chat;
+
+    byId(chatId: string): Chat {
+        return this.chats.find(chat => chat.id === chatId);
     }
 
     init(room: Room<State>) {
@@ -36,8 +51,8 @@ export class ChatHandler implements Handler {
     }
 
     onCreate(options?: any) {
-        this.globalChat = new ChatState();
-        this.chats().push(this.globalChat);
+        this.globalChat = new Chat("");
+        this.chats.push(this.globalChat);
         this.room.onMessage(MessageType.CHAT_SEND, (client, message) => this.onSend(client, message));
         this.room.onMessage(MessageType.CHAT_LOG, (client, message) => this.onLog(client, message));
     }
@@ -50,34 +65,35 @@ export class ChatHandler implements Handler {
 
     onSend(client: Client, chatMessage: ChatMessage) {
         const message: string = chatMessage.message;
-        console.log("Message recieved: " + message);
-        if (message === "gimmelog") {
-            //client.send(MessageType.CHAT_LOG, this.room.state.chatStates);
-        }
-        const pos: number = chatMessage.pos;
-        console.log(pos);
-        if (!this.chats().at(pos)) {
+        if (message.length > 1000) {
             //TODO
             return;
         }
-        let newMessage = makeMessage(this.room, client, message.substr(1));
-        this.chats().at(pos).contents.push(newMessage);
-
-        this.chats()
-            .at(pos)
-            .contents.forEach(e => {
-                console.log("content: " + e);
-            });
-        if (pos === 0) {
-            this.room.clients.forEach(client => {
-                client.send(MessageType.CHAT_NEW, pos + newMessage);
-            });
+        console.log("Message received:", message);
+        const chatId: string = chatMessage.chatId;
+        console.log("chatId:", chatId);
+        const chat: Chat = this.byId(chatId);
+        if (!chat) {
+            //TODO
+            return;
+        }
+        /*
+        if (message === "gimmelog") {
+            //client.send(MessageType.CHAT_LOG, this.room.state.chatStates);
+            client.send(MessageType.CHAT_LOG, chat);
+        }
+        */
+        const serverMessage: ChatMessage = makeMessage(this.room, client, chatMessage);
+        chat.messages.push(serverMessage);
+        chat.messages.forEach(e => console.log("content: " + e));
+        if (chatId === "") {
+            this.room.clients.forEach(client => client.send(MessageType.CHAT_NEW, serverMessage));
         }
     }
 
-    onLog(client: Client, position?: number) {
-        if (position) {
-            client.send(this.chats()[position]);
+    onLog(client: Client, chatId?: string) {
+        if (chatId) {
+            client.send(JSON.stringify(this.byId(chatId))); //TODO Check this
         } else {
             //Send all chats as arrayschema
         }
@@ -85,19 +101,13 @@ export class ChatHandler implements Handler {
 }
 
 //message assembly for storage
-function makeMessage(room: Room, client: Client, message: string): string {
-    let m: string = "";
-    const date = new Date();
-    m +=
-        addZero(date.getHours()) +
-        ":" +
-        addZero(date.getMinutes()) +
-        ":" +
-        room.state.players[client.sessionId].name +
-        ": ";
-    m += message;
-    //console.log(m);
-    return m;
+function makeMessage(room: Room, client: Client, chatMessage: ChatMessage): ChatMessage {
+    return {
+        timestamp: new Date().toISOString(),
+        name: room.state.players[client.sessionId].name,
+        chatId: chatMessage.chatId,
+        message: chatMessage.message,
+    };
 }
 
 function addZero(i) {

@@ -10,6 +10,7 @@ import {
     textchatSendButton,
 } from "./static";
 import { getOurPlayer, getRoom } from "./util";
+import { ChatMessage } from "../common/handler/chatHandler";
 
 //tracks if button/shortcut have been pressed
 let _showTextchat = false;
@@ -50,7 +51,7 @@ export function initChatListener() {
     };
 
     textchatSendButton.addEventListener("click", () => {
-        sendMessage(textchatArea.value, 0);
+        sendMessage(textchatArea.value, "");
         textchatArea.value = "";
     });
 
@@ -68,7 +69,7 @@ export function initChatListener() {
     });*/
 
     //primitive updating of the chat
-    getRoom().onMessage(MessageType.CHAT_NEW, message => {
+    getRoom().onMessage(MessageType.CHAT_NEW, (message: ChatMessage) => {
         //TODO Decode message for key
         writeMessage(message);
 
@@ -92,15 +93,15 @@ export function getInFocus() {
 
 //write message from contents at position x, if not specified, last will be written
 //will need to accept key/position of chatgroupstate
-function writeMessage(message: string) {
-    let pos = message.substr(0, 1);
-    let messageLine = document.createElement("p");
-    let messageString = message.substr(1);
-    console.log(messageString);
-    let formattedMessage = "(" + messageString.substring(0, 5) + ") " + messageString.substring(6);
-    messageLine.innerText = formattedMessage;
+function writeMessage(chatMessage: ChatMessage) {
+    const chatId: string = chatMessage.chatId;
+    const message: string = chatMessage.message;
+    console.debug("message:", message);
+    //const formattedMessage = "(" + message.substring(0, 5) + ") " + message.substring(6);
+    const messageLine = document.createElement("p");
+    messageLine.innerText = `[${chatMessage.timestamp}] ${chatMessage.name}: ${chatMessage.message}`;
     textchatBar.prepend(messageLine);
-    console.log("writing message" + pos);
+    console.debug("Writing message to chat:", chatId);
 }
 
 function setInFocus(set) {
@@ -116,10 +117,10 @@ function toggleTextchatBar() {
 }
 
 //sends text message to server (if its not empty)
-function sendMessage(message: string, pos: number) {
+function sendMessage(message: string, chatId: string) {
     //console.log(message);
     if (message && message !== "") {
-        getRoom().send(MessageType.CHAT_SEND, { message, pos });
+        getRoom().send(MessageType.CHAT_SEND, { message, chatId });
     }
 }
 
