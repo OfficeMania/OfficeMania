@@ -56,6 +56,7 @@ export function initChatListener() {
     });
 
     getRoom().onMessage(MessageType.CHAT_LOG, (message: string) => {
+        console.log("message:", message);
         const chat: Chat = JSON.parse(message);
         console.log("chat:", chat);
     });
