@@ -3,6 +3,11 @@ import { ArraySchema, Schema, type } from "@colyseus/schema";
 import { MessageType } from "../util";
 import { Handler } from "./handler";
 
+export interface ChatMessage {
+    pos: number;
+    message: string;
+}
+
 //Schema for sending to client
 export class ChatState extends Schema {
     //for later modularity
@@ -28,7 +33,7 @@ export class ChatHandler implements Handler {
     }
 
     onCreate(options?: any) {
-        this.room.onMessage(MessageType.CHAT_SEND, (client: Client, message: string) => {
+        this.room.onMessage(MessageType.CHAT_SEND, (client: Client, message: ChatMessage) => {
             this.onSend(client, message);
         });
         this.room.onMessage(MessageType.CHAT_LOG, (client: Client, message: number) => {
@@ -42,12 +47,13 @@ export class ChatHandler implements Handler {
 
     onDispose() {}
 
-    onSend(client: Client, message: string) {
+    onSend(client: Client, chatMessage: ChatMessage) {
+        const message: string = chatMessage.message;
         console.log("Message recieved: " + message);
         if (message === "gimmelog") {
             client.send(MessageType.CHAT_LOG, this.room.state.chatState);
         }
-        let pos: number = parseInt(message.substring(0, 1));
+        const pos: number = chatMessage.pos;
         console.log(pos);
         if (!this.chats.at(pos)) {
             //TODO

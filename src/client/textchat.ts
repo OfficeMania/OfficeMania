@@ -119,7 +119,7 @@ function toggleTextchatBar() {
 function sendMessage(message: string, pos: number) {
     //console.log(message);
     if (message && message !== "") {
-        getRoom().send(MessageType.CHAT_SEND, pos + message);
+        getRoom().send(MessageType.CHAT_SEND, { message, pos });
     }
 }
 
