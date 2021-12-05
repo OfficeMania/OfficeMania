@@ -1,15 +1,20 @@
 import { DataTypes, Model } from "sequelize";
 import { getEntity, sequelize } from "./database";
 import { compareSync, hashSync } from "bcrypt";
-import { BCRYPT_SALT_ROUNDS } from "./config";
+import { BCRYPT_SALT_ROUNDS, PASSWORD_SECRET } from "./config";
+import CryptoJS from "crypto-js";
 
 export default class User extends Model {
     private getPassword(): string {
         return this["password"];
     }
 
+    private decryptPassword(): string {
+        return CryptoJS.AES.decrypt(this.getPassword(), PASSWORD_SECRET).toString(CryptoJS.enc.Utf8);
+    }
+
     public compareSync(password: string): boolean {
-        return compareSync(password, this.getPassword());
+        return compareSync(password, this.decryptPassword());
     }
 }
 
@@ -57,12 +62,17 @@ function hashPasswordSync(password: string): string {
     return hashSync(password, BCRYPT_SALT_ROUNDS);
 }
 
+function encryptPassword(password: string): string {
+    return CryptoJS.AES.encrypt(password, PASSWORD_SECRET).toString();
+}
+
 export function createUser(username: string, password: string = undefined): Promise<User> {
-    return User.create({ username, password: hashPasswordSync(password) });
+    return User.create({ username, password: encryptPassword(hashPasswordSync(password)) });
 }
 
 export function findOrCreateUserByUsername(username: string, password: string = undefined): Promise<User> {
-    return User.findOrCreate({ where: { username }, defaults: { password: hashPasswordSync(password) } }).then(
-        getEntity
-    );
+    return User.findOrCreate({
+        where: { username },
+        defaults: { password: encryptPassword(hashPasswordSync(password)) },
+    }).then(getEntity);
 }
