@@ -41,7 +41,6 @@ export default class User extends Model {
                 let passwordHash: string = this.getPassword();
                 if (version === PasswordVersion.ENCRYPTED_BCRYPT) {
                     passwordHash = CryptoJS.AES.decrypt(passwordHash, PASSWORD_SECRET).toString(CryptoJS.enc.Utf8);
-                    console.debug("passwordHash:", passwordHash);
                 }
                 return compareSync(password, passwordHash);
             default:
