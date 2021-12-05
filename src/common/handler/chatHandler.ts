@@ -42,8 +42,12 @@ export class ChatHandler implements Handler {
 
     globalChat: Chat;
 
-    byId(chatId: string): Chat {
+    byChatId(chatId: string): Chat {
         return this.chats.find(chat => chat.id === chatId);
+    }
+
+    byUserId(userId: string): Chat[] {
+        return this.chats.filter(chat => chat.users.includes(userId));
     }
 
     init(room: Room<State>) {
@@ -72,7 +76,7 @@ export class ChatHandler implements Handler {
         console.log("Message received:", message);
         const chatId: string = chatMessage.chatId;
         console.log("chatId:", chatId);
-        const chat: Chat = this.byId(chatId);
+        const chat: Chat = this.byChatId(chatId);
         if (!chat) {
             //TODO
             return;
@@ -93,10 +97,14 @@ export class ChatHandler implements Handler {
 
     onLog(client: Client, chatId?: string) {
         if (chatId) {
-            console.log("request log for:", chatId);
-            client.send(MessageType.CHAT_LOG, JSON.stringify(this.byId(chatId).messages)); //TODO Check this
+            console.log("Request log for Chat:", chatId);
+            const chat: Chat = this.byChatId(chatId);
+            client.send(MessageType.CHAT_LOG, JSON.stringify(chat.messages));
         } else {
-            //Send all chats as arrayschema
+            const userId: string = this.room.state.players[client.sessionId].name;
+            console.log("Request log for User:", userId);
+            const chats: Chat[] = this.byUserId(userId);
+            client.send(MessageType.CHAT_LOG, JSON.stringify(chats.flatMap(chat => chat.messages)));
         }
     }
 }
