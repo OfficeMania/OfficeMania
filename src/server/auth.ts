@@ -57,9 +57,20 @@ export function setupRouter(): void {
     });
 }
 
+async function initDatabase(): Promise<void> {
+    // TODO Remove this and use proper user creation etc.
+    return findOrCreateUserByUsername("officemania", "sec-sep21-project").then(user => {
+        if (!user) {
+            console.error("Something went wrong when creating the default user");
+        } else if (DEBUG) {
+            console.debug(`Default user successfully found or created`);
+        }
+    });
+}
+
 function setupLDAPStrategy(): void {
-    // Use LdapStrategy
-    console.debug("Using LdapStrategy");
+    //TODO This needs to be worked on
+    console.debug("Setup Passport with LdapStrategy");
     passport.use(
         new LdapStrategy(LDAP_OPTIONS, (user, done) => {
             done(null, user);
@@ -74,8 +85,7 @@ function setupLDAPStrategy(): void {
 }
 
 function setupLocalStrategy(): void {
-    // Use LocalStrategy
-    console.debug("Using LocalStrategy");
+    console.debug("Setup Passport with LocalStrategy");
     passport.use(
         new LocalStrategy(function (username, password, done) {
             findUserByUsername(username)
@@ -100,7 +110,6 @@ function setupLocalStrategy(): void {
 }
 
 export function setupAuth(app: Express): void {
-    // Use express sessions
     app.use(
         session({
             secret: SESSION_SECRET,
@@ -109,33 +118,16 @@ export function setupAuth(app: Express): void {
             cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
         })
     );
-
-    async function initDatabase(): Promise<void> {
-        // TODO Remove this and use proper user creation etc.
-        return findOrCreateUserByUsername("officemania", "sec-sep21-project").then(user => {
-            if (!user) {
-                console.error("Something went wrong when creating the default user");
-            } else if (DEBUG) {
-                console.debug(`Default user successfully found or created`);
-            }
-        });
-    }
-
     connectDatabase()
         .then(() => initDatabase())
         .catch(console.error);
-
-    // Set passport strategy
     if (LDAP_OPTIONS) {
         setupLDAPStrategy();
     } else {
         setupLocalStrategy();
     }
-
     app.use(passport.initialize());
     app.use(passport.session());
-
-    //app.use(flash());
     if (IS_DEV && !FORCE_LOGIN) {
         app.use((req, res, next) => {
             req.isAuthenticated = () => true;
