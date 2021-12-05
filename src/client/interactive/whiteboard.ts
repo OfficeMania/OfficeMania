@@ -61,9 +61,7 @@ export class Whiteboard extends Interactive {
 
         ctx.beginPath(); // begin
 
-
-        ctx.moveTo(this.oldX, this.oldY); // from
-        ctx.lineTo(this.x, this.y); // to
+        this.makeLine(this.oldX, this.oldY, this.x, this.y, ctx); //from oldX,oldY to x,y
         ctx.closePath();
         ctx.stroke(); // draw it!
 

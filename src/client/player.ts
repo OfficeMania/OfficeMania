@@ -30,18 +30,18 @@ export interface Player {
     scaledY: number;            //one step changes this by 1
     lastScaledX: number[];      //last 5 postion from scaledX
     lastScaledY: number[];      //last 5 postion from scaledY
-    moveDirection: Direction;      //currently moving in this or none direction
+    moveDirection: Direction;   //currently moving in this or none direction
     moveTime: number;           //time moving in current move
-    priorDirections: Direction[];    //current and last direction button pressed
+    priorDirections: Direction[];  //current and last direction button pressed
     facing: Direction;             //direction facing to calculate sprite while standing still
     standing: number;           //time standing still
     moving: number;             //time moving to calculate sprite
     animationName: string;      // current animation
     animationStep: number;      // current animation step
     whiteboard: number;
-    previousDirection: Direction;       // direction (previously) facing
+    previousDirection: Direction;  // direction (previously) facing
     changeDirection: boolean;   // true, if last facing direction was different to current facing direction
-    waitBeforeMoving: number;
+    waitBeforeMoving: number;   // time that it takes to turn before moving
 }
 
 /*
@@ -108,7 +108,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     } else {
                         player.previousDirection = Direction.DOWN;
                         player.changeDirection = true;
-                        player.waitBeforeMoving = 3;
+                        player.waitBeforeMoving = 2*Math.floor(PLAYER_MOVEMENT_PER_TICK);
                     }
                 } else {
                     player.facing = Direction.DOWN
@@ -142,7 +142,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     } else {
                         player.previousDirection = Direction.UP;
                         player.changeDirection = true;
-                        player.waitBeforeMoving = 3;
+                        player.waitBeforeMoving = 2*Math.floor(PLAYER_MOVEMENT_PER_TICK);
                     }
                 } else {
                     player.facing = Direction.UP
@@ -172,7 +172,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     } else {
                         player.previousDirection = Direction.LEFT;
                         player.changeDirection = true;
-                        player.waitBeforeMoving = 3;
+                        player.waitBeforeMoving = 2*Math.floor(PLAYER_MOVEMENT_PER_TICK);
                     }
                 } else {
                     player.facing = Direction.LEFT
@@ -201,7 +201,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
                     } else {
                         player.previousDirection = Direction.RIGHT;
                         player.changeDirection = true;
-                        player.waitBeforeMoving = 3;
+                        player.waitBeforeMoving = 2*Math.floor(PLAYER_MOVEMENT_PER_TICK);
                     }
                 } else {
                     player.facing = Direction.RIGHT
