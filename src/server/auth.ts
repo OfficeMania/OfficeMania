@@ -57,6 +57,48 @@ export function setupRouter(): void {
     });
 }
 
+function setupLDAPStrategy(): void {
+    // Use LdapStrategy
+    console.debug("Using LdapStrategy");
+    passport.use(
+        new LdapStrategy(LDAP_OPTIONS, (user, done) => {
+            done(null, user);
+        })
+    );
+    passport.serializeUser((user, done) => {
+        done(null, user);
+    });
+    passport.deserializeUser((user, done) => {
+        done(null, user);
+    });
+}
+
+function setupLocalStrategy(): void {
+    // Use LocalStrategy
+    console.debug("Using LocalStrategy");
+    passport.use(
+        new LocalStrategy(function (username, password, done) {
+            findUserByUsername(username)
+                .then(user => {
+                    if (!user || !user.compareSync(password)) {
+                        if (!user) {
+                            console.error(`No user found for username "${username}"`);
+                        }
+                        return done(null, false, { message: "Username or Password incorrect." });
+                    }
+                    return done(null, { id: getId(user), username: getUsername(user) });
+                })
+                .catch(error => done(error, null));
+        })
+    );
+    passport.serializeUser((user: User, done) => done(null, getId(user)));
+    passport.deserializeUser((id: string, done) =>
+        findUserById(id)
+            .then(user => done(null, user))
+            .catch(error => done(error, null))
+    );
+}
+
 export function setupAuth(app: Express): void {
     // Use express sessions
     app.use(
@@ -85,43 +127,9 @@ export function setupAuth(app: Express): void {
 
     // Set passport strategy
     if (LDAP_OPTIONS) {
-        // Use LdapStrategy
-        console.debug("Using LdapStrategy");
-        passport.use(
-            new LdapStrategy(LDAP_OPTIONS, (user, done) => {
-                done(null, user);
-            })
-        );
-        passport.serializeUser((user, done) => {
-            done(null, user);
-        });
-        passport.deserializeUser((user, done) => {
-            done(null, user);
-        });
+        setupLDAPStrategy();
     } else {
-        // Use LocalStrategy
-        console.debug("Using LocalStrategy");
-        passport.use(
-            new LocalStrategy(function (username, password, done) {
-                findUserByUsername(username)
-                    .then(user => {
-                        if (!user || !user.compareSync(password)) {
-                            if (!user) {
-                                console.error(`No user found for username "${username}"`);
-                            }
-                            return done(null, false, { message: "Username or Password incorrect." });
-                        }
-                        return done(null, { id: getId(user), username: getUsername(user) });
-                    })
-                    .catch(error => done(error, null));
-            })
-        );
-        passport.serializeUser((user: User, done) => done(null, getId(user)));
-        passport.deserializeUser((id: string, done) =>
-            findUserById(id)
-                .then(user => done(null, user))
-                .catch(error => done(error, null))
-        );
+        setupLocalStrategy();
     }
 
     app.use(passport.initialize());
