@@ -44,7 +44,6 @@ function setupLogin(): void {
         passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", {
             successRedirect: "/",
             failureRedirect: "/login",
-            failureFlash: true,
         })
     );
     router.get("/login.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.css")));
