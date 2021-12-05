@@ -20,8 +20,12 @@ export default class User extends Model {
         return CryptoJS.AES.decrypt(this.getPassword(), PASSWORD_SECRET).toString(CryptoJS.enc.Utf8);
     }
 
-    public compareSync(password: string): boolean {
+    private compareSync(password: string): boolean {
         return compareSync(password, this.decryptPassword());
+    }
+
+    public isValid(password: string): boolean {
+        return this.compareSync(password);
     }
 }
 

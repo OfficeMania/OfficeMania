@@ -162,7 +162,7 @@ function setupLocalStrategy(): void {
         new LocalStrategy(function (username, password, done) {
             findUserByUsername(username)
                 .then(user => {
-                    if (!user || !user.compareSync(password)) {
+                    if (!user || !user.isValid(password)) {
                         if (!user) {
                             console.debug(`No user found for username "${username}"`);
                         }
