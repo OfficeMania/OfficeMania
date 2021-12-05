@@ -7,8 +7,8 @@ import { Server } from "colyseus";
 
 import { TURoom } from "../common/rooms/turoom";
 import { SERVER_PORT } from "./config";
-import { getAuthRouter, setupAuth } from "./auth";
-import connectionEnsureLogin, { LoggedInOptions, LoggedOutOptions } from "connect-ensure-login";
+import { getAuthRouter, loggedInOptions, setupAuth } from "./auth";
+import connectionEnsureLogin from "connect-ensure-login";
 
 const app: Express = express();
 
@@ -26,9 +26,6 @@ app.use(compression());
 
 setupAuth(app);
 app.use("/auth", getAuthRouter());
-
-const loggedOutOptions: LoggedOutOptions = { redirectTo: "/auth/login" };
-const loggedInOptions: LoggedInOptions = { ...loggedOutOptions };
 
 // Expose public directory
 app.use("/", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), express.static("public"));

@@ -2,13 +2,16 @@ import { Express, Router } from "express";
 import passport from "passport";
 import { DEBUG, DISABLE_SIGNUP, IS_DEV, LDAP_OPTIONS, SESSION_SECRET } from "./config";
 import path from "path";
-import connectionEnsureLogin from "connect-ensure-login";
+import connectionEnsureLogin, { LoggedInOptions, LoggedOutOptions } from "connect-ensure-login";
 import User, { createUser, findOrCreateUserByUsername, findUserById, findUserByUsername, getUsername } from "./user";
 import session from "express-session";
 import { connectDatabase, getId } from "./database";
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
+
+export const loggedOutOptions: LoggedOutOptions = { redirectTo: "/auth/login" };
+export const loggedInOptions: LoggedInOptions = { ...loggedOutOptions };
 
 const router: Router = Router();
 
@@ -31,7 +34,7 @@ export function setupRouter(): void {
     router.get("/login", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.html")));
 
     if (!DISABLE_SIGNUP) {
-        router.post("/signup", connectionEnsureLogin.ensureLoggedOut(), (req, res, next) => {
+        router.post("/signup", connectionEnsureLogin.ensureLoggedOut(loggedOutOptions), (req, res, next) => {
             const username: string = req.body.username;
             const password: string[] = req.body.password;
             if (password.length !== 2 || password[0] !== password[1]) {
