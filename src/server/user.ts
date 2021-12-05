@@ -4,6 +4,13 @@ import { compareSync, hashSync } from "bcrypt";
 import { BCRYPT_SALT_ROUNDS, PASSWORD_SECRET } from "./config";
 import CryptoJS from "crypto-js";
 
+enum PasswordVersion {
+    NONE,
+    PLAIN,
+    BCRYPT,
+    ENCRYPTED_BCRYPT,
+}
+
 export default class User extends Model {
     private getPassword(): string {
         return this["password"];
