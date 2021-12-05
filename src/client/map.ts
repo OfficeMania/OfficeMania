@@ -11,6 +11,7 @@ import {VendingMachine} from "./interactive/machines/vendingMachine";
 import {ChessBoard} from "./interactive/chessboard";
 import {WaterCooler} from "./interactive/machines/waterCooler";
 import {Computer} from "./interactive/computer";
+import {Notes} from "./interactive/notes";
 
 export {convertMapData, MapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -348,6 +349,9 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         }
         case 16: {
             return new WaterCooler();
+        }
+        case 17: {
+            return new Notes();
         }
     }
     return null;

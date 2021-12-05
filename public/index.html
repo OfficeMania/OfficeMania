@@ -33,6 +33,7 @@
             <div id="group-right">
                 <button id="button-settings" aria-label="Open Settings" data-toggle="modal" data-target="#settings-modal"><em class="fa fa-cog"></em><span></span></button>
                 <button id="button-users" aria-label="Show Users"><em class="fa fa-users"></em><span></span></button>
+                <button id="button-textchat" aria-label="Toggle Textchat"><em class="fas fa-comments"></em><span></span></button>
                 <button id="button-help"data-toggle="modal" data-target="#help-modal"><em class="fa fa-question-circle"></em><span></span></button>
             </div>
         </div>
@@ -168,9 +169,23 @@
             <ul id="player-online-list"></ul>
         </div>
 
-        <div id="chat-container">
-            <ul id="chat-list"></ul>
+        <div id="textchat-container" class="horizontal-animation">
+            <div id="menu-bar">
+                <select id="select-textchat"></select>
+                <button id="button-create-chat" aria-label="Show Users"><em class="fas fa-plus-square"></em><span></span></button>
+            </div>
+            <div id="messages-bar">
+                
+            </div>
+            <div id="textchat-bar">
+                <textarea id="typing-field" name="Text" rows="1"></textarea>
+                <button id="button-send" aria-label="Send Message"><em class="fas fa-paper-plane"></em><span></span></button>
+            </div>
         </div>
+
+        <!--<div id="chat-container">
+            <ul id="chat-list"></ul>
+        </div>-->
 
         <div id="interactive-bar">
             <canvas id="interactive" tabindex='0' width="1280" height="720"></canvas>
@@ -178,6 +193,8 @@
             <div id="interactive-bar-whiteboard">
                 <button id="button-whiteboard-save"><em class="fas fa-save"></em><span></span></button>
                 <button id="button-whiteboard-clear"><em class="fa fa-trash"></em><span></span></button>
+                <button id="button-whiteboard-pen"><em class="fas fa-pen"></em><span></span></button>
+                <button id="button-whiteboard-eraser"><em class="fa fa-eraser"></em><span></span></button>
             </div>
             <div id="interactive-bar-chess">
                 <button id="button-chess-export"><em class="fa fa-copy"></em><span></span></button>

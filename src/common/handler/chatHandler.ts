@@ -1,0 +1,95 @@
+import { Client, Room } from "colyseus";
+import {ArraySchema, MapSchema, Schema, type} from "@colyseus/schema";
+import {  } from "../rooms/schema/state";
+import { MessageType } from "../util";
+import { Handler } from "./handler";
+
+//Schema for sending to client
+export class ChatState extends Schema {
+    //for later modularity
+    @type({array: "string"})
+    participants: ArraySchema<string> = new ArraySchema<string>();
+
+    @type({array: "string"})
+    contents: ArraySchema<string> = new ArraySchema<string>();
+
+    //position in array (reference for client)
+    @type("number")
+    pos: number;
+}
+
+export class ChatHandler implements Handler {
+    room: Room;
+    chats: ArraySchema<ChatState> = new ArraySchema<ChatState>();
+    init (room: Room) {
+        this.room = room;
+        let a = new ChatState();
+        this.chats.push(a);
+    }
+
+    onCreate(options?: any) {    
+        this.room.onMessage(MessageType.CHAT_SEND, (client: Client, message: string) => {this.onSend(client, message)});
+        this.room.onMessage(MessageType.CHAT_LOG, (client: Client, message: number) => {this.onLog(client, message)})
+    }
+
+    onJoin() {
+
+    }
+
+    onLeave() {
+
+    }
+
+    onDispose() {
+
+    }
+    onSend(client: Client, message: string) {
+        console.log("Message recieved: " + message);
+        if(message === "gimmelog") {
+            client.send(MessageType.CHAT_LOG, this.room.state.chatState);
+        }
+        let pos: number = parseInt(message.substring(0, 1));
+        console.log(pos);
+        if (!this.chats.at(pos)) {
+            //TODO
+            return;
+        }
+        let newMessage = makeMessage(this.room, client, message.substr(1));
+        this.chats.at(pos).contents.push(newMessage);
+        
+    
+        this.chats.at(pos).contents.forEach(e => {
+            console.log("content: "+e);
+        });  
+        if(pos === 0) {
+            this.room.clients.forEach((client) => {
+                client.send(MessageType.CHAT_NEW,pos + newMessage);
+            });
+        }     
+    }
+    onLog(client: Client, position?: number){
+        if(position) {
+            client.send(this.chats[position]);
+        }
+        else {
+            //Send all chats as arrayschema
+        }
+    }
+}
+
+//message assembly for storage
+function makeMessage(room: Room, client: Client, message: string): string{
+    let m: string = "";
+    const date = new Date();
+    m += addZero(date.getHours()) + ":" + addZero(date.getMinutes()) + ":" + room.state.players[client.sessionId].name + ": ";
+    m += message;
+    //console.log(m);
+    return m;
+}
+
+
+function addZero(i) {
+    if (i < 10) {i = "0" + i}
+    return i;
+}
+  

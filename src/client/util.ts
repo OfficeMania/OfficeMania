@@ -243,6 +243,7 @@ export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionI
 }
 
 export function setUsername(value: string) {
+    console.warn("REDUNDANCY WARNING, USE INTEGRATED MENU!");
     value = value?.slice(0, 20) || "Jimmy";
     getOurPlayer().name = value;
     localStorage.setItem(KEY_USERNAME, value);

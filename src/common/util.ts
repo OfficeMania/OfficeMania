@@ -40,6 +40,8 @@ export enum MessageType {
     WHITEBOARD_CLEAR = "whiteboardClear",
     WHITEBOARD_SAVE = "whiteboardSave",
     WHITEBOARD_PATH = "whiteboardPath",
+    WHITEBOARD_DRAW = "whiteboardDraw",
+    WHITEBOARD_ERASE = "whiteboardErase",
     WHITEBOARD_REDRAW = "whiteboardRedraw",
     WHITEBOARD_CREATE = "whiteboardCreate",
     //TodoListHandler
@@ -57,6 +59,10 @@ export enum MessageType {
     NOTES_ENTER = "notesEnter",
     NOTES_SET = "notesSet",
     NOTES_MARKER = "notesMarker",
+    //ChatHandler
+    CHAT_SEND = "chatSend",
+    CHAT_LOG = "chatLog",
+    CHAT_NEW = "chatNew",
 }
 export enum GameMode {
     SINGLE = 1,

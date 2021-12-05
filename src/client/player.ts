@@ -30,15 +30,18 @@ export interface Player {
     scaledY: number;            //one step changes this by 1
     lastScaledX: number[];      //last 5 postion from scaledX
     lastScaledY: number[];      //last 5 postion from scaledY
-    moveDirection: Direction;      //currently moving in this or none direction
+    moveDirection: Direction;   //currently moving in this or none direction
     moveTime: number;           //time moving in current move
-    priorDirections: Direction[];    //current and last direction button pressed
+    priorDirections: Direction[];  //current and last direction button pressed
     facing: Direction;             //direction facing to calculate sprite while standing still
     standing: number;           //time standing still
     moving: number;             //time moving to calculate sprite
     animationName: string;      // current animation
     animationStep: number;      // current animation step
     whiteboard: number;
+    previousDirection: Direction;  // direction (previously) facing
+    changeDirection: boolean;   // true, if last facing direction was different to current facing direction
+    waitBeforeMoving: number;   // time that it takes to turn before moving
 }
 
 /*
@@ -96,9 +99,17 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
 
                     player.lastScaledY.pop()
                     player.lastScaledY.unshift(player.scaledY) //stores the previous position
-
-                    player.scaledY++;
-                    room.send(MessageType.MOVE, Direction.DOWN);
+                    
+                    // turn without moving when not facing down
+                    if (player.previousDirection === player.facing) {
+                        player.scaledY++;
+                        room.send(MessageType.MOVE, Direction.DOWN);
+                        player.changeDirection = false;
+                    } else {
+                        player.previousDirection = Direction.DOWN;
+                        player.changeDirection = true;
+                        player.waitBeforeMoving = 2*Math.floor(PLAYER_MOVEMENT_PER_TICK);
+                    }
                 } else {
                     player.facing = Direction.DOWN
                 }
@@ -122,9 +133,17 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
 
                     player.lastScaledY.pop()
                     player.lastScaledY.unshift(player.scaledY) //stores the previous position
-
-                    player.scaledY--;
-                    room.send(MessageType.MOVE, Direction.UP);
+                    
+                    // turn without moving when not facing up
+                    if (player.previousDirection === player.facing) {    
+                        player.scaledY--;
+                        room.send(MessageType.MOVE, Direction.UP);
+                        player.changeDirection = false;
+                    } else {
+                        player.previousDirection = Direction.UP;
+                        player.changeDirection = true;
+                        player.waitBeforeMoving = 2*Math.floor(PLAYER_MOVEMENT_PER_TICK);
+                    }
                 } else {
                     player.facing = Direction.UP
                 }
@@ -144,9 +163,17 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
 
                     player.lastScaledX.pop()
                     player.lastScaledX.unshift(player.scaledX) //stores the previous position
-
-                    player.scaledX--;
-                    room.send(MessageType.MOVE, Direction.LEFT);
+                    
+                    // turn without moving when not facing left
+                    if (player.previousDirection === player.facing) {
+                        player.scaledX--;
+                        room.send(MessageType.MOVE, Direction.LEFT);
+                        player.changeDirection = false;
+                    } else {
+                        player.previousDirection = Direction.LEFT;
+                        player.changeDirection = true;
+                        player.waitBeforeMoving = 2*Math.floor(PLAYER_MOVEMENT_PER_TICK);
+                    }
                 } else {
                     player.facing = Direction.LEFT
                 }
@@ -165,9 +192,17 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
 
                     player.lastScaledX.pop()
                     player.lastScaledX.unshift(player.scaledX) //stores the previous position
-
-                    player.scaledX++;
-                    room.send(MessageType.MOVE, Direction.RIGHT);
+                    
+                    // turn without moving when not facing right
+                    if (player.previousDirection === player.facing) {
+                        player.scaledX++;
+                        room.send(MessageType.MOVE, Direction.RIGHT);
+                        player.changeDirection = false;
+                    } else {
+                        player.previousDirection = Direction.RIGHT;
+                        player.changeDirection = true;
+                        player.waitBeforeMoving = 2*Math.floor(PLAYER_MOVEMENT_PER_TICK);
+                    }
                 } else {
                     player.facing = Direction.RIGHT
                 }
@@ -179,16 +214,16 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
     //moves to the next tile
     if (player.moveDirection) {
         player.moveTime++;
-        if (player.moveDirection === Direction.DOWN) {
+        if (player.moveDirection === Direction.DOWN && !player.changeDirection) {
             player.positionY += PLAYER_MOVEMENT_PER_TICK;
-        } else if (player.moveDirection === Direction.UP) {
+        } else if (player.moveDirection === Direction.UP && !player.changeDirection) {
             player.positionY -= PLAYER_MOVEMENT_PER_TICK;
-        } else if (player.moveDirection === Direction.LEFT) {
+        } else if (player.moveDirection === Direction.LEFT && !player.changeDirection) {
             player.positionX -= PLAYER_MOVEMENT_PER_TICK;
-        } else if (player.moveDirection === Direction.RIGHT) {
+        } else if (player.moveDirection === Direction.RIGHT && !player.changeDirection) {
             player.positionX += PLAYER_MOVEMENT_PER_TICK;
         }
-        if (player.moveTime === FRAMES_PER_MOVE) {
+        if (player.moveTime === FRAMES_PER_MOVE && !player.changeDirection) {
             //centers the player every whole step
             player.positionX = player.scaledX * STEP_SIZE
             player.positionY = player.scaledY * STEP_SIZE

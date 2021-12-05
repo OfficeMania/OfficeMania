@@ -67,6 +67,7 @@ import {
 import {updateDoors} from "./interactive/door";
 import {initLoadingScreenLoading, setShowLoadingscreen} from "./loadingscreen";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
+import { getInFocus, initChatListener } from "./textchat";
 
 export const characters: { [key: string]: AnimatedSpriteSheet } = {}
 export const START_POSITION_X = 5;
@@ -93,10 +94,13 @@ function toggleMute(type: string) {
     updateButtons();
 }
 
+
+
 // Settings
 
 settingsButton.addEventListener("click", () => onSettingsOpen());
 usersButton.addEventListener("click", () => toggleShowParticipantsTab());
+
 
 settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
@@ -116,6 +120,8 @@ export function checkInputMode() {
         setInputMode(InputMode.IGNORE);
     } else if (!interactiveCanvas.style.visibility.match(/hidden/)) {
         setInputMode(InputMode.INTERACTION);
+    } else if (getInFocus()) {
+        setInputMode(InputMode.IGNORE);
     } else {
         setInputMode(InputMode.NORMAL);
     }
@@ -267,6 +273,11 @@ async function main() {
     getUsernameIntern = () => ourPlayer.name;
     getCharacterIntern = () => ourPlayer.character;
 
+    //INITIATE CHAT
+
+    initChatListener();
+
+
     //loads all the character information
     await loadCharacter();
     checkInputMode();
@@ -362,7 +373,7 @@ async function main() {
             nearbyPlayerCheck();
         } else if (playerNearbyTimer % 20 === 10) {
             updateUsers();
-            updateChat();
+            //updateChat();
         }
 
         //check if interaction is nearby
