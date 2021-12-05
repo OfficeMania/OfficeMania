@@ -124,15 +124,14 @@ export class ChatHandler implements Handler {
         const userId: string = this.room.state.players[client.sessionId].name;
         console.log("Request chat update for User:", userId);
         const chats: Chat[] = this.byUserId(userId);
-        client.send(
-            MessageType.CHAT_UPDATE,
-            JSON.stringify(
-                chats.map(chat => {
-                    chat.id;
-                    chat.name;
-                })
-            )
-        );
+        if (!chats.includes(this.globalChat)) {
+            chats.push(this.globalChat);
+        }
+        const chatDTOs: ChatDTO[] = chats.map(chat => ({
+            id: chat.id,
+            name: chat.name,
+        }));
+        client.send(MessageType.CHAT_UPDATE, JSON.stringify(chatDTOs));
     }
 }
 
