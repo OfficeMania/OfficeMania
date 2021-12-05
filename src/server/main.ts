@@ -24,6 +24,8 @@ app.use(express.json());
 // Compress all responses
 app.use(compression());
 
+app.set("view engine", "ejs");
+
 setupAuth(app);
 app.use("/auth", getAuthRouter());
 
