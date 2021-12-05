@@ -1,7 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import { getEntity, sequelize } from "./database";
 import { compareSync, hashSync } from "bcrypt";
-import { SALT_ROUNDS } from "./config";
+import { BCRYPT_SALT_ROUNDS } from "./config";
 
 export default class User extends Model {
     private getPassword(): string {
@@ -54,7 +54,7 @@ export function findUserByUsername(username: string): Promise<User> {
 }
 
 function hashPasswordSync(password: string): string {
-    return hashSync(password, SALT_ROUNDS);
+    return hashSync(password, BCRYPT_SALT_ROUNDS);
 }
 
 export function createUser(username: string, password: string = undefined): Promise<User> {

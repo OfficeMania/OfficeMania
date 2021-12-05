@@ -9,7 +9,7 @@ export const SESSION_SECRET = process.env.SESSION_SECRET || "USE_A_SECURE_RANDOM
 export const SERVER_PORT = Number(process.env.PORT) || 3000;
 export const WEBPACK_PORT = 8085; // For dev environment only
 
-export const SALT_ROUNDS = 12;
+export const BCRYPT_SALT_ROUNDS = 12;
 
 export const FORCE_LOGIN: boolean = !!process.env.FORCE_LOGIN;
 export const DISABLE_SIGNUP = process.env.DISABLE_SIGNUP || true;
