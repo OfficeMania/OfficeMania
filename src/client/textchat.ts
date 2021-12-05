@@ -49,23 +49,12 @@ function updateChat(chatDTO: ChatDTO): void {
 //initializes all needed functions for the chat
 export function initChatListener() {
     textchatButton.addEventListener("click", () => toggleTextchatBar());
-    while (textchatSelect.firstChild) {
-        textchatSelect.firstChild.remove();
-    }
+    
     console.log("hello");
-    const option = document.createElement("option");
-    option.innerText = "globul";
-    option.value = "ungabunga";
-    textchatSelect.append(option);
-    getRoom().state.players.forEach((value, key) => {
-        if (key === getOurPlayer().id) {
-            return;
-        }
-        const option = document.createElement("option");
-        option.innerText = getRoom().state.players[key].name;
-        option.value = key;
-        textchatSelect.append(option);
-    });
+    
+    updateChatUsers();
+    //update textchatSelect on click
+    textchatSelect.addEventListener("click", () => updateChatUsers());
     //changing of inputmode if text area is in use or not
     textchatArea.onfocus = function () {
         setInFocus(true);
@@ -170,6 +159,26 @@ function setShowTextchatBar(set: boolean) {
         textchatContainer.classList.remove("hover");
     }
     _showTextchat = set;
+}
+
+//update user list in select
+function updateChatUsers() {
+    while (textchatSelect.firstChild) {
+        textchatSelect.firstChild.remove();
+    }
+    const option = document.createElement("option");
+    option.innerText = "globul";
+    option.value = "ungabunga";
+    textchatSelect.append(option);
+    getRoom().state.players.forEach((value, key) => {
+        if (key === getOurPlayer().id) {
+            return;
+        }
+        const option = document.createElement("option");
+        option.innerText = getRoom().state.players[key].name;
+        option.value = key;
+        textchatSelect.append(option);
+    });
 }
 
 function onStateChange() {}
