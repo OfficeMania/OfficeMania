@@ -137,7 +137,10 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                     moving: 0,
                     animationName: undefined,
                     animationStep: 0,
-                    whiteboard: 0
+                    whiteboard: 0,
+                    previousDirection: Direction.DOWN,
+                    changeDirection: false,
+                    waitBeforeMoving: 0
                 };
                 players[sessionId] = player;
 
