@@ -3,6 +3,7 @@ import { getEntity, sequelize } from "./database";
 import { compareSync, hashSync } from "bcrypt";
 import { BCRYPT_SALT_ROUNDS, PASSWORD_SECRET } from "./config";
 import CryptoJS from "crypto-js";
+import { RequestHandler } from "express-serve-static-core";
 
 enum PasswordVersion {
     NONE,
@@ -10,6 +11,11 @@ enum PasswordVersion {
     BCRYPT,
     ENCRYPTED_BCRYPT,
     LATEST = ENCRYPTED_BCRYPT,
+}
+
+export enum Role {
+    USER,
+    ADMIN,
 }
 
 export default class User extends Model {
@@ -27,6 +33,10 @@ export default class User extends Model {
 
     private setPasswordVersion(version: PasswordVersion): void {
         this["passwordVersion"] = version;
+    }
+
+    public getRole(): Role {
+        return this["role"];
     }
 
     public checkPassword(password: string): boolean {
@@ -107,6 +117,11 @@ User.init(
             allowNull: false,
             field: "password_version",
         },
+        role: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+        },
     },
     {
         sequelize,
@@ -164,4 +179,19 @@ function serializePassword(password: string, version: PasswordVersion): string {
         default:
             throw new Error(`Unsupported Password Version: ${version}`);
     }
+}
+
+export function ensureHasRole(...roles): RequestHandler {
+    return (req, res, next) => {
+        const user: User = req.user as User;
+        if (!user) {
+            return res.redirect("/auth/login");
+        }
+        const userRole: Role = user.getRole();
+        const hasRole: boolean = roles.find(role => userRole === role);
+        if (!hasRole) {
+            res.sendStatus(401);
+        }
+        return next();
+    };
 }
