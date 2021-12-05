@@ -17,9 +17,9 @@ export interface ChatDTO {
 
 export class Chat {
     private readonly _id: string;
-    private _name: string;
-    private _users: string[];
+    private readonly _users: string[] = [];
     private readonly _messages: ChatMessage[] = [];
+    private _name: string;
 
     constructor(name: string, id: string = generateUUIDv4()) {
         this._id = id;
@@ -40,10 +40,6 @@ export class Chat {
 
     get users(): string[] {
         return this._users;
-    }
-
-    set users(value: string[]) {
-        this._users = value;
     }
 
     get messages(): ChatMessage[] {
