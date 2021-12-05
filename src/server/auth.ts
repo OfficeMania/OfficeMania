@@ -10,7 +10,39 @@ import { connectDatabase, getId } from "./database";
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
 
+declare module "express-session" {
+    interface Session {
+        user: User;
+        loginError: number;
+        signupError: number;
+    }
+}
+
 export const loggedInOptions: LoggedInOptions = { redirectTo: "/auth/login" };
+
+enum AuthError {
+    UNKNOWN = -1,
+    NO_ERROR,
+    USERNAME_TAKEN,
+    USER_CREATION_FAILED,
+    PASSWORDS_MISMATCH,
+    INVALID_CREDENTIALS,
+}
+
+function authErrorToString(error: AuthError): string {
+    switch (error) {
+        case AuthError.UNKNOWN:
+            return "Unknown Error";
+        case AuthError.NO_ERROR:
+            return undefined;
+        case AuthError.USERNAME_TAKEN:
+            return "The Username is already taken";
+        case AuthError.PASSWORDS_MISMATCH:
+            return "Passwords do not match";
+        case AuthError.INVALID_CREDENTIALS:
+            return "Invalid Credentials";
+    }
+}
 
 const router: Router = Router();
 
@@ -25,29 +57,61 @@ function setupSignup(): void {
         const username: string = req.body.username;
         const password: string[] = req.body.password;
         if (password.length !== 2 || password[0] !== password[1]) {
-            return res.redirect("/login");
+            req.session.signupError = AuthError.PASSWORDS_MISMATCH;
+            return res.redirect("/auth/signup");
         }
-        findUserByUsername(username).then(user => {
-            if (user) {
-                return;
-            }
-            return createUser(username, password[0]);
-        });
-        return res.redirect("/login");
+        findUserByUsername(username)
+            .then(user => {
+                req.session.signupError = AuthError.NO_ERROR;
+                if (user) {
+                    req.session.signupError = AuthError.USERNAME_TAKEN;
+                    return res.redirect("/auth/signup");
+                }
+                return createUser(username, password[0]).catch(() => {
+                    req.session.signupError = AuthError.USER_CREATION_FAILED;
+                    res.redirect("/auth/signup");
+                });
+            })
+            .then(() => res.redirect("/auth/login"))
+            .catch(() => {
+                req.session.signupError = AuthError.UNKNOWN;
+                res.redirect("/auth/signup");
+            });
     });
-    router.get("/signup", (req, res) => res.sendFile(path.join(process.cwd(), "public", "signup.html")));
+    router.get("/signup", (req, res) =>
+        res.render("pages/signup", {
+            error: authErrorToString(req.session.signupError),
+        })
+    );
 }
 
 function setupLogin(): void {
-    router.post(
-        "/login",
-        passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", {
-            successRedirect: "/",
-            failureRedirect: "/login",
+    router.post("/login", (req, res, next) => {
+        passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", (error, user, info) => {
+            if (error) {
+                req.session.loginError = AuthError.UNKNOWN;
+                return res.redirect("/auth/login");
+            }
+            if (!user) {
+                req.session.loginError = AuthError.INVALID_CREDENTIALS;
+                return res.redirect("/auth/login");
+            }
+            req.logIn(user, function (error) {
+                if (error) {
+                    req.session.loginError = AuthError.UNKNOWN;
+                    return res.redirect("/auth/login");
+                }
+                req.session.loginError = AuthError.NO_ERROR;
+                return res.redirect("/");
+            });
+        })(req, res, next);
+    });
+    router.get("/login.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.css")));
+    router.get("/login", (req, res) =>
+        res.render("pages/login", {
+            error: authErrorToString(req.session.loginError),
         })
     );
-    router.get("/login.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.css")));
-    router.get("/login", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.html")));
 }
 
 function setupLogout(): void {
@@ -100,7 +164,7 @@ function setupLocalStrategy(): void {
                 .then(user => {
                     if (!user || !user.compareSync(password)) {
                         if (!user) {
-                            console.error(`No user found for username "${username}"`);
+                            console.debug(`No user found for username "${username}"`);
                         }
                         return done(null, false, { message: "Username or Password incorrect." });
                     }
