@@ -106,7 +106,6 @@ function setupLogin(): void {
             });
         })(req, res, next);
     });
-    router.get("/login.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.css")));
     router.get("/login", (req, res) =>
         res.render("pages/login", {
             error: authErrorToString(req.session.loginError),
@@ -122,6 +121,7 @@ function setupLogout(): void {
 }
 
 export function setupRouter(): void {
+    router.get("/auth.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "auth.css")));
     if (!DISABLE_SIGNUP) {
         setupSignup();
     }
