@@ -63,10 +63,10 @@ export class ChatHandler implements Handler {
 
     init(room: Room<State>) {
         this.room = room;
+        this.globalChat = new Chat("Global");
     }
 
     onCreate(options?: any) {
-        this.globalChat = new Chat("Global");
         this.chats.push(this.globalChat);
         this.room.onMessage(MessageType.CHAT_SEND, (client, message: ChatMessage) => this.onSend(client, message));
         this.room.onMessage(MessageType.CHAT_UPDATE, client => this.onChatUpdate(client));
