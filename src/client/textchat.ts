@@ -10,7 +10,7 @@ import {
     textchatSendButton,
 } from "./static";
 import { getOurPlayer, getRoom } from "./util";
-import { ChatMessage } from "../common/handler/chatHandler";
+import { Chat, ChatDTO, ChatMessage } from "../common/handler/chatHandler";
 
 //tracks if button/shortcut have been pressed
 let _showTextchat = false;
@@ -21,6 +21,30 @@ var _inFocus = false;
 var _menuOpen = false;
 
 var _clientLogs = new Map();
+
+const chats: Chat[] = [];
+
+function getChatById(chatId: string): Chat {
+    return this.chats.find(chat => chat.id === chatId);
+}
+
+function getOrCreateChatById(chatId: string): Chat {
+    let chat: Chat = getChatById(chatId);
+    if (!chat) {
+        chat = new Chat(undefined, chatId);
+        chats.push(chat);
+    }
+    return chat;
+}
+
+function updateChat(chatDTO: ChatDTO): void {
+    const chat: Chat = getChatById(chatDTO.id);
+    if (!chat) {
+        chats.push(new Chat(chat.name, chat.id));
+        return;
+    }
+    chat.name = chatDTO.name;
+}
 
 //initializes all needed functions for the chat
 export function initChatListener() {
@@ -55,13 +79,10 @@ export function initChatListener() {
         textchatArea.value = "";
     });
 
-    getRoom().onMessage(MessageType.CHAT_LOG, (message: string) => {
-        console.log("message:", message);
-        const chatMessages: ChatMessage[] = JSON.parse(message);
-        console.log("chatMessages:", chatMessages);
-        chatMessages.forEach(writeMessage);
-    });
-    getRoom().send(MessageType.CHAT_LOG, "global");
+    getRoom().onMessage(MessageType.CHAT_UPDATE, (message: string) => onChatUpdate(JSON.parse(message)));
+    getRoom().onMessage(MessageType.CHAT_LOG, (message: string) => onMessageLogs(JSON.parse(message)));
+    getRoom().send(MessageType.CHAT_UPDATE);
+    getRoom().send(MessageType.CHAT_LOG);
     textchatCreateButton.addEventListener("click", () => {});
 
     /*//write chatlog in client
@@ -89,6 +110,16 @@ export function initChatListener() {
     });
 }
 
+function onChatUpdate(chatDTOs: ChatDTO[]): void {
+    console.debug("chatDTOs:", chatDTOs);
+    chatDTOs.forEach(updateChat);
+}
+
+function onMessageLogs(chatMessages: ChatMessage[]): void {
+    console.debug("chatMessages:", chatMessages);
+    chatMessages.forEach(onMessage);
+}
+
 //getter for _inFocus
 export function getInFocus() {
     return _inFocus;
@@ -98,13 +129,12 @@ export function getInFocus() {
 //will need to accept key/position of chatgroupstate
 function onMessage(chatMessage: ChatMessage) {
     const chatId: string = chatMessage.chatId;
-    const message: string = chatMessage.message;
-    console.debug("message:", message);
-    //const formattedMessage = "(" + message.substring(0, 5) + ") " + message.substring(6);
+    const chat: Chat = getOrCreateChatById(chatId);
+    chat.messages.push(chatMessage);
+    //TODO Only add it if the Chat is selected?
     const messageLine = document.createElement("p");
     messageLine.innerText = `[${chatMessage.timestamp}] ${chatMessage.name}: ${chatMessage.message}`;
     textchatBar.prepend(messageLine);
-    console.debug("Writing message to chat:", chatId);
 }
 
 function setInFocus(set) {

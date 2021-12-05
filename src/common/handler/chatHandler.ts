@@ -10,17 +10,32 @@ export interface ChatMessage {
     message: string;
 }
 
+export interface ChatDTO {
+    id: string;
+    name: string;
+}
+
 export class Chat {
     private readonly _id: string;
+    private _name: string;
     private _users: string[];
     private readonly _messages: ChatMessage[] = [];
 
-    constructor(id: string = generateUUIDv4()) {
+    constructor(name: string, id: string = generateUUIDv4()) {
         this._id = id;
+        this._name = name;
     }
 
     get id(): string {
         return this._id;
+    }
+
+    get name(): string {
+        return this._name;
+    }
+
+    set name(value: string) {
+        this._name = value;
     }
 
     get users(): string[] {
@@ -55,10 +70,11 @@ export class ChatHandler implements Handler {
     }
 
     onCreate(options?: any) {
-        this.globalChat = new Chat("global");
+        this.globalChat = new Chat("Global");
         this.chats.push(this.globalChat);
-        this.room.onMessage(MessageType.CHAT_SEND, (client, message) => this.onSend(client, message));
-        this.room.onMessage(MessageType.CHAT_LOG, (client, message) => this.onLog(client, message));
+        this.room.onMessage(MessageType.CHAT_SEND, (client, message: ChatMessage) => this.onSend(client, message));
+        this.room.onMessage(MessageType.CHAT_UPDATE, client => this.onChatUpdate(client));
+        this.room.onMessage(MessageType.CHAT_LOG, (client, message: string) => this.onLog(client, message));
     }
 
     onJoin() {}
@@ -90,7 +106,7 @@ export class ChatHandler implements Handler {
         const serverMessage: ChatMessage = makeMessage(this.room, client, chatMessage);
         chat.messages.push(serverMessage);
         chat.messages.forEach(chatMessage => console.log("chatMessage:", JSON.stringify(chatMessage)));
-        if (chatId === "global") {
+        if (chatId === this.globalChat.id) {
             this.room.clients.forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
         }
     }
@@ -106,6 +122,21 @@ export class ChatHandler implements Handler {
             const chats: Chat[] = this.byUserId(userId);
             client.send(MessageType.CHAT_LOG, JSON.stringify(chats.flatMap(chat => chat.messages)));
         }
+    }
+
+    onChatUpdate(client: Client) {
+        const userId: string = this.room.state.players[client.sessionId].name;
+        console.log("Request chat update for User:", userId);
+        const chats: Chat[] = this.byUserId(userId);
+        client.send(
+            MessageType.CHAT_UPDATE,
+            JSON.stringify(
+                chats.map(chat => {
+                    chat.id;
+                    chat.name;
+                })
+            )
+        );
     }
 }
 
