@@ -4,6 +4,11 @@
         <meta charset="UTF-8">
         <link rel="stylesheet" href="auth.css">
         <title>Login</title>
+        <script>
+            function resetLoginError() {
+                document.getElementById("error-login")?.remove();
+            }
+        </script>
     </head>
     <body class="container">
         <form action="/auth/login" method="post">
@@ -11,12 +16,12 @@
                 <div>
                     <label for="username"><strong>Username</strong></label>
                     <input id="username" type="text" placeholder="Enter Username" name="username"
-                           autocomplete="username" required />
+                           autocomplete="username" required oninput="resetLoginError()" />
                 </div>
                 <div>
                     <label for="password"><strong>Password</strong></label>
                     <input id="password" type="password" placeholder="Enter Password" name="password"
-                           autocomplete="current-password" required />
+                           autocomplete="current-password" required oninput="resetLoginError()" />
                 </div>
                 <% if (!!error) { %>
                     <small id="error-login" style="color: red;"><%= error; %></small>
