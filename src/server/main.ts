@@ -1,24 +1,14 @@
 import http from "http";
 import express, { Express } from "express";
-import session from "express-session";
 import cors from "cors";
 import compression from "compression";
 import path from "path";
-import passport from "passport";
 import { Server } from "colyseus";
 
 import { TURoom } from "../common/rooms/turoom";
-import { DEBUG, LDAP_OPTIONS, SERVER_PORT, SESSION_SECRET } from "./config";
-import User, { findOrCreateUserByUsername, findUserById, findUserByUsername, getUsername } from "./user";
-import { connectDatabase, getId } from "./database";
+import { SERVER_PORT } from "./config";
 import { setupAuth } from "./auth";
-import { LoggedInOptions, LoggedOutOptions } from "connect-ensure-login";
-
-const LocalStrategy = require("passport-local").Strategy;
-const LdapStrategy = require("passport-ldapauth").Strategy;
-
-const flash = require("connect-flash");
-const connectionEnsureLogin = require("connect-ensure-login");
+import connectionEnsureLogin, { LoggedInOptions, LoggedOutOptions } from "connect-ensure-login";
 
 const app: Express = express();
 
@@ -33,77 +23,6 @@ app.use(express.json());
 
 // Compress all responses
 app.use(compression());
-
-// Use express sessions
-app.use(
-    session({
-        secret: SESSION_SECRET,
-        resave: false,
-        saveUninitialized: true,
-        cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
-    })
-);
-
-async function initDatabase(): Promise<void> {
-    // TODO Remove this and use proper user creation etc.
-    return findOrCreateUserByUsername("officemania", "sec-sep21-project").then(user => {
-        if (!user) {
-            console.error("Something went wrong when creating the default user");
-        } else if (DEBUG) {
-            console.debug(`Default user successfully found or created`);
-        }
-    });
-}
-
-connectDatabase()
-    .then(() => initDatabase())
-    .catch(console.error);
-
-// Set passport strategy
-if (LDAP_OPTIONS) {
-    // Use LdapStrategy
-    console.debug("Using LdapStrategy");
-    passport.use(
-        new LdapStrategy(LDAP_OPTIONS, (user, done) => {
-            done(null, user);
-        })
-    );
-    passport.serializeUser((user, done) => {
-        done(null, user);
-    });
-    passport.deserializeUser((user, done) => {
-        done(null, user);
-    });
-} else {
-    // Use LocalStrategy
-    console.debug("Using LocalStrategy");
-    passport.use(
-        new LocalStrategy(function (username, password, done) {
-            findUserByUsername(username)
-                .then(user => {
-                    if (!user || !user.compareSync(password)) {
-                        if (!user) {
-                            console.error(`No user found for username "${username}"`);
-                        }
-                        return done(null, false, { message: "Username or Password incorrect." });
-                    }
-                    return done(null, { id: getId(user), username: getUsername(user) });
-                })
-                .catch(error => done(error, null));
-        })
-    );
-    passport.serializeUser((user: User, done) => done(null, getId(user)));
-    passport.deserializeUser((id: string, done) =>
-        findUserById(id)
-            .then(user => done(null, user))
-            .catch(error => done(error, null))
-    );
-}
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use(flash());
 
 setupAuth(app);
 
