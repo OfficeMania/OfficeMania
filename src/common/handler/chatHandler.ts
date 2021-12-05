@@ -93,7 +93,7 @@ export class ChatHandler implements Handler {
 
     onLog(client: Client, chatId?: string) {
         if (chatId) {
-            client.send(JSON.stringify(this.byId(chatId))); //TODO Check this
+            client.send(MessageType.CHAT_LOG, JSON.stringify(this.byId(chatId))); //TODO Check this
         } else {
             //Send all chats as arrayschema
         }
