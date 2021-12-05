@@ -21,7 +21,25 @@ export function getAuthRouter(): Router {
     return router;
 }
 
-export function setupRouter(): void {
+function setupSignup(): void {
+    router.post("/signup", connectionEnsureLogin.ensureLoggedOut(loggedOutOptions), (req, res, next) => {
+        const username: string = req.body.username;
+        const password: string[] = req.body.password;
+        if (password.length !== 2 || password[0] !== password[1]) {
+            return res.redirect("/login");
+        }
+        findUserByUsername(username).then(user => {
+            if (user) {
+                return;
+            }
+            return createUser(username, password[0]);
+        });
+        return res.redirect("/login");
+    });
+    router.get("/signup", (req, res) => res.sendFile(path.join(process.cwd(), "public", "signup.html")));
+}
+
+function setupLogin(): void {
     router.post(
         "/login",
         passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", {
@@ -32,29 +50,21 @@ export function setupRouter(): void {
     );
     router.get("/login.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.css")));
     router.get("/login", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.html")));
+}
 
-    if (!DISABLE_SIGNUP) {
-        router.post("/signup", connectionEnsureLogin.ensureLoggedOut(loggedOutOptions), (req, res, next) => {
-            const username: string = req.body.username;
-            const password: string[] = req.body.password;
-            if (password.length !== 2 || password[0] !== password[1]) {
-                return res.redirect("/login");
-            }
-            findUserByUsername(username).then(user => {
-                if (user) {
-                    return;
-                }
-                return createUser(username, password[0]);
-            });
-            return res.redirect("/login");
-        });
-        router.get("/signup", (req, res) => res.sendFile(path.join(process.cwd(), "public", "signup.html")));
-    }
-
+function setupLogout(): void {
     router.get("/logout", (req, res) => {
         req.logout();
         res.redirect("/");
     });
+}
+
+export function setupRouter(): void {
+    if (!DISABLE_SIGNUP) {
+        setupSignup();
+    }
+    setupLogin();
+    setupLogout();
 }
 
 async function initDatabase(): Promise<void> {
