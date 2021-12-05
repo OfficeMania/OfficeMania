@@ -25,7 +25,7 @@ var _clientLogs = new Map();
 const chats: Chat[] = [];
 
 function getChatById(chatId: string): Chat {
-    return this.chats.find(chat => chat.id === chatId);
+    return chats.find(chat => chat.id === chatId);
 }
 
 function getOrCreateChatById(chatId: string): Chat {
