@@ -1,5 +1,5 @@
 import http from "http";
-import express from "express";
+import express, { Express } from "express";
 import session from "express-session";
 import cors from "cors";
 import compression from "compression";
@@ -8,9 +8,10 @@ import passport from "passport";
 import { Server } from "colyseus";
 
 import { TURoom } from "../common/rooms/turoom";
-import { DEBUG, DISABLE_SIGNUP, IS_DEV, LDAP_OPTIONS, SERVER_PORT, SESSION_SECRET } from "./config";
-import User, { createUser, findOrCreateUserByUsername, findUserById, findUserByUsername, getUsername } from "./user";
+import { DEBUG, LDAP_OPTIONS, SERVER_PORT, SESSION_SECRET } from "./config";
+import User, { findOrCreateUserByUsername, findUserById, findUserByUsername, getUsername } from "./user";
 import { connectDatabase, getId } from "./database";
+import { setupAuth } from "./auth";
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
@@ -18,7 +19,7 @@ const LdapStrategy = require("passport-ldapauth").Strategy;
 const flash = require("connect-flash");
 const connectionEnsureLogin = require("connect-ensure-login");
 
-const app = express();
+const app: Express = express();
 
 // Enable cors
 app.use(cors());
@@ -103,23 +104,7 @@ app.use(passport.session());
 
 app.use(flash());
 
-if (IS_DEV) {
-    app.use((req, res, next) => {
-        req.isAuthenticated = () => true;
-        next();
-    });
-}
-
-app.post(
-    "/login",
-    passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", {
-        successRedirect: "/",
-        failureRedirect: "/login",
-        failureFlash: true,
-    })
-);
-app.get("/login.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.css")));
-app.get("/login", (req, res) => res.sendFile(path.join(process.cwd(), "public", "login.html")));
+setupAuth(app);
 
 if (!DISABLE_SIGNUP) {
     app.post("/signup", connectionEnsureLogin.ensureLoggedOut(), (req, res, next) => {
