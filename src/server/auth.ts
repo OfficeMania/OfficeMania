@@ -10,7 +10,11 @@ import { connectDatabase, getId } from "./database";
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
 
-export const router: Router = Router();
+const router: Router = Router();
+
+export function getAuthRouter(): Router {
+    return router;
+}
 
 export function setupAuth(app: Express): void {
     // Use express sessions
@@ -122,6 +126,4 @@ export function setupAuth(app: Express): void {
         req.logout();
         res.redirect("/");
     });
-
-    //app.use("/auth", router);
 }
