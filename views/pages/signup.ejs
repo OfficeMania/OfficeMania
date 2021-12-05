@@ -5,7 +5,11 @@
         <link rel="stylesheet" href="auth.css">
         <title>Sign Up</title>
         <script>
+            function resetUserError() {
+                document.getElementById("error-user")?.remove();
+            }
             function validateForm() {
+                resetUserError();
                 const password1 = document.getElementById("password").value;
                 const password2 = document.getElementById("password-confirmation").value;
                 let entered = password1 !== "";
@@ -22,7 +26,7 @@
                 <div>
                     <label for="username"><strong>Username</strong></label>
                     <input id="username" type="text" placeholder="Enter Username" name="username"
-                           autocomplete="username" required />
+                           autocomplete="username" required oninput="resetUserError()" />
                     <% if (!!error) { %>
                         <small id="error-user" style="color: red;"><%= error; %></small>
                     <% } %>
