@@ -10,7 +10,7 @@ import {
     textchatSendButton,
 } from "./static";
 import { getOurPlayer, getRoom } from "./util";
-import { Chat, ChatMessage } from "../common/handler/chatHandler";
+import { ChatMessage } from "../common/handler/chatHandler";
 
 //tracks if button/shortcut have been pressed
 let _showTextchat = false;
@@ -51,15 +51,17 @@ export function initChatListener() {
     };
 
     textchatSendButton.addEventListener("click", () => {
-        sendMessage(textchatArea.value, "");
+        sendMessage(textchatArea.value, "global");
         textchatArea.value = "";
     });
 
     getRoom().onMessage(MessageType.CHAT_LOG, (message: string) => {
         console.log("message:", message);
-        const chat: Chat = JSON.parse(message);
-        console.log("chat:", chat);
+        const chatMessages: ChatMessage[] = JSON.parse(message);
+        console.log("chatMessages:", chatMessages);
+        chatMessages.forEach(writeMessage);
     });
+    getRoom().send(MessageType.CHAT_LOG, "global");
     textchatCreateButton.addEventListener("click", () => {});
 
     /*//write chatlog in client

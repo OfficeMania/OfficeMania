@@ -51,7 +51,7 @@ export class ChatHandler implements Handler {
     }
 
     onCreate(options?: any) {
-        this.globalChat = new Chat("");
+        this.globalChat = new Chat("global");
         this.chats.push(this.globalChat);
         this.room.onMessage(MessageType.CHAT_SEND, (client, message) => this.onSend(client, message));
         this.room.onMessage(MessageType.CHAT_LOG, (client, message) => this.onLog(client, message));
@@ -85,15 +85,16 @@ export class ChatHandler implements Handler {
         */
         const serverMessage: ChatMessage = makeMessage(this.room, client, chatMessage);
         chat.messages.push(serverMessage);
-        chat.messages.forEach(e => console.log("content: " + e));
-        if (chatId === "") {
+        chat.messages.forEach(chatMessage => console.log("chatMessage:", JSON.stringify(chatMessage)));
+        if (chatId === "global") {
             this.room.clients.forEach(client => client.send(MessageType.CHAT_NEW, serverMessage));
         }
     }
 
     onLog(client: Client, chatId?: string) {
         if (chatId) {
-            client.send(MessageType.CHAT_LOG, JSON.stringify(this.byId(chatId))); //TODO Check this
+            console.log("request log for:", chatId);
+            client.send(MessageType.CHAT_LOG, JSON.stringify(this.byId(chatId).messages)); //TODO Check this
         } else {
             //Send all chats as arrayschema
         }
