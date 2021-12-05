@@ -48,6 +48,39 @@ export default class User extends Model {
                 throw new Error(`Unsupported Password Version: ${version}`);
         }
     }
+
+    private upgradePasswordOnce(): boolean {
+        const password: string = this.getPassword();
+        const version: PasswordVersion = this.getPasswordVersion();
+        switch (version) {
+            case PasswordVersion.NONE:
+                return false;
+            case PasswordVersion.PLAIN:
+                this.setPassword(hashPasswordSync(password));
+                this.setPasswordVersion(PasswordVersion.BCRYPT);
+                return true;
+            case PasswordVersion.BCRYPT:
+                this.setPassword(encryptPassword(password));
+                this.setPasswordVersion(PasswordVersion.ENCRYPTED_BCRYPT);
+                return true;
+            case PasswordVersion.ENCRYPTED_BCRYPT:
+                return false;
+            default:
+                throw new Error(`Unsupported Password Version: ${version}`);
+        }
+    }
+
+    public upgradePassword(version: PasswordVersion): boolean {
+        if (this.getPasswordVersion() > version) {
+            throw new Error("Cannot downgrade Password");
+        }
+        while (this.getPasswordVersion() < version) {
+            if (!this.upgradePasswordOnce()) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 export function getUsername(user: User): string {
