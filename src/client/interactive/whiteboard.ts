@@ -38,8 +38,6 @@ export class Whiteboard extends Interactive {
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
     currentColor: number = 0;
-    //private indexOfStroke: number = 0; //used in drawOthers
-    //private currentlyUsingTool: boolean = false;
 
 
     //define events
@@ -58,7 +56,6 @@ export class Whiteboard extends Interactive {
             //use eraser
             ctx.strokeStyle = "white";
         }
-        //this.curentColor = ctx.strokeStyle;
         //draw to the canvas
         this.setPosition(e, this);
 
@@ -67,14 +64,8 @@ export class Whiteboard extends Interactive {
         this.makeLine(this.oldX, this.oldY, this.x, this.y, ctx); //from oldX,oldY to x,y
         ctx.closePath();
         ctx.stroke(); // draw it!
-        //this.indexOfStroke++;
 
         this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.x, this.y])
-
-        /*if (!this.currentlyUsingTool) {
-            this.currentlyUsingTool = true;
-            this.indexOfStroke++;
-        }*/
         
     }
 
@@ -93,7 +84,6 @@ export class Whiteboard extends Interactive {
 
     mouseUp = (e) => {
         this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, -1]);
-        //this.currentlyUsingTool = false;
     }
 
     clearPressed = () => {
@@ -197,7 +187,7 @@ export class Whiteboard extends Interactive {
         Whiteboard.currentWhiteboard = this.wID
 
         this.resize(this);
-        //this.setup(this.canvas);
+        //this.setup(this.canvas); //unnecessary because redraw calls setup
         this.redraw(this);
     }
 
@@ -231,7 +221,7 @@ export class Whiteboard extends Interactive {
     
     setup(canvas) {
         var ctx = canvas.getContext("2d");
-        ctx.fillStyle = "red"
+        ctx.fillStyle = "red"        //TODO: WHITEboard should be white (just red to be able to see the erased lines)
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "black"
         ctx.beginPath();
@@ -243,11 +233,9 @@ export class Whiteboard extends Interactive {
     }
 
     redraw(whiteboard: Whiteboard){
-        whiteboard.setup(whiteboard.canvas)
-        //this.indexOfStroke = 0;
+        whiteboard.setup(whiteboard.canvas);
         for (const [player] of whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer) {
             whiteboard.resetPlayer(player);
-            //whiteboard.drawOthers(player, whiteboard);
         }
         whiteboard.drawOthers(whiteboard);
     }
@@ -264,7 +252,6 @@ export class Whiteboard extends Interactive {
             whiteboard.whiteboardPlayer[id] = 0;
         }
         whiteboard.setup(whiteboard.canvas)
-        //this.indexOfStroke = 0;
     }
 
     save(whiteboard: Whiteboard, message: number) {
@@ -273,8 +260,6 @@ export class Whiteboard extends Interactive {
         }
 
         // This code will automatically save the current canvas as a .png file. 
-
-        // Get the canvas
         var canvas = <HTMLCanvasElement> document.getElementById("interactive");
         // Convert the canvas to data
         var image = canvas.toDataURL();
@@ -303,17 +288,10 @@ export class Whiteboard extends Interactive {
         penButton.style.top = rect.top + "px";
     }
 
-    drawOthers(whiteboard: Whiteboard) { //TODO Nach der redraw wird die glöschte linie wieder sichtbar
+    drawOthers(whiteboard: Whiteboard) { //TODO nach der redraw werden nicht alle linien richtuig dargestellt
         if(Whiteboard.currentWhiteboard !== this.wID){
             return;
         }
-        //this.clear(whiteboard, this.wID);
-        /*var max: number = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths.length;
-        var start: number = whiteboard.whiteboardPlayer[clientID]
-        var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths;
-        var color: ArraySchema<string> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].color;
-        //var color: string = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].color;
-        var j = 0;*/
         var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).paths;
         var color: ArraySchema<string> = whiteboard.room.state.whiteboard.at(whiteboard.wID).color;
         var max: number = paths.length;
@@ -321,44 +299,6 @@ export class Whiteboard extends Interactive {
 
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
-        //===========================old====================================//
-
-        /*ctx.beginPath(); // begin one stroke
-
-        for (var i: number = start; i + 3 < max; i++) {
-            if (paths[i] === -1) {
-                j = 0;
-                continue;
-            } else if (paths[i + 1] === -1) {
-                i = i + 1
-                j = 0;
-                continue;
-            } else if (paths[i + 2] === -1) {
-                i = i + 2
-                j = 0;
-                continue;
-            } else if (paths[i + 3] === -1) {
-                i = i + 3
-                j = 0;
-                continue;
-            }
-            if (j === 0) {
-                ctx.strokeStyle = color[this.indexOfStroke];
-                whiteboard.makeLine(paths[i], paths[i + 1], paths[i + 2], paths[i + 3], ctx);
-                this.indexOfStroke++;
-                j++;
-            } else {
-                j = 0;
-            }
-        }
-        ctx.stroke(); // draw it!
-        ctx.closePath(); //end this stroke
-
-
-        whiteboard.whiteboardPlayer[clientID] = max - 2;*/
-
-        //=================================new================================//
-
         var j = 0;
         let indexOfStroke = 0;
         for (var i: number = 0; i < max - 3; i++) {

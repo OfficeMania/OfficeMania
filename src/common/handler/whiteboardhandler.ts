@@ -5,7 +5,6 @@ import {MessageType} from "../util";
 import {ArraySchema} from "@colyseus/schema";
 
 let whiteboardCount = 300
-//let indexOfStroke: number = 0;
 
 export class WhiteboardHandler implements Handler {
 
@@ -32,7 +31,7 @@ export class WhiteboardHandler implements Handler {
     }
 
     onLeave(client: Client, consented: boolean) {
-        //Nothing
+        //Nothing?
     }
 
     onDispose() {
@@ -52,9 +51,6 @@ function onNewWhiteboard(room: Room<State>, client: Client, wID: number){
 }
 
 function onClear(room: Room<State>, client: Client, wID: number) {
-    /*for (const [, player] of room.state.whiteboard.at(wID).whiteboardPlayer) {
-        player.paths = new ArraySchema<number>();
-    }*/
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
     room.broadcast(MessageType.WHITEBOARD_CLEAR, wID, {except: client});
     room.state.whiteboard.at(wID).color = new ArraySchema<string>();
@@ -62,10 +58,7 @@ function onClear(room: Room<State>, client: Client, wID: number) {
 }
 
 function onSave(room: Room<State>, client: Client, wID: number) {
-    /*for (const [, player] of room.state.whiteboard.at(wID).whiteboardPlayer) {
-        player.paths = new ArraySchema<number>();
-    }
-    room.broadcast(MessageType.WHITEBOARD_SAVE, wID, {except: client});*/
+    //room.broadcast(MessageType.WHITEBOARD_SAVE, wID, {except: client});
     //nothing?
 }
 
@@ -79,10 +72,6 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
         } else {
             room.state.whiteboard.at(wID).color.push('white');
         }
-        //indexOfStroke++; //unnecessary??
-        //if (room.state.whiteboard.at(wID).color[room.state.whiteboard.at(wID).indexOfStroke] !== 'NULL') {
-            //room.state.whiteboard.at(wID).indexOfStroke++;
-        //}
     } else {
         room.state.whiteboard.at(wID).paths.push(...message);
     }
@@ -90,15 +79,9 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
 }
 
 function onDraw(room: Room<State>, client: Client, wID: number) {
-    //room.broadcast(MessageType.WHITEBOARD_REDRAW, wID, {except: client});
-    //let indexOfStroke = room.state.whiteboard.at(wID).indexOfStroke;
     room.state.whiteboard.at(wID).color.push('black');
-    //room.state.whiteboard.at(wID).color[indexOfStroke + 1] = 'NULL';
 }
 
 function onErase(room: Room<State>, client: Client, wID: number) {
-    //room.broadcast(MessageType.WHITEBOARD_REDRAW, wID, {except: client});
-    //let indexOfStroke = room.state.whiteboard.at(wID).indexOfStroke;
     room.state.whiteboard.at(wID).color.push('white');
-    //room.state.whiteboard.at(wID).color[indexOfStroke + 1] = 'NULL';
 }
