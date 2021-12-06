@@ -128,6 +128,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 // console.log("Add", sessionId, playerData);
 
                 let player: Player = {
+                    userId: playerData.id,
                     roomId: sessionId,
                     name: "",
                     participantId: null,

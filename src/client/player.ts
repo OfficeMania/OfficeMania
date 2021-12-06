@@ -19,6 +19,7 @@ export var PLAYER_COLORS = ["red", "blue", "green", "yellow", "black"];
  * a change from the server is reported (in the onAdd, onRemove, onChange methods).
  */
 export interface Player {
+    userId: string; // user id logged in with
     roomId: string; //players id in the room
     name: string; //players name
     participantId: string; //id of the jitsi participant
