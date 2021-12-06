@@ -1,19 +1,19 @@
-import {Client, Presence, Room} from "colyseus";
-import {State} from "./schema/state";
-import fs from 'fs';
-import {generateUUIDv4} from "../util";
-import {PongHandler} from "../handler/ponghandler";
-import {Handler} from "../handler/handler";
-import {DoorHandler} from "../handler/doorhandler";
-import {PlayerHandler} from "../handler/playerhandler";
-import {WhiteboardHandler} from "../handler/whiteboardhandler";
-import {TodoListHandler} from "../handler/todoListhandler";
-import {ChessHandler} from "../handler/chesshandler";
+import { Client, Presence, Room } from "colyseus";
+import { State } from "./schema/state";
+import fs from "fs";
+import { generateUUIDv4 } from "../util";
+import { PongHandler } from "../handler/ponghandler";
+import { Handler } from "../handler/handler";
+import { DoorHandler } from "../handler/doorhandler";
+import { PlayerHandler } from "../handler/playerhandler";
+import { WhiteboardHandler } from "../handler/whiteboardhandler";
+import { TodoListHandler } from "../handler/todoListhandler";
+import { ChessHandler } from "../handler/chesshandler";
 import { MachineHandler } from "../handler/machinehandler";
 import { NotesHandler } from "../handler/noteshandler";
 import { ChatHandler } from "../handler/chatHandler";
 
-const path = require('path');
+const path = require("path");
 
 const chessHandler: ChessHandler = new ChessHandler();
 const doorHandler: DoorHandler = new DoorHandler();
@@ -24,16 +24,25 @@ const todoListHandler: TodoListHandler = new TodoListHandler();
 const machineHandler: MachineHandler = new MachineHandler();
 const notesHandler: NotesHandler = new NotesHandler();
 const chatHandler: ChatHandler = new ChatHandler();
-const handlers: Handler[] = [chessHandler, doorHandler, playerHandler, pongHandler, whiteboardHandler, todoListHandler, machineHandler, notesHandler, chatHandler];
+const handlers: Handler[] = [
+    chessHandler,
+    doorHandler,
+    playerHandler,
+    pongHandler,
+    whiteboardHandler,
+    todoListHandler,
+    machineHandler,
+    notesHandler,
+    chatHandler,
+];
 
 /*
  * See: https://docs.colyseus.io/server/room/
  */
 export class TURoom extends Room<State> {
-
     constructor(presence: Presence) {
         super(presence);
-        handlers.forEach((handler) => handler.init(this));
+        handlers.forEach(handler => handler.init(this));
     }
 
     onCreate(options: any) {
@@ -42,12 +51,14 @@ export class TURoom extends Room<State> {
         //generate jitsi conference id and password
         setupConferenceData(this.state);
         //sets the interval in which update gets called
-        this.setSimulationInterval((deltaTime) => this.update(deltaTime));
+        this.setSimulationInterval(deltaTime => this.update(deltaTime));
         //loads paths from assets
-        fs.readdirSync('./assets/img/characters').filter(file => file.includes(".png")).forEach(file => this.state.playerSpritePaths.push(file));
+        fs.readdirSync("./assets/img/characters")
+            .filter(file => file.includes(".png"))
+            .forEach(file => this.state.playerSpritePaths.push(file));
         //loads paths from templates
         getPaths("./assets/templates", this.state);
-        handlers.forEach((handler) => handler.onCreate(options));
+        handlers.forEach(handler => handler.onCreate(options));
     }
 
     onAuth(client: Client, options: any, req: any) {
@@ -55,23 +66,22 @@ export class TURoom extends Room<State> {
     }
 
     onJoin(client: Client) {
-        handlers.forEach((handler) => handler.onJoin(client));
+        handlers.forEach(handler => handler.onJoin(client));
     }
 
     onLeave(client: Client, consented: boolean) {
-        handlers.forEach((handler) => handler.onLeave(client, consented));
+        handlers.forEach(handler => handler.onLeave(client, consented));
         delete this.state.players[client.sessionId];
     }
 
     onDispose() {
-        handlers.forEach((handler) => handler.onDispose());
+        handlers.forEach(handler => handler.onDispose());
     }
 
     //gameloop for server
     update(deltaTime) {
         //Nothing?
     }
-
 }
 
 function setupConferenceData(state: State) {
