@@ -12,6 +12,7 @@ import { ChessHandler } from "../handler/chesshandler";
 import { MachineHandler } from "../handler/machinehandler";
 import { NotesHandler } from "../handler/noteshandler";
 import { ChatHandler } from "../handler/chatHandler";
+import http from "http";
 
 const path = require("path");
 
@@ -61,11 +62,20 @@ export class TURoom extends Room<State> {
         handlers.forEach(handler => handler.onCreate(options));
     }
 
-    onAuth(client: Client, options: any, req: any) {
-        return true;
+    onAuth(client: Client, options: any, req: http.IncomingMessage) {
+        const session: { passport: { user: string } } = req["session"];
+        if (!session) {
+            return false;
+        }
+        const userId: string = session?.passport?.user;
+        if (!userId) {
+            return false;
+        }
+        return userId;
     }
 
-    onJoin(client: Client) {
+    onJoin(client: Client, options: any, auth: any) {
+        client.userData.id = auth as string;
         handlers.forEach(handler => handler.onJoin(client));
     }
 
