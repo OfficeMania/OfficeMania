@@ -7,7 +7,8 @@ import {ArraySchema} from "@colyseus/schema";
 let whiteboardCount = 300
 
 export class WhiteboardHandler implements Handler {
-
+    //TODO: refactor: do we need all the empty functions?
+    
     room: Room<State>;
 
     init(room: Room<State>) {
@@ -46,7 +47,7 @@ function onNewWhiteboard(room: Room<State>, client: Client, wID: number){
         whiteboardCount++;
     }
     room.state.whiteboard.at(wID).color = new ArraySchema<string>();
-    room.state.whiteboard.at(wID).color.push('black');
+    room.state.whiteboard.at(wID).color.push('black'); //first line is black
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
 }
 
@@ -54,7 +55,7 @@ function onClear(room: Room<State>, client: Client, wID: number) {
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
     room.broadcast(MessageType.WHITEBOARD_CLEAR, wID, {except: client});
     room.state.whiteboard.at(wID).color = new ArraySchema<string>();
-    room.state.whiteboard.at(wID).color.push('black');
+    room.state.whiteboard.at(wID).color.push('black'); //first line is black
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
 }
 
@@ -68,8 +69,8 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
     var color: number = message.shift(); //colors: 0=black, 1=white
     if (message[0] < 0) {
         let length = room.state.whiteboard.at(wID).paths.length;
-        if (room.state.whiteboard.at(wID).paths.at(length-2) > -1) {
-            room.state.whiteboard.at(wID).paths.push(-1);
+        if (room.state.whiteboard.at(wID).paths.at(length-2) > -1) { //only push -1 if last element is not already -1
+            room.state.whiteboard.at(wID).paths.push(-1); //-1 means end of line/beginning of new line
             if (color === 0 && message[0] === -1) {
                 room.state.whiteboard.at(wID).color.push('black');
             } else if (color === 1 && message[0] === -1) {
@@ -84,9 +85,9 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
 }
 
 function onDraw(room: Room<State>, client: Client, wID: number) {
-    //room.state.whiteboard.at(wID).color.push('black');
+    //nothing?
 }
 
 function onErase(room: Room<State>, client: Client, wID: number) {
-    //room.state.whiteboard.at(wID).color.push('white');
+    //nothing?
 }
