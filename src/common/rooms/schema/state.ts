@@ -16,7 +16,7 @@ export class ConferenceData extends Schema {
  */
 export class PlayerData extends Schema {
     @type("string")
-    id: string;
+    userId: string;
 
     @type("string")
     name: string;
