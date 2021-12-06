@@ -68,6 +68,12 @@ export function initChatListener() {
     textchatArea.onblur = function () {
         setInFocus(false);
     };
+    textchatArea.addEventListener("keydown", e => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            textchatSendButton.click();
+        }
+    });
 
     textchatSendButton.addEventListener("click", () => {
         sendMessage(textchatArea.value, textchatSelect.selectedOptions[0].value);
