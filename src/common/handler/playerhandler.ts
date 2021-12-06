@@ -35,6 +35,7 @@ export class PlayerHandler implements Handler {
 
     onJoin(client: Client) {
         this.room.state.players[client.sessionId] = new PlayerData();
+        this.room.state.players[client.sessionId].id = client.userData?.id;
         this.room.state.players[client.sessionId].name = "";
         this.room.state.players[client.sessionId].character = "Adam_48x48.png";
         this.room.state.players[client.sessionId].x = 0;

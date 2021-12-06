@@ -15,6 +15,8 @@ export class ConferenceData extends Schema {
  * Class to sync the playerdata with the server
  */
 export class PlayerData extends Schema {
+    @type("string")
+    id: string;
 
     @type("string")
     name: string;
