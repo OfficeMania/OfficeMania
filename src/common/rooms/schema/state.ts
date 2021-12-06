@@ -35,26 +35,9 @@ export class PlayerData extends Schema {
 }
 
 /*
- * state of whiteboard players
- */
-export class WhiteboardPlayerState extends Schema {
-    @type({ array: "number" })
-    paths: ArraySchema<number> = new ArraySchema<number>();
-
-    //@type("string")
-    //color: string;
-    @type({array: "string"})
-    color: ArraySchema<string> = new ArraySchema<string>();
-
-}
-
-/*
  * state of whiteboard
  */
 export class WhiteboardState extends Schema {
-    @type({ map: WhiteboardPlayerState })
-    whiteboardPlayer: MapSchema<WhiteboardPlayerState> = new MapSchema<WhiteboardPlayerState>();
-
     @type({array: "number"})
     paths: ArraySchema<number> = new ArraySchema<number>();
 

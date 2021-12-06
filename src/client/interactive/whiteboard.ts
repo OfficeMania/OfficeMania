@@ -33,7 +33,6 @@ export class Whiteboard extends Interactive {
     stretchY: number = 1;
     private room: Room<State>;
     private players: PlayerRecord;
-    private whiteboardPlayer: { [key: string]: number } = {};
     wID: number = 0;
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
@@ -234,22 +233,12 @@ export class Whiteboard extends Interactive {
 
     redraw(whiteboard: Whiteboard){
         whiteboard.setup(whiteboard.canvas);
-        for (const [player] of whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer) {
-            whiteboard.resetPlayer(player);
-        }
         whiteboard.drawOthers(whiteboard);
-    }
-
-    resetPlayer(player: string) {
-        this.whiteboardPlayer[player] = 0;
     }
 
     clear(whiteboard: Whiteboard, message: number) {
         if(whiteboard.wID !== message){
             return;
-        }
-        for (var id in whiteboard.whiteboardPlayer) {
-            whiteboard.whiteboardPlayer[id] = 0;
         }
         whiteboard.setup(whiteboard.canvas)
     }

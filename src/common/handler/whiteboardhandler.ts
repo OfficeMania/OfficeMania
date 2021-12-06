@@ -1,6 +1,6 @@
 import {Handler} from "./handler";
 import {Client, Room} from "colyseus";
-import {State, WhiteboardPlayerState, WhiteboardState} from "../rooms/schema/state";
+import {State, WhiteboardState} from "../rooms/schema/state";
 import {MessageType} from "../util";
 import {ArraySchema} from "@colyseus/schema";
 
@@ -45,7 +45,6 @@ function onNewWhiteboard(room: Room<State>, client: Client, wID: number){
         room.state.whiteboard.push(new WhiteboardState());
         whiteboardCount++;
     }
-    room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId] = new WhiteboardPlayerState();
     room.state.whiteboard.at(wID).color = new ArraySchema<string>();
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
 }
