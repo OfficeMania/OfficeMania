@@ -82,7 +82,7 @@ export class Whiteboard extends Interactive {
     }
 
     mouseUp = (e) => {
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, -1]);
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, -2]); //-2: dont save color again (already saved)
     }
 
     clearPressed = () => {

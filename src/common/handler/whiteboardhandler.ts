@@ -46,6 +46,7 @@ function onNewWhiteboard(room: Room<State>, client: Client, wID: number){
         whiteboardCount++;
     }
     room.state.whiteboard.at(wID).color = new ArraySchema<string>();
+    room.state.whiteboard.at(wID).color.push('black');
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
 }
 
@@ -53,6 +54,7 @@ function onClear(room: Room<State>, client: Client, wID: number) {
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
     room.broadcast(MessageType.WHITEBOARD_CLEAR, wID, {except: client});
     room.state.whiteboard.at(wID).color = new ArraySchema<string>();
+    room.state.whiteboard.at(wID).color.push('black');
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
 }
 
@@ -64,13 +66,19 @@ function onSave(room: Room<State>, client: Client, wID: number) {
 function onPath(room: Room<State>, client: Client, message: number[]) {           //message: [wID, color, x, y]
     var wID: number = message.shift();
     var color: number = message.shift(); //colors: 0=black, 1=white
-    if (message[0] === -1) {
-        room.state.whiteboard.at(wID).paths.push(-1);
-        if (color === 0) {
-            room.state.whiteboard.at(wID).color.push('black');
-        } else {
-            room.state.whiteboard.at(wID).color.push('white');
+    if (message[0] < 0) {
+        let length = room.state.whiteboard.at(wID).paths.length;
+        if (room.state.whiteboard.at(wID).paths.at(length-2) > -1) {
+            room.state.whiteboard.at(wID).paths.push(-1);
+            if (color === 0 && message[0] === -1) {
+                room.state.whiteboard.at(wID).color.push('black');
+                console.log(room.state.whiteboard.at(wID).color);
+            } else if (color === 1 && message[0] === -1) {
+                room.state.whiteboard.at(wID).color.push('white');
+                console.log(room.state.whiteboard.at(wID).color);
+            }
         }
+        
     } else {
         room.state.whiteboard.at(wID).paths.push(...message);
     }
@@ -78,9 +86,9 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
 }
 
 function onDraw(room: Room<State>, client: Client, wID: number) {
-    room.state.whiteboard.at(wID).color.push('black');
+    //room.state.whiteboard.at(wID).color.push('black');
 }
 
 function onErase(room: Room<State>, client: Client, wID: number) {
-    room.state.whiteboard.at(wID).color.push('white');
+    //room.state.whiteboard.at(wID).color.push('white');
 }
