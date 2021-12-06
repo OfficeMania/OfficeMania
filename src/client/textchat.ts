@@ -1,6 +1,15 @@
 import { MessageType } from "../common/util";
 import { checkInputMode } from "./main";
-import { textchatArea, textchatBar, textchatButton, textchatContainer, textchatCreateButton, textchatSelect, textchatMenuButton, textchatSendButton } from "./static";
+import {
+    textchatArea,
+    textchatBar,
+    textchatButton,
+    textchatContainer,
+    textchatCreateButton,
+    textchatSelect,
+    textchatMenuButton,
+    textchatSendButton,
+} from "./static";
 import { getOurPlayer, getRoom } from "./util";
 import { ChatState } from "../common/handler/chatHandler";
 
@@ -8,7 +17,7 @@ import { ChatState } from "../common/handler/chatHandler";
 let _showTextchat = false;
 
 //tracks if client is using text area, for changing of inputmode
-var _inFocus = false; 
+var _inFocus = false;
 
 var _menuOpen = false;
 
@@ -16,44 +25,43 @@ var _clientLogs = new Map();
 
 //initializes all needed functions for the chat
 export function initChatListener() {
-
     textchatButton.addEventListener("click", () => toggleTextchatBar());
-    while (textchatSelect.firstChild){
+    while (textchatSelect.firstChild) {
         textchatSelect.firstChild.remove();
     }
     console.log("hello");
-    const option = document.createElement("option"); 
+    const option = document.createElement("option");
     option.innerText = "globul";
     option.value = "ungabunga";
     textchatSelect.append(option);
     getRoom().state.players.forEach((value, key) => {
-        if (key === getOurPlayer().id) {
+        if (key === getOurPlayer().roomId) {
             return;
         }
-        const option = document.createElement("option"); 
+        const option = document.createElement("option");
         option.innerText = getRoom().state.players[key].name;
         option.value = key;
         textchatSelect.append(option);
-    })
+    });
     //changing of inputmode if text area is in use or not
-    textchatArea.onfocus = function(){setInFocus(true)};
-    textchatArea.onblur = function() {setInFocus(false)};
-    
+    textchatArea.onfocus = function () {
+        setInFocus(true);
+    };
+    textchatArea.onblur = function () {
+        setInFocus(false);
+    };
+
     textchatSendButton.addEventListener("click", () => {
         sendMessage(textchatArea.value, 0);
         textchatArea.value = "";
     });
-    
-    getRoom().onMessage(MessageType.CHAT_LOG, (message) => {
+
+    getRoom().onMessage(MessageType.CHAT_LOG, message => {
         console.log(message);
     });
-    textchatCreateButton.addEventListener("click", () => {
-        
-    });
+    textchatCreateButton.addEventListener("click", () => {});
 
-    
-    
-    /*//write chatlog in client 
+    /*//write chatlog in client
     let counter = 0;
     getRoom().state.chatState.contents.forEach((e) => {
         console.log("gogo " + counter)
@@ -62,7 +70,7 @@ export function initChatListener() {
     });*/
 
     //primitive updating of the chat
-    getRoom().onMessage(MessageType.CHAT_NEW, (message) => {
+    getRoom().onMessage(MessageType.CHAT_NEW, message => {
         //TODO Decode message for key
         writeMessage(message);
 
@@ -88,23 +96,23 @@ export function getInFocus() {
 //will need to accept key/position of chatgroupstate
 function writeMessage(message: string) {
     let pos = message.substr(0, 1);
-    let messageLine = document.createElement('p');
+    let messageLine = document.createElement("p");
     let messageString = message.substr(1);
     console.log(messageString);
-    let formattedMessage = "(" + messageString.substring(0,5) + ") " + messageString.substring(6)
+    let formattedMessage = "(" + messageString.substring(0, 5) + ") " + messageString.substring(6);
     messageLine.innerText = formattedMessage;
     textchatBar.prepend(messageLine);
     console.log("writing message" + pos);
 }
 
-function setInFocus(set){
+function setInFocus(set) {
     _inFocus = set;
     checkInputMode();
-}  
+}
 
 //toggles chat visibility
 function toggleTextchatBar() {
-    if(getShowTextchatBar()) setShowTextchatBar(false);
+    if (getShowTextchatBar()) setShowTextchatBar(false);
     else setShowTextchatBar(true);
     checkInputMode();
 }
@@ -118,21 +126,18 @@ function sendMessage(message: string, pos: number) {
 }
 
 //getter of _showTextchat
-function getShowTextchatBar(): boolean{
+function getShowTextchatBar(): boolean {
     return _showTextchat;
 }
 
 //setter of _showTextchat
 function setShowTextchatBar(set: boolean) {
-    if(set) {
+    if (set) {
         textchatContainer.classList.add("hover");
-    }
-    else {
+    } else {
         textchatContainer.classList.remove("hover");
     }
     _showTextchat = set;
 }
 
-function onStateChange(){
-
-}
+function onStateChange() {}

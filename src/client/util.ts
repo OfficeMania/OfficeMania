@@ -128,7 +128,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 // console.log("Add", sessionId, playerData);
 
                 let player: Player = {
-                    id: sessionId,
+                    roomId: sessionId,
                     name: "",
                     participantId: null,
                     character: "Adam_48x48.png",
@@ -418,7 +418,7 @@ export function getPlayerByRoomId(playerId: string): Player {
         return null;
     }
     for (const player of Object.values(players)) {
-        if (player?.id === playerId) {
+        if (player?.roomId === playerId) {
             return player;
         }
     }

@@ -1,10 +1,10 @@
-import {Interactive} from "./interactive"
-import {getCorrectedPlayerCoordinates, getOurPlayer, getRoom} from "../util"
-import {Chunk, MapInfo, TileSet} from "../map"
-import {Room} from "colyseus.js";
-import {State} from "../../common";
-import {MessageType} from "../../common/util";
-import {doors} from "../static";
+import { Interactive } from "./interactive";
+import { getCorrectedPlayerCoordinates, getOurPlayer, getRoom } from "../util";
+import { Chunk, MapInfo, TileSet } from "../map";
+import { Room } from "colyseus.js";
+import { State } from "../../common";
+import { MessageType } from "../../common/util";
+import { doors } from "../static";
 
 export enum DoorDirection {
     UNKNOWN,
@@ -12,17 +12,16 @@ export enum DoorDirection {
     EAST,
     SOUTH,
     WEST,
-    ALWAYS_OPEN
+    ALWAYS_OPEN,
 }
 
 export class Door extends Interactive {
-
     isClosed: boolean;
     direction: DoorDirection;
     playerId: string;
     posX: number;
     posY: number;
-    map: MapInfo
+    map: MapInfo;
     texture: HTMLImageElement;
     tileSet: TileSet;
     private room: Room<State>;
@@ -46,7 +45,6 @@ export class Door extends Interactive {
     syncDelay: number;
 
     constructor(direction: DoorDirection, posX: number, posY: number, map: MapInfo) {
-
         super("Door", true, 1);
         this.isClosed = false;
         this.lastIsClosed = false;
@@ -69,25 +67,21 @@ export class Door extends Interactive {
         this.syncDelay = 0;
     }
 
-
     onInteraction(): void {
         let player = getOurPlayer();
         let [x, y] = getCorrectedPlayerCoordinates(player);
-        this.startInteraction(x, y, player.id);
+        this.startInteraction(x, y, player.roomId);
     }
 
     calculateX(correction: number) {
-
         return (this.posX + correction) / 2 + this.map.lowestX;
     }
 
     calculateY(correction: number) {
-
         return (this.posY + correction) / 2 + this.map.lowestY;
     }
 
     chunkCorrection(i: number) {
-
         if (i < 0) {
             return 16 - Math.abs(i);
         } else {
@@ -96,7 +90,6 @@ export class Door extends Interactive {
     }
 
     setTexture() {
-
         let x = this.calculateX(0);
         let y = this.calculateY(0);
 
@@ -111,12 +104,10 @@ export class Door extends Interactive {
 
         for (const layer of this.map.layers) {
             if (layer.name === "Doors") {
-
                 for (const chunk of layer.chunks) {
-
                     if (this.chunkStartX === chunk.posX && this.chunkStartY === chunk.posY) {
-
-                        if (!chunk.tileSetForElement[this.chunkX][this.chunkY]) { //why are there two doors with this?
+                        if (!chunk.tileSetForElement[this.chunkX][this.chunkY]) {
+                            //why are there two doors with this?
                             // console.log("ehhhh");
                             return;
                         } else {
@@ -127,12 +118,10 @@ export class Door extends Interactive {
                     }
                 }
             } else if (layer.name !== "Doors") {
-
                 for (const groundChunk of layer.chunks) {
-
                     if (this.chunkStartX === groundChunk.posX && this.chunkStartY === groundChunk.posY) {
-
-                        if (!groundChunk.tileSetForElement[this.chunkX][this.chunkY]) { //why are there two doors with this?
+                        if (!groundChunk.tileSetForElement[this.chunkX][this.chunkY]) {
+                            //why are there two doors with this?
                             // console.log("ehhhh");
                         } else {
                             this.groundTileset = groundChunk.tileSetForElement[this.chunkX][this.chunkY];
@@ -141,7 +130,6 @@ export class Door extends Interactive {
                         }
                     }
                 }
-
             }
         }
     }
@@ -158,7 +146,7 @@ export class Door extends Interactive {
         } else {
             this.playerId = id;
             this.isClosed = true;
-            let message = [this.posX + "" + this.posY, this.playerId]
+            let message = [this.posX + "" + this.posY, this.playerId];
             this.room.send(MessageType.DOOR_LOCK, message);
         }
     }
@@ -238,7 +226,8 @@ export class Door extends Interactive {
         const bottom = new DoorPart(ty, by * resolution);
         const middle = new DoorPart(ty - resolution, (by - 1) * resolution);
         const top = new DoorPart(ty - resolution * 2, (by - 2) * resolution);
-        if (this.inAnimation && this.syncIndex && this.delay === 5) { //TODO Do not sync door animation with server? Just animate it on message/event...
+        if (this.inAnimation && this.syncIndex && this.delay === 5) {
+            //TODO Do not sync door animation with server? Just animate it on message/event...
             this.syncDelay = 0;
             if (this.isClosed) {
                 this.animationCounter--;
@@ -256,7 +245,7 @@ export class Door extends Interactive {
             if (lastCounter !== this.animationCounter) {
                 const sxOpenVertical = tx + this.animationCounter * resolution;
                 const sxOpenHorizontalLeft = tx + (this.animationCounter * 2 - 1) * resolution;
-                const sxOpenHorizontalRight = tx + (this.animationCounter * 2) * resolution;
+                const sxOpenHorizontalRight = tx + this.animationCounter * 2 * resolution;
                 switch (this.direction) {
                     case DoorDirection.NORTH: {
                         this.ctx.clearRect(bxTimes, top.dy, resolution, resolution * 3);
@@ -276,14 +265,38 @@ export class Door extends Interactive {
                         break;
                     }
                 }
-                this.drawDoorIntern(resolution, sxOpenVertical, sxOpenHorizontalLeft, sxOpenHorizontalRight, bxTimes, bxMinusTimes, bxPlusTimes, bottomDeep, bottom, middle, top);
+                this.drawDoorIntern(
+                    resolution,
+                    sxOpenVertical,
+                    sxOpenHorizontalLeft,
+                    sxOpenHorizontalRight,
+                    bxTimes,
+                    bxMinusTimes,
+                    bxPlusTimes,
+                    bottomDeep,
+                    bottom,
+                    middle,
+                    top
+                );
             }
         }
         if (!this.firstTimeDrawn) {
             const sxOpenVertical = tx + 4 * resolution;
             const sxOpenHorizontalLeft = tx + 7 * resolution;
             const sxOpenHorizontalRight = tx + 8 * resolution;
-            this.drawDoorIntern(resolution, sxOpenVertical, sxOpenHorizontalLeft, sxOpenHorizontalRight, bxTimes, bxMinusTimes, bxPlusTimes, bottomDeep, bottom, middle, top);
+            this.drawDoorIntern(
+                resolution,
+                sxOpenVertical,
+                sxOpenHorizontalLeft,
+                sxOpenHorizontalRight,
+                bxTimes,
+                bxMinusTimes,
+                bxPlusTimes,
+                bottomDeep,
+                bottom,
+                middle,
+                top
+            );
             this.firstTimeDrawn = true;
         }
         if (this.delay === 5) {
@@ -292,7 +305,19 @@ export class Door extends Interactive {
         this.delay++;
     }
 
-    private drawDoorIntern(resolution: number, sxVertical: number, sxHorizontalLeft: number, sxHorizontalRight: number, dxMiddle: number, dxLeft: number, dxRight: number, bottomDeep: DoorPart, bottom: DoorPart, middle: DoorPart, top: DoorPart) {
+    private drawDoorIntern(
+        resolution: number,
+        sxVertical: number,
+        sxHorizontalLeft: number,
+        sxHorizontalRight: number,
+        dxMiddle: number,
+        dxLeft: number,
+        dxRight: number,
+        bottomDeep: DoorPart,
+        bottom: DoorPart,
+        middle: DoorPart,
+        top: DoorPart
+    ) {
         switch (this.direction) {
             case DoorDirection.NORTH: {
                 this.drawVertical(resolution, sxVertical, dxMiddle, bottom, middle, top);
@@ -300,7 +325,16 @@ export class Door extends Interactive {
             }
             case DoorDirection.EAST: {
                 // this.drawHorizontal(resolution, sxHorizontalLeft, sxHorizontalRight, dxMiddle, dxRight, bottom, middle, top);
-                this.drawHorizontal(resolution, sxHorizontalLeft, sxHorizontalRight, dxLeft, dxMiddle, bottom, middle, top);
+                this.drawHorizontal(
+                    resolution,
+                    sxHorizontalLeft,
+                    sxHorizontalRight,
+                    dxLeft,
+                    dxMiddle,
+                    bottom,
+                    middle,
+                    top
+                );
                 break;
             }
             case DoorDirection.SOUTH: {
@@ -308,13 +342,31 @@ export class Door extends Interactive {
                 break;
             }
             case DoorDirection.WEST: {
-                this.drawHorizontal(resolution, sxHorizontalLeft, sxHorizontalRight, dxLeft, dxMiddle, bottom, middle, top);
+                this.drawHorizontal(
+                    resolution,
+                    sxHorizontalLeft,
+                    sxHorizontalRight,
+                    dxLeft,
+                    dxMiddle,
+                    bottom,
+                    middle,
+                    top
+                );
                 break;
             }
         }
     }
 
-    private drawHorizontal(resolution: number, sxLeft: number, sxRight: number, dxLeft: number, dxRight: number, bottom: DoorPart, middle: DoorPart, top: DoorPart) {
+    private drawHorizontal(
+        resolution: number,
+        sxLeft: number,
+        sxRight: number,
+        dxLeft: number,
+        dxRight: number,
+        bottom: DoorPart,
+        middle: DoorPart,
+        top: DoorPart
+    ) {
         this.drawVertical(resolution, sxLeft, dxLeft, bottom, middle, top); // Draw left Part of the Door
         this.drawVertical(resolution, sxRight, dxRight, bottom, middle, top); // Draw right Part of the Door
     }
@@ -324,11 +376,10 @@ export class Door extends Interactive {
         this.ctx.drawImage(this.texture, sx, middle.sy, length, length, dx, middle.dy, length, length); // Draw middle Part of the Door
         this.ctx.drawImage(this.texture, sx, top.sy, length, length, dx, top.dy, length, length); // Draw top Part of the Door
     }
-
 }
 
 export function updateDoors() {
-    Door.doors.forEach((value) => {
+    Door.doors.forEach(value => {
         value.sync();
         value.update();
         value.drawDoor();
@@ -336,7 +387,6 @@ export function updateDoors() {
 }
 
 class DoorPart {
-
     private _sy: number;
     private _dy: number;
 
@@ -360,5 +410,4 @@ class DoorPart {
     set dy(value: number) {
         this._dy = value;
     }
-
 }

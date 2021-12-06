@@ -1,25 +1,24 @@
-import {Room} from "colyseus.js";
-import {State} from "../../common";
-import {PongState} from "../../common/rooms/schema/state";
-import {Direction, MessageType} from "../../common/util";
-import {checkInputMode} from "../main";
-import {Player} from "../player";
+import { Room } from "colyseus.js";
+import { State } from "../../common";
+import { PongState } from "../../common/rooms/schema/state";
+import { Direction, MessageType } from "../../common/util";
+import { checkInputMode } from "../main";
+import { Player } from "../player";
 import {
     createCloseInteractionButton,
     getOurPlayer,
     getPlayers,
     getRoom,
     PlayerRecord,
-    removeCloseInteractionButton
+    removeCloseInteractionButton,
 } from "../util";
-import {Interactive} from "./interactive";
-import {Pong, PongPlayer} from "./pong";
-import {PongMessage} from "../../common/handler/ponghandler";
+import { Interactive } from "./interactive";
+import { Pong, PongPlayer } from "./pong";
+import { PongMessage } from "../../common/handler/ponghandler";
 
 let ourGame: Pong;
 
 export class PingPongTable extends Interactive {
-
     //pongs: Pong[];
     room: Room<State>;
     ourPlayer: Player;
@@ -28,7 +27,7 @@ export class PingPongTable extends Interactive {
     leavable: boolean;
 
     constructor() {
-        super("Pong table", false, 2)
+        super("Pong table", false, 2);
         this.room = getRoom();
         this.players = getPlayers();
         this.input = [null];
@@ -49,25 +48,23 @@ export class PingPongTable extends Interactive {
             checkInputMode();
             this.initListener();
             createCloseInteractionButton(() => this.leave());
-
         } else {
             //console.log("already in a game");
         }
     }
 
     initListener() {
-        this.room.onMessage(MessageType.PONG_INTERACTION, (message) => {
+        this.room.onMessage(MessageType.PONG_INTERACTION, message => {
             //console.log("interatction message recieved in client " + message)
             switch (message) {
                 case PongMessage.INIT: {
-
                     this.getPong();
                     this.leavable = true;
                     break;
                 }
                 case PongMessage.UPDATE: {
                     if (ourGame) {
-                        ourGame.selfGameId = this.getGame(this.ourPlayer.id);
+                        ourGame.selfGameId = this.getGame(this.ourPlayer.roomId);
                         this.updateState();
                         ourGame.paint();
                     }
@@ -84,8 +81,8 @@ export class PingPongTable extends Interactive {
 
     getPong() {
         let stateSize = this.getHighestIndex();
-        this.room.state.pongStates.forEach((state) => {
-            if (state.playerA === this.ourPlayer.id || state.playerB === this.ourPlayer.id) {
+        this.room.state.pongStates.forEach(state => {
+            if (state.playerA === this.ourPlayer.roomId || state.playerB === this.ourPlayer.roomId) {
                 ourGame = this.getPongFromState(state);
             }
         });
@@ -93,7 +90,7 @@ export class PingPongTable extends Interactive {
 
     getPongFromState(state: PongState): Pong {
         if (state) {
-            let pong = new Pong(this.canvas, this.room, this.players, this.ourPlayer.id);
+            let pong = new Pong(this.canvas, this.room, this.players, this.ourPlayer.roomId);
             pong.playerA = new PongPlayer(state.playerA);
             if (state.playerB) {
                 pong.playerB = new PongPlayer(state.playerB);
@@ -102,7 +99,7 @@ export class PingPongTable extends Interactive {
                 pong.sizeBall = state.sizes.at(0);
                 pong.sizeBat = state.sizes.at(1);
             } catch (e) {
-                console.warn("PROPERTY HAS NOT BEEN LOADED INTO PONGSTATE")
+                console.warn("PROPERTY HAS NOT BEEN LOADED INTO PONGSTATE");
             }
             //console.log("created a pong game");
             pong.updatePong();
@@ -113,7 +110,10 @@ export class PingPongTable extends Interactive {
 
     getGame(clientId: string): number {
         for (let i = 0; i < this.getHighestIndex(); i++) {
-            if (this.room.state.pongStates[i.toString()].playerA === clientId || this.room.state.pongStates[i.toString()].playerB === clientId) {
+            if (
+                this.room.state.pongStates[i.toString()].playerA === clientId ||
+                this.room.state.pongStates[i.toString()].playerB === clientId
+            ) {
                 return i;
             }
         }
@@ -138,7 +138,6 @@ export class PingPongTable extends Interactive {
             ourGame = null;
             checkInputMode();
         }
-
     }
 
     onLeave() {
@@ -147,13 +146,14 @@ export class PingPongTable extends Interactive {
         }
     }
 
-
     updateState() {
         //check for player A in state
         const playerA: string = this.room.state.pongStates[ourGame.selfGameId.toString()].playerA;
         if (playerA) {
             if (!ourGame.playerA) {
-                ourGame.playerA = new PongPlayer(this.room.state.pongStates[this.getGame(this.ourPlayer.id).toString()].playerA);
+                ourGame.playerA = new PongPlayer(
+                    this.room.state.pongStates[this.getGame(this.ourPlayer.roomId).toString()].playerA
+                );
             }
         } else {
             if (ourGame.playerA) {
@@ -164,7 +164,9 @@ export class PingPongTable extends Interactive {
         const playerB = this.room.state.pongStates[ourGame.selfGameId.toString()].playerB;
         if (playerB) {
             if (!ourGame.playerB) {
-                ourGame.playerB = new PongPlayer(this.room.state.pongStates[this.getGame(this.ourPlayer.id).toString()].playerB);
+                ourGame.playerB = new PongPlayer(
+                    this.room.state.pongStates[this.getGame(this.ourPlayer.roomId).toString()].playerB
+                );
             }
         } else {
             if (ourGame.playerB) {
@@ -194,8 +196,6 @@ export class PingPongTable extends Interactive {
 
             index = this.input.indexOf(Direction.RIGHT);
             if (index > -1) this.input.splice(index, 1);
-
-
         }
     }
 
@@ -203,11 +203,10 @@ export class PingPongTable extends Interactive {
         let highestInt = -1;
         this.room.state.pongStates.forEach((key, value) => {
             if (parseInt(value) > highestInt) {
-                highestInt = parseInt(value)
+                highestInt = parseInt(value);
             }
         });
         highestInt > -1 ? highestInt++ : {};
         return highestInt;
     }
-
 }
