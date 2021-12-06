@@ -16,6 +16,7 @@ import { characters, checkInputMode } from "./main";
 import { panelButtonsInteraction, usernameInputWelcome, welcomeModal } from "./static";
 import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
 import AnimationData, { createAnimationData } from "./graphic/animation-data";
+import { PlayerData } from "../common/rooms/schema/state";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -124,11 +125,12 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
              *
              * See: https://docs.colyseus.io/state/schema/#onadd-instance-key
              */
-            room.state.players.onAdd = (playerData, sessionId) => {
+            room.state.players.onAdd = (playerData: PlayerData, sessionId: string) => {
                 // console.log("Add", sessionId, playerData);
+                const userId: string = playerData.userId;
 
                 let player: Player = {
-                    userId: playerData.userId,
+                    userId: userId,
                     roomId: sessionId,
                     name: "",
                     participantId: null,
