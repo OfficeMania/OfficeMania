@@ -47,7 +47,7 @@ connectDatabase()
 setupAuth(app);
 app.use("/auth", getAuthRouter());
 
-app.use("/api", getApiRouter());
+app.use("/api", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), getApiRouter());
 
 // Expose public directory
 app.use("/", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), express.static("public"));
