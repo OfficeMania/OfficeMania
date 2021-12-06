@@ -75,7 +75,7 @@ export class TURoom extends Room<State> {
     }
 
     onJoin(client: Client, options: any, auth: any) {
-        client.userData.id = auth as string;
+        client.userData = { id: auth as string };
         handlers.forEach(handler => handler.onJoin(client));
     }
 
