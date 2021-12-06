@@ -18,7 +18,7 @@ let _showTextchat = false;
 //tracks if client is using text area, for changing of inputmode
 var _inFocus = false;
 
-var _menuOpen = false;
+var _addToChat = false;
 
 var _clientLogs = new Map();
 
@@ -40,10 +40,15 @@ function getOrCreateChatById(chatId: string): Chat {
 function updateChat(chatDTO: ChatDTO): void {
     const chat: Chat = getChatById(chatDTO.id);
     if (!chat) {
-        chats.push(new Chat(chat.name, chat.id));
+        chats.push(new Chat(chatDTO.name, chatDTO.id));
         return;
     }
-    chat.name = chatDTO.name;
+    if (chat.name !== chatDTO.name) {
+        chat.name = chatDTO.name;
+    }
+    else {
+        console.log("Name was equal");
+    }
 }
 
 //initializes all needed functions for the chat
@@ -52,9 +57,10 @@ export function initChatListener() {
 
     console.log("hello");
 
-    updateChatUsers();
-    //update textchatSelect on click
-    textchatSelect.addEventListener("click", () => updateChatUsers());
+    updateParticipatingChats();
+    //update textchatSelect on click, but not selected element??
+    textchatSelect.addEventListener("click", () => {
+    });
     //changing of inputmode if text area is in use or not
     textchatArea.onfocus = function () {
         setInFocus(true);
@@ -64,23 +70,32 @@ export function initChatListener() {
     };
 
     textchatSendButton.addEventListener("click", () => {
-        sendMessage(textchatArea.value, undefined);
+        sendMessage(textchatArea.value, textchatSelect.selectedOptions[0].value);
+        console.log(textchatSelect.selectedOptions[0].innerText)
         textchatArea.value = "";
     });
+    
 
     getRoom().onMessage(MessageType.CHAT_UPDATE, (message: string) => onChatUpdate(JSON.parse(message)));
     getRoom().onMessage(MessageType.CHAT_LOG, (message: string) => onMessageLogs(JSON.parse(message)));
     getRoom().send(MessageType.CHAT_UPDATE);
     getRoom().send(MessageType.CHAT_LOG);
-    textchatCreateButton.addEventListener("click", () => {});
 
-    /*//write chatlog in client
-    let counter = 0;
-    getRoom().state.chatState.contents.forEach((e) => {
-        console.log("gogo " + counter)
-        writeMessage(counter);
-        counter++;
-    });*/
+    textchatCreateButton.addEventListener("click", () => {
+        if (!_addToChat) {
+            updateParticipatingChats();
+            updateChatUsers();
+            _addToChat = true;
+        }
+        else {
+            //TODO
+            updateParticipatingChats();
+            _addToChat = false;
+        }
+        
+    });
+
+
 
     //primitive updating of the chat
     getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => {
@@ -105,6 +120,7 @@ function onChatUpdate(chatDTOs: ChatDTO[]): void {
 }
 
 function onMessageLogs(chatMessages: ChatMessage[]): void {
+    updateParticipatingChats();
     console.debug("chatMessages:", chatMessages);
     chatMessages.forEach(onMessage);
 }
@@ -121,6 +137,13 @@ function onMessage(chatMessage: ChatMessage) {
     const chat: Chat = getOrCreateChatById(chatId);
     chat.messages.push(chatMessage);
     //TODO Only add it if the Chat is selected?
+    if (textchatSelect.selectedOptions[0].value === chatMessage.chatId) {
+        addMessageToBar(chatMessage);
+    }
+        
+}
+
+function addMessageToBar(chatMessage: ChatMessage){
     const messageLine = document.createElement("p");
     messageLine.innerText = `[${chatMessage.timestamp}] ${chatMessage.name}: ${chatMessage.message}`;
     textchatBar.prepend(messageLine);
@@ -166,19 +189,54 @@ function updateChatUsers() {
     while (textchatSelect.firstChild) {
         textchatSelect.firstChild.remove();
     }
-    const option = document.createElement("option");
-    option.innerText = "globul";
-    option.value = "ungabunga";
-    textchatSelect.append(option);
     getRoom().state.players.forEach((value, key) => {
-        if (key === getOurPlayer().id) {
+        /*if (key === getOurPlayer().id) {
             return;
-        }
+        }*/
         const option = document.createElement("option");
         option.innerText = getRoom().state.players[key].name;
         option.value = key;
         textchatSelect.append(option);
     });
 }
+//refresh chat list in select
+function updateParticipatingChats() {
+    //console.log("chats:", chats);
+    while (textchatSelect.firstChild) {
+        textchatSelect.firstChild.remove();
+    }
+    chats.forEach(e => {
+        const option = document.createElement("option");
+        option.innerText = e.name;
+        option.value = e.id;
 
-function onStateChange() {}
+        option.onclick = function () {
+            while(textchatBar.firstChild){
+                textchatBar.firstChild.remove();
+            }
+            onMessageLogs(e.messages);
+        }
+        textchatSelect.append(option);
+    });
+    addTestOption("abc");
+    addTestOption("lorem ipsum");
+
+    //TODO dont reset pointer?? hulp
+}
+
+function addTestOption(name: string) {
+    const option = document.createElement("option");
+        option.innerText = name;
+        option.value = name + name;
+        textchatSelect.append(option);
+        option.onclick = function () {
+            while(textchatBar.firstChild){
+                textchatBar.firstChild.remove();
+            }
+        }
+}
+
+function addCurrentToChat(chatId) {
+    const a = textchatSelect.selectedOptions[0].value;
+    getRoom().send(MessageType.CHAT_ADD_USER, {a, chatId});
+}

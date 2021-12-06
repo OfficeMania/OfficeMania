@@ -149,13 +149,20 @@ function getUserId(client: Client): string {
 }
 
 //message assembly for storage
-function makeMessage(room: Room, client: Client, chatMessage: ChatMessage): ChatMessage {
+function makeMessage(room: Room, client: Client, chatMessage: ChatMessage): ChatMessage { 
     return {
-        timestamp: new Date().toISOString(),
+        timestamp: getFormattedTime(),
         name: room.state.players[client.sessionId].name,
         chatId: chatMessage.chatId,
         message: chatMessage.message,
     };
+}
+
+//format current Time, prone to change
+function getFormattedTime() {
+    const date = new Date();
+    const temp = addZero(date.getHours()) + ":" + addZero(date.getMinutes()) + ":" + addZero(date.getSeconds());
+    return temp;
 }
 
 function addZero(i) {
