@@ -19,6 +19,14 @@ export enum Role {
 }
 
 export default class User extends Model {
+    public getId(): Role {
+        return this["id"];
+    }
+
+    public getUsername(): Role {
+        return this["username"];
+    }
+
     private getPassword(): string {
         return this["password"];
     }
