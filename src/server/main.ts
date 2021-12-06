@@ -11,6 +11,7 @@ import { getAuthRouter, getSessionHandler, loggedInOptions, setupAuth } from "./
 import connectionEnsureLogin from "connect-ensure-login";
 import { findOrCreateUserByUsername } from "./user";
 import { connectDatabase } from "./database";
+import { getApiRouter } from "./api";
 
 async function initDatabase(): Promise<void> {
     // TODO Remove this and use proper user creation etc.
@@ -45,6 +46,8 @@ connectDatabase()
 
 setupAuth(app);
 app.use("/auth", getAuthRouter());
+
+app.use("/api", getApiRouter());
 
 // Expose public directory
 app.use("/", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), express.static("public"));
