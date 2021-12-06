@@ -58,6 +58,10 @@ export function getAuthRouter(): Router {
     return router;
 }
 
+export function getSessionHandler(): express.RequestHandler {
+    return sessionHandler;
+}
+
 function setupSignup(): void {
     router.post("/signup", connectionEnsureLogin.ensureLoggedOut(), (req, res, next) => {
         const username: string = req.body.username;

@@ -7,7 +7,7 @@ import { Server } from "colyseus";
 
 import { TURoom } from "../common/rooms/turoom";
 import { SERVER_PORT } from "./config";
-import { getAuthRouter, loggedInOptions, setupAuth } from "./auth";
+import { getAuthRouter, getSessionHandler, loggedInOptions, setupAuth } from "./auth";
 import connectionEnsureLogin from "connect-ensure-login";
 
 const app: Express = express();
@@ -36,6 +36,10 @@ app.use("/", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), express.stat
 const gameServer = new Server({
     server: http.createServer(app),
     express: app,
+    verifyClient: (info, next) => {
+        // Make "session" available for the WebSocket connection (during onAuth())
+        getSessionHandler()(info.req as any, {} as any, () => next(true));
+    },
     //pingInterval: 0, // Number of milliseconds for the server to "ping" the clients. Default: 3000
     // The clients are going to be forcibly disconnected if they can't respond after pingMaxRetries retries.
     // Maybe this solves the problem that you can't move after some time doing nothing on the website.
