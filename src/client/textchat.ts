@@ -76,6 +76,9 @@ export function initChatListener() {
     });
 
     textchatSendButton.addEventListener("click", () => {
+        if (Notification.permission !== "default") {
+            Notification.requestPermission();
+        }
         sendMessage(textchatArea.value, textchatSelect.selectedOptions[0].value);
         console.log(textchatSelect.selectedOptions[0].innerText)
         textchatArea.value = "";
@@ -121,6 +124,11 @@ export function initChatListener() {
 }
 
 function onChatUpdate(chatDTOs: ChatDTO[]): void {
+    console.log(Notification.permission)
+    const notification = new Notification("Message recieved", {
+        body: "f m l (:"
+    });
+    
     console.debug("chatDTOs:", chatDTOs);
     chatDTOs.forEach(updateChat);
 }
