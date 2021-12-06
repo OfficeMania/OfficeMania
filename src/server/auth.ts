@@ -1,4 +1,4 @@
-import { Express, Router } from "express";
+import express, { Express, Router } from "express";
 import passport from "passport";
 import { DEBUG, DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, LDAP_OPTIONS, SESSION_SECRET } from "./config";
 import path from "path";
@@ -45,6 +45,12 @@ function authErrorToString(error: AuthError): string {
 }
 
 const router: Router = Router();
+const sessionHandler: express.RequestHandler = session({
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
+});
 
 setupRouter();
 
@@ -182,14 +188,7 @@ function setupLocalStrategy(): void {
 }
 
 export function setupAuth(app: Express): void {
-    app.use(
-        session({
-            secret: SESSION_SECRET,
-            resave: false,
-            saveUninitialized: true,
-            cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
-        })
-    );
+    app.use(sessionHandler);
     connectDatabase()
         .then(() => initDatabase())
         .catch(console.error);
