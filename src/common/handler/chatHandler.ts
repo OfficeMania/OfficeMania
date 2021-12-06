@@ -1,95 +1,166 @@
 import { Client, Room } from "colyseus";
-import {ArraySchema, MapSchema, Schema, type} from "@colyseus/schema";
-import {  } from "../rooms/schema/state";
-import { MessageType } from "../util";
+import { generateUUIDv4, MessageType } from "../util";
 import { Handler } from "./handler";
+import { State } from "../rooms/schema/state";
 
-//Schema for sending to client
-export class ChatState extends Schema {
-    //for later modularity
-    @type({array: "string"})
-    participants: ArraySchema<string> = new ArraySchema<string>();
+export interface ChatMessage {
+    timestamp?: string;
+    name?: string;
+    chatId: string;
+    message: string;
+}
 
-    @type({array: "string"})
-    contents: ArraySchema<string> = new ArraySchema<string>();
+export interface ChatDTO {
+    id: string;
+    name: string;
+}
 
-    //position in array (reference for client)
-    @type("number")
-    pos: number;
+export class Chat {
+    private readonly _id: string;
+    private readonly _users: string[] = [];
+    private readonly _messages: ChatMessage[] = [];
+    private _name: string;
+
+    constructor(name: string, id: string = generateUUIDv4()) {
+        this._id = id;
+        this._name = name;
+    }
+
+    get id(): string {
+        return this._id;
+    }
+
+    get name(): string {
+        return this._name;
+    }
+
+    set name(value: string) {
+        this._name = value;
+    }
+
+    get users(): string[] {
+        return this._users;
+    }
+
+    get messages(): ChatMessage[] {
+        return this._messages;
+    }
 }
 
 export class ChatHandler implements Handler {
-    room: Room;
-    chats: ArraySchema<ChatState> = new ArraySchema<ChatState>();
-    init (room: Room) {
+    room: Room<State>;
+    readonly chats: Chat[] = [];
+
+    globalChat: Chat;
+
+    byChatId(chatId: string): Chat {
+        return this.chats.find(chat => chat.id === chatId);
+    }
+
+    byUserId(userId: string): Chat[] {
+        return this.chats.filter(chat => chat.users.includes(userId));
+    }
+
+    init(room: Room<State>) {
         this.room = room;
-        let a = new ChatState();
-        this.chats.push(a);
+        this.globalChat = new Chat("Global");
     }
 
-    onCreate(options?: any) {    
-        this.room.onMessage(MessageType.CHAT_SEND, (client: Client, message: string) => {this.onSend(client, message)});
-        this.room.onMessage(MessageType.CHAT_LOG, (client: Client, message: number) => {this.onLog(client, message)})
+    onCreate(options?: any) {
+        this.chats.push(this.globalChat);
+        this.room.onMessage(MessageType.CHAT_SEND, (client, message: ChatMessage) => this.onSend(client, message));
+        this.room.onMessage(MessageType.CHAT_UPDATE, client => this.onChatUpdate(client));
+        this.room.onMessage(MessageType.CHAT_LOG, (client, message: string) => this.onLog(client, message));
     }
 
-    onJoin() {
+    onJoin() {}
 
-    }
+    onLeave() {}
 
-    onLeave() {
+    onDispose() {}
 
-    }
-
-    onDispose() {
-
-    }
-    onSend(client: Client, message: string) {
-        console.log("Message recieved: " + message);
-        if(message === "gimmelog") {
-            client.send(MessageType.CHAT_LOG, this.room.state.chatState);
-        }
-        let pos: number = parseInt(message.substring(0, 1));
-        console.log(pos);
-        if (!this.chats.at(pos)) {
+    onSend(client: Client, chatMessage: ChatMessage) {
+        const message: string = chatMessage.message;
+        if (message.length > 1000) {
             //TODO
             return;
         }
-        let newMessage = makeMessage(this.room, client, message.substr(1));
-        this.chats.at(pos).contents.push(newMessage);
-        
-    
-        this.chats.at(pos).contents.forEach(e => {
-            console.log("content: "+e);
-        });  
-        if(pos === 0) {
-            this.room.clients.forEach((client) => {
-                client.send(MessageType.CHAT_NEW,pos + newMessage);
-            });
-        }     
-    }
-    onLog(client: Client, position?: number){
-        if(position) {
-            client.send(this.chats[position]);
+        console.debug("Message received:", message);
+        const chatId: string = chatMessage.chatId || this.globalChat.id;
+        console.debug("chatId:", chatId);
+        const chat: Chat = this.byChatId(chatId);
+        if (!chat) {
+            //TODO
+            return;
         }
-        else {
-            //Send all chats as arrayschema
+        /*
+        if (message === "gimmelog") {
+            //client.send(MessageType.CHAT_LOG, this.room.state.chatStates);
+            client.send(MessageType.CHAT_LOG, chat);
+        }
+        */
+        const userId: string = getUserId(client);
+        if (!chat.users.includes(userId)) {
+            chat.users.push(userId);
+        }
+        const serverMessage: ChatMessage = makeMessage(this.room, client, chatMessage);
+        chat.messages.push(serverMessage);
+        //chat.messages.forEach(chatMessage => console.log("chatMessage:", JSON.stringify(chatMessage)));
+        if (chatId === this.globalChat.id) {
+            this.room.clients.forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
+        } else {
+            this.room.clients
+                .filter(client => chat.users.includes(getUserId(client)))
+                .forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
         }
     }
+
+    onLog(client: Client, chatId?: string) {
+        if (chatId) {
+            console.log("Request log for Chat:", chatId);
+            const chat: Chat = this.byChatId(chatId);
+            client.send(MessageType.CHAT_LOG, JSON.stringify(chat.messages));
+        } else {
+            const userId: string = getUserId(client);
+            console.log("Request log for User:", userId);
+            const chats: Chat[] = this.byUserId(userId);
+            if (!chats.includes(this.globalChat)) {
+                chats.unshift(this.globalChat);
+            }
+            client.send(MessageType.CHAT_LOG, JSON.stringify(chats.flatMap(chat => chat.messages)));
+        }
+    }
+
+    onChatUpdate(client: Client) {
+        const userId: string = getUserId(client);
+        console.log("Request chat update for User:", userId);
+        const chats: Chat[] = this.byUserId(userId);
+        chats.unshift(this.globalChat);
+        const chatDTOs: ChatDTO[] = chats.map(chat => ({
+            id: chat.id,
+            name: chat.name,
+        }));
+        client.send(MessageType.CHAT_UPDATE, JSON.stringify(chatDTOs));
+    }
+}
+
+function getUserId(client: Client): string {
+    return client.sessionId;
 }
 
 //message assembly for storage
-function makeMessage(room: Room, client: Client, message: string): string{
-    let m: string = "";
-    const date = new Date();
-    m += addZero(date.getHours()) + ":" + addZero(date.getMinutes()) + ":" + room.state.players[client.sessionId].name + ": ";
-    m += message;
-    //console.log(m);
-    return m;
+function makeMessage(room: Room, client: Client, chatMessage: ChatMessage): ChatMessage {
+    return {
+        timestamp: new Date().toISOString(),
+        name: room.state.players[client.sessionId].name,
+        chatId: chatMessage.chatId,
+        message: chatMessage.message,
+    };
 }
-
 
 function addZero(i) {
-    if (i < 10) {i = "0" + i}
+    if (i < 10) {
+        i = "0" + i;
+    }
     return i;
 }
-  
