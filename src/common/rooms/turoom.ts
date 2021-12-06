@@ -65,11 +65,11 @@ export class TURoom extends Room<State> {
     onAuth(client: Client, options: any, req: http.IncomingMessage) {
         const session: { passport: { user: string } } = req["session"];
         if (!session) {
-            return false;
+            return "undefined";
         }
         const userId: string = session?.passport?.user;
         if (!userId) {
-            return false;
+            return "undefined";
         }
         return userId;
     }

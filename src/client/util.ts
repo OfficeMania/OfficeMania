@@ -134,7 +134,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 let player: Player = {
                     userId: userId,
                     roomId: sessionId,
-                    name: user.username,
+                    name: user?.username || "",
                     participantId: null,
                     character: "Adam_48x48.png",
                     positionX: 0,
@@ -154,7 +154,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                     whiteboard: 0,
                     previousDirection: Direction.DOWN,
                     changeDirection: false,
-                    waitBeforeMoving: 0
+                    waitBeforeMoving: 0,
                 };
                 players[sessionId] = player;
 
