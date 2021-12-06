@@ -130,7 +130,7 @@ function setupLogout(): void {
     });
 }
 
-export function setupRouter(): void {
+function setupRouter(): void {
     router.get("/auth.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "auth.css")));
     if (!DISABLE_SIGNUP) {
         setupSignup();
