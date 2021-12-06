@@ -220,7 +220,7 @@ export class Whiteboard extends Interactive {
     
     setup(canvas) {
         var ctx = canvas.getContext("2d");
-        ctx.fillStyle = "red"        //TODO: WHITEboard should be white (just red to be able to see the erased lines)
+        ctx.fillStyle = "white"
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "black"
         ctx.beginPath();
@@ -277,7 +277,7 @@ export class Whiteboard extends Interactive {
         penButton.style.top = rect.top + "px";
     }
 
-    drawOthers(whiteboard: Whiteboard) { //TODO nach der redraw werden nicht alle linien richtuig dargestellt
+    drawOthers(whiteboard: Whiteboard) {
         if(Whiteboard.currentWhiteboard !== this.wID){
             return;
         }
