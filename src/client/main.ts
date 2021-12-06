@@ -1,5 +1,5 @@
-import {Client} from "colyseus.js";
-import {TILE_SIZE} from "./player";
+import { Client } from "colyseus.js";
+import { TILE_SIZE } from "./player";
 import {
     createPlayerAvatar,
     getCharacter,
@@ -18,9 +18,9 @@ import {
     setOurPlayer,
     setPlayers,
     setRoom,
-    setUsername
+    setUsername,
 } from "./util";
-import {convertMapData, drawMap, fillSolidInfos, MapInfo, solidInfo} from "./map";
+import { convertMapData, drawMap, fillSolidInfos, MapInfo, solidInfo } from "./map";
 import {
     applyConferenceSettings,
     initConference,
@@ -30,19 +30,18 @@ import {
     toggleSharing,
     toggleShowParticipantsTab,
     updateButtons,
-    updateChat,
-    updateUsers
+    updateUsers,
 } from "./conference/conference";
-import {playerLoop} from "./movement";
+import { playerLoop } from "./movement";
 import {
     checkInteraction,
     checkInteractionNearby,
     currentInteraction,
     getInputMode,
     loadInputFunctions,
-    setInputMode
+    setInputMode,
 } from "./input";
-import {drawPlayers} from "./draw-player"
+import { drawPlayers } from "./draw-player";
 import {
     background,
     camButton,
@@ -62,14 +61,14 @@ import {
     usersButton,
     version,
     welcomeModal,
-    welcomeOkButton
+    welcomeOkButton,
 } from "./static";
-import {updateDoors} from "./interactive/door";
-import {initLoadingScreenLoading, setShowLoadingscreen} from "./loadingscreen";
+import { updateDoors } from "./interactive/door";
+import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 import { getInFocus, initChatListener } from "./textchat";
 
-export const characters: { [key: string]: AnimatedSpriteSheet } = {}
+export const characters: { [key: string]: AnimatedSpriteSheet } = {};
 export const START_POSITION_X = 5;
 export const START_POSITION_Y = -10;
 const MS_PER_UPDATE = 10;
@@ -94,22 +93,18 @@ function toggleMute(type: string) {
     updateButtons();
 }
 
-
-
 // Settings
 
 settingsButton.addEventListener("click", () => onSettingsOpen());
 usersButton.addEventListener("click", () => toggleShowParticipantsTab());
-
 
 settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
 
 welcomeOkButton.addEventListener("click", () => applySettingsWelcome());
 
-
 const observer = new MutationObserver(mutations => mutations.forEach(checkInputMode));
-observer.observe(settingsModal, {attributes: true, attributeFilter: ['style']});
+observer.observe(settingsModal, { attributes: true, attributeFilter: ["style"] });
 
 //observer.observe(pongModal, {attributes: true, attributeFilter: ['style']});
 
@@ -249,9 +244,9 @@ async function main() {
     /*
      * We communicate to our server via WebSockets (ws-protocol instead of http)
      */
-    let host = window.document.location.host.replace(/:.*/, '');
+    let host = window.document.location.host.replace(/:.*/, "");
     let protocol = location.protocol.replace("http", "ws") + "//";
-    let portSuffix = (location.port ? ':' + location.port : '');
+    let portSuffix = location.port ? ":" + location.port : "";
     let client = new Client(protocol + host + portSuffix);
 
     // Keep track of all (active) players (from movement)
@@ -277,7 +272,6 @@ async function main() {
 
     initChatListener();
 
-
     //loads all the character information
     await loadCharacter();
     checkInputMode();
@@ -286,18 +280,28 @@ async function main() {
      * Then, we wait for our map to load
      */
 
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     let width = canvas.width;
     let height = canvas.height;
     let ctx = canvas.getContext("2d");
 
     //load map from server
-    const mapJson = await fetch("/map/Map.json").then((response) => response.json());
+    const mapJson = await fetch("/map/Map.json").then(response => response.json());
     const map: MapInfo = await convertMapData(mapJson, room, background);
     setMapInfo(map);
 
-    let currentMap = new MapInfo(map.layers, map.tileSets, map.canvas, map.resolution, map.textures, map.lowestX, map.lowestY, map.highestY, map.highestX);
+    let currentMap = new MapInfo(
+        map.layers,
+        map.tileSets,
+        map.canvas,
+        map.resolution,
+        map.textures,
+        map.lowestX,
+        map.lowestY,
+        map.highestY,
+        map.highestX
+    );
 
     drawMap(currentMap);
 
@@ -331,8 +335,8 @@ async function main() {
 
     // message recieve test
 
-    room.onMessage("skill", (message) => {
-        console.log("lol")
+    room.onMessage("skill", message => {
+        console.log("lol");
     });
 
     initConference(room);
@@ -346,12 +350,11 @@ async function main() {
     let playerNearbyTimer = 0;
 
     function loop(now: number) {
-
         ctx.clearRect(0, 0, width, height);
 
         //update width and height
-        canvas.width = window.innerWidth
-        canvas.height = window.innerHeight
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
         width = canvas.width;
         height = canvas.height;
 
@@ -363,8 +366,9 @@ async function main() {
          */
 
         //the new Position of yourself in relation to the map
-        posX = ((ourPlayer.positionX / TILE_SIZE) + START_POSITION_X + Math.floor(currentMap.widthOfMap / 2)) * TILE_SIZE;
-        posY = ((ourPlayer.positionY / TILE_SIZE) + START_POSITION_Y + Math.floor(currentMap.heightOfMap / 2)) * TILE_SIZE;
+        posX = (ourPlayer.positionX / TILE_SIZE + START_POSITION_X + Math.floor(currentMap.widthOfMap / 2)) * TILE_SIZE;
+        posY =
+            (ourPlayer.positionY / TILE_SIZE + START_POSITION_Y + Math.floor(currentMap.heightOfMap / 2)) * TILE_SIZE;
 
         //detection if someone is nearby, executed only every 20th time
         playerNearbyTimer++;
@@ -379,8 +383,28 @@ async function main() {
         //check if interaction is nearby
         checkInteractionNearby();
 
-        ctx.drawImage(background, posX - Math.floor(width / 2), posY - Math.floor(height / 2), width, height, 0, 0, width, height);
-        ctx.drawImage(doors, posX - Math.floor(width / 2), posY - Math.floor(height / 2), width, height, 0, 0, width, height);
+        ctx.drawImage(
+            background,
+            posX - Math.floor(width / 2),
+            posY - Math.floor(height / 2),
+            width,
+            height,
+            0,
+            0,
+            width,
+            height
+        );
+        ctx.drawImage(
+            doors,
+            posX - Math.floor(width / 2),
+            posY - Math.floor(height / 2),
+            width,
+            height,
+            0,
+            0,
+            width,
+            height
+        );
 
         //check if a doorState changed
         updateDoors();
