@@ -72,10 +72,8 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
             room.state.whiteboard.at(wID).paths.push(-1);
             if (color === 0 && message[0] === -1) {
                 room.state.whiteboard.at(wID).color.push('black');
-                console.log(room.state.whiteboard.at(wID).color);
             } else if (color === 1 && message[0] === -1) {
                 room.state.whiteboard.at(wID).color.push('white');
-                console.log(room.state.whiteboard.at(wID).color);
             }
         }
         
