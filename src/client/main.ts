@@ -12,6 +12,7 @@ import {
     PlayerRecord,
     removeChildren,
     setCharacter,
+    setClient,
     setCollisionInfo,
     setCurrentVersion,
     setMapInfo,
@@ -247,7 +248,8 @@ async function main() {
     let host = window.document.location.host.replace(/:.*/, "");
     let protocol = location.protocol.replace("http", "ws") + "//";
     let portSuffix = location.port ? ":" + location.port : "";
-    let client = new Client(protocol + host + portSuffix);
+    const client: Client = new Client(protocol + host + portSuffix);
+    setClient(client);
 
     // Keep track of all (active) players (from movement)
     const players: PlayerRecord = {};

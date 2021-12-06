@@ -26,12 +26,21 @@ export enum InputMode {
 export type InitState = [Room<State>, Player];
 export type PlayerRecord = { [key: string]: Player };
 
+let _client: Client = undefined;
 let _room: Room<State> = undefined;
 let _collisionInfo: solidInfo[][] = undefined;
 let _mapInfo: MapInfo = undefined;
 let _ourPlayer: Player = undefined;
 let _players: PlayerRecord = undefined;
 let _chatEnabled: boolean = false;
+
+export function setClient(client: Client) {
+    _client = client;
+}
+
+export function getClient(): Client {
+    return _client;
+}
 
 export function setRoom(room: Room<State>) {
     _room = room;
