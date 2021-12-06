@@ -1,4 +1,4 @@
-import {v4 as uuid4} from "uuid";
+import { v4 as uuid4 } from "uuid";
 
 export const KEY_USERNAME = "username";
 export const KEY_CHARACTER = "character";
@@ -11,7 +11,7 @@ export enum Direction {
     LEFT = "left",
     RIGHT = "right",
     UP = "up",
-    DOWN = "down"
+    DOWN = "down",
 }
 
 export enum MessageType {
@@ -62,8 +62,10 @@ export enum MessageType {
     //ChatHandler
     CHAT_SEND = "chatSend",
     CHAT_LOG = "chatLog",
-    CHAT_NEW = "chatNew",
+    CHAT_UPDATE = "chatUpdate",
+    CHAT_ADD_USER = "chatAddUser",
 }
+
 export enum GameMode {
     SINGLE = 1,
     MULTI = 2,
@@ -74,7 +76,6 @@ export function generateUUIDv4() {
 }
 
 export class TaskExecutor<T> {
-
     private _pending: Promise<T>;
 
     queueTask(task: () => T): Promise<T> {
@@ -90,5 +91,4 @@ export class TaskExecutor<T> {
         }
         return task();
     }
-
 }
