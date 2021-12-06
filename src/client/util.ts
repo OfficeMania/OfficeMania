@@ -1,7 +1,7 @@
-import {Client, Room} from "colyseus.js";
-import {State} from "../common";
-import {Player, STEP_SIZE} from "./player";
-import {MapInfo, solidInfo} from "./map";
+import { Client, Room } from "colyseus.js";
+import { State } from "../common";
+import { Player, STEP_SIZE } from "./player";
+import { MapInfo, solidInfo } from "./map";
 import {
     Direction,
     KEY_CAMERA_DEVICE_ID,
@@ -10,12 +10,12 @@ import {
     KEY_MIC_DEVICE_ID,
     KEY_SPEAKER_DEVICE_ID,
     KEY_USERNAME,
-    MessageType
+    MessageType,
 } from "../common/util";
-import {characters, checkInputMode} from "./main";
-import {panelButtonsInteraction, usernameInputWelcome, welcomeModal} from "./static";
-import {createAnimatedSpriteSheet} from "./graphic/animated-sprite-sheet";
-import AnimationData, {createAnimationData} from "./graphic/animation-data";
+import { characters, checkInputMode } from "./main";
+import { panelButtonsInteraction, usernameInputWelcome, welcomeModal } from "./static";
+import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
+import AnimationData, { createAnimationData } from "./graphic/animation-data";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -24,7 +24,7 @@ export enum InputMode {
 }
 
 export type InitState = [Room<State>, Player];
-export type PlayerRecord = { [key: string]: Player }
+export type PlayerRecord = { [key: string]: Player };
 
 let _room: Room<State> = undefined;
 let _collisionInfo: solidInfo[][] = undefined;
@@ -86,7 +86,7 @@ export function getChatEnabled(): boolean {
  * from the url. Note that this function currently does no error handling.
  */
 export function loadImage(url: string): Promise<HTMLImageElement> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         const image = new Image();
         image.addEventListener("load", () => resolve(image));
         image.src = url;
@@ -107,14 +107,14 @@ export function loadImage(url: string): Promise<HTMLImageElement> {
  * See: https://docs.colyseus.io/client/client/#joinorcreate-roomname-string-options-any
  */
 export async function joinAndSync(client: Client, players: PlayerRecord): Promise<InitState> {
-    return client.joinOrCreate<State>("turoom").then((room) => {
-        return new Promise((resolve) => {
+    return client.joinOrCreate<State>("turoom").then(room => {
+        return new Promise(resolve => {
             /*
-            * This method is called when the server adds new players to its state.
-            * To keep synced to the server state, we save the newly added player...
-            *
-            * See: https://docs.colyseus.io/state/schema/#onadd-instance-key
-            */
+             * This method is called when the server adds new players to its state.
+             * To keep synced to the server state, we save the newly added player...
+             *
+             * See: https://docs.colyseus.io/state/schema/#onadd-instance-key
+             */
             room.state.players.onAdd = (playerData, sessionId) => {
                 // console.log("Add", sessionId, playerData);
 
@@ -137,7 +137,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                     moving: 0,
                     animationName: undefined,
                     animationStep: 0,
-                    whiteboard: 0
+                    whiteboard: 0,
                 };
                 players[sessionId] = player;
 
@@ -153,11 +153,11 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
             };
 
             /*
-            * ... but once a player becomes inactive (according to the server) we
-            * also delete it from our record
-            *
-            * See: https://docs.colyseus.io/state/schema/#onremove-instance-key
-            */
+             * ... but once a player becomes inactive (according to the server) we
+             * also delete it from our record
+             *
+             * See: https://docs.colyseus.io/state/schema/#onremove-instance-key
+             */
             room.state.players.onRemove = (_, sessionId) => {
                 console.log("Remove", sessionId);
                 delete players[sessionId];
@@ -183,12 +183,12 @@ export function setOneTimeCookie(key: string, value: string, path: string = "/")
 
 export function setCookie(key: string, value: string, expirationDays: number = 1, path: string = "/") {
     const date = new Date();
-    date.setTime(date.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
+    date.setTime(date.getTime() + expirationDays * 24 * 60 * 60 * 1000);
     document.cookie = `${key}=${value};expires=${date.toUTCString()};path=${path}`;
 }
 
 export function getCookie(key: string) {
-    return document.cookie.match('(^|;)\\s*' + key + '\\s*=\\s*([^;]+)')?.pop() || '';
+    return document.cookie.match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")?.pop() || "";
 }
 
 //const xCorrection = Math.abs(_mapInfo.lowestX - _mapInfo.highestX) - START_POSITION_X;
@@ -213,11 +213,17 @@ export function getCorrectedPlayerFacingCoordinates(player: Player): [number, nu
             deltaY += 2;
             break;
     }
-    return [Math.round(player.positionX / STEP_SIZE - xCorrection + deltaX), Math.round(player.positionY / STEP_SIZE - yCorrection + deltaY)];
+    return [
+        Math.round(player.positionX / STEP_SIZE - xCorrection + deltaX),
+        Math.round(player.positionY / STEP_SIZE - yCorrection + deltaY),
+    ];
 }
 
 export function getCorrectedPlayerCoordinates(player: Player): [number, number] {
-    return [Math.round(player.positionX / STEP_SIZE - xCorrection), Math.round(player.positionY / STEP_SIZE - yCorrection)];
+    return [
+        Math.round(player.positionX / STEP_SIZE - xCorrection),
+        Math.round(player.positionY / STEP_SIZE - yCorrection),
+    ];
 }
 
 export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionInfo: solidInfo[][]): boolean {
@@ -229,8 +235,8 @@ export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionI
     const diffX = Math.abs(oneX - twoX);
     const diffY = Math.abs(oneY - twoY);
     const length = Math.ceil(Math.sqrt(diffX * diffX + diffY * diffY));
-    const currentX = (progress) => Math.floor(oneX + (twoX - oneX) * progress);
-    const currentY = (progress) => Math.floor(oneY + (twoY - oneY) * progress);
+    const currentX = progress => Math.floor(oneX + (twoX - oneX) * progress);
+    const currentY = progress => Math.floor(oneY + (twoY - oneY) * progress);
     for (let i = 0; i <= length; i++) {
         const progress = i / length;
         const x = currentX(progress);
@@ -255,7 +261,7 @@ export function getUsername(): string {
 }
 
 export function payRespect() {
-    console.log("F's in chat")
+    console.log("F's in chat");
 }
 
 //sprite dimensions (from movement)
@@ -268,23 +274,35 @@ export async function loadCharacter() {
     if (username && username !== "") {
         setUsername(username);
     } else {
-        document.getElementById("name-form").addEventListener('submit', function(e) {
-            setUsername(usernameInputWelcome.value);
-            e.preventDefault();  
-            //janky
-            $("#welcome-modal").modal("hide");
-            welcomeModal.style.display = "none";
-            checkInputMode();
-        }, false);}
+        document.getElementById("name-form").addEventListener(
+            "submit",
+            function (e) {
+                setUsername(usernameInputWelcome.value);
+                e.preventDefault();
+                //janky
+                $("#welcome-modal").modal("hide");
+                welcomeModal.style.display = "none";
+                checkInputMode();
+            },
+            false
+        );
+    }
 
     //loads character animations
-    const characterAnimationsJson: { [key: string]: any } = await fetch("/assets/animation/character-animations.json").then((response) => response.json());
+    const characterAnimationsJson: { [key: string]: any } = await fetch(
+        "/assets/animation/character-animations.json"
+    ).then(response => response.json());
     const characterAnimations: { [key: string]: AnimationData } = createAnimationData(characterAnimationsJson);
 
     //loads character sprite paths from the server (from movement)
     for (const path of getRoom().state.playerSpritePaths) {
         //characters[path] = await loadImage("/img/characters/" + path);
-        characters[path] = await createAnimatedSpriteSheet(await loadImage("/img/characters/" + path), characterAnimations, playerWidth, playerHeight);
+        characters[path] = await createAnimatedSpriteSheet(
+            await loadImage("/img/characters/" + path),
+            characterAnimations,
+            playerWidth,
+            playerHeight
+        );
     }
 
     //load character
@@ -368,7 +386,7 @@ export function getPlayerByParticipantId(participantId: string): Player {
     }
     const players = getPlayers();
     if (!players) {
-        console.log("no players")
+        console.log("no players");
         return null;
     }
     for (const player of Object.values(players)) {
@@ -376,7 +394,7 @@ export function getPlayerByParticipantId(participantId: string): Player {
             return player;
         }
     }
-    console.log("not in players")
+    console.log("not in players");
     return null;
 }
 
@@ -387,7 +405,7 @@ export function getPlayerByRoomId(playerId: string): Player {
     }
     const players = getPlayers();
     if (!players) {
-        console.log("no players")
+        console.log("no players");
         return null;
     }
     for (const player of Object.values(players)) {
@@ -395,7 +413,7 @@ export function getPlayerByRoomId(playerId: string): Player {
             return player;
         }
     }
-    console.log("not in players")
+    console.log("not in players");
     return null;
 }
 
@@ -410,10 +428,14 @@ let interactionClosed: boolean = false;
 export function createCloseInteractionButton(listener: () => void) {
     const button: HTMLButtonElement = createInteractionButton(listener, "button-close-interaction");
     appendFAIcon(button, "times");
-    button.addEventListener("click", () => interactionClosed = true);
+    button.addEventListener("click", () => (interactionClosed = true));
 }
 
-export function createInteractionButton(listener: () => void, id: string = null, preAppend: (button: HTMLButtonElement) => void = null): HTMLButtonElement {
+export function createInteractionButton(
+    listener: () => void,
+    id: string = null,
+    preAppend: (button: HTMLButtonElement) => void = null
+): HTMLButtonElement {
     const button: HTMLButtonElement = document.createElement("button");
     if (id) {
         button.id = id;
