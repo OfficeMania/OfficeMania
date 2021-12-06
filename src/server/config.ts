@@ -12,7 +12,7 @@ export const WEBPACK_PORT = 8085; // For dev environment only
 export const BCRYPT_SALT_ROUNDS = 12;
 export const PASSWORD_SECRET: string = process.env.PASSWORD_SECRET || "USE_A_SECURE_RANDOM_KEY_FOR_THE_PASSWORDS";
 
-export const FORCE_LOGIN: boolean = !!process.env.FORCE_LOGIN;
+export const FORCE_LOGIN: boolean = process.env.FORCE_LOGIN === "true";
 export const DISABLE_SIGNUP: boolean = process.env.DISABLE_SIGNUP !== "false";
 
 export const LDAP_OPTIONS = null;
