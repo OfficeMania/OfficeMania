@@ -1,11 +1,11 @@
 import express, { Express, Router } from "express";
 import passport from "passport";
-import { DEBUG, DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, LDAP_OPTIONS, SESSION_SECRET } from "./config";
+import { DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, LDAP_OPTIONS, SESSION_SECRET } from "./config";
 import path from "path";
 import connectionEnsureLogin, { LoggedInOptions } from "connect-ensure-login";
-import User, { createUser, findOrCreateUserByUsername, findUserById, findUserByUsername, getUsername } from "./user";
+import User, { createUser, findUserById, findUserByUsername, getUsername } from "./user";
 import session from "express-session";
-import { connectDatabase, getId } from "./database";
+import { getId } from "./database";
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
@@ -139,17 +139,6 @@ export function setupRouter(): void {
     setupLogout();
 }
 
-async function initDatabase(): Promise<void> {
-    // TODO Remove this and use proper user creation etc.
-    return findOrCreateUserByUsername("officemania", "sec-sep21-project").then(user => {
-        if (!user) {
-            console.error("Something went wrong when creating the default user");
-        } else if (DEBUG) {
-            console.debug(`Default user successfully found or created`);
-        }
-    });
-}
-
 function setupLDAPStrategy(): void {
     //TODO This needs to be worked on
     console.debug("Setup Passport with LdapStrategy");
@@ -193,9 +182,6 @@ function setupLocalStrategy(): void {
 
 export function setupAuth(app: Express): void {
     app.use(sessionHandler);
-    connectDatabase()
-        .then(() => initDatabase())
-        .catch(console.error);
     if (LDAP_OPTIONS) {
         setupLDAPStrategy();
     } else {

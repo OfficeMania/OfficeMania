@@ -6,9 +6,22 @@ import path from "path";
 import { Server } from "colyseus";
 
 import { TURoom } from "../common/rooms/turoom";
-import { SERVER_PORT } from "./config";
+import { DEBUG, SERVER_PORT } from "./config";
 import { getAuthRouter, getSessionHandler, loggedInOptions, setupAuth } from "./auth";
 import connectionEnsureLogin from "connect-ensure-login";
+import { findOrCreateUserByUsername } from "./user";
+import { connectDatabase } from "./database";
+
+async function initDatabase(): Promise<void> {
+    // TODO Remove this and use proper user creation etc.
+    return findOrCreateUserByUsername("officemania", "sec-sep21-project").then(user => {
+        if (!user) {
+            console.error("Something went wrong when creating the default user");
+        } else if (DEBUG) {
+            console.debug(`Default user successfully found or created`);
+        }
+    });
+}
 
 const app: Express = express();
 
@@ -25,6 +38,10 @@ app.use(express.json());
 app.use(compression());
 
 app.set("view engine", "ejs");
+
+connectDatabase()
+    .then(() => initDatabase())
+    .catch(console.error);
 
 setupAuth(app);
 app.use("/auth", getAuthRouter());
