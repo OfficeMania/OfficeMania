@@ -39,6 +39,10 @@ export default class AnimatedSpriteSheet extends SpriteSheet {
         dy: number
     ): void {
         const animationData = this.getAnimation(animation);
+        if (!animationData) {
+            console.warn("animationData does not exist");
+            return;
+        }
         const [spriteCol, spriteRow]: [number, number] = animationData.getStep(animationStep);
         super.draw(context, spriteCol, spriteRow, dx, dy);
     }
