@@ -6,6 +6,7 @@ import { State } from "../../common";
 import { MessageType } from "../../common/util";
 import { doors } from "../static";
 import { getPlayers, PlayerRecord } from "../util";
+import { Player } from "../player";
 
 export enum DoorDirection {
     UNKNOWN,
@@ -164,11 +165,24 @@ export class Door extends Interactive {
         const callPlayers: string[] = [];
         const players: PlayerRecord = getPlayers();
         for (const player of Object.values(players)) {
-            if (player.roomId === roomId) {
+            //we dont want to send the server a message if its just us
+            if (this.checkRoom(player, roomId) && player.roomId !== id) {
                 callPlayers.push(player.participantId);
             }
         }
-        console.log("you sucessfully knocked");
+        
+        if(callPlayers.length !== 0) {
+            this.room.send(MessageType.DOOR_KNOCK, callPlayers);
+        }
+    }
+
+    checkRoom(player: Player, roomId: String): boolean {
+        const collisionInfo: solidInfo[][] = getCollisionInfo();
+        const [posX, posY] = getCorrectedPlayerCoordinates(player);
+        if(collisionInfo[posX][posY]?.roomId + "" === roomId) {
+            return true;
+        }
+        return false;
     }
 
     getRoomId() {
@@ -178,21 +192,26 @@ export class Door extends Interactive {
         switch (this.direction) {
             case DoorDirection.NORTH: {
                 roomX = this.posX;
-                roomY = this.posY + 1;
+                roomY = this.posY + 2;
+                break;
             }
             case DoorDirection.SOUTH: {
                 roomX = this.posX;
                 roomY = this.posY - 1;
+                break;
             }
             case DoorDirection.WEST: {
-                roomX = this.posX - 1;
+                roomX = this.posX + 2;
                 roomY = this.posY;
+                break;
             }
             case DoorDirection.EAST: {
-                roomX = this.posX + 1;
+                roomX = this.posX - 1;
                 roomY = this.posY;
+                break;
             }
         }
+
         return collisionInfo[roomX][roomY].roomId;
     }
 
