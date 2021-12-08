@@ -176,7 +176,7 @@ function toggleTextchatBar() {
 }
 
 //sends text message to server (if its not empty)
-function sendMessage(message: string, chatId: string) {
+export function sendMessage(message: string, chatId: string) {
     //console.log(message);
     if (message && message !== "") {
         getRoom().send(MessageType.CHAT_SEND, { message, chatId });

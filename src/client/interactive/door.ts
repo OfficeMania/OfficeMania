@@ -7,6 +7,7 @@ import { MessageType } from "../../common/util";
 import { doors } from "../static";
 import { getPlayers, PlayerRecord } from "../util";
 import { Player } from "../player";
+import { sendMessage } from "../textchat";
 
 export enum DoorDirection {
     UNKNOWN,
@@ -171,9 +172,8 @@ export class Door extends Interactive {
             }
         }
         
-        if(callPlayers.length !== 0) {
-            this.room.send(MessageType.DOOR_KNOCK, callPlayers);
-        }
+        //TODO ID for chat
+        sendMessage("lass mich rein", null);
     }
 
     checkRoom(player: Player, roomId: String): boolean {
