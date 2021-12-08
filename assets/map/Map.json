@@ -2012,7 +2012,7 @@
                 {
                  "height":48,
                  "id":9,
-                 "name":"Door east",
+                 "name":"door east",
                  "rotation":0,
                  "type":"2",
                  "visible":true,
@@ -2034,7 +2034,7 @@
                 {
                  "height":48,
                  "id":11,
-                 "name":"doorsouth",
+                 "name":"door south",
                  "rotation":0,
                  "type":"3",
                  "visible":true,
@@ -2157,7 +2157,7 @@
                  "id":23,
                  "name":"door east",
                  "rotation":0,
-                 "type":"3",
+                 "type":"2",
                  "visible":true,
                  "width":48,
                  "x":288,
@@ -2210,7 +2210,7 @@
                 {
                  "height":48,
                  "id":28,
-                 "name":"door east",
+                 "name":"door west",
                  "rotation":0,
                  "type":"4",
                  "visible":true,
@@ -2221,7 +2221,7 @@
                 {
                  "height":48,
                  "id":29,
-                 "name":"door east",
+                 "name":"door west",
                  "rotation":0,
                  "type":"4",
                  "visible":true,
@@ -2232,7 +2232,7 @@
                 {
                  "height":48,
                  "id":30,
-                 "name":"door east",
+                 "name":"door west",
                  "rotation":0,
                  "type":"4",
                  "visible":true,
@@ -2243,7 +2243,7 @@
                 {
                  "height":48,
                  "id":31,
-                 "name":"door east",
+                 "name":"door west",
                  "rotation":0,
                  "type":"4",
                  "visible":true,
@@ -2965,7 +2965,7 @@
  "nextobjectid":101,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.7.2",
+ "tiledversion":"1.6.0",
  "tileheight":48,
  "tilesets":[
         {
