@@ -1,10 +1,11 @@
 import { Interactive } from "./interactive";
-import { getCorrectedPlayerCoordinates, getOurPlayer, getRoom } from "../util";
-import { Chunk, MapInfo, TileSet } from "../map";
+import { getCollisionInfo, getCorrectedPlayerCoordinates, getOurPlayer, getRoom } from "../util";
+import { Chunk, MapInfo, solidInfo, TileSet } from "../map";
 import { Room } from "colyseus.js";
 import { State } from "../../common";
 import { MessageType } from "../../common/util";
 import { doors } from "../static";
+import { getPlayers, PlayerRecord } from "../util";
 
 export enum DoorDirection {
     UNKNOWN,
@@ -156,17 +157,53 @@ export class Door extends Interactive {
         this.room.send(MessageType.DOOR_UNLOCK, this.posX + "" + this.posY);
     }
 
-    knockDoor(id: string) {
-        //TODO Klopfton im Raum abspielen (also bei Spielern, die sich aktuell in der RaumID des Raumes befinden)
-        console.log("Klopf, klopf from:", id);
+    //id descripes who knocks
+    knockDoor(id: string): void  {
+        const roomId = "" + this.getRoomId();
+
+        const callPlayers: string[] = [];
+        const players: PlayerRecord = getPlayers();
+        for (const player of Object.values(players)) {
+            if (player.roomId === roomId) {
+                callPlayers.push(player.participantId);
+            }
+        }
+        console.log("you sucessfully knocked");
     }
 
+    getRoomId() {
+        const collisionInfo: solidInfo[][] = getCollisionInfo();
+        var roomX: number;
+        var roomY: number;
+        switch (this.direction) {
+            case DoorDirection.NORTH: {
+                roomX = this.posX;
+                roomY = this.posY + 1;
+            }
+            case DoorDirection.SOUTH: {
+                roomX = this.posX;
+                roomY = this.posY - 1;
+            }
+            case DoorDirection.WEST: {
+                roomX = this.posX - 1;
+                roomY = this.posY;
+            }
+            case DoorDirection.EAST: {
+                roomX = this.posX + 1;
+                roomY = this.posY;
+            }
+        }
+        return collisionInfo[roomX][roomY].roomId;
+    }
+
+    //TODO: you cann lock as much doors as you want
     startInteraction(playerX: number, playerY: number, playerId: string) {
         const isVertical: boolean = this.direction === DoorDirection.NORTH || this.direction === DoorDirection.SOUTH;
         const isBigger: boolean = this.direction === DoorDirection.EAST || this.direction === DoorDirection.SOUTH;
         const player = isVertical ? playerY : playerX;
         const pos = isVertical ? this.posY : this.posX;
         if (isBigger ? player > pos : player < pos) {
+            //you knock on door every time you are outside of the room
             this.knockDoor(playerId);
         } else {
             if (this.isClosed) {
