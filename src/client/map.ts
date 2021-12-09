@@ -12,6 +12,7 @@ import {ChessBoard} from "./interactive/chessboard";
 import {WaterCooler} from "./interactive/machines/waterCooler";
 import {Computer} from "./interactive/computer";
 import {Notes} from "./interactive/notes";
+import { Cat } from "./interactive/cat";
 
 export {convertMapData, MapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -352,6 +353,9 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         }
         case 17: {
             return new Notes();
+        }
+        case 18: {
+            return new Cat();
         }
     }
     return null;
