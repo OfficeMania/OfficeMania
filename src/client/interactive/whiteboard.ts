@@ -33,6 +33,7 @@ export class Whiteboard extends Interactive {
     stretchY: number = 1;
     private room: Room<State>;
     private players: PlayerRecord;
+    private whiteboardPlayer: { [key: string]: number } = {}; //(new) code where multiple players should be able to draw at once
     wID: number = 0;
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
@@ -128,7 +129,12 @@ export class Whiteboard extends Interactive {
         penButton.style.left = "33%"
 
         this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
-        this.room.onMessage(MessageType.WHITEBOARD_REDRAW, () => this.drawOthers(this));
+        //(new) code where multiple players should be able to draw at once
+        //this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
+
+        //"same" (old) code where only one player can draw at a time
+        this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(this));
+
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
         this.room.onMessage(MessageType.WHITEBOARD_SAVE, (message) => this.save(this, message));
         this.room.onMessage(MessageType.WHITEBOARD_DRAW, () => this.draw());
@@ -233,13 +239,30 @@ export class Whiteboard extends Interactive {
 
     redraw(whiteboard: Whiteboard){
         whiteboard.setup(whiteboard.canvas);
+        //(new) code where multiple players should be able to draw at once
+        /*for (const [player] of whiteboard.room.state.whiteboard.at(this.wID).whiteboardPlayer) {
+            whiteboard.resetPlayer(player);
+            whiteboard.drawOthers(player, whiteboard);
+        }*/
+
+        //"same" (old) code where only one player can draw at a time
         whiteboard.drawOthers(whiteboard);
+    }
+
+    resetPlayer(player: string) {
+        this.whiteboardPlayer[player] = 0;
     }
 
     clear(whiteboard: Whiteboard, message: number) {
         if(whiteboard.wID !== message){
             return;
         }
+
+        //(new) code where multiple players should be able to draw at once
+        /*for (var id in whiteboard.whiteboardPlayer) {
+            whiteboard.whiteboardPlayer[id] = 0;
+        }*/
+
         whiteboard.setup(whiteboard.canvas)
     }
 
@@ -277,20 +300,38 @@ export class Whiteboard extends Interactive {
         penButton.style.top = rect.top + "px";
     }
 
+    //(new) code where multiple players should be able to draw at once
+    //drawOthers(clientID: string, whiteboard: Whiteboard) {
+
+    //"same" (old) code where only one player can draw at a time
     drawOthers(whiteboard: Whiteboard) {
         if(Whiteboard.currentWhiteboard !== this.wID){
             return;
         }
+        //(new) code where multiple players should be able to draw at once
+        /*var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths;
+        var color: ArraySchema<string> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].color;*/
+        
+        //"same" (old) code where only one player can draw at a time
         var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).paths;
         var color: ArraySchema<string> = whiteboard.room.state.whiteboard.at(whiteboard.wID).color;
+        
         var max: number = paths.length;
+
+        //(new) code where multiple players should be able to draw at once
+        //var start: number = whiteboard.whiteboardPlayer[clientID];
+
         var ctx = whiteboard.canvas.getContext("2d");
 
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
         var j = 0;
         let indexOfStroke = 0;
-        for (var i: number = 0; i < max - 3; i++) {
+
+        //(new) code where multiple players should be able to draw at once
+        //for (var i: number = start; i < max - 3; i++) {
+        //"same" (old) code where only one player can draw at a time
+        for (var i: number = 0; i < max - 3; i++) {    
             if (paths[i] === -1) {
                 indexOfStroke++;
                 j = 0;
@@ -309,7 +350,7 @@ export class Whiteboard extends Interactive {
                 continue;
             }
             if (j === 0) {
-                ctx.beginPath();
+                ctx.beginPath(); //TODO: beginpath, closepath and stroke out of for-loop? ->  no! (different colors per line)
                 ctx.strokeStyle = color[indexOfStroke];
                 whiteboard.makeLine(paths[i], paths[i + 1], paths[i + 2], paths[i + 3], ctx);
                 ctx.closePath();
@@ -319,6 +360,9 @@ export class Whiteboard extends Interactive {
                 j = 0;
             }
         }
+
+        //(new) code where multiple players should be able to draw at once
+        //whiteboard.whiteboardPlayer[clientID] = max - 2;
 
     }
 

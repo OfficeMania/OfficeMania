@@ -46,15 +46,36 @@ function onNewWhiteboard(room: Room<State>, client: Client, wID: number){
         room.state.whiteboard.push(new WhiteboardState());
         whiteboardCount++;
     }
-    room.state.whiteboard.at(wID).color = new ArraySchema<string>();
+    //(new) code where multiple players should be able to draw at once
+    //!!!!!!!!!!Fehlermeldung: Property 'color' does not exist on type 'WhiteboardPlayerState'.!!!!!!!!!!!!!!!!!
+    /*room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color = new ArraySchema<string>(); //not working! (???)
+    room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.push('black'); //first line is black
+    room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths = new ArraySchema<number>();*/
+
+    //more or less same (new) code without error (i'm not sure it works)
+    /*for (const [, player] of room.state.whiteboard.at(wID).whiteboardPlayer) {
+        player.color = new ArraySchema<string>();
+        player.color.push('black'); //first line is black
+        player.paths = new ArraySchema<number>();
+    }*/
+
+    //"same" (old) code where only one player can draw at a time
+    room.state.whiteboard.at(wID).color = new ArraySchema<string>(); //not working! (???)
     room.state.whiteboard.at(wID).color.push('black'); //first line is black
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
 }
 
 function onClear(room: Room<State>, client: Client, wID: number) {
-    room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
+    //(new) code where multiple players should be able to draw at once (no error here)
+    /*for (const [, player] of room.state.whiteboard.at(wID).whiteboardPlayer) {
+        player.color = new ArraySchema<string>();
+        player.color.push('black'); //first line is black
+        player.paths = new ArraySchema<number>();
+    }*/
     room.broadcast(MessageType.WHITEBOARD_CLEAR, wID, {except: client});
-    room.state.whiteboard.at(wID).color = new ArraySchema<string>();
+
+    //"same" (old) code where only one player can draw at a time
+    room.state.whiteboard.at(wID).color = new ArraySchema<string>(); //not working! (???)
     room.state.whiteboard.at(wID).color.push('black'); //first line is black
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
 }
@@ -68,6 +89,22 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
     var wID: number = message.shift();
     var color: number = message.shift(); //colors: 0=black, 1=white
     if (message[0] < 0) {
+        //(new) code where multiple players should be able to draw at once
+        //!!!!!!!!!!Fehlermeldung: Property 'color' does not exist on type 'WhiteboardPlayerState'.!!!!!!!!!!!!!!!!!
+        /*let length = room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.length;
+        if (room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.at(length-2) > -1) { //only push -1 if last element is not already -1
+            room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.push(-1); //-1 means end of line/beginning of new line
+            if (color === 0 && message[0] === -1) {
+                room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.push('black');
+            } else if (color === 1 && message[0] === -1) {
+                room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.push('white');
+            }
+        }
+    } else {
+        room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.push(...message);
+    }*/
+
+        //"same" (old) code where only one player can draw at a time
         let length = room.state.whiteboard.at(wID).paths.length;
         if (room.state.whiteboard.at(wID).paths.at(length-2) > -1) { //only push -1 if last element is not already -1
             room.state.whiteboard.at(wID).paths.push(-1); //-1 means end of line/beginning of new line
@@ -77,7 +114,6 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
                 room.state.whiteboard.at(wID).color.push('white');
             }
         }
-        
     } else {
         room.state.whiteboard.at(wID).paths.push(...message);
     }
