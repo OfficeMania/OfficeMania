@@ -62,6 +62,7 @@ function onNewWhiteboard(room: Room<State>, client: Client, wID: number){
     //"same" (old) code where only one player can draw at a time
     room.state.whiteboard.at(wID).color = new ArraySchema<string>(); //not working! (???)
     room.state.whiteboard.at(wID).color.push('black'); //first line is black
+    room.state.whiteboard.at(wID).size = new ArraySchema<number>();
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
 }
 
@@ -78,6 +79,7 @@ function onClear(room: Room<State>, client: Client, wID: number) {
     room.state.whiteboard.at(wID).color = new ArraySchema<string>(); //not working! (???)
     room.state.whiteboard.at(wID).color.push('black'); //first line is black
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
+    room.state.whiteboard.at(wID).size = new ArraySchema<number>();
 }
 
 function onSave(room: Room<State>, client: Client, wID: number) {
@@ -88,6 +90,7 @@ function onSave(room: Room<State>, client: Client, wID: number) {
 function onPath(room: Room<State>, client: Client, message: number[]) {           //message: [wID, color, x, y]
     var wID: number = message.shift();
     var color: number = message.shift(); //colors: 0=black, 1=white
+    var size: number = message.shift();
     if (message[0] < 0) {
         //(new) code where multiple players should be able to draw at once
         //!!!!!!!!!!Fehlermeldung: Property 'color' does not exist on type 'WhiteboardPlayerState'.!!!!!!!!!!!!!!!!!
@@ -110,8 +113,10 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
             room.state.whiteboard.at(wID).paths.push(-1); //-1 means end of line/beginning of new line
             if (color === 0 && message[0] === -1) {
                 room.state.whiteboard.at(wID).color.push('black');
+                room.state.whiteboard.at(wID).size.push(size);
             } else if (color === 1 && message[0] === -1) {
                 room.state.whiteboard.at(wID).color.push('white');
+                room.state.whiteboard.at(wID).size.push(size);
             }
         }
     } else {

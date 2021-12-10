@@ -12,7 +12,9 @@ import {
     saveButton,
     clearButton,
     eraserButton,
-    penButton
+    penButton,
+    size5Button,
+    size10Button
 } from "../static";
 import {ArraySchema} from "@colyseus/schema";
 import {MessageType} from "../../common/util";
@@ -38,7 +40,12 @@ export class Whiteboard extends Interactive {
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
     currentColor: number = 0;
+    private size: number = 5;
 
+
+    changeSize = (size) => {
+        this.size = size;
+    }
 
     //define events
     resized = () => this.resize(this);
@@ -47,7 +54,7 @@ export class Whiteboard extends Interactive {
         
         if (e.buttons !== 1) return;
         var ctx = this.canvas.getContext("2d");
-        ctx.lineWidth = 5;
+        ctx.lineWidth = this.size;
         ctx.lineCap = 'round';
         if (this.isPen) {
             //use pen
@@ -65,25 +72,25 @@ export class Whiteboard extends Interactive {
         ctx.closePath();
         ctx.stroke(); // draw it!
 
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.x, this.y])
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, this.x, this.y])
         
     }
 
     mouseDown = (e) => {
         this.setPosition(e, this);
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, -1])
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.x, this.y])
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -1])
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, this.x, this.y])
     }
 
     mouseEnter = (e) => {
         this.setPosition(e, this);
         if (e.buttons !== 1) return;
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, -1])
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.x, this.y])
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -1])
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, this.x, this.y])
     }
 
     mouseUp = (e) => {
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, -2]); //-2: dont save color again (already saved)
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -2]); //-2: dont save color again (already saved)
     }
 
     clearPressed = () => {
@@ -128,13 +135,18 @@ export class Whiteboard extends Interactive {
         penButton.style.top = "33%"
         penButton.style.left = "33%"
 
+        size5Button.style.top = "33%"
+        size5Button.style.left = "33%"
+
+        size10Button.style.top = "37%"
+        size10Button.style.left = "33%"
+
         this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
         //(new) code where multiple players should be able to draw at once
         //this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
 
         //"same" (old) code where only one player can draw at a time
         this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(this));
-
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
         this.room.onMessage(MessageType.WHITEBOARD_SAVE, (message) => this.save(this, message));
         this.room.onMessage(MessageType.WHITEBOARD_DRAW, () => this.draw());
@@ -170,6 +182,8 @@ export class Whiteboard extends Interactive {
         saveButton.addEventListener("click", this.savePressed);
         eraserButton.addEventListener("click", this.erasePressed);
         penButton.addEventListener("click", this.drawPressed);
+        size5Button.addEventListener("click", (e) => {this.changeSize(5);});
+        size10Button.addEventListener("click", (e) => {this.changeSize(10);});
 
         //size changed
         window.addEventListener('resize', this.resized);
@@ -186,6 +200,12 @@ export class Whiteboard extends Interactive {
 
         penButton.innerHTML = "<em class=\"fas fa-pen\"></em>"
         penButton.style.visibility = "visible";
+
+        size5Button.innerHTML = "<em class=\"fas fa-circle\"></em>"
+        size5Button.style.visibility = "visible";
+
+        size10Button.innerHTML = "<em class=\"fas fa-circle fa-lg\"></em>"
+        size10Button.style.visibility = "visible";
         
         checkInputMode()
 
@@ -207,6 +227,8 @@ export class Whiteboard extends Interactive {
         saveButton.removeEventListener("click", this.savePressed);
         eraserButton.removeEventListener("click", this.erasePressed);
         penButton.removeEventListener("click", this.drawPressed);
+        size5Button.removeEventListener("click", (e) => {this.changeSize(5);});
+        size10Button.removeEventListener("click", (e) => {this.changeSize(10);});
         window.removeEventListener('resize', this.resized);
 
         removeCloseInteractionButton();
@@ -216,6 +238,8 @@ export class Whiteboard extends Interactive {
         saveButton.style.visibility = "hidden";
         eraserButton.style.visibility = "hidden";
         penButton.style.visibility = "hidden";
+        size5Button.style.visibility = "hidden";
+        size10Button.style.visibility = "hidden";
         
         checkInputMode()
         
@@ -230,7 +254,8 @@ export class Whiteboard extends Interactive {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "black"
         ctx.beginPath();
-        ctx.lineWidth = 10;
+        ctx.lineWidth = 5;
+        this.size = 5;0
         ctx.rect(0, 0, canvas.width, canvas.height);
         ctx.stroke();
         ctx.closePath();
@@ -315,6 +340,7 @@ export class Whiteboard extends Interactive {
         //"same" (old) code where only one player can draw at a time
         var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).paths;
         var color: ArraySchema<string> = whiteboard.room.state.whiteboard.at(whiteboard.wID).color;
+        var sizes: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).size;
         
         var max: number = paths.length;
 
@@ -323,7 +349,6 @@ export class Whiteboard extends Interactive {
 
         var ctx = whiteboard.canvas.getContext("2d");
 
-        ctx.lineWidth = 5;
         ctx.lineCap = 'round';
         var j = 0;
         let indexOfStroke = 0;
@@ -351,6 +376,7 @@ export class Whiteboard extends Interactive {
             }
             if (j === 0) {
                 ctx.beginPath(); //TODO: beginpath, closepath and stroke out of for-loop? ->  no! (different colors per line)
+                ctx.lineWidth = sizes[indexOfStroke];
                 ctx.strokeStyle = color[indexOfStroke];
                 whiteboard.makeLine(paths[i], paths[i + 1], paths[i + 2], paths[i + 3], ctx);
                 ctx.closePath();

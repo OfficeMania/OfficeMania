@@ -60,6 +60,9 @@ export class WhiteboardState extends Schema {
     @type({array: "string"})
     color: ArraySchema<string> = new ArraySchema<string>();
 
+    @type({array: "number"})
+    size: ArraySchema<number> = new ArraySchema<number>();
+
     //each whiteboardplayer has its own color and paths (new) 
     @type({map: WhiteboardPlayerState})
     whiteboardPlayer: MapSchema<WhiteboardPlayerState> = new MapSchema<WhiteboardPlayerState>();

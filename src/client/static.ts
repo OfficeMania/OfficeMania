@@ -45,3 +45,5 @@ export const saveButton = $<HTMLButtonElement>("button-whiteboard-save");
 export const clearButton = $<HTMLButtonElement>("button-whiteboard-clear");
 export const eraserButton = $<HTMLButtonElement>("button-whiteboard-eraser");
 export const penButton = $<HTMLButtonElement>("button-whiteboard-pen");
+export const size5Button = $<HTMLButtonElement>("button-whiteboard-size5");
+export const size10Button = $<HTMLButtonElement>("button-whiteboard-size10");
