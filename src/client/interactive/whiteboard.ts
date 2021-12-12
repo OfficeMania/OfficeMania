@@ -14,7 +14,8 @@ import {
     eraserButton,
     penButton,
     size5Button,
-    size10Button
+    size10Button,
+    whiteboardPanel
 } from "../static";
 import {ArraySchema} from "@colyseus/schema";
 import {MessageType} from "../../common/util";
@@ -74,7 +75,7 @@ export class Whiteboard extends Interactive {
         ctx.closePath();
         ctx.stroke(); // draw it!
 
-        if (this.numberOfDrawnPixel % 4 === 0) { //only send each 10th pixel to server => draw short lines rather than each pixel
+        if (this.numberOfDrawnPixel % 4 === 0) { //only send each 4th pixel to server => draw short lines rather than each pixel
             this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, this.x, this.y])
         }
         this.numberOfDrawnPixel++;
@@ -83,7 +84,7 @@ export class Whiteboard extends Interactive {
 
     mouseDown = (e) => {
         this.setPosition(e, this);
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -1]); //-2: dont save color again (already saved)
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -2]); //-2: dont save color again (already saved)
         this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, this.x, this.y])
     }
 
@@ -99,7 +100,7 @@ export class Whiteboard extends Interactive {
             this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, this.x, this.y]);
             this.currentlyPainting = false;
         }
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -2]);
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -1]);
     }
 
     clearPressed = () => {
@@ -131,7 +132,7 @@ export class Whiteboard extends Interactive {
 
         this.room = getRoom();
         this.players = getPlayers();
-
+/*
         clearButton.style.top = "35%"
         clearButton.style.left = "25%"
 
@@ -149,7 +150,7 @@ export class Whiteboard extends Interactive {
 
         size10Button.style.top = "37%"
         size10Button.style.left = "33%"
-
+*/
         this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
         //(new) code where multiple players should be able to draw at once
         //this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
@@ -216,6 +217,8 @@ export class Whiteboard extends Interactive {
         size10Button.innerHTML = "<em class=\"fas fa-circle fa-lg\"></em>"
         size10Button.style.visibility = "visible";
         
+        whiteboardPanel.style.visibility = "visible";
+
         checkInputMode()
 
         Whiteboard.currentWhiteboard = this.wID
@@ -249,6 +252,7 @@ export class Whiteboard extends Interactive {
         penButton.style.visibility = "hidden";
         size5Button.style.visibility = "hidden";
         size10Button.style.visibility = "hidden";
+        whiteboardPanel.style.visibility = "hidden";
         
         checkInputMode()
         
@@ -327,12 +331,12 @@ export class Whiteboard extends Interactive {
 
         whiteboard.stretchX = 1280 / rect.width
         whiteboard.stretchY = 720 / rect.height
-
+/*
         clearButton.style.top = rect.top + "px";
         saveButton.style.top = rect.top + "px";
         eraserButton.style.top = rect.top + "px";
         penButton.style.top = rect.top + "px";
-    }
+    */  }
 
     //(new) code where multiple players should be able to draw at once
     //drawOthers(clientID: string, whiteboard: Whiteboard) {

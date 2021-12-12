@@ -187,17 +187,24 @@
             <ul id="chat-list"></ul>
         </div>-->
 
+
         <div id="interactive-bar">
-            <canvas id="interactive" tabindex='0' width="1280" height="720"></canvas>
-            <button id="button-interactive"></button>
-            <div id="interactive-bar-whiteboard">
-                <button id="button-whiteboard-save"><em class="fas fa-save"></em><span></span></button>
-                <button id="button-whiteboard-clear"><em class="fa fa-trash"></em><span></span></button>
-                <button id="button-whiteboard-pen"><em class="fas fa-pen"></em><span></span></button>
-                <button id="button-whiteboard-eraser"><em class="fa fa-eraser"></em><span></span></button>
-                <button id="button-whiteboard-size5"><em class="fa fa-eraser"></em><span></span></button>
-                <button id="button-whiteboard-size10"><em class="fa fa-eraser"></em><span></span></button>
+            <div id="interactive-whiteboard-wrapper">
+                <div id="interactive-bar-whiteboard">
+                    <button id="button-whiteboard-save"><em class="fas fa-save"></em><span></span></button>
+                    <button id="button-whiteboard-clear"><em class="fa fa-trash"></em><span></span></button>
+                    <button id="button-whiteboard-pen"><em class="fas fa-pen"></em><span></span></button>
+                    <button id="button-whiteboard-eraser"><em class="fa fa-eraser"></em><span></span></button>
+                    <button id="button-whiteboard-size5"><em class="fa fa-circle"></em><span></span></button>
+                    <button id="button-whiteboard-size10"><em class="fa fa-circle fa-2x"></em><span></span></button>
+                </div>
+                <canvas id="interactive" tabindex='0' width="1280" height="720"></canvas>
             </div>
+        </div>
+
+        <div id="interactive-bar">
+            <canvas id="interactive" tabindex='0' width="1280" height="720" style="margin-left: 20%;"></canvas>
+            <button id="button-interactive"></button>
             <div id="interactive-bar-chess">
                 <button id="button-chess-export"><em class="fa fa-copy"></em><span></span></button>
                 <button id="button-chess-import"><em class="fa fa-paste"></em><span></span></button>

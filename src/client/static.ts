@@ -47,3 +47,4 @@ export const eraserButton = $<HTMLButtonElement>("button-whiteboard-eraser");
 export const penButton = $<HTMLButtonElement>("button-whiteboard-pen");
 export const size5Button = $<HTMLButtonElement>("button-whiteboard-size5");
 export const size10Button = $<HTMLButtonElement>("button-whiteboard-size10");
+export const whiteboardPanel = $<HTMLDivElement>("interactive-bar-whiteboard");
