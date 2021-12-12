@@ -49,19 +49,16 @@ function onNewWhiteboard(room: Room<State>, client: Client, wID: number){
     //(new) code where multiple players should be able to draw at once
     //!!!!!!!!!!Fehlermeldung: Property 'color' does not exist on type 'WhiteboardPlayerState'.!!!!!!!!!!!!!!!!!
     /*room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color = new ArraySchema<string>(); //not working! (???)
-    room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.push('black'); //first line is black
     room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths = new ArraySchema<number>();*/
 
     //more or less same (new) code without error (i'm not sure it works)
     /*for (const [, player] of room.state.whiteboard.at(wID).whiteboardPlayer) {
         player.color = new ArraySchema<string>();
-        player.color.push('black'); //first line is black
         player.paths = new ArraySchema<number>();
     }*/
 
     //"same" (old) code where only one player can draw at a time
     room.state.whiteboard.at(wID).color = new ArraySchema<string>(); //not working! (???)
-    room.state.whiteboard.at(wID).color.push('black'); //first line is black
     room.state.whiteboard.at(wID).size = new ArraySchema<number>();
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
 }
@@ -77,7 +74,6 @@ function onClear(room: Room<State>, client: Client, wID: number) {
 
     //"same" (old) code where only one player can draw at a time
     room.state.whiteboard.at(wID).color = new ArraySchema<string>(); //not working! (???)
-    room.state.whiteboard.at(wID).color.push('black'); //first line is black
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
     room.state.whiteboard.at(wID).size = new ArraySchema<number>();
 }
