@@ -83,7 +83,7 @@ export class Whiteboard extends Interactive {
 
     mouseDown = (e) => {
         this.setPosition(e, this);
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -2]); //-2: dont save color again (already saved)
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -1]); //-2: dont save color again (already saved)
         this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, this.x, this.y])
     }
 
@@ -99,7 +99,7 @@ export class Whiteboard extends Interactive {
             this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, this.x, this.y]);
             this.currentlyPainting = false;
         }
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -1]);
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -2]);
     }
 
     clearPressed = () => {

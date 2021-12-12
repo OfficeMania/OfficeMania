@@ -86,7 +86,16 @@ function onSave(room: Room<State>, client: Client, wID: number) {
 function onPath(room: Room<State>, client: Client, message: number[]) {           //message: [wID, color, x, y]
     var wID: number = message.shift();
     var color: number = message.shift(); //colors: 0=black, 1=white
+    if (color === 1) {
+        var colorStr: string = 'white';
+    } else {
+        var colorStr: string = 'black';
+    }
     var size: number = message.shift();
+    if (room.state.whiteboard.at(wID).color.length === 0) {
+        room.state.whiteboard.at(wID).color.push(colorStr);
+        room.state.whiteboard.at(wID).size.push(size);
+    }
     if (message[0] < 0) {
         //(new) code where multiple players should be able to draw at once
         //!!!!!!!!!!Fehlermeldung: Property 'color' does not exist on type 'WhiteboardPlayerState'.!!!!!!!!!!!!!!!!!
@@ -107,12 +116,13 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
         let length = room.state.whiteboard.at(wID).paths.length;
         if (room.state.whiteboard.at(wID).paths.at(length-2) > -1) { //only push -1 if last element is not already -1
             room.state.whiteboard.at(wID).paths.push(-1); //-1 means end of line/beginning of new line
-            if (color === 0 && message[0] === -1) {
-                room.state.whiteboard.at(wID).color.push('black');
+            if (message[0] === -1) {
+            //if (color === 0 && message[0] === -1) {
+                room.state.whiteboard.at(wID).color.push(colorStr);
                 room.state.whiteboard.at(wID).size.push(size);
-            } else if (color === 1 && message[0] === -1) {
+            /*} else if (color === 1 && message[0] === -1) {
                 room.state.whiteboard.at(wID).color.push('white');
-                room.state.whiteboard.at(wID).size.push(size);
+                room.state.whiteboard.at(wID).size.push(size);*/
             }
         }
     } else {
