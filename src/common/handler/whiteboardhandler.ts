@@ -58,7 +58,7 @@ function onNewWhiteboard(room: Room<State>, client: Client, wID: number){
     }*/
 
     //"same" (old) code where only one player can draw at a time
-    room.state.whiteboard.at(wID).color = new ArraySchema<string>(); //not working! (???)
+    room.state.whiteboard.at(wID).color = new ArraySchema<string>();
     room.state.whiteboard.at(wID).size = new ArraySchema<number>();
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
 }
@@ -73,7 +73,7 @@ function onClear(room: Room<State>, client: Client, wID: number) {
     room.broadcast(MessageType.WHITEBOARD_CLEAR, wID, {except: client});
 
     //"same" (old) code where only one player can draw at a time
-    room.state.whiteboard.at(wID).color = new ArraySchema<string>(); //not working! (???)
+    room.state.whiteboard.at(wID).color = new ArraySchema<string>();
     room.state.whiteboard.at(wID).paths = new ArraySchema<number>();
     room.state.whiteboard.at(wID).size = new ArraySchema<number>();
 }
@@ -88,11 +88,11 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
     var color: number = message.shift(); //colors: 0=black, 1=white
     if (color === 1) {
         var colorStr: string = 'white';
-    } else {
+    } else { //if color === 0
         var colorStr: string = 'black';
     }
     var size: number = message.shift();
-    if (room.state.whiteboard.at(wID).color.length === 0) {
+    if (room.state.whiteboard.at(wID).color.length === 0) { //add setting of first stroke to color and size variable
         room.state.whiteboard.at(wID).color.push(colorStr);
         room.state.whiteboard.at(wID).size.push(size);
     }
@@ -117,12 +117,8 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
         if (room.state.whiteboard.at(wID).paths.at(length-2) > -1) { //only push -1 if last element is not already -1
             room.state.whiteboard.at(wID).paths.push(-1); //-1 means end of line/beginning of new line
             if (message[0] === -1) {
-            //if (color === 0 && message[0] === -1) {
                 room.state.whiteboard.at(wID).color.push(colorStr);
                 room.state.whiteboard.at(wID).size.push(size);
-            /*} else if (color === 1 && message[0] === -1) {
-                room.state.whiteboard.at(wID).color.push('white');
-                room.state.whiteboard.at(wID).size.push(size);*/
             }
         }
     } else {
