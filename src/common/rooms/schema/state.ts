@@ -67,6 +67,23 @@ export class WhiteboardState extends Schema {
     @type({map: WhiteboardPlayerState})
     whiteboardPlayer: MapSchema<WhiteboardPlayerState> = new MapSchema<WhiteboardPlayerState>();
 
+    //=================================new Code==============================
+    //playerPaths[clientId] is paths-array for that client, playerColors and playerSizes analog
+    @type({array: "number"})
+    playerPaths: ArraySchema<ArraySchema<number>> = new ArraySchema<ArraySchema<number>>();
+
+    @type({array: "string"})
+    playerColors: ArraySchema<ArraySchema<string>> = new ArraySchema<ArraySchema<string>>();
+
+    @type({array: "number"})
+    playerSizes: ArraySchema<ArraySchema<number>> = new ArraySchema<ArraySchema<number>>();
+
+    //@type(Map)  //????????????????
+    //clientIDs: Map<string, number> = new Map<string, number>();
+
+    @type("number")
+    numberOfClients: number;
+
 }
 
 /*

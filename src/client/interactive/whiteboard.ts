@@ -1,6 +1,7 @@
 import {Room} from "colyseus.js";
 import {State} from "../../common";
 import {
+    consumeInteractionClosed,
     createCloseInteractionButton,
     getPlayers,
     getRoom,
@@ -35,7 +36,7 @@ export class Whiteboard extends Interactive {
     stretchX: number = 1;
     stretchY: number = 1;
     private room: Room<State>;
-    private players: PlayerRecord;
+    private players: PlayerRecord = getPlayers();
     private whiteboardPlayer: { [key: string]: number } = {}; //(new) code where multiple players should be able to draw at once
     wID: number = 0;
     static whiteboardCount: number = 0;
@@ -155,6 +156,9 @@ export class Whiteboard extends Interactive {
         //(new) code where multiple players should be able to draw at once
         //this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
 
+        //================================new Code ==============================================
+        //this.clientIDs = this.room.state.whiteboard.at(this.wID).clientIDs;
+        //this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client, this));
         //"same" (old) code where only one player can draw at a time
         this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(this));
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
@@ -175,6 +179,8 @@ export class Whiteboard extends Interactive {
             createCloseInteractionButton(() => this.hide());
         }
     }
+
+    loop() {}
 
     //input.ts function, for esc key 
     leave() {
@@ -226,6 +232,8 @@ export class Whiteboard extends Interactive {
         this.resize(this);
         //this.setup(this.canvas); //unnecessary because redraw calls setup
         this.redraw(this);
+        //=================================new Code=================================
+        //this.clientIDs = this.room.state.whiteboard.at(this.wID).clientIDs; //sync in case a client went/joint
     }
 
     hide() {
@@ -284,12 +292,18 @@ export class Whiteboard extends Interactive {
         }*/
 
         //"same" (old) code where only one player can draw at a time
+        //=========================================old==============================================
         whiteboard.drawOthers(whiteboard);
+
+        //======================================new Code=============================================
+        //for (let i = 0; i < whiteboard.room.state.whiteboard.at(whiteboard.wID).numberOfClients; i++) {
+        //    whiteboard.drawOthers(i, whiteboard);
+        //}
     }
 
-    resetPlayer(player: string) {
+    /*resetPlayer(player: string) {
         this.whiteboardPlayer[player] = 0;
-    }
+    }*/
 
     clear(whiteboard: Whiteboard, message: number) {
         if(whiteboard.wID !== message){
@@ -343,6 +357,8 @@ export class Whiteboard extends Interactive {
 
     //"same" (old) code where only one player can draw at a time
     drawOthers(whiteboard: Whiteboard) {
+    //========================new Code==================================
+    //drawOthers(clientID: number, whiteboard: Whiteboard) {
         if(Whiteboard.currentWhiteboard !== this.wID){
             return;
         }
@@ -350,10 +366,30 @@ export class Whiteboard extends Interactive {
         /*var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths;
         var color: ArraySchema<string> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].color;*/
         
+        //============================================old==========================================
         //"same" (old) code where only one player can draw at a time
         var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).paths;
         var color: ArraySchema<string> = whiteboard.room.state.whiteboard.at(whiteboard.wID).color;
         var sizes: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).size;
+
+        //=======================================new Code=========================================
+        //var path: ArraySchema<ArraySchema<number>> = whiteboard.room.state.whiteboard.at(whiteboard.wID).playerPaths;
+        //var pathsProxy = new Proxy(path, {
+        //    set: function (target, key, value) {
+        //        console.log(`${String(key)} set to ${value}`);
+        //        target[key] = value;
+        //        return true;
+        //    }
+        //  });
+        ////next 2 lines just for debugging (dont have any function)
+        //console.log(pathsProxy); //Proxy {$changes: ChangeTree, $items: Map(0), $indexes: Map(0), $refId: 0, $proxy: true}
+        ////TODO: why is playerPaths (and playerColors and playerSizes) always empty?!?!?!?!???
+        //var paths: ArraySchema<number> = pathsProxy[clientID];
+        //if (paths !== undefined) { //avoid errors
+            //var color: ArraySchema<string> = whiteboard.room.state.whiteboard.at(whiteboard.wID).playerColors[clientID];
+            //console.log(color);
+            //console.log("DEEEEEEEBBBBUUUUUUUUUUUGGGGGGGGGG"); //never... -> paths always undefined?
+            //var sizes: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).playerSizes[clientID];
         
         var max: number = paths.length;
 
@@ -370,36 +406,37 @@ export class Whiteboard extends Interactive {
         //for (var i: number = start; i < max - 3; i++) {
         //"same" (old) code where only one player can draw at a time
         for (var i: number = 0; i < max - 3; i++) {    
-            if (paths[i] === -1) {
+            if (paths.at(i) === -1) {
                 indexOfStroke++;
                 j = 0;
                 continue;
-            } else if (paths[i + 1] === -1) { //paths: [...,-1,firstX,firstY,secondX,secondY,thirdX,thirdY,...,-1,firstX,...]
+            } else if (paths.at(i + 1) === -1) { //paths: [...,-1,firstX,firstY,secondX,secondY,thirdX,thirdY,...,-1,firstX,...]
                 i = i + 1;
                 j = 0;
                 continue;
-            } else if (paths[i + 2] === -1) {
+            } else if (paths.at(i + 2) === -1) {
                 i = i + 2;
                 j = 0;
                 continue;
-            } else if (paths[i + 3] === -1) {
+            } else if (paths.at(i + 3) === -1) {
                 i = i + 3;
                 j = 0;
                 continue;
             }
             if (j === 0) {
-                ctx.beginPath(); //TODO: beginpath, closepath and stroke out of for-loop? ->  no! (different colors per line)
-                ctx.lineWidth = sizes[indexOfStroke];
-                ctx.strokeStyle = color[indexOfStroke];
-                whiteboard.makeLine(paths[i], paths[i + 1], paths[i + 2], paths[i + 3], ctx);
+                ctx.beginPath(); 
+                ctx.lineWidth = sizes.at(indexOfStroke);
+                ctx.strokeStyle = color.at(indexOfStroke);
+                whiteboard.makeLine(paths.at(i), paths.at(i + 1), paths.at(i + 2), paths.at(i + 3), ctx);
                 ctx.closePath();
                 ctx.stroke();
                 j++;
             } else {
                 j = 0;
             }
+            //}
         }
-
+        
         //(new) code where multiple players should be able to draw at once
         //whiteboard.whiteboardPlayer[clientID] = max - 2;
 
