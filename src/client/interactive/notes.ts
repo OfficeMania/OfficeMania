@@ -11,12 +11,12 @@ export class Notes extends Interactive {
     inputs = [" ", "A", "a", "B", "b", "C", "c", "D", "d", "E", "e", "F", "f", "G", "g", "H", "h", "I", "i", "J", "j", "K", "k", "L", "l",
     "M", "m", "N", "n", "O", "o", "P", "p", "Q", "q", "R", "r", "S", "s", "T", "t", "U", "u", "V", "v", "W", "w", "X", "x", "Y", "y", "Z", "z",
     "Ä", "ä", "Ü", "ü", "Ö", "ö", "-", "_", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "'", "#", "+", "=", "*", "/", ".", ":", ",", ";",
-    "?", "!", "%", "&", "(", ")", "<", ">", "|", "Backspace", "Enter", "ArrowLeft", "ArrowRight"];
+    "?", "!", "%", "&", "(", ")", "<", ">", "|", "Backspace", "Enter", "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp"];
     ctx: CanvasRenderingContext2D;
     static notesID: number = 0;
 
     id: number = 0;
-    content: string = "";
+    contents: string[] = [""];
 
     marker: number = 0;
     
@@ -83,17 +83,9 @@ export class Notes extends Interactive {
     }
 
     drawText(){
-        let buffer;
-        this.marker = this.room.state.notesState.markers[this.ourPlayer.id];
-        this.content = this.room.state.notesState.content;
-
-        let subs: string[] = [];
-        let lineCounter: number = 0;
-        let prevPos: number = 0;
-        this.room.state.notesState.lengths.forEach((length) => {
-            subs[lineCounter] = this.content.substr(prevPos, length);
-            prevPos += length;
-        });
+        this.marker = this.room.state.notesState.markersX[this.ourPlayer.id];
+        this.contents = [];
+        this.room.state.notesState.contents.forEach(content => this.contents.push(content));
 
         this.ctx.fillStyle = "black";
         this.ctx.font = "25px DejaVu Sans Mono";
@@ -102,17 +94,17 @@ export class Notes extends Interactive {
         let i = 0;
         let j = 0;
         let lineheight = 30;
-        while(i < subs.length) {
-            let l = subs[i].length;
+        while(i < this.contents.length) {
+            let l = this.contents[i].length;
             let c = 1;
             while (l > 0) {
                 if (l > 80) {
-                    this.ctx.fillText(subs[i].substr(80 * (c - 1), 80), 100, 100 + (lineheight * j));
+                    this.ctx.fillText(this.contents[i].substr(80 * (c - 1), 80), 100, 100 + (lineheight * j));
                     j++;
                     c++;
                 }
                 else {
-                    this.ctx.fillText(subs[i].substr(80 * (c - 1)), 100, 100 + (lineheight * j));
+                    this.ctx.fillText(this.contents[i].substr(80 * (c - 1)), 100, 100 + (lineheight * j));
                 }
                 l -= 80;
 
