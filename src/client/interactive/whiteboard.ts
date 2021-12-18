@@ -16,6 +16,7 @@ import {
     penButton,
     size5Button,
     size10Button,
+    redButton,
     whiteboardPanel
 } from "../static";
 import {ArraySchema} from "@colyseus/schema";
@@ -62,7 +63,11 @@ export class Whiteboard extends Interactive {
         ctx.lineCap = 'round';
         if (this.isPen) {
             //use pen
-            ctx.strokeStyle = "black";
+            if (this.currentColor === 2) {
+                ctx.strokeStyle ="red";
+            } else { // this.currentColor === 0
+                ctx.strokeStyle = "black";
+            }
         } else {
             //use eraser
             ctx.strokeStyle = "white";
@@ -116,12 +121,17 @@ export class Whiteboard extends Interactive {
 
     drawPressed = () => {
         this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
-        this.draw();
+        this.draw(0);
     }
 
     erasePressed = () => {
         this.room.send(MessageType.WHITEBOARD_ERASE, this.wID);
         this.erase();
+    }
+
+    redPressed = () => {
+        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
+        this.draw(2); //TODO: send color
     }
 
     constructor() {
@@ -163,7 +173,7 @@ export class Whiteboard extends Interactive {
         this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(this));
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
         this.room.onMessage(MessageType.WHITEBOARD_SAVE, (message) => this.save(this, message));
-        this.room.onMessage(MessageType.WHITEBOARD_DRAW, () => this.draw());
+        this.room.onMessage(MessageType.WHITEBOARD_DRAW, () => this.draw(0));
         this.room.onMessage(MessageType.WHITEBOARD_ERASE, () => this.erase());
 
         this.resize(this);
@@ -200,6 +210,7 @@ export class Whiteboard extends Interactive {
         penButton.addEventListener("click", this.drawPressed);
         size5Button.addEventListener("click", (e) => {this.changeSize(5);});
         size10Button.addEventListener("click", (e) => {this.changeSize(10);});
+        redButton.addEventListener("click", this.redPressed); //todo: send color?
 
         //size changed
         window.addEventListener('resize', this.resized);
@@ -222,6 +233,10 @@ export class Whiteboard extends Interactive {
 
         size10Button.innerHTML = "<em class=\"fas fa-circle fa-lg\"></em>"
         size10Button.style.visibility = "visible";
+
+        redButton.innerHTML = "<em></em>"
+        redButton.style.visibility = "visible";
+        redButton.style.backgroundColor = "red";
         
         whiteboardPanel.style.visibility = "visible";
 
@@ -249,6 +264,7 @@ export class Whiteboard extends Interactive {
         penButton.removeEventListener("click", this.drawPressed);
         size5Button.removeEventListener("click", (e) => {this.changeSize(5);});
         size10Button.removeEventListener("click", (e) => {this.changeSize(10);});
+        redButton.removeEventListener("click", this.redPressed);
         window.removeEventListener('resize', this.resized);
 
         removeCloseInteractionButton();
@@ -261,6 +277,7 @@ export class Whiteboard extends Interactive {
         size5Button.style.visibility = "hidden";
         size10Button.style.visibility = "hidden";
         whiteboardPanel.style.visibility = "hidden";
+        redButton.style.visibility = "hidden";
         
         checkInputMode()
         
@@ -450,9 +467,9 @@ export class Whiteboard extends Interactive {
         whiteboard.y = (e.clientY - whiteboard.offsetY) * whiteboard.stretchY;
     }
 
-    private draw () {
+    private draw(color: number) { //0: black, 1: white, 2:red
         this.isPen = true;
-        this.currentColor = 0;
+        this.currentColor = color;
     }
 
     private erase() {

@@ -130,10 +130,12 @@ function onSave(room: Room<State>, client: Client, wID: number) {
 
 function onPath(room: Room<State>, client: Client, message: number[]) {           //message: [wID, color, x, y]
     var wID: number = message.shift();
-    var color: number = message.shift(); //colors: 0=black, 1=white
+    var color: number = message.shift(); //colors: 0=black, 1=white, 2=red
     if (color === 1) {
         var colorStr: string = 'white';
-    } else { //if color === 0
+    } else if (color === 2) {
+        var colorStr: string = 'red';
+    } else { //color === 0
         var colorStr: string = 'black';
     }
     var size: number = message.shift();
