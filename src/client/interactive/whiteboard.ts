@@ -17,6 +17,11 @@ import {
     size5Button,
     size10Button,
     redButton,
+    pinkButton,
+    orangeButton,
+    yellowButton,
+    greenButton,
+    blueButton,
     whiteboardPanel
 } from "../static";
 import {ArraySchema} from "@colyseus/schema";
@@ -63,10 +68,28 @@ export class Whiteboard extends Interactive {
         ctx.lineCap = 'round';
         if (this.isPen) {
             //use pen
-            if (this.currentColor === 2) {
-                ctx.strokeStyle ="red";
-            } else { // this.currentColor === 0
-                ctx.strokeStyle = "black";
+            switch (this.currentColor) {
+                case 2:
+                    ctx.strokeStyle = "red";
+                    break;
+                case 3:
+                    ctx.strokeStyle = "pink";
+                    break;
+                case 4:
+                    ctx.strokeStyle = "orange";
+                    break;
+                case 5:
+                    ctx.strokeStyle = "yellow";
+                    break;
+                case 6:
+                    ctx.strokeStyle = "green";
+                    break;
+                case 7:
+                    ctx.strokeStyle = "blue";
+                    break;
+                default: //case 0
+                    ctx.strokeStyle = "black";
+                    break;
             }
         } else {
             //use eraser
@@ -131,7 +154,32 @@ export class Whiteboard extends Interactive {
 
     redPressed = () => {
         this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
-        this.draw(2); //TODO: send color
+        this.draw(2);
+    }
+
+    pinkPressed = () => {
+        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
+        this.draw(3);
+    }
+
+    orangePressed = () => {
+        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
+        this.draw(4);
+    }
+
+    yellowPressed = () => {
+        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
+        this.draw(5);
+    }
+
+    greenPressed = () => {
+        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
+        this.draw(6);
+    }
+
+    bluePressed = () => {
+        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
+        this.draw(7);
     }
 
     constructor() {
@@ -210,7 +258,12 @@ export class Whiteboard extends Interactive {
         penButton.addEventListener("click", this.drawPressed);
         size5Button.addEventListener("click", (e) => {this.changeSize(5);});
         size10Button.addEventListener("click", (e) => {this.changeSize(10);});
-        redButton.addEventListener("click", this.redPressed); //todo: send color?
+        redButton.addEventListener("click", this.redPressed);
+        pinkButton.addEventListener("click", this.pinkPressed);
+        orangeButton.addEventListener("click", this.orangePressed);
+        yellowButton.addEventListener("click", this.yellowPressed);
+        greenButton.addEventListener("click", this.greenPressed);
+        blueButton.addEventListener("click", this.bluePressed);
 
         //size changed
         window.addEventListener('resize', this.resized);
@@ -237,6 +290,26 @@ export class Whiteboard extends Interactive {
         redButton.innerHTML = "<em></em>"
         redButton.style.visibility = "visible";
         redButton.style.backgroundColor = "red";
+
+        pinkButton.innerHTML = "<em></em>"
+        pinkButton.style.visibility = "visible";
+        pinkButton.style.backgroundColor = "magenta";
+
+        orangeButton.innerHTML = "<em></em>"
+        orangeButton.style.visibility = "visible";
+        orangeButton.style.backgroundColor = "orange";
+
+        yellowButton.innerHTML = "<em></em>"
+        yellowButton.style.visibility = "visible";
+        yellowButton.style.backgroundColor = "yellow";
+
+        greenButton.innerHTML = "<em></em>"
+        greenButton.style.visibility = "visible";
+        greenButton.style.backgroundColor = "green";
+
+        blueButton.innerHTML = "<em></em>"
+        blueButton.style.visibility = "visible";
+        blueButton.style.backgroundColor = "blue";
         
         whiteboardPanel.style.visibility = "visible";
 
@@ -265,6 +338,11 @@ export class Whiteboard extends Interactive {
         size5Button.removeEventListener("click", (e) => {this.changeSize(5);});
         size10Button.removeEventListener("click", (e) => {this.changeSize(10);});
         redButton.removeEventListener("click", this.redPressed);
+        pinkButton.removeEventListener("click", this.pinkPressed);
+        orangeButton.removeEventListener("click", this.orangePressed);
+        yellowButton.removeEventListener("click", this.yellowPressed);
+        greenButton.removeEventListener("click", this.greenPressed);
+        blueButton.removeEventListener("click", this.bluePressed);
         window.removeEventListener('resize', this.resized);
 
         removeCloseInteractionButton();
@@ -276,8 +354,13 @@ export class Whiteboard extends Interactive {
         penButton.style.visibility = "hidden";
         size5Button.style.visibility = "hidden";
         size10Button.style.visibility = "hidden";
-        whiteboardPanel.style.visibility = "hidden";
         redButton.style.visibility = "hidden";
+        pinkButton.style.visibility = "hidden";
+        orangeButton.style.visibility = "hidden";
+        yellowButton.style.visibility = "hidden";
+        greenButton.style.visibility = "hidden";
+        blueButton.style.visibility = "hidden";
+        whiteboardPanel.style.visibility = "hidden";
         
         checkInputMode()
         
