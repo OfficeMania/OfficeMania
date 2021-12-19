@@ -36,7 +36,6 @@ export class NotesHandler implements Handler{
     private initNotes(client: Client) {
         this.room.state.notesState.markersX.set(client.id, 0);
         this.room.state.notesState.markersY.set(client.id, 0);
-        //console.log(this.room.state.notesState.markers.get(client.id))
     }
 
     private enterNotes(client: Client, key: string) {
@@ -46,7 +45,6 @@ export class NotesHandler implements Handler{
         console.log("at: ", markerX, line)
         this.oldContents = [];
         this.room.state.notesState.contents.forEach(content => this.oldContents.push(content));
-        console.log(this.oldContents);
         switch (key) {
             case "Backspace":
                 if (markerX > 0) {
@@ -84,7 +82,13 @@ export class NotesHandler implements Handler{
                 break;
 
             case "Delete":
-                //TODO
+                if (markerX + 1 < this.room.state.notesState.contents.at(line).length) {
+                    this.moveEverything(Direction.LEFT, markerX + 1, line);
+                }
+                else if (line + 1 < this.room.state.notesState.contents.length){
+                    this.moveEverything(Direction.UP, 0, line + 1);
+                }
+                this.room.state.notesState.change = !this.room.state.notesState.change;
                 break;
 
             case "End":
@@ -95,6 +99,7 @@ export class NotesHandler implements Handler{
                 break;
 
             default:
+                //maybe for clipboard?
                 if(key.length > 1) {
                     console.log("Not implemented")
                     break;
@@ -103,7 +108,6 @@ export class NotesHandler implements Handler{
                 let contents: string[] = []
                 this.room.state.notesState.contents.forEach(content => contents.push(content));
                 this.room.state.notesState.contents.forEach(content => this.room.state.notesState.contents.pop());
-                //console.log(this.room.state.notesState.contents)
                 if (contents[line] === "") {
                     console.log("empty", line)
                     contents[line] = key;
@@ -112,24 +116,18 @@ export class NotesHandler implements Handler{
                     contents[line] = contents[line].substring(0, markerX) + key + contents[line].substring(markerX);
                 }
                 contents.forEach(content => this.room.state.notesState.contents.push(content));
-                this.room.state.notesState.contents.forEach(content => console.log(`[${content}]`));
+                //this.room.state.notesState.contents.forEach(content => console.log(`[${content}]`));
                 this.moveEverything(Direction.RIGHT, markerX, line);
-                console.log(this.room.state.notesState.markersX.get(client.id) + " - " + this.room.state.notesState.markersY.get(client.id));
                 this.room.state.notesState.change = !this.room.state.notesState.change;
 
         }
-        this.room.state.notesState.contents.forEach(content => console.log(content));
-        
-        //TODO: Special cases for enter, left, right arrow, delete, end?, pos1?
-        //TODO: check for overflowing lines --> client
         
     }
 
     //handles moving all the markers, correcting the line lengths
-    //direction: true = added a key, false: removed a key
-    //frompos: position of marker before insertion/deletion 
+    //direction: either of 4, currently never right, thats being handled manually
+    //fromposx: position of marker before insertion/deletion 
     private moveEverything(direction: Direction, fromPosX: number, line: number){
-        //console.log(fromPos)
         let old: string[] = [];
         let counter = 0;
         
@@ -175,7 +173,7 @@ export class NotesHandler implements Handler{
             default:
                 //something else not possible on a keyboard
         }
-        //modify all client markers in the same originating line 
+        //modify all client markers in the same originating line and/or the following lines, depending on operation
         this.room.state.notesState.markersX.forEach((markerPos, clientid, map) => {
             switch (direction) {
                 case Direction.LEFT:
@@ -207,8 +205,9 @@ export class NotesHandler implements Handler{
         }); 
         
     }
-
+    //moves markers
     private modifyMarkers(markerX: number, line: number, clientid: string, direction: Direction) {
+        //move marker up a line if possible, adjust x position if there was any overhang
         if (direction === Direction.UP) {
             if(line === 0) {
                 return;
@@ -216,11 +215,12 @@ export class NotesHandler implements Handler{
             else {
                 this.room.state.notesState.markersY.set(clientid, line - 1);
                 if (this.room.state.notesState.contents.at(line - 1).length < markerX){
-                    console.log("check")
                     this.room.state.notesState.markersX.set(clientid, this.room.state.notesState.contents.at(line - 1).length)
                 }
             }
         }
+
+        //move marker down a line if possible, adjust x position if there was any overhang
         else if (direction === Direction.DOWN) {
             if(line === this.room.state.notesState.contents.length - 1) {
                 return;
@@ -232,6 +232,8 @@ export class NotesHandler implements Handler{
                 }
             }
         }
+
+        //move marker left or up if possible, adjust y position if necessary
         else if (direction === Direction.LEFT) {
             if (markerX === 0) {
                 if (line === 0) {
@@ -246,6 +248,8 @@ export class NotesHandler implements Handler{
             this.room.state.notesState.markersX.set(clientid, markerX - 1);
             
         }
+
+        //move marker right or down if possible, adjust y position if necessary
         else if (direction === Direction.RIGHT) {
             let rand: string = this.room.state.notesState.contents.at(line);
             console.log(rand, line);

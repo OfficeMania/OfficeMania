@@ -12,7 +12,7 @@ export class Notes extends Interactive {
     inputs = [" ", "A", "a", "B", "b", "C", "c", "D", "d", "E", "e", "F", "f", "G", "g", "H", "h", "I", "i", "J", "j", "K", "k", "L", "l",
     "M", "m", "N", "n", "O", "o", "P", "p", "Q", "q", "R", "r", "S", "s", "T", "t", "U", "u", "V", "v", "W", "w", "X", "x", "Y", "y", "Z", "z",
     "Ä", "ä", "Ü", "ü", "Ö", "ö", "-", "_", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "'", "#", "+", "=", "*", "/", ".", ":", ",", ";",
-    "?", "!", "%", "&", "(", ")", "<", ">", "|", "Backspace", "Enter", "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp"];
+    "?", "!", "%", "&", "(", ")", "<", ">", "|", "Backspace", "Enter", "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Delete"];
     ctx: CanvasRenderingContext2D;
     static notesID: number = 0;
 
@@ -20,6 +20,7 @@ export class Notes extends Interactive {
 
     room: Room<State>;
     ourPlayer: Player;
+
     inputLam = (e) => {
         if (this.inputs.includes(e.key)) {
             this.room.send(MessageType.NOTES_ENTER, e.key);
@@ -38,7 +39,6 @@ export class Notes extends Interactive {
         this.room = getRoom();
         this.room.send(MessageType.NOTES_CREATE);
         this.ourPlayer = getOurPlayer();
-        //this.room.send(MessageType.NOTES_SET, [this.id, ""]);
     }
 
     onInteraction() {
@@ -49,8 +49,8 @@ export class Notes extends Interactive {
         checkInputMode();
         this.loop();
 
-        //this.room.send(MessageType.NOTES_ENTER, "B");
         document.addEventListener("keydown", this.inputLam);
+
         this.room.state.notesState.onChange = () => {
             this.paint();
             this.drawText();
@@ -67,6 +67,8 @@ export class Notes extends Interactive {
         document.removeEventListener("keydown", this.inputLam);
         this.room.state.notesState.onChange = () => {};
     }
+
+    //paint background
     paint() {
         this.ctx.fillStyle = "black";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -80,6 +82,7 @@ export class Notes extends Interactive {
         this.ctx.fillRect((this.canvas.width/ 2), (this.canvas.height / 2), (this.canvas.width / 2) - 5, (this.canvas.height / 2) - 5);
     }
 
+    //darw text on top of background
     drawText(){
         let markerX = this.room.state.notesState.markersX.get(this.ourPlayer.roomId);
         let markerY = this.room.state.notesState.markersY.get(this.ourPlayer.roomId);
@@ -109,15 +112,7 @@ export class Notes extends Interactive {
                 }
                 l -= 80;
 
-            }/*
-            if (subs[i].length > 80) {
-                this.ctx.fillText(subs[i].substring(0, 79), 100, 100 + (lineheight * j));
-                j++;
-                this.ctx.fillText(subs[i].substring(79), 100, 100 + (lineheight * j));
             }
-            else {
-                this.ctx.fillText(subs[i], 100, 100 + (lineheight * j));
-            }*/
             j++;
             i++;
         }
