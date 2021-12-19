@@ -3,6 +3,7 @@ import { Room } from "colyseus.js";
 import { State } from "../../common";
 import { MessageType } from "../../common/util";
 import { checkInputMode } from "../main";
+import { Player } from "../player";
 import { createCloseInteractionButton, getOurPlayer, getRoom, removeCloseInteractionButton } from "../util";
 import { Interactive } from "./interactive";
 
@@ -16,12 +17,9 @@ export class Notes extends Interactive {
     static notesID: number = 0;
 
     id: number = 0;
-    contents: string[] = [""];
 
-    marker: number = 0;
-    
     room: Room<State>;
-    ourPlayer;
+    ourPlayer: Player;
     inputLam = (e) => {
         if (this.inputs.includes(e.key)) {
             this.room.send(MessageType.NOTES_ENTER, e.key);
@@ -83,9 +81,12 @@ export class Notes extends Interactive {
     }
 
     drawText(){
-        this.marker = this.room.state.notesState.markersX[this.ourPlayer.id];
-        this.contents = [];
-        this.room.state.notesState.contents.forEach(content => this.contents.push(content));
+        let markerX = this.room.state.notesState.markersX.get(this.ourPlayer.roomId);
+        let markerY = this.room.state.notesState.markersY.get(this.ourPlayer.roomId);
+        let contents: string[] = [];
+        this.room.state.notesState.contents.forEach(content => contents.push(content));
+
+        contents[markerY] = contents[markerY].substring(0, markerX) + "|" + contents[markerY].substring(markerX);
 
         this.ctx.fillStyle = "black";
         this.ctx.font = "25px DejaVu Sans Mono";
@@ -94,25 +95,25 @@ export class Notes extends Interactive {
         let i = 0;
         let j = 0;
         let lineheight = 30;
-        while(i < this.contents.length) {
-            let l = this.contents[i].length;
+        while(i < contents.length) {
+            let l = contents[i].length;
             let c = 1;
             while (l > 0) {
                 if (l > 80) {
-                    this.ctx.fillText(this.contents[i].substr(80 * (c - 1), 80), 100, 100 + (lineheight * j));
+                    this.ctx.fillText(contents[i].substring(80 * (c - 1), 80), 100, 100 + (lineheight * j));
                     j++;
                     c++;
                 }
                 else {
-                    this.ctx.fillText(this.contents[i].substr(80 * (c - 1)), 100, 100 + (lineheight * j));
+                    this.ctx.fillText(contents[i].substring(80 * (c - 1)), 100, 100 + (lineheight * j));
                 }
                 l -= 80;
 
             }/*
             if (subs[i].length > 80) {
-                this.ctx.fillText(subs[i].substr(0, 79), 100, 100 + (lineheight * j));
+                this.ctx.fillText(subs[i].substring(0, 79), 100, 100 + (lineheight * j));
                 j++;
-                this.ctx.fillText(subs[i].substr(79), 100, 100 + (lineheight * j));
+                this.ctx.fillText(subs[i].substring(79), 100, 100 + (lineheight * j));
             }
             else {
                 this.ctx.fillText(subs[i], 100, 100 + (lineheight * j));
