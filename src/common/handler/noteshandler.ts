@@ -47,7 +47,7 @@ export class NotesHandler implements Handler{
                 if (markerX > 0) {
                     this.moveEverything(Direction.LEFT, markerX, line);
                 }
-                else {
+                else if (line > 0){
                     this.moveEverything(Direction.UP, markerX, line);
                 }
                 this.room.state.notesState.change = !this.room.state.notesState.change;
