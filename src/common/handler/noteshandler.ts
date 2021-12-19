@@ -1,6 +1,4 @@
 import { Client, Room } from "colyseus";
-import { textChangeRangeIsUnchanged } from "typescript";
-import { ContextReplacementPlugin } from "webpack";
 import { State } from "../rooms/schema/state";
 import { Direction, MessageType } from "../util";
 import { Handler } from "./handler";
@@ -92,10 +90,12 @@ export class NotesHandler implements Handler{
                 break;
 
             case "End":
-                //TODO
+                this.room.state.notesState.markersX.set(client.id, this.oldContents[line].length)
+                this.room.state.notesState.change = !this.room.state.notesState.change;
                 break;
-            case "Pos1":
-                //TODO
+            case "Home":
+                this.room.state.notesState.markersX.set(client.id, 0);
+                this.room.state.notesState.change = !this.room.state.notesState.change;
                 break;
 
             default:
