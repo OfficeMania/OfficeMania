@@ -1,5 +1,6 @@
 import { Client, Room } from "colyseus";
 import { textChangeRangeIsUnchanged } from "typescript";
+import { ContextReplacementPlugin } from "webpack";
 import { State } from "../rooms/schema/state";
 import { Direction, MessageType } from "../util";
 import { Handler } from "./handler";
@@ -9,7 +10,8 @@ import { Handler } from "./handler";
 export class NotesHandler implements Handler{
 
     room: Room<State>;
-
+    
+    oldContents: string[] = [];
     init(room: Room<State>) {
         this.room = room;
     }
@@ -42,6 +44,9 @@ export class NotesHandler implements Handler{
         let markerX = this.room.state.notesState.markersX.get(client.id)
         let line = this.room.state.notesState.markersY.get(client.id);
         console.log("at: ", markerX, line)
+        this.oldContents = [];
+        this.room.state.notesState.contents.forEach(content => this.oldContents.push(content));
+        console.log(this.oldContents);
         switch (key) {
             case "Backspace":
                 if (markerX > 0) {
@@ -127,7 +132,7 @@ export class NotesHandler implements Handler{
         //console.log(fromPos)
         let old: string[] = [];
         let counter = 0;
-
+        
         switch (direction) {
             case Direction.UP:
                 this.room.state.notesState.contents.forEach(content => old.push(content));
@@ -182,6 +187,11 @@ export class NotesHandler implements Handler{
                 case Direction.DOWN:
                     this.room.state.notesState.markersX.set(clientid, 0);
                 case Direction.UP:
+                    if (direction === Direction.UP) {
+                        markerPos = this.oldContents[line - 1].length;
+                        this.room.state.notesState.markersX.set(clientid, markerPos);
+                        console.log("markerPos is now", markerPos)
+                    }
                     if(this.room.state.notesState.markersY.get(clientid) === line && markerPos >= fromPosX) {
                         this.modifyMarkers(markerPos, line, clientid, direction);
                     }
@@ -206,6 +216,7 @@ export class NotesHandler implements Handler{
             else {
                 this.room.state.notesState.markersY.set(clientid, line - 1);
                 if (this.room.state.notesState.contents.at(line - 1).length < markerX){
+                    console.log("check")
                     this.room.state.notesState.markersX.set(clientid, this.room.state.notesState.contents.at(line - 1).length)
                 }
             }

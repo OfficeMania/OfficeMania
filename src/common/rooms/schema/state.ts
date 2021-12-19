@@ -156,6 +156,9 @@ export class NotesState extends Schema {
     @type({ array: "string" })
     contents: ArraySchema<string> = new ArraySchema<string>();
 
+    @type({ array: "string" })
+    oldContents: ArraySchema<string> = new ArraySchema<string>();
+
     @type("boolean")
     change: boolean;
 }
