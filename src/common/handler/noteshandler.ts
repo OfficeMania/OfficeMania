@@ -17,7 +17,7 @@ export class NotesHandler implements Handler{
     onCreate(options: any) {
         this.room.onMessage(MessageType.NOTES_CREATE, (client, message) => {this.initNotes(client)})
         this.room.onMessage(MessageType.NOTES_ENTER, (client, message) => {this.enterNotes(client, message)})
-        this.room.onMessage(MessageType.NOTES_MARKER, (client, message) => {this.modifyMarkers(this.room.state.notesState.markersX.get(client.id), this.room.state.notesState.markersY.get(client.id), client.id, message)})
+        this.room.onMessage(MessageType.NOTES_MARKER, (client, message) => {this.modifyMarkers(this.room.state.notesState.markersX.get(client.sessionId), this.room.state.notesState.markersY.get(client.sessionId), client.sessionId, message)})
         this.room.state.notesState.contents.push("");
         this.room.state.notesState.contents.forEach(content => console.log("Notes: " + content + " "));
     }
@@ -32,14 +32,14 @@ export class NotesHandler implements Handler{
     }
 
     private initNotes(client: Client) {
-        this.room.state.notesState.markersX.set(client.id, 0);
-        this.room.state.notesState.markersY.set(client.id, 0);
+        this.room.state.notesState.markersX.set(client.sessionId, 0);
+        this.room.state.notesState.markersY.set(client.sessionId, 0);
     }
 
     private enterNotes(client: Client, key: string) {
         console.log("inserting: " + key);
-        let markerX = this.room.state.notesState.markersX.get(client.id)
-        let line = this.room.state.notesState.markersY.get(client.id);
+        let markerX = this.room.state.notesState.markersX.get(client.sessionId)
+        let line = this.room.state.notesState.markersY.get(client.sessionId);
         console.log("at: ", markerX, line)
         this.oldContents = [];
         this.room.state.notesState.contents.forEach(content => this.oldContents.push(content));
@@ -60,22 +60,22 @@ export class NotesHandler implements Handler{
                 break;
 
             case "ArrowLeft":
-                this.modifyMarkers(markerX, line, client.id, Direction.LEFT);
+                this.modifyMarkers(markerX, line, client.sessionId, Direction.LEFT);
                 this.room.state.notesState.change = !this.room.state.notesState.change;
                 break;
 
             case "ArrowRight":
-                this.modifyMarkers(markerX, line, client.id, Direction.RIGHT);
+                this.modifyMarkers(markerX, line, client.sessionId, Direction.RIGHT);
                 this.room.state.notesState.change = !this.room.state.notesState.change;
                 break;
 
             case "ArrowUp":
-                this.modifyMarkers(markerX, line, client.id, Direction.UP);
+                this.modifyMarkers(markerX, line, client.sessionId, Direction.UP);
                 this.room.state.notesState.change = !this.room.state.notesState.change;
                 break;
 
             case "ArrowDown":
-                this.modifyMarkers(markerX, line, client.id, Direction.DOWN);
+                this.modifyMarkers(markerX, line, client.sessionId, Direction.DOWN);
                 this.room.state.notesState.change = !this.room.state.notesState.change;
                 break;
 
@@ -90,11 +90,11 @@ export class NotesHandler implements Handler{
                 break;
 
             case "End":
-                this.room.state.notesState.markersX.set(client.id, this.oldContents[line].length)
+                this.room.state.notesState.markersX.set(client.sessionId, this.oldContents[line].length)
                 this.room.state.notesState.change = !this.room.state.notesState.change;
                 break;
             case "Home":
-                this.room.state.notesState.markersX.set(client.id, 0);
+                this.room.state.notesState.markersX.set(client.sessionId, 0);
                 this.room.state.notesState.change = !this.room.state.notesState.change;
                 break;
 

@@ -55,6 +55,8 @@ export class Notes extends Interactive {
             this.paint();
             this.drawText();
         };
+        this.paint();
+        this.drawText();
     }
 
     loop() { 
