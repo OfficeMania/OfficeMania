@@ -12,6 +12,7 @@ import {ChessBoard} from "./interactive/chessboard";
 import {WaterCooler} from "./interactive/machines/waterCooler";
 import {Computer} from "./interactive/computer";
 import {Notes} from "./interactive/notes";
+import { Donuts } from "./interactive/donuts";
 
 export {convertMapData, MapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -177,18 +178,18 @@ export class TileSet {
         this.firstGridId = firstId;
         source = source.replace(".tsx", ".png");
         source = source.replace("Map/", "");
-        this.path = this.getPath(source);
+        this.path = getPath(source);
         this.tileWidth = 0;
     }
 
-    getPath(source: string) {
-        for (const path of paths) {
-            if (path.includes(source)) {
-                return path;
-            }
+}
+
+export function getPath(source:string) {
+    for (const path of paths) {
+        if (path.includes(source)) {
+            return path;
         }
     }
-
 }
 
 const LAYER_NAME_SOLID: string = "Solid";
@@ -334,6 +335,10 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         //coffee machine
         case 9: {
             return new CoffeeMachine();
+        }
+        //Donuts
+        case 10: {
+            return new Donuts();
         }
         //vending machine
         case 11: {
