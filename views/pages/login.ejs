@@ -28,7 +28,9 @@
                 <% } %>
                 <div>
                     <input type="submit" value="Login" />
-                    <button onclick="window.location='/auth/signup';">Sign Up</button>
+                    <% if (!disableSignup) { %>
+                        <button onclick="window.location='/auth/signup';">Sign Up</button>
+                    <% } %>
                 </div>
             </div>
         </form>

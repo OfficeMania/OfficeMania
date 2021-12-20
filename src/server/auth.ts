@@ -119,6 +119,7 @@ function setupLogin(): void {
     router.get("/login", (req, res) =>
         res.render("pages/login", {
             error: authErrorToString(req.session.loginError),
+            disableSignup: DISABLE_SIGNUP,
         })
     );
 }
