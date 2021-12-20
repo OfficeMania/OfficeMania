@@ -339,8 +339,8 @@ body {
     position: absolute;
 }
 
-#interactive {
-    /*position:absolute;*/
+#interactive, #backpack {
+    position:absolute;
     margin-left: 20%;
     margin-top: 15%;
     z-index: 1;

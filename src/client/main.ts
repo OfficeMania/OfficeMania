@@ -45,6 +45,7 @@ import {
 import { drawPlayers } from "./draw-player";
 import {
     background,
+    backpackCanvas,
     camButton,
     canvas,
     characterPreview,
@@ -68,6 +69,7 @@ import { updateDoors } from "./interactive/door";
 import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 import { getInFocus, initChatListener } from "./textchat";
+import { Backpack } from "./backpack";
 
 export const characters: { [key: string]: AnimatedSpriteSheet } = {};
 export const START_POSITION_X = 5;
@@ -116,7 +118,9 @@ export function checkInputMode() {
         setInputMode(InputMode.IGNORE);
     } else if (!interactiveCanvas.style.visibility.match(/hidden/)) {
         setInputMode(InputMode.INTERACTION);
-    } else if (getInFocus()) {
+    } else if (!backpackCanvas.style.visibility.match(/hidden/)) {
+        setInputMode(InputMode.BACKPACK);
+    }else if (getInFocus()) {
         setInputMode(InputMode.IGNORE);
     } else {
         setInputMode(InputMode.NORMAL);
@@ -196,6 +200,7 @@ function loadCharacterSettings() {
 function onSettingsOpen() {
     if (currentInteraction === null) {
         interactiveCanvas.style.visibility = "hidden";
+        backpackCanvas.style.visibility = "hidden";
     }
     currentInteraction?.hide();
     loadSettings();
@@ -263,20 +268,6 @@ async function main() {
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
     setRoom(room);
-    setOurPlayer(ourPlayer);
-
-    checkWelcomeScreen();
-
-    getUsernameIntern = () => ourPlayer.name;
-    getCharacterIntern = () => ourPlayer.character;
-
-    //INITIATE CHAT
-
-    initChatListener();
-
-    //loads all the character information
-    await loadCharacter();
-    checkInputMode();
 
     /*
      * Then, we wait for our map to load
@@ -305,6 +296,25 @@ async function main() {
         map.highestX
     );
 
+    //i guess it should not be here but i don't know where it should be
+    ourPlayer.backpack = new Backpack();
+
+
+    setOurPlayer(ourPlayer);
+
+    checkWelcomeScreen();
+
+    getUsernameIntern = () => ourPlayer.name;
+    getCharacterIntern = () => ourPlayer.character;
+
+    //INITIATE CHAT
+
+    initChatListener();
+
+    //loads all the character information
+    await loadCharacter();
+    checkInputMode();
+    
     drawMap(currentMap);
 
     let collisionInfo: solidInfo[][] = fillSolidInfos(currentMap);
@@ -353,7 +363,7 @@ async function main() {
 
     function loop(now: number) {
         ctx.clearRect(0, 0, width, height);
-
+        
         //update width and height
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -430,6 +440,7 @@ async function main() {
     //loadingScreen.style.display = "none";
     setShowLoadingscreen(false);
     interactiveCanvas.style.visibility = "hidden";
+    backpackCanvas.style.visibility = "hidden";
     checkInputMode();
     // Start game loop
     requestAnimationFrame(loop);

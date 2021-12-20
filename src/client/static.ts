@@ -38,6 +38,7 @@ export const characterSelect = $<HTMLSelectElement>("character-select");
 export const characterPreview = $<HTMLSelectElement>("character-preview");
 export const helpExitButton = $<HTMLSelectElement>("button-help-ok");
 export const interactiveCanvas = $<HTMLCanvasElement>("interactive");
+export const backpackCanvas = $<HTMLCanvasElement>("backpack");
 export const canvas = $<HTMLCanvasElement>("canvas");
 export const background = $<HTMLCanvasElement>("background");
 export const doors = $<HTMLCanvasElement>("doors");

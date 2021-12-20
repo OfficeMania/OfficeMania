@@ -23,6 +23,7 @@ export enum InputMode {
     NORMAL = "normal",
     IGNORE = "ignore",
     INTERACTION = "interaction",
+    BACKPACK = "backpack",
 }
 
 export type InitState = [Room<State>, Player];
@@ -155,6 +156,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                     previousDirection: Direction.DOWN,
                     changeDirection: false,
                     waitBeforeMoving: 0,
+                    backpack: null
                 };
                 players[sessionId] = player;
 

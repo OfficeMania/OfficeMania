@@ -2,6 +2,7 @@ import { Room } from "colyseus.js";
 import { solidInfo } from "./map";
 import { Direction, MessageType } from "../common/util";
 import { getCorrectedPlayerCoordinates } from "./util";
+import { Backpack } from "./backpack";
 //import { lowestX, lowestY } from "./main"
 
 //all variables needed to adjust movement speed and length.
@@ -42,6 +43,7 @@ export interface Player {
     previousDirection: Direction; // direction (previously) facing
     changeDirection: boolean; // true, if last facing direction was different to current facing direction
     waitBeforeMoving: number; // time that it takes to turn before moving
+    backpack: Backpack;
 }
 
 /*

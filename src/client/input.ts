@@ -111,9 +111,14 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
 
 export function loadInputFunctions() {
     function onKeyDown(e: KeyboardEvent) {
+        const ourPlayer = getOurPlayer();
         if (e.key === "Escape") {
             if (inputMode === InputMode.INTERACTION) {
                 checkInteraction().content.leave();
+                return;
+            }
+            if (inputMode === InputMode.BACKPACK) {
+                ourPlayer.backpack.leave();
                 return;
             }
             if (inputMode === InputMode.IGNORE) {
@@ -122,11 +127,10 @@ export function loadInputFunctions() {
                 return;
             }
         }
-        if (inputMode === InputMode.IGNORE || (inputMode === InputMode.INTERACTION && interactionIgnore.includes(checkInteraction()?.content?.name))){
+        if (inputMode === InputMode.IGNORE || (inputMode === InputMode.INTERACTION && interactionIgnore.includes(checkInteraction()?.content?.name)) || inputMode === InputMode.BACKPACK){
             //console.log("exiting");
             return;
         }
-        const ourPlayer = getOurPlayer();
         onDirectionKeyDown(e, "s", Direction.DOWN);
         onDirectionKeyDown(e, "w", Direction.UP);
         onDirectionKeyDown(e, "a", Direction.LEFT);
@@ -137,6 +141,7 @@ export function loadInputFunctions() {
         onDirectionKeyDown(e, "ArrowRight", Direction.RIGHT);
         //player interacts with object in front of him
         onPureKey(e, "e", () => checkInteraction(true));
+        onPureKey(e, "i", () => ourPlayer.backpack.draw());
         if (inputMode === InputMode.INTERACTION) {
             return;
         }
