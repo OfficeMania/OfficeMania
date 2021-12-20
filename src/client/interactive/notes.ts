@@ -3,6 +3,7 @@ import { Room } from "colyseus.js";
 import { State } from "../../common";
 import { MessageType } from "../../common/util";
 import { checkInputMode } from "../main";
+import { Player } from "../player";
 import { createCloseInteractionButton, getOurPlayer, getRoom, removeCloseInteractionButton } from "../util";
 import { Interactive } from "./interactive";
 
@@ -11,17 +12,15 @@ export class Notes extends Interactive {
     inputs = [" ", "A", "a", "B", "b", "C", "c", "D", "d", "E", "e", "F", "f", "G", "g", "H", "h", "I", "i", "J", "j", "K", "k", "L", "l",
     "M", "m", "N", "n", "O", "o", "P", "p", "Q", "q", "R", "r", "S", "s", "T", "t", "U", "u", "V", "v", "W", "w", "X", "x", "Y", "y", "Z", "z",
     "Ä", "ä", "Ü", "ü", "Ö", "ö", "-", "_", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "'", "#", "+", "=", "*", "/", ".", ":", ",", ";",
-    "?", "!", "%", "&", "(", ")", "<", ">", "|", "Backspace", "Enter", "ArrowLeft", "ArrowRight"];
+    "?", "!", "%", "&", "(", ")", "<", ">", "|", "Backspace", "Enter", "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Delete", "End", "Home"];
     ctx: CanvasRenderingContext2D;
     static notesID: number = 0;
 
     id: number = 0;
-    content: string = "";
 
-    marker: number = 0;
-    
     room: Room<State>;
-    ourPlayer;
+    ourPlayer: Player;
+
     inputLam = (e) => {
         if (this.inputs.includes(e.key)) {
             this.room.send(MessageType.NOTES_ENTER, e.key);
@@ -40,7 +39,6 @@ export class Notes extends Interactive {
         this.room = getRoom();
         this.room.send(MessageType.NOTES_CREATE);
         this.ourPlayer = getOurPlayer();
-        //this.room.send(MessageType.NOTES_SET, [this.id, ""]);
     }
 
     onInteraction() {
@@ -51,8 +49,8 @@ export class Notes extends Interactive {
         checkInputMode();
         this.loop();
 
-        //this.room.send(MessageType.NOTES_ENTER, "B");
         document.addEventListener("keydown", this.inputLam);
+
         this.room.state.notesState.onChange = () => {
             this.paint();
             this.drawText();
@@ -69,6 +67,8 @@ export class Notes extends Interactive {
         document.removeEventListener("keydown", this.inputLam);
         this.room.state.notesState.onChange = () => {};
     }
+
+    //paint background
     paint() {
         this.ctx.fillStyle = "black";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -82,18 +82,14 @@ export class Notes extends Interactive {
         this.ctx.fillRect((this.canvas.width/ 2), (this.canvas.height / 2), (this.canvas.width / 2) - 5, (this.canvas.height / 2) - 5);
     }
 
+    //darw text on top of background
     drawText(){
-        let buffer;
-        this.marker = this.room.state.notesState.markers[this.ourPlayer.id];
-        this.content = this.room.state.notesState.content;
+        let markerX = this.room.state.notesState.markersX.get(this.ourPlayer.roomId);
+        let markerY = this.room.state.notesState.markersY.get(this.ourPlayer.roomId);
+        let contents: string[] = [];
+        this.room.state.notesState.contents.forEach(content => contents.push(content));
 
-        let subs: string[] = [];
-        let lineCounter: number = 0;
-        let prevPos: number = 0;
-        this.room.state.notesState.lengths.forEach((length) => {
-            subs[lineCounter] = this.content.substr(prevPos, length);
-            prevPos += length;
-        });
+        contents[markerY] = contents[markerY].substring(0, markerX) + "|" + contents[markerY].substring(markerX);
 
         this.ctx.fillStyle = "black";
         this.ctx.font = "25px DejaVu Sans Mono";
@@ -102,29 +98,21 @@ export class Notes extends Interactive {
         let i = 0;
         let j = 0;
         let lineheight = 30;
-        while(i < subs.length) {
-            let l = subs[i].length;
+        while(i < contents.length) {
+            let l = contents[i].length;
             let c = 1;
             while (l > 0) {
                 if (l > 80) {
-                    this.ctx.fillText(subs[i].substr(80 * (c - 1), 80), 100, 100 + (lineheight * j));
+                    this.ctx.fillText(contents[i].substring(80 * (c - 1), 80), 100, 100 + (lineheight * j));
                     j++;
                     c++;
                 }
                 else {
-                    this.ctx.fillText(subs[i].substr(80 * (c - 1)), 100, 100 + (lineheight * j));
+                    this.ctx.fillText(contents[i].substring(80 * (c - 1)), 100, 100 + (lineheight * j));
                 }
                 l -= 80;
 
-            }/*
-            if (subs[i].length > 80) {
-                this.ctx.fillText(subs[i].substr(0, 79), 100, 100 + (lineheight * j));
-                j++;
-                this.ctx.fillText(subs[i].substr(79), 100, 100 + (lineheight * j));
             }
-            else {
-                this.ctx.fillText(subs[i], 100, 100 + (lineheight * j));
-            }*/
             j++;
             i++;
         }

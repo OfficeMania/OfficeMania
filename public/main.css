@@ -341,7 +341,6 @@ body {
 
 #interactive, #backpack {
     position:absolute;
-    margin-left: 20%;
     margin-top: 15%;
     z-index: 1;
     width: 60%;
@@ -350,13 +349,29 @@ body {
     border: 5px black;
 }
 
+#interactive-whiteboard-wrapper {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: inherit;
+}
+
+#interactive-bar-whiteboard {
+    height: 50px;
+    width: 50px;
+    z-index: 2;
+    visibility: hidden;
+    display: inline-table;
+    margin-top: 15%;
+}
+
 #interactive-bar button {
     height: 40px;
     width: 40px;
     cursor: pointer;
     font-size: 110%;
     font-weight: bold;
-    position: absolute;
+    position: relative;
     margin: 5px;
     color: #3a3a50;
     background: #f8f8f8;

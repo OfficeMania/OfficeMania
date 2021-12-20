@@ -1,6 +1,7 @@
 import {Room} from "colyseus.js";
 import {State} from "../../common";
 import {
+    consumeInteractionClosed,
     createCloseInteractionButton,
     getPlayers,
     getRoom,
@@ -12,7 +13,16 @@ import {
     saveButton,
     clearButton,
     eraserButton,
-    penButton
+    penButton,
+    size5Button,
+    size10Button,
+    redButton,
+    pinkButton,
+    orangeButton,
+    yellowButton,
+    greenButton,
+    blueButton,
+    whiteboardPanel
 } from "../static";
 import {ArraySchema} from "@colyseus/schema";
 import {MessageType} from "../../common/util";
@@ -32,12 +42,20 @@ export class Whiteboard extends Interactive {
     stretchX: number = 1;
     stretchY: number = 1;
     private room: Room<State>;
-    private players: PlayerRecord;
+    private players: PlayerRecord = getPlayers();
+    private whiteboardPlayer: { [key: string]: number } = {}; //(new) code where multiple players should be able to draw at once
     wID: number = 0;
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
     currentColor: number = 0;
+    private size: number = 5;
+    private numberOfDrawnPixel: number = 0;
+    private currentlyPainting: boolean = false;
 
+
+    changeSize = (size) => {
+        this.size = size;
+    }
 
     //define events
     resized = () => this.resize(this);
@@ -46,11 +64,33 @@ export class Whiteboard extends Interactive {
         
         if (e.buttons !== 1) return;
         var ctx = this.canvas.getContext("2d");
-        ctx.lineWidth = 5;
+        ctx.lineWidth = this.size;
         ctx.lineCap = 'round';
         if (this.isPen) {
             //use pen
-            ctx.strokeStyle = "black";
+            switch (this.currentColor) {
+                case 2:
+                    ctx.strokeStyle = "red";
+                    break;
+                case 3:
+                    ctx.strokeStyle = "pink";
+                    break;
+                case 4:
+                    ctx.strokeStyle = "orange";
+                    break;
+                case 5:
+                    ctx.strokeStyle = "yellow";
+                    break;
+                case 6:
+                    ctx.strokeStyle = "green";
+                    break;
+                case 7:
+                    ctx.strokeStyle = "blue";
+                    break;
+                default: //case 0
+                    ctx.strokeStyle = "black";
+                    break;
+            }
         } else {
             //use eraser
             ctx.strokeStyle = "white";
@@ -64,25 +104,32 @@ export class Whiteboard extends Interactive {
         ctx.closePath();
         ctx.stroke(); // draw it!
 
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.x, this.y])
-        
+        if (this.numberOfDrawnPixel % 4 === 0) { //only send each 4th pixel to server => draw short lines rather than each pixel
+            this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, this.x, this.y])
+        }
+        this.numberOfDrawnPixel++;
+        this.currentlyPainting = true;
     }
 
     mouseDown = (e) => {
         this.setPosition(e, this);
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, -1])
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.x, this.y])
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -2]); //-2: dont save color again (already saved)
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, this.x, this.y])
     }
 
     mouseEnter = (e) => {
         this.setPosition(e, this);
         if (e.buttons !== 1) return;
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, -1])
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.x, this.y])
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -1])
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, this.x, this.y])
     }
 
     mouseUp = (e) => {
-        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, -2]); //-2: dont save color again (already saved)
+        if (this.currentlyPainting) { //send last pixel of stroke to server
+            this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, this.x, this.y]);
+            this.currentlyPainting = false;
+        }
+        this.room.send(MessageType.WHITEBOARD_PATH, [this.wID, this.currentColor, this.size, -1]);
     }
 
     clearPressed = () => {
@@ -97,12 +144,42 @@ export class Whiteboard extends Interactive {
 
     drawPressed = () => {
         this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
-        this.draw();
+        this.draw(0);
     }
 
     erasePressed = () => {
         this.room.send(MessageType.WHITEBOARD_ERASE, this.wID);
         this.erase();
+    }
+
+    redPressed = () => {
+        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
+        this.draw(2);
+    }
+
+    pinkPressed = () => {
+        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
+        this.draw(3);
+    }
+
+    orangePressed = () => {
+        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
+        this.draw(4);
+    }
+
+    yellowPressed = () => {
+        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
+        this.draw(5);
+    }
+
+    greenPressed = () => {
+        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
+        this.draw(6);
+    }
+
+    bluePressed = () => {
+        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
+        this.draw(7);
     }
 
     constructor() {
@@ -114,7 +191,7 @@ export class Whiteboard extends Interactive {
 
         this.room = getRoom();
         this.players = getPlayers();
-
+/*
         clearButton.style.top = "35%"
         clearButton.style.left = "25%"
 
@@ -127,11 +204,24 @@ export class Whiteboard extends Interactive {
         penButton.style.top = "33%"
         penButton.style.left = "33%"
 
+        size5Button.style.top = "33%"
+        size5Button.style.left = "33%"
+
+        size10Button.style.top = "37%"
+        size10Button.style.left = "33%"
+*/
         this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
-        this.room.onMessage(MessageType.WHITEBOARD_REDRAW, () => this.drawOthers(this));
+        //(new) code where multiple players should be able to draw at once
+        //this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
+
+        //================================new Code ==============================================
+        //this.clientIDs = this.room.state.whiteboard.at(this.wID).clientIDs;
+        //this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client, this));
+        //"same" (old) code where only one player can draw at a time
+        this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(this));
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
         this.room.onMessage(MessageType.WHITEBOARD_SAVE, (message) => this.save(this, message));
-        this.room.onMessage(MessageType.WHITEBOARD_DRAW, () => this.draw());
+        this.room.onMessage(MessageType.WHITEBOARD_DRAW, () => this.draw(0));
         this.room.onMessage(MessageType.WHITEBOARD_ERASE, () => this.erase());
 
         this.resize(this);
@@ -147,6 +237,8 @@ export class Whiteboard extends Interactive {
             createCloseInteractionButton(() => this.hide());
         }
     }
+
+    loop() {}
 
     //input.ts function, for esc key 
     leave() {
@@ -164,6 +256,14 @@ export class Whiteboard extends Interactive {
         saveButton.addEventListener("click", this.savePressed);
         eraserButton.addEventListener("click", this.erasePressed);
         penButton.addEventListener("click", this.drawPressed);
+        size5Button.addEventListener("click", (e) => {this.changeSize(5);});
+        size10Button.addEventListener("click", (e) => {this.changeSize(10);});
+        redButton.addEventListener("click", this.redPressed);
+        pinkButton.addEventListener("click", this.pinkPressed);
+        orangeButton.addEventListener("click", this.orangePressed);
+        yellowButton.addEventListener("click", this.yellowPressed);
+        greenButton.addEventListener("click", this.greenPressed);
+        blueButton.addEventListener("click", this.bluePressed);
 
         //size changed
         window.addEventListener('resize', this.resized);
@@ -180,7 +280,39 @@ export class Whiteboard extends Interactive {
 
         penButton.innerHTML = "<em class=\"fas fa-pen\"></em>"
         penButton.style.visibility = "visible";
+
+        size5Button.innerHTML = "<em class=\"fas fa-circle\"></em>"
+        size5Button.style.visibility = "visible";
+
+        size10Button.innerHTML = "<em class=\"fas fa-circle fa-lg\"></em>"
+        size10Button.style.visibility = "visible";
+
+        redButton.innerHTML = "<em></em>"
+        redButton.style.visibility = "visible";
+        redButton.style.backgroundColor = "red";
+
+        pinkButton.innerHTML = "<em></em>"
+        pinkButton.style.visibility = "visible";
+        pinkButton.style.backgroundColor = "magenta";
+
+        orangeButton.innerHTML = "<em></em>"
+        orangeButton.style.visibility = "visible";
+        orangeButton.style.backgroundColor = "orange";
+
+        yellowButton.innerHTML = "<em></em>"
+        yellowButton.style.visibility = "visible";
+        yellowButton.style.backgroundColor = "yellow";
+
+        greenButton.innerHTML = "<em></em>"
+        greenButton.style.visibility = "visible";
+        greenButton.style.backgroundColor = "green";
+
+        blueButton.innerHTML = "<em></em>"
+        blueButton.style.visibility = "visible";
+        blueButton.style.backgroundColor = "blue";
         
+        whiteboardPanel.style.visibility = "visible";
+
         checkInputMode()
 
         Whiteboard.currentWhiteboard = this.wID
@@ -188,6 +320,8 @@ export class Whiteboard extends Interactive {
         this.resize(this);
         //this.setup(this.canvas); //unnecessary because redraw calls setup
         this.redraw(this);
+        //=================================new Code=================================
+        //this.clientIDs = this.room.state.whiteboard.at(this.wID).clientIDs; //sync in case a client went/joint
     }
 
     hide() {
@@ -201,6 +335,14 @@ export class Whiteboard extends Interactive {
         saveButton.removeEventListener("click", this.savePressed);
         eraserButton.removeEventListener("click", this.erasePressed);
         penButton.removeEventListener("click", this.drawPressed);
+        size5Button.removeEventListener("click", (e) => {this.changeSize(5);});
+        size10Button.removeEventListener("click", (e) => {this.changeSize(10);});
+        redButton.removeEventListener("click", this.redPressed);
+        pinkButton.removeEventListener("click", this.pinkPressed);
+        orangeButton.removeEventListener("click", this.orangePressed);
+        yellowButton.removeEventListener("click", this.yellowPressed);
+        greenButton.removeEventListener("click", this.greenPressed);
+        blueButton.removeEventListener("click", this.bluePressed);
         window.removeEventListener('resize', this.resized);
 
         removeCloseInteractionButton();
@@ -210,6 +352,15 @@ export class Whiteboard extends Interactive {
         saveButton.style.visibility = "hidden";
         eraserButton.style.visibility = "hidden";
         penButton.style.visibility = "hidden";
+        size5Button.style.visibility = "hidden";
+        size10Button.style.visibility = "hidden";
+        redButton.style.visibility = "hidden";
+        pinkButton.style.visibility = "hidden";
+        orangeButton.style.visibility = "hidden";
+        yellowButton.style.visibility = "hidden";
+        greenButton.style.visibility = "hidden";
+        blueButton.style.visibility = "hidden";
+        whiteboardPanel.style.visibility = "hidden";
         
         checkInputMode()
         
@@ -224,7 +375,8 @@ export class Whiteboard extends Interactive {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "black"
         ctx.beginPath();
-        ctx.lineWidth = 10;
+        ctx.lineWidth = 5;
+        this.size = 5;0
         ctx.rect(0, 0, canvas.width, canvas.height);
         ctx.stroke();
         ctx.closePath();
@@ -233,13 +385,36 @@ export class Whiteboard extends Interactive {
 
     redraw(whiteboard: Whiteboard){
         whiteboard.setup(whiteboard.canvas);
+        //(new) code where multiple players should be able to draw at once
+        /*for (const [player] of whiteboard.room.state.whiteboard.at(this.wID).whiteboardPlayer) {
+            whiteboard.resetPlayer(player);
+            whiteboard.drawOthers(player, whiteboard);
+        }*/
+
+        //"same" (old) code where only one player can draw at a time
+        //=========================================old==============================================
         whiteboard.drawOthers(whiteboard);
+
+        //======================================new Code=============================================
+        //for (let i = 0; i < whiteboard.room.state.whiteboard.at(whiteboard.wID).numberOfClients; i++) {
+        //    whiteboard.drawOthers(i, whiteboard);
+        //}
     }
+
+    /*resetPlayer(player: string) {
+        this.whiteboardPlayer[player] = 0;
+    }*/
 
     clear(whiteboard: Whiteboard, message: number) {
         if(whiteboard.wID !== message){
             return;
         }
+
+        //(new) code where multiple players should be able to draw at once
+        /*for (var id in whiteboard.whiteboardPlayer) {
+            whiteboard.whiteboardPlayer[id] = 0;
+        }*/
+
         whiteboard.setup(whiteboard.canvas)
     }
 
@@ -270,55 +445,100 @@ export class Whiteboard extends Interactive {
 
         whiteboard.stretchX = 1280 / rect.width
         whiteboard.stretchY = 720 / rect.height
-
+/*
         clearButton.style.top = rect.top + "px";
         saveButton.style.top = rect.top + "px";
         eraserButton.style.top = rect.top + "px";
         penButton.style.top = rect.top + "px";
-    }
+    */  }
 
+    //(new) code where multiple players should be able to draw at once
+    //drawOthers(clientID: string, whiteboard: Whiteboard) {
+
+    //"same" (old) code where only one player can draw at a time
     drawOthers(whiteboard: Whiteboard) {
+    //========================new Code==================================
+    //drawOthers(clientID: number, whiteboard: Whiteboard) {
         if(Whiteboard.currentWhiteboard !== this.wID){
             return;
         }
+        //(new) code where multiple players should be able to draw at once
+        /*var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths;
+        var color: ArraySchema<string> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].color;*/
+        
+        //============================================old==========================================
+        //"same" (old) code where only one player can draw at a time
         var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).paths;
         var color: ArraySchema<string> = whiteboard.room.state.whiteboard.at(whiteboard.wID).color;
+        var sizes: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).size;
+
+        //=======================================new Code=========================================
+        //var path: ArraySchema<ArraySchema<number>> = whiteboard.room.state.whiteboard.at(whiteboard.wID).playerPaths;
+        //var pathsProxy = new Proxy(path, {
+        //    set: function (target, key, value) {
+        //        console.log(`${String(key)} set to ${value}`);
+        //        target[key] = value;
+        //        return true;
+        //    }
+        //  });
+        ////next 2 lines just for debugging (dont have any function)
+        //console.log(pathsProxy); //Proxy {$changes: ChangeTree, $items: Map(0), $indexes: Map(0), $refId: 0, $proxy: true}
+        ////TODO: why is playerPaths (and playerColors and playerSizes) always empty?!?!?!?!???
+        //var paths: ArraySchema<number> = pathsProxy[clientID];
+        //if (paths !== undefined) { //avoid errors
+            //var color: ArraySchema<string> = whiteboard.room.state.whiteboard.at(whiteboard.wID).playerColors[clientID];
+            //console.log(color);
+            //console.log("DEEEEEEEBBBBUUUUUUUUUUUGGGGGGGGGG"); //never... -> paths always undefined?
+            //var sizes: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).playerSizes[clientID];
+        
         var max: number = paths.length;
+
+        //(new) code where multiple players should be able to draw at once
+        //var start: number = whiteboard.whiteboardPlayer[clientID];
+
         var ctx = whiteboard.canvas.getContext("2d");
 
-        ctx.lineWidth = 5;
         ctx.lineCap = 'round';
         var j = 0;
         let indexOfStroke = 0;
-        for (var i: number = 0; i < max - 3; i++) {
-            if (paths[i] === -1) {
+
+        //(new) code where multiple players should be able to draw at once
+        //for (var i: number = start; i < max - 3; i++) {
+        //"same" (old) code where only one player can draw at a time
+        for (var i: number = 0; i < max - 3; i++) {    
+            if (paths.at(i) === -1) {
                 indexOfStroke++;
                 j = 0;
                 continue;
-            } else if (paths[i + 1] === -1) { //paths: [...,-1,firstX,firstY,secondX,secondY,thirdX,thirdY,...,-1,firstX,...]
+            } else if (paths.at(i + 1) === -1) { //paths: [...,-1,firstX,firstY,secondX,secondY,thirdX,thirdY,...,-1,firstX,...]
                 i = i + 1;
                 j = 0;
                 continue;
-            } else if (paths[i + 2] === -1) {
+            } else if (paths.at(i + 2) === -1) {
                 i = i + 2;
                 j = 0;
                 continue;
-            } else if (paths[i + 3] === -1) {
+            } else if (paths.at(i + 3) === -1) {
                 i = i + 3;
                 j = 0;
                 continue;
             }
             if (j === 0) {
-                ctx.beginPath();
-                ctx.strokeStyle = color[indexOfStroke];
-                whiteboard.makeLine(paths[i], paths[i + 1], paths[i + 2], paths[i + 3], ctx);
+                ctx.beginPath(); 
+                ctx.lineWidth = sizes.at(indexOfStroke);
+                ctx.strokeStyle = color.at(indexOfStroke);
+                whiteboard.makeLine(paths.at(i), paths.at(i + 1), paths.at(i + 2), paths.at(i + 3), ctx);
                 ctx.closePath();
                 ctx.stroke();
                 j++;
             } else {
                 j = 0;
             }
+            //}
         }
+        
+        //(new) code where multiple players should be able to draw at once
+        //whiteboard.whiteboardPlayer[clientID] = max - 2;
 
     }
 
@@ -330,9 +550,9 @@ export class Whiteboard extends Interactive {
         whiteboard.y = (e.clientY - whiteboard.offsetY) * whiteboard.stretchY;
     }
 
-    private draw () {
+    private draw(color: number) { //0: black, 1: white, 2:red
         this.isPen = true;
-        this.currentColor = 0;
+        this.currentColor = color;
     }
 
     private erase() {
