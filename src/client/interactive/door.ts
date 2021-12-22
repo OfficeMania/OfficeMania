@@ -1,13 +1,15 @@
 import { Interactive } from "./interactive";
-import { getCollisionInfo, getCorrectedPlayerCoordinates, getOurPlayer, getRoom } from "../util";
+import { createCloseInteractionButton, getCollisionInfo, getCorrectedPlayerCoordinates, getOurPlayer, getRoom, InputMode, removeCloseInteractionButton } from "../util";
 import { Chunk, MapInfo, solidInfo, TileSet } from "../map";
 import { Room } from "colyseus.js";
 import { State } from "../../common";
 import { MessageType } from "../../common/util";
-import { doors } from "../static";
+import { doors, interactiveCanvas } from "../static";
 import { getPlayers, PlayerRecord } from "../util";
 import { Player } from "../player";
 import { sendMessage } from "../textchat";
+import { checkInputMode } from "../main";
+import { setInputMode } from "../input";
 
 export enum DoorDirection {
     UNKNOWN,
@@ -145,6 +147,8 @@ export class Door extends Interactive {
     lockDoor(id: string) {
         //if you are not allowed to close this door
         if (this.direction === DoorDirection.ALWAYS_OPEN) {
+            //TODO
+            this.printWarning();
             console.warn("Tried to close an always open door");
         } else {
             this.playerId = id;
@@ -152,6 +156,38 @@ export class Door extends Interactive {
             let message = [this.posX + "" + this.posY, this.playerId];
             this.room.send(MessageType.DOOR_LOCK, message);
         }
+    }
+
+    printMessage(iCtx: CanvasRenderingContext2D) {
+        iCtx.textAlign = "left";
+        iCtx.fillStyle = "black";
+        iCtx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        iCtx.fillStyle = "white";
+        iCtx.fillRect(5, 5, this.canvas.width - 10, this.canvas.height - 10);
+
+        iCtx.fillStyle = "black";
+        //TODO change font
+        iCtx.font = "50px MobileFont"; 
+        iCtx.lineWidth = 3;
+        iCtx.fillText("You cannot close a door", 100, 100);
+        iCtx.fillText("that is supossed to be open all the time", 100, 150);
+    }
+
+    loop() {}
+
+    printWarning() {
+        interactiveCanvas.style.visibility = "visible";
+        const interactiveCtx = interactiveCanvas.getContext("2d");
+        interactiveCtx.textAlign = "center";
+        createCloseInteractionButton(() => this.leave());
+        checkInputMode();
+        this.printMessage(interactiveCtx);
+    }
+
+    leave() {
+        removeCloseInteractionButton();
+        interactiveCanvas.style.visibility = "hidden";
+        setInputMode(InputMode.NORMAL);
     }
 
     unlockDoor() {

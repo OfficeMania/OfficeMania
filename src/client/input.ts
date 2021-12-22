@@ -204,7 +204,7 @@ export function checkInteraction(executeInteraction: boolean = false): solidInfo
         return null;
     }
     solidInfo.content && executeInteraction && solidInfo.content.onInteraction();
-    currentInteraction = solidInfo.content
+    currentInteraction = solidInfo.content;
     return solidInfo;
 }
 
