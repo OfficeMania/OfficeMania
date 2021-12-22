@@ -339,7 +339,15 @@ body {
     position: absolute;
 }
 
-#interactive, #backpack {
+#interactive {
+    position:absolute;
+    z-index: 1;
+    width: 60%;
+    visibility: hidden;
+    border: 5px black;
+}
+
+#backpack {
     position:absolute;
     margin-top: 15%;
     z-index: 1;
@@ -356,14 +364,21 @@ body {
     justify-content: inherit;
 }
 
-#interactive-bar-whiteboard {
-    height: 50px;
-    width: 50px;
-    z-index: 2;
-    visibility: hidden;
-    display: inline-table;
-    margin-top: 15%;
+#interactive-bar-whiteboard-wrapper {
+    height: 100vh;
+    position: relative;
+    right: 34%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+#interactive-bar-whiteboard {
+    display: inline-grid;
+    position: relative;
+    height: 352px;
+}
+
 
 #interactive-bar button {
     height: 40px;
