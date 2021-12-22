@@ -44,6 +44,7 @@ export class Backpack {
                 }
                 i += 2;
                 this.ctx.fillStyle = "black";
+                //TODO change font
                 this.ctx.font = "25px MobileFont"; 
                 this.ctx.lineWidth = 3;
                 this.ctx.fillText(text, 20 + getMapInfo().resolution + 20, 20 * i)
