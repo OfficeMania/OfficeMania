@@ -155,7 +155,6 @@ export function loadInputFunctions() {
             setCharacter(filenames[nextIndex]);
         });
         //rename players name
-        onPureKey(e, "r", () => setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")));
         onPureKey(e, "u", () => toggleShowParticipantsTab());
         onPureKey(e, "f", () => payRespect());
         onPureKey(e, "n", () => muteButton.click());
