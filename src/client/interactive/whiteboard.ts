@@ -500,7 +500,7 @@ export class Whiteboard extends Interactive{
 
     mouseDown(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -2])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -2]) //-2: dont save color again (already saved)
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, whiteboard.x, whiteboard.y])
     }
 
@@ -513,7 +513,7 @@ export class Whiteboard extends Interactive{
 
     private draw(color: number) {
         this.isPen = true;
-        this.currentColor = color;
+        this.currentColor = color; //0=black, 1=white, 2=red, 3=pink, 4=orange, 5=yellow, 6=green, 7=blue
     }
 
     private erase() {
