@@ -70,11 +70,33 @@ function onErase(room:Room<State>, client: Client, wID: number) {
 function onPath(room: Room<State>, client: Client, message: number[]) {           //message: [wID, color, size, x, y]
     var wID: number = message.shift();
     var color: number = message.shift();
-    if (color == 0) {
-        var colorStr: string = 'black';
-    } else {
-        var colorStr: string = 'white';
+    switch (color) {
+        case 1:
+            var colorStr: string = "white";
+            break;
+        case 2:
+            var colorStr: string = "red";
+            break;
+        case 3:
+            var colorStr: string = "magenta";
+            break;
+        case 4:
+            var colorStr: string = "orange";
+            break;
+        case 5:
+            var colorStr: string = "yellow";
+            break;
+        case 6:
+            var colorStr: string = "green";
+            break;
+        case 7:
+            var colorStr: string = "blue";
+            break;
+        default: //case 0
+            var colorStr: string = "black";
+            break;
     }
+
     var size: number = message.shift();
     if (room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.length === 0) {
         room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.push(colorStr);
