@@ -77,9 +77,6 @@ export class Whiteboard extends Interactive{
         this.room = getRoom();
         this.players = getPlayers();
 
-        clearButton.style.top = "30%"
-        clearButton.style.left = "20%"
-
         this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
 
         this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
