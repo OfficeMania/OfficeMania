@@ -12,6 +12,7 @@ import {
     clearButton,
     penButton,
     eraserButton,
+    saveButton,
     whiteboardPanel
 } from "../static";
 import {ArraySchema} from "@colyseus/schema";
@@ -54,6 +55,10 @@ export class Whiteboard extends Interactive{
         this.room.send(MessageType.WHITEBOARD_ERASE, this.wID);
         this.erase();
     }
+    savePressed = () => {
+        this.room.send(MessageType.WHITEBOARD_SAVE, this.wID);
+        this.save(this, this.wID);
+    }
 
     resized = () => this.resize(this);
 
@@ -75,6 +80,8 @@ export class Whiteboard extends Interactive{
         this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
 
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
+
+        this.room.onMessage(MessageType.WHITEBOARD_SAVE, (message) => this.save(this, message));
 
         this.room.onMessage(MessageType.WHITEBOARD_DRAW, () => this.draw());
 
@@ -98,6 +105,7 @@ export class Whiteboard extends Interactive{
         this.canvas.removeEventListener('mouseup',this.mouseup);
         this.canvas.removeEventListener('mouseenter',this.mouseenter);
         clearButton.removeEventListener("click", this.clearCommand);
+        saveButton.removeEventListener("click", this.savePressed);
         eraserButton.removeEventListener("click", this.erasePressed);
         penButton.removeEventListener("click", this.drawPressed);
 
@@ -116,6 +124,10 @@ export class Whiteboard extends Interactive{
         penButton.style.visibility = "hidden";
         penButton.setAttribute("aria-label", "");
         penButton.innerHTML ="";
+        saveButton.style.visibility = "hidden";
+        saveButton.setAttribute("aria-label", "");
+        saveButton.innerHTML ="";
+        whiteboardPanel.style.visibility = "hidden";
 
         checkInputMode()
 
@@ -134,6 +146,7 @@ export class Whiteboard extends Interactive{
         this.canvas.addEventListener('mouseup',this.mouseup);
         this.canvas.addEventListener('mouseenter',this.mouseenter);
         clearButton.addEventListener("click", this.clearCommand);
+        saveButton.addEventListener("click", this.savePressed);
         eraserButton.addEventListener("click", this.erasePressed);
         penButton.addEventListener("click", this.drawPressed);
 
@@ -154,6 +167,12 @@ export class Whiteboard extends Interactive{
         eraserButton.setAttribute("aria-label", "Draw");
         eraserButton.innerHTML = "<em class=\"fa fa-eraser\"></em>"
         eraserButton.style.visibility = "visible";
+
+        saveButton.setAttribute("aria-label", "Draw");
+        saveButton.innerHTML = "<em class=\"fa fa-save\"></em>"
+        saveButton.style.visibility = "visible";
+
+        whiteboardPanel.style.visibility = "vsible";
 
         checkInputMode()
 
@@ -202,6 +221,24 @@ export class Whiteboard extends Interactive{
             whiteboard.whiteboardPlayer[id] = 0;
         }
         whiteboard.setup(whiteboard.canvas)
+    }
+
+    save(whiteboard: Whiteboard, message: number) {
+        if (whiteboard.wID != message) {
+            return;
+        }
+        // This code will automatically save the current canvas as a .png file. 
+        var canvas = <HTMLCanvasElement> document.getElementById("interactive");
+        // Convert the canvas to data
+        var image = canvas.toDataURL();
+        // Create a link
+        var aDownloadLink = document.createElement('a');
+        // Add the name of the file to the link
+        aDownloadLink.download = 'whiteboard_image.png';
+        // Attach the data to the link
+        aDownloadLink.href = image;
+        // Get the code to click the download link
+        aDownloadLink.click();
     }
 
     resize(whiteboard: Whiteboard) {
