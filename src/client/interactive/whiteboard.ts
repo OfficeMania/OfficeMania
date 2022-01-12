@@ -42,6 +42,8 @@ export class Whiteboard extends Interactive{
     static currentWhiteboard: number = 0;
     currentColor: number = 0; //black
     private size: number = 5;
+    private numberOfDrawnPixel: number = 0;
+    private currentlyDrawing: boolean = false;
 
     changeSize = (size) => {
         this.size = size;
@@ -340,7 +342,11 @@ export class Whiteboard extends Interactive{
 
         this.drawLine(whiteboard.oldX, whiteboard.oldY, whiteboard.x, whiteboard.y, whiteboard)
 
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, whiteboard.x, whiteboard.y])
+        if (this.numberOfDrawnPixel % 4 === 0) { //only send each eth pixel to server => draw short lines rather than each pixel
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, whiteboard.x, whiteboard.y]);
+        }
+        this.numberOfDrawnPixel++;
+        this.currentlyDrawing = true;
     }
 
     makeLine(firstX: number, firstY: number, secondX: number, secondY: number, ctx) {
@@ -368,6 +374,10 @@ export class Whiteboard extends Interactive{
 
 
     mouseUp(e, whiteboard: Whiteboard) {
+        if (this.currentlyDrawing) { //send last pixel of stroke to server
+            this.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, this.x, this.y]);
+            this.currentlyDrawing = false;
+        }
         whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -1])
     }
 
