@@ -56,37 +56,8 @@ export class WhiteboardPlayerState extends Schema {
  * state of whiteboard
  */
 export class WhiteboardState extends Schema {
-    //paths and color have to be saved FOR EACH PLAYER or its not possible for two players to draw at once
-    @type({array: "number"})
-    paths: ArraySchema<number> = new ArraySchema<number>();
-
-    @type({array: "string"})
-    color: ArraySchema<string> = new ArraySchema<string>();
-
-    @type({array: "number"})
-    size: ArraySchema<number> = new ArraySchema<number>();
-
-    //each whiteboardplayer has its own color and paths (new) 
     @type({map: WhiteboardPlayerState})
     whiteboardPlayer: MapSchema<WhiteboardPlayerState> = new MapSchema<WhiteboardPlayerState>();
-
-    //=================================new Code==============================
-    //playerPaths[clientId] is paths-array for that client, playerColors and playerSizes analog
-    @type({array: "number"})
-    playerPaths: ArraySchema<ArraySchema<number>> = new ArraySchema<ArraySchema<number>>();
-
-    @type({array: "string"})
-    playerColors: ArraySchema<ArraySchema<string>> = new ArraySchema<ArraySchema<string>>();
-
-    @type({array: "number"})
-    playerSizes: ArraySchema<ArraySchema<number>> = new ArraySchema<ArraySchema<number>>();
-
-    //@type(Map)  //????????????????
-    //clientIDs: Map<string, number> = new Map<string, number>();
-
-    @type("number")
-    numberOfClients: number;
-
 }
 
 /*
