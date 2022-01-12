@@ -67,7 +67,7 @@ function onErase(room:Room<State>, client: Client, wID: number) {
     //nothing?
 }
 
-function onPath(room: Room<State>, client: Client, message: number[]) {           //message: [wID, color, x, y]
+function onPath(room: Room<State>, client: Client, message: number[]) {           //message: [wID, color, size, x, y]
     var wID: number = message.shift();
     var color: number = message.shift();
     if (color == 0) {
@@ -75,12 +75,17 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
     } else {
         var colorStr: string = 'white';
     }
-    /*if (room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.length === 0) {
+    var size: number = message.shift();
+    if (room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.length === 0) {
         room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.push(colorStr);
-    }*/
-    if (message[0] === -1) {
+        room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].sizes.push(size);
+    }
+    if (message[0] < 0) {
         room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.push(-1);
-        room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.push(colorStr);
+        if (message[0] === -1) {
+            room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.push(colorStr);
+            room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].sizes.push(size);
+        }
     } else {
         room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.push(...message);
     }

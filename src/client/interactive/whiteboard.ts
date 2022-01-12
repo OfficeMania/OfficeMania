@@ -13,6 +13,8 @@ import {
     penButton,
     eraserButton,
     saveButton,
+    size5Button,
+    size10Button,
     whiteboardPanel
 } from "../static";
 import {ArraySchema} from "@colyseus/schema";
@@ -39,8 +41,11 @@ export class Whiteboard extends Interactive{
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
     currentColor: number = 0; //black
+    private size: number = 5;
 
-    //private clearButton = <HTMLButtonElement>document.getElementById("button-interactive");
+    changeSize = (size) => {
+        this.size = size;
+    }
 
     mousemove = (e) => this.useTool(e, this)
     mousedown = (e) => this.mouseDown(e, this)
@@ -108,6 +113,8 @@ export class Whiteboard extends Interactive{
         saveButton.removeEventListener("click", this.savePressed);
         eraserButton.removeEventListener("click", this.erasePressed);
         penButton.removeEventListener("click", this.drawPressed);
+        size5Button.removeEventListener("click", (e) => {this.changeSize(5);});
+        size10Button.removeEventListener("click", (e) => {this.changeSize(10);});
 
         window.removeEventListener('resize', this.resized);
 
@@ -124,6 +131,12 @@ export class Whiteboard extends Interactive{
         penButton.style.visibility = "hidden";
         penButton.setAttribute("aria-label", "");
         penButton.innerHTML ="";
+        size5Button.style.visibility = "hidden";
+        size5Button.setAttribute("aria-label", "");
+        size5Button.innerHTML ="";
+        size10Button.style.visibility = "hidden";
+        size10Button.setAttribute("aria-label", "");
+        size10Button.innerHTML ="";
         saveButton.style.visibility = "hidden";
         saveButton.setAttribute("aria-label", "");
         saveButton.innerHTML ="";
@@ -149,7 +162,8 @@ export class Whiteboard extends Interactive{
         saveButton.addEventListener("click", this.savePressed);
         eraserButton.addEventListener("click", this.erasePressed);
         penButton.addEventListener("click", this.drawPressed);
-
+        size5Button.addEventListener("click", (e) => {this.changeSize(5);});
+        size10Button.addEventListener("click", (e) => {this.changeSize(10);});
 
         //size changed
         window.addEventListener('resize', this.resized);
@@ -164,11 +178,19 @@ export class Whiteboard extends Interactive{
         penButton.innerHTML = "<em class=\"fa fa-pen\"></em>"
         penButton.style.visibility = "visible";
 
-        eraserButton.setAttribute("aria-label", "Draw");
+        size5Button.setAttribute("aria-label", "Size");
+        size5Button.innerHTML = "<em class=\"fas fa-circle\"></em>";
+        size5Button.style.visibility = "visible";
+
+        size10Button.setAttribute("aria-label", "Size");
+        size10Button.innerHTML = "<em class=\"fas fa-circle fa-lg\"></em>";
+        size10Button.style.visibility = "visible";
+
+        eraserButton.setAttribute("aria-label", "Erase");
         eraserButton.innerHTML = "<em class=\"fa fa-eraser\"></em>"
         eraserButton.style.visibility = "visible";
 
-        saveButton.setAttribute("aria-label", "Draw");
+        saveButton.setAttribute("aria-label", "Save");
         saveButton.innerHTML = "<em class=\"fa fa-save\"></em>"
         saveButton.style.visibility = "visible";
 
@@ -261,14 +283,11 @@ export class Whiteboard extends Interactive{
         var start: number = whiteboard.whiteboardPlayer[clientID]
         var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths;
         var color: ArraySchema<string> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].color;
+        var sizes: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].sizes;
         var j = 0;
         var ctx = whiteboard.canvas.getContext("2d");
 
-        ctx.lineWidth = 5;
         ctx.lineCap = 'round';
-        //ctx.strokeStyle = 'black';
-
-        //ctx.beginPath(); // begin
 
         let indexOfStroke = 0;
 
@@ -292,6 +311,7 @@ export class Whiteboard extends Interactive{
             }
             if (j === 0) {
                 ctx.beginPath(); // begin
+                ctx.lineWidth = sizes.at(indexOfStroke);
                 ctx.strokeStyle = color.at(indexOfStroke);
                 whiteboard.makeLine(paths[i], paths[i + 1], paths[i + 2], paths[i + 3], ctx);
                 ctx.closePath();
@@ -323,7 +343,7 @@ export class Whiteboard extends Interactive{
 
         this.drawLine(whiteboard.oldX, whiteboard.oldY, whiteboard.x, whiteboard.y, whiteboard)
 
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, whiteboard.x, whiteboard.y])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, whiteboard.x, whiteboard.y])
     }
 
     makeLine(firstX: number, firstY: number, secondX: number, secondY: number, ctx) {
@@ -335,7 +355,7 @@ export class Whiteboard extends Interactive{
         var ctx = whiteboard.canvas.getContext("2d");
         ctx.beginPath(); // begin
 
-        ctx.lineWidth = 5;
+        ctx.lineWidth = this.size;
         ctx.lineCap = 'round';
         if (this.isPen) {
             ctx.strokeStyle = 'black';
@@ -351,20 +371,20 @@ export class Whiteboard extends Interactive{
 
 
     mouseUp(e, whiteboard: Whiteboard) {
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, -1])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -1])
     }
 
     mouseDown(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, -1])
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, whiteboard.x, whiteboard.y])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -2])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, whiteboard.x, whiteboard.y])
     }
 
     mouseEnter(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
         if (e.buttons !== 1) return;
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, -1])
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, whiteboard.x, whiteboard.y])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -1])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, whiteboard.x, whiteboard.y])
     }
 
     private draw() {
