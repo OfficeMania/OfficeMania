@@ -37,6 +37,7 @@ export class Whiteboard extends Interactive{
     wID: number = 0;
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
+    currentColor: number = 0; //black
 
     //private clearButton = <HTMLButtonElement>document.getElementById("button-interactive");
 
@@ -222,17 +223,21 @@ export class Whiteboard extends Interactive{
         var max: number = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths.length;
         var start: number = whiteboard.whiteboardPlayer[clientID]
         var paths: ArraySchema<number> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].paths;
+        var color: ArraySchema<string> = whiteboard.room.state.whiteboard.at(whiteboard.wID).whiteboardPlayer[clientID].color;
         var j = 0;
         var ctx = whiteboard.canvas.getContext("2d");
 
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
-        ctx.strokeStyle = 'black';
+        //ctx.strokeStyle = 'black';
 
-        ctx.beginPath(); // begin
+        //ctx.beginPath(); // begin
+
+        let indexOfStroke = 0;
 
         for (var i: number = start; i + 3 < max; i++) {
             if (paths[i] === -1) {
+                indexOfStroke++;
                 j = 0;
                 continue;
             } else if (paths[i + 1] === -1) {
@@ -249,13 +254,17 @@ export class Whiteboard extends Interactive{
                 continue;
             }
             if (j === 0) {
+                ctx.beginPath(); // begin
+                ctx.strokeStyle = color.at(indexOfStroke);
                 whiteboard.makeLine(paths[i], paths[i + 1], paths[i + 2], paths[i + 3], ctx);
+                ctx.closePath();
+                ctx.stroke();
                 j++;
             } else {
                 j = 0;
             }
         }
-        ctx.stroke(); // draw it!
+        //ctx.stroke(); // draw it!
 
 
         whiteboard.whiteboardPlayer[clientID] = max - 2;
@@ -277,7 +286,7 @@ export class Whiteboard extends Interactive{
 
         this.drawLine(whiteboard.oldX, whiteboard.oldY, whiteboard.x, whiteboard.y, whiteboard)
 
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, whiteboard.x, whiteboard.y])
     }
 
     makeLine(firstX: number, firstY: number, secondX: number, secondY: number, ctx) {
@@ -305,28 +314,30 @@ export class Whiteboard extends Interactive{
 
 
     mouseUp(e, whiteboard: Whiteboard) {
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, -1])
     }
 
     mouseDown(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, -1])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, whiteboard.x, whiteboard.y])
     }
 
     mouseEnter(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
         if (e.buttons !== 1) return;
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, -1])
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, whiteboard.x, whiteboard.y])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, -1])
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, whiteboard.x, whiteboard.y])
     }
 
     private draw() {
         this.isPen = true;
+        this.currentColor = 0;
     }
 
     private erase() {
         this.isPen = false;
+        this.currentColor = 1;
     }
 
     //doesnt really work

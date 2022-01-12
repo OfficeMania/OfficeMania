@@ -62,10 +62,20 @@ function onErase(room:Room<State>, client: Client, wID: number) {
     //nothing?
 }
 
-function onPath(room: Room<State>, client: Client, message: number[]) {           //message: [wID, x, y]
+function onPath(room: Room<State>, client: Client, message: number[]) {           //message: [wID, color, x, y]
     var wID: number = message.shift();
+    var color: number = message.shift();
+    if (color == 0) {
+        var colorStr: string = 'black';
+    } else {
+        var colorStr: string = 'white';
+    }
+    /*if (room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.length === 0) {
+        room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.push(colorStr);
+    }*/
     if (message[0] === -1) {
         room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.push(-1);
+        room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.push(colorStr);
     } else {
         room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.push(...message);
     }
