@@ -98,12 +98,11 @@ function onPath(room: Room<State>, client: Client, message: number[]) {         
     }
 
     var size: number = message.shift();
-    if (room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.length === 0) {
-        room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.push(colorStr);
-        room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].sizes.push(size);
-    }
     if (message[0] < 0) {
-        room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.push(-1);
+        let length = room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.length;
+        if (room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.at(length-2) > -1) { // only push -1 if last element is not already -1
+            room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.push(-1); //-1 means end of line/beginning of new line
+        }
         if (message[0] === -1) {
             room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.push(colorStr);
             room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].sizes.push(size);
