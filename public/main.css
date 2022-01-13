@@ -674,10 +674,10 @@ body {
 }
 #select-textchat{
     float: left;
-    width: 90%;
+    width: 80%;
 }
-#button-create-chat {
-    width: auto;
+#select-users {
+    width: 20%;
 }
 #typing-field {
     resize: none;

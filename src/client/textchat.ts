@@ -5,7 +5,7 @@ import {
     textchatBar,
     textchatButton,
     textchatContainer,
-    textchatCreateButton,
+    textchatUsers,
     textchatSelect,
     textchatSendButton,
 } from "./static";
@@ -58,6 +58,7 @@ export function initChatListener() {
     console.log("hello");
 
     updateParticipatingChats();
+    updateChatUsers();
     //update textchatSelect on click, but not selected element??
     textchatSelect.addEventListener("click", () => {
     });
@@ -90,36 +91,13 @@ export function initChatListener() {
     getRoom().send(MessageType.CHAT_UPDATE);
     getRoom().send(MessageType.CHAT_LOG);
 
-    textchatCreateButton.addEventListener("click", () => {
-        if (!_addToChat) {
-            updateParticipatingChats();
-            updateChatUsers();
-            //open select?
-            _addToChat = true;
-        }
-        else {
-            //TODO
-            updateParticipatingChats(true);
-            _addToChat = false;
-        }
-    });
+    textchatUsers.addEventListener("click", () => updateChatUsers());
 
 
 
     //primitive updating of the chat
     getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => {
         onMessage(message);
-
-        //FOR LATER USE, WITH MULTIPLE GROUPS
-        /**
-         room.state.chatState.participants.forEach(participant => {
-           if (participant === getOurPlayer().id) {
-                let a = document.createElement("p");
-                a.innerText = con.at(con.length-1);
-                textchatBar.prepend(a);
-            }
-        });
-         */
     });
 }
 
@@ -202,28 +180,21 @@ function setShowTextchatBar(set: boolean) {
 
 //update user list in select
 function updateChatUsers() {
-    clearTextchatSelect();
-
-    const childrenItems: HTMLOptionsCollection = textchatSelect.options;
-    const children: HTMLOptionElement[] = Array.from(childrenItems);
-    var wasFound: boolean = false;
+    
+    while(textchatUsers.firstChild){
+        textchatUsers.firstChild.remove();
+    }
+    var opt = document.createElement("option");
+    opt.innerText = "New Chat With:";
+    textchatUsers.append(opt);
     getRoom().state.players.forEach((value, key) => {
-        /*if (key === getOurPlayer().roomId) {
-            return;
-        }*/
-        wasFound = false;
-        children.forEach(child => {
-            if(child.value === key) {
-                wasFound = true;
-            }
+        const option = document.createElement("option");
+        option.innerText = getRoom().state.players[key].name;
+        option.value = key;
+        option.addEventListener("click", () => {
+            console.log(value.name);
         });
-        if (wasFound) return;
-        else {
-            const option = document.createElement("option");
-            option.innerText = getRoom().state.players[key].name;
-            option.value = key;
-            textchatSelect.append(option);
-        }
+        textchatUsers.append(option);
         
     });
 }
@@ -264,7 +235,6 @@ function updateParticipatingChats(hard?: boolean) {
             textchatSelect.append(option);
         }
     });
-
     //TODO dont reset pointer?? hulp
 }
 function clearTextchatSelect() {
