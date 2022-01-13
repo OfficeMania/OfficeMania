@@ -94,14 +94,14 @@ export function initChatListener() {
         if (!_addToChat) {
             updateParticipatingChats();
             updateChatUsers();
+            //open select?
             _addToChat = true;
         }
         else {
             //TODO
-            updateParticipatingChats();
+            updateParticipatingChats(true);
             _addToChat = false;
         }
-
     });
 
 
@@ -134,7 +134,9 @@ function onChatUpdate(chatDTOs: ChatDTO[]): void {
 }
 
 function onMessageLogs(chatMessages: ChatMessage[]): void {
-    updateParticipatingChats();
+    if (!_addToChat) {
+        updateParticipatingChats();
+    }
     console.debug("chatMessages:", chatMessages);
     chatMessages.forEach(onMessage);
 }
@@ -200,42 +202,75 @@ function setShowTextchatBar(set: boolean) {
 
 //update user list in select
 function updateChatUsers() {
-    while (textchatSelect.firstChild) {
-        textchatSelect.firstChild.remove();
-    }
+    clearTextchatSelect();
+
+    const childrenItems: HTMLOptionsCollection = textchatSelect.options;
+    const children: HTMLOptionElement[] = Array.from(childrenItems);
+    var wasFound: boolean = false;
     getRoom().state.players.forEach((value, key) => {
         /*if (key === getOurPlayer().roomId) {
             return;
         }*/
-        const option = document.createElement("option");
-        option.innerText = getRoom().state.players[key].name;
-        option.value = key;
-        textchatSelect.append(option);
+        wasFound = false;
+        children.forEach(child => {
+            if(child.value === key) {
+                wasFound = true;
+            }
+        });
+        if (wasFound) return;
+        else {
+            const option = document.createElement("option");
+            option.innerText = getRoom().state.players[key].name;
+            option.value = key;
+            textchatSelect.append(option);
+        }
+        
     });
 }
 //refresh chat list in select
-function updateParticipatingChats() {
+function updateParticipatingChats(hard?: boolean) {
     //console.log("chats:", chats);
+    if (hard) {
+        clearTextchatSelect();
+    }
+
+    const childrenItems: HTMLOptionsCollection = textchatSelect.options;
+    const children: HTMLOptionElement[] = Array.from(childrenItems);
+    var wasFound: boolean = false;
+    
+    chats.forEach(chat => {
+        wasFound = false;
+
+        children.forEach(child => {
+            if (child.value === chat.id) {
+                wasFound = true;
+            }
+        });
+        if (wasFound) {
+            console.log("was found, exiting");
+            return;
+        }
+        else {
+            const option: HTMLOptionElement = document.createElement("option");
+            option.innerText = chat.name;
+            option.value = chat.id;
+    
+            option.onclick = function () {
+                while(textchatBar.firstChild){
+                    textchatBar.firstChild.remove();
+                }
+                onMessageLogs(chat.messages);
+            }
+            textchatSelect.append(option);
+        }
+    });
+
+    //TODO dont reset pointer?? hulp
+}
+function clearTextchatSelect() {
     while (textchatSelect.firstChild) {
         textchatSelect.firstChild.remove();
     }
-    chats.forEach(e => {
-        const option = document.createElement("option");
-        option.innerText = e.name;
-        option.value = e.id;
-
-        option.onclick = function () {
-            while(textchatBar.firstChild){
-                textchatBar.firstChild.remove();
-            }
-            onMessageLogs(e.messages);
-        }
-        textchatSelect.append(option);
-    });
-    addTestOption("abc");
-    addTestOption("lorem ipsum");
-
-    //TODO dont reset pointer?? hulp
 }
 
 function addTestOption(name: string) {
