@@ -17,7 +17,6 @@ import { panelButtonsInteraction, usernameInputWelcome, welcomeModal } from "./s
 import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
 import AnimationData, { createAnimationData } from "./graphic/animation-data";
 import { PlayerData } from "../common/rooms/schema/state";
-import { getUserById, User } from "./api";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -129,13 +128,11 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
              */
             room.state.players.onAdd = async (playerData: PlayerData, sessionId: string) => {
                 // console.log("Add", sessionId, playerData);
-                const userId: string = playerData.userId;
-                const user: User = await getUserById(userId);
 
                 let player: Player = {
-                    userId: userId,
+                    userId: playerData.userId,
                     roomId: sessionId,
-                    name: user?.username || "",
+                    name: playerData.name,
                     participantId: null,
                     character: "Adam_48x48.png",
                     positionX: 0,
@@ -156,7 +153,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                     previousDirection: Direction.DOWN,
                     changeDirection: false,
                     waitBeforeMoving: 0,
-                    backpack: null
+                    backpack: null,
                 };
                 players[sessionId] = player;
 
