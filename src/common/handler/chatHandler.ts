@@ -71,6 +71,7 @@ export class ChatHandler implements Handler {
         this.room.onMessage(MessageType.CHAT_SEND, (client, message: ChatMessage) => this.onSend(client, message));
         this.room.onMessage(MessageType.CHAT_UPDATE, client => this.onChatUpdate(client));
         this.room.onMessage(MessageType.CHAT_LOG, (client, message: string) => this.onLog(client, message));
+        this.room.onMessage(MessageType.CHAT_ADD, (client, message) => this.onAdd(client, message));
     }
 
     onJoin() {}
@@ -93,12 +94,7 @@ export class ChatHandler implements Handler {
             //TODO
             return;
         }
-        /*
-        if (message === "gimmelog") {
-            //client.send(MessageType.CHAT_LOG, this.room.state.chatStates);
-            client.send(MessageType.CHAT_LOG, chat);
-        }
-        */
+        
         const userId: string = getUserId(client);
         if (!chat.users.includes(userId)) {
             chat.users.push(userId);
@@ -141,6 +137,17 @@ export class ChatHandler implements Handler {
             name: chat.name,
         }));
         client.send(MessageType.CHAT_UPDATE, JSON.stringify(chatDTOs));
+    }
+
+    onAdd(client: Client, message) {
+        if (message.chatId == "new") {
+            console.log("create new chat" + client.sessionId + message.playerId);
+            // create new chat between client and playerid
+
+        }
+        else {
+            //add playerId to chat with chatId
+        }
     }
 }
 

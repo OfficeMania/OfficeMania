@@ -11,6 +11,7 @@ import {
 } from "./static";
 import { getOurPlayer, getRoom } from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chatHandler";
+import { PlayerData } from "../common/rooms/schema/state";
 
 //tracks if button/shortcut have been pressed
 let _showTextchat = false;
@@ -58,7 +59,7 @@ export function initChatListener() {
     console.log("hello");
 
     updateParticipatingChats();
-    updateChatUsers();
+    openChatUsers();
     //update textchatSelect on click, but not selected element??
     textchatSelect.addEventListener("click", () => {
     });
@@ -88,7 +89,7 @@ export function initChatListener() {
     getRoom().send(MessageType.CHAT_UPDATE);
     getRoom().send(MessageType.CHAT_LOG);
 
-    textchatUsers.addEventListener("click", () => updateChatUsers());
+    textchatUsers.addEventListener("click", () => openChatUsers());
 
 
 
@@ -171,23 +172,30 @@ function setShowTextchatBar(set: boolean) {
 }
 
 //update user list in select
-function updateChatUsers() {
-    
-    while(textchatUsers.firstChild){
+function openChatUsers() {
+    while (textchatUsers.firstChild) {
         textchatUsers.firstChild.remove();
     }
     var opt = document.createElement("option");
-    opt.innerText = "New Chat With:";
+    opt.innerText = "New Chat With";
+    opt.value = "default";
     textchatUsers.append(opt);
+
+    //add any players online except for player
     getRoom().state.players.forEach((value, key) => {
+        //return is it is the player himself??
+        if (value.userId === getOurPlayer().userId) {
+            return;
+        }
         const option = document.createElement("option");
-        option.innerText = getRoom().state.players[key].name;
+        option.innerText = value.name;
         option.value = key;
-        option.addEventListener("click", () => {
+        option.addEventListener("click", (e) => {
+            addNewChat(value);
             console.log(value.name);
+
         });
         textchatUsers.append(option);
-        
     });
 }
 //refresh chat list in select
@@ -246,7 +254,11 @@ function addTestOption(name: string) {
         }
 }
 
-function addCurrentToChat(chatId) {
-    const a = textchatSelect.selectedOptions[0].value;
-    getRoom().send(MessageType.CHAT_ADD_USER, {a, chatId});
+function addNewChat(player: PlayerData) {
+    //if chat is selected, add to it (even if global, garbage sorting on handler side)
+    var chatId: string = "new";
+    var playerId: string = player.userId;
+    getRoom().send(MessageType.CHAT_ADD, {playerId, chatId});
 }
+
+
