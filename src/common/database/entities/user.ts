@@ -132,6 +132,10 @@ User.init(
             allowNull: false,
             unique: true,
         },
+        character: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
         password: {
             type: DataTypes.STRING,
             allowNull: true,
