@@ -26,6 +26,10 @@ export class PlayerHandler implements Handler {
         this.room.onMessage(MessageType.UPDATE_CHARACTER, (client, message) => {
             const character: string = message;
             const playerData: PlayerData = this.room.state.players[client.sessionId];
+            if (!playerData.userId || playerData.userId === "undefined") {
+                playerData.character = character;
+                return;
+            }
             findUserById(playerData.userId)
                 .then(user => {
                     user.setCharacter(character);
@@ -37,6 +41,10 @@ export class PlayerHandler implements Handler {
         this.room.onMessage(MessageType.UPDATE_USERNAME, (client, message) => {
             const name: string = message;
             const playerData: PlayerData = this.room.state.players[client.sessionId];
+            if (!playerData.userId || playerData.userId === "undefined") {
+                playerData.name = name;
+                return;
+            }
             findUserById(playerData.userId)
                 .then(user => {
                     user.setUsername(name);
