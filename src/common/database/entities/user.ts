@@ -27,6 +27,18 @@ export default class User extends Model {
         return this["username"];
     }
 
+    public setUsername(username: string): void {
+        this["username"] = username;
+    }
+
+    public getCharacter(): string {
+        return this["character"];
+    }
+
+    public setCharacter(character: string): void {
+        this["character"] = character;
+    }
+
     private getPassword(): string {
         return this["password"];
     }
