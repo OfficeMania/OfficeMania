@@ -13,6 +13,7 @@ import { MachineHandler } from "../handler/machinehandler";
 import { NotesHandler } from "../handler/noteshandler";
 import { ChatHandler } from "../handler/chatHandler";
 import http from "http";
+import User, { findUserById } from "../database/entities/user";
 
 const path = require("path");
 
@@ -62,7 +63,7 @@ export class TURoom extends Room<State> {
         handlers.forEach(handler => handler.onCreate(options));
     }
 
-    onAuth(client: Client, options: any, req: http.IncomingMessage): UserData {
+    async onAuth(client: Client, options: any, req: http.IncomingMessage): Promise<UserData> {
         const session: { passport: { user: string } } = req["session"];
         if (!session) {
             return { id: "undefined" };
@@ -71,7 +72,11 @@ export class TURoom extends Room<State> {
         if (!userId) {
             return { id: "undefined" };
         }
-        return { id: userId, name: "TODO" };
+        const user: User = await findUserById(userId);
+        if (!user) {
+            return { id: "undefined" };
+        }
+        return { id: user.getId(), name: user.getUsername(), character: user.getCharacter() };
     }
 
     onJoin(client: Client, options: any, auth: UserData) {
