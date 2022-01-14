@@ -31,12 +31,16 @@ export default class User extends Model {
         this["username"] = username;
     }
 
-    public getCharacter(): string {
+    public getCharacter(): string | undefined {
         return this["character"];
     }
 
-    public setCharacter(character: string): void {
-        this["character"] = character;
+    public setCharacter(character?: string): void {
+        if (!character) {
+            delete this["character"];
+        } else {
+            this["character"] = character;
+        }
     }
 
     private getPassword(): string {
