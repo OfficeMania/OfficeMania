@@ -22,15 +22,15 @@ export class PlayerHandler implements Handler {
         //recives sync message
         this.room.onMessage(MessageType.SYNC, (client, message) => onSync(this.room, client, message));
         //receives character changes
-        this.room.onMessage(
-            MessageType.UPDATE_CHARACTER,
-            (client, message) => (this.room.state.players[client.sessionId].character = message)
-        );
+        this.room.onMessage(MessageType.UPDATE_CHARACTER, (client, message) => {
+            //TODO Update the Database
+            this.room.state.players[client.sessionId].character = message;
+        });
         //receives name changes
-        this.room.onMessage(
-            MessageType.UPDATE_USERNAME,
-            (client, message) => (this.room.state.players[client.sessionId].name = message)
-        );
+        this.room.onMessage(MessageType.UPDATE_USERNAME, (client, message) => {
+            //TODO Update the Database
+            this.room.state.players[client.sessionId].name = message;
+        });
         //receives participant id changes
         //TODO Maybe let the server join the jitsi conference too (without mic/cam) and then authenticate via the jitsi chat, that a player is linked to a participantId, so that one cannot impersonate another one.
         this.room.onMessage(
