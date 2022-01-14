@@ -132,9 +132,9 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 let player: Player = {
                     userId: playerData.userId,
                     roomId: sessionId,
-                    name: playerData.name,
+                    name: playerData.name || "",
                     participantId: null,
-                    character: "Adam_48x48.png",
+                    character: playerData.character || "Adam_48x48.png",
                     positionX: 0,
                     positionY: 0,
                     scaledX: 0,

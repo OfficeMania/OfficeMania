@@ -6,6 +6,7 @@ import { Direction, MessageType } from "../util";
 export interface UserData {
     id: string;
     name?: string;
+    character?: string;
 }
 
 export class PlayerHandler implements Handler {
