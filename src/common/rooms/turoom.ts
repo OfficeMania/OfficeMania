@@ -5,7 +5,7 @@ import { generateUUIDv4 } from "../util";
 import { PongHandler } from "../handler/ponghandler";
 import { Handler } from "../handler/handler";
 import { DoorHandler } from "../handler/doorhandler";
-import { PlayerHandler } from "../handler/playerhandler";
+import { PlayerHandler, UserData } from "../handler/playerhandler";
 import { WhiteboardHandler } from "../handler/whiteboardhandler";
 import { TodoListHandler } from "../handler/todoListhandler";
 import { ChessHandler } from "../handler/chesshandler";
@@ -62,20 +62,20 @@ export class TURoom extends Room<State> {
         handlers.forEach(handler => handler.onCreate(options));
     }
 
-    onAuth(client: Client, options: any, req: http.IncomingMessage) {
+    onAuth(client: Client, options: any, req: http.IncomingMessage): UserData {
         const session: { passport: { user: string } } = req["session"];
         if (!session) {
-            return "undefined";
+            return { id: "undefined" };
         }
         const userId: string = session?.passport?.user;
         if (!userId) {
-            return "undefined";
+            return { id: "undefined" };
         }
-        return userId;
+        return { id: userId, name: "TODO" };
     }
 
-    onJoin(client: Client, options: any, auth: any) {
-        client.userData = { id: auth as string };
+    onJoin(client: Client, options: any, auth: UserData) {
+        client.userData = auth;
         handlers.forEach(handler => handler.onJoin(client));
     }
 

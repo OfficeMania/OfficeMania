@@ -3,6 +3,11 @@ import { Client, Room } from "colyseus";
 import { PlayerData, State } from "../rooms/schema/state";
 import { Direction, MessageType } from "../util";
 
+export interface UserData {
+    id: string;
+    name?: string;
+}
+
 export class PlayerHandler implements Handler {
     room: Room<State>;
 
@@ -34,9 +39,10 @@ export class PlayerHandler implements Handler {
     }
 
     onJoin(client: Client) {
+        const userData: UserData | undefined = client.userData as UserData;
         this.room.state.players[client.sessionId] = new PlayerData();
-        this.room.state.players[client.sessionId].userId = client.userData?.id;
-        this.room.state.players[client.sessionId].name = "";
+        this.room.state.players[client.sessionId].userId = userData?.id;
+        this.room.state.players[client.sessionId].name = userData?.name || "";
         this.room.state.players[client.sessionId].character = "Adam_48x48.png";
         this.room.state.players[client.sessionId].x = 0;
         this.room.state.players[client.sessionId].y = 0;
