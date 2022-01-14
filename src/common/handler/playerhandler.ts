@@ -44,7 +44,7 @@ export class PlayerHandler implements Handler {
         this.room.state.players[client.sessionId] = new PlayerData();
         this.room.state.players[client.sessionId].userId = userData?.id;
         this.room.state.players[client.sessionId].name = userData?.name || "";
-        this.room.state.players[client.sessionId].character = "Adam_48x48.png";
+        this.room.state.players[client.sessionId].character = userData?.character || "Adam_48x48.png";
         this.room.state.players[client.sessionId].x = 0;
         this.room.state.players[client.sessionId].y = 0;
         this.room.state.players[client.sessionId].cooldown = 0;
