@@ -1,7 +1,6 @@
 import { DataTypes, Model } from "sequelize";
-import { getEntity, sequelize } from "./database";
+import { getEntity, sequelize } from "../database";
 import { compareSync, hashSync } from "bcrypt";
-import { BCRYPT_SALT_ROUNDS, PASSWORD_SECRET } from "./config";
 import CryptoJS from "crypto-js";
 import { RequestHandler } from "express-serve-static-core";
 
