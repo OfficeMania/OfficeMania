@@ -26,22 +26,20 @@ var _clientLogs = new Map();
 const chats: Chat[] = [];
 
 function getChatById(chatId: string): Chat {
-    return chats.find(chat => chat.id === chatId);
-}
-
-function getOrCreateChatById(chatId: string): Chat {
-    let chat: Chat = getChatById(chatId);
-    if (!chat) {
-        chat = new Chat(undefined, chatId);
-        chats.push(chat);
+    const chat = chats.find(chat => chat.id === chatId);
+    if (!chat){
+        console.warn("chat not existing");
     }
     return chat;
 }
 
 function updateChat(chatDTO: ChatDTO): void {
-    const chat: Chat = getChatById(chatDTO.id);
+    var chat: Chat = getChatById(chatDTO.id);
+    console.log(chat);
     if (!chat) {
-        chats.push(new Chat(chatDTO.name, chatDTO.id));
+        console.log("hi")
+        chat = new Chat(chatDTO.name, chatDTO.id)
+        chats.push(chat);
         return;
     }
     if (chat.name !== chatDTO.name) {
@@ -58,7 +56,7 @@ export function initChatListener() {
 
     console.log("hello");
 
-    updateParticipatingChats();
+    //updateParticipatingChats();
     openChatUsers();
     //update textchatSelect on click, but not selected element??
     textchatSelect.addEventListener("click", () => {
@@ -102,12 +100,11 @@ export function initChatListener() {
 function onChatUpdate(chatDTOs: ChatDTO[]): void {    
     console.debug("chatDTOs:", chatDTOs);
     chatDTOs.forEach(updateChat);
+    updateParticipatingChats();
 }
 
 function onMessageLogs(chatMessages: ChatMessage[]): void {
-    if (!_addToChat) {
-        updateParticipatingChats();
-    }
+    updateParticipatingChats();
     console.debug("chatMessages:", chatMessages);
     chatMessages.forEach(onMessage);
 }
@@ -121,7 +118,7 @@ export function getInFocus() {
 //will need to accept key/position of chatgroupstate
 function onMessage(chatMessage: ChatMessage) {
     const chatId: string = chatMessage.chatId;
-    const chat: Chat = getOrCreateChatById(chatId);
+    const chat: Chat = getChatById(chatId);
     chat.messages.push(chatMessage);
     //TODO Only add it if the Chat is selected?
     if (textchatSelect.selectedOptions[0].value === chatMessage.chatId) {
@@ -184,14 +181,14 @@ function openChatUsers() {
     //add any players online except for player
     getRoom().state.players.forEach((value, key) => {
         //return is it is the player himself??
-        if (value.userId === getOurPlayer().userId) {
+        if (key === getOurPlayer().roomId) {
             return;
         }
         const option = document.createElement("option");
         option.innerText = value.name;
         option.value = key;
         option.addEventListener("click", (e) => {
-            addNewChat(value);
+            addNewChat(key);
             console.log(value.name);
 
         });
@@ -199,17 +196,18 @@ function openChatUsers() {
     });
 }
 //refresh chat list in select
-function updateParticipatingChats(hard?: boolean) {
+function updateParticipatingChats() {
     //console.log("chats:", chats);
-    if (hard) {
-        clearTextchatSelect();
-    }
 
-    const childrenItems: HTMLOptionsCollection = textchatSelect.options;
-    const children: HTMLOptionElement[] = Array.from(childrenItems);
+    var childrenItems: HTMLOptionsCollection = textchatSelect.options;
+    var children: HTMLOptionElement[] = Array.from(childrenItems);
     var wasFound: boolean = false;
-    
+
+    //keeps log of all the chatids
+    var chatIds: string[] = [];
     chats.forEach(chat => {
+        chatIds.push(chat.id);
+
         wasFound = false;
 
         children.forEach(child => {
@@ -223,6 +221,7 @@ function updateParticipatingChats(hard?: boolean) {
         }
         else {
             const option: HTMLOptionElement = document.createElement("option");
+            console.log(chat.id, chat.name);
             option.innerText = chat.name;
             option.value = chat.id;
     
@@ -235,30 +234,43 @@ function updateParticipatingChats(hard?: boolean) {
             textchatSelect.append(option);
         }
     });
+
+    //removes any chats
+    var selectOptions: HTMLOptionsCollection = textchatSelect.options;
+    for ( var i = 0; i < selectOptions.length; i++) {
+        console.log(chatIds, selectOptions[i].value)
+        if (!chatIds.includes(selectOptions[i].value)) {
+            console.log("chat not part of list: removing " + selectOptions[i].innerText)
+            textchatSelect.removeChild(selectOptions[i]);
+        }
+        else {
+            console.log("chats include: " + selectOptions[i].innerText)
+        }
+    }
+    addTestOption("New: ", "new");
 }
+
 function clearTextchatSelect() {
     while (textchatSelect.firstChild) {
         textchatSelect.firstChild.remove();
     }
 }
 
-function addTestOption(name: string) {
+function addTestOption(name: string, id: string) {
     const option = document.createElement("option");
         option.innerText = name;
-        option.value = name + name;
+        option.value = id;
         textchatSelect.append(option);
-        option.onclick = function () {
-            while(textchatBar.firstChild){
-                textchatBar.firstChild.remove();
-            }
-        }
 }
 
-function addNewChat(player: PlayerData) {
+function addNewChat(roomId: string) {
     //if chat is selected, add to it (even if global, garbage sorting on handler side)
-    var chatId: string = "new";
-    var playerId: string = player.userId;
-    getRoom().send(MessageType.CHAT_ADD, {playerId, chatId});
+    console.log(roomId);
+    console.log(getRoom().state.players)
+    var chatId: string = textchatSelect.selectedOptions[0].value;
+    var message: string = roomId;
+    getRoom().send(MessageType.CHAT_ADD,{ message, chatId });
 }
+
 
 

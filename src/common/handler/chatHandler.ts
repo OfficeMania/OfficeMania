@@ -1,7 +1,7 @@
 import { Client, Room } from "colyseus";
 import { generateUUIDv4, MessageType } from "../util";
 import { Handler } from "./handler";
-import { State } from "../rooms/schema/state";
+import { PlayerData, State } from "../rooms/schema/state";
 
 export interface ChatMessage {
     timestamp?: string;
@@ -139,14 +139,44 @@ export class ChatHandler implements Handler {
         client.send(MessageType.CHAT_UPDATE, JSON.stringify(chatDTOs));
     }
 
-    onAdd(client: Client, message) {
+    onAdd(client: Client, message: ChatMessage) {
+        console.log(message);
+        var ourPlayerKey: string = getUserId(client);
+        var ourPlayer: PlayerData;
+        var otherPlayerKey: string = message.message;
+        var otherPlayer: PlayerData;
+        this.room.state.players.forEach((value, key) => { 
+            if (key === ourPlayerKey) {
+                ourPlayer = value;
+            }
+            else if(key === otherPlayerKey) {
+                otherPlayer = value;
+            }  
+        });
+        
         if (message.chatId == "new") {
-            console.log("create new chat" + client.sessionId + message.playerId);
+            console.log("create new chat", ourPlayerKey, otherPlayerKey);
             // create new chat between client and playerid
+            var newChat: Chat = new Chat(ourPlayer.name + otherPlayer.name);
+            newChat.users.push(ourPlayerKey, otherPlayerKey);
+            this.chats.push(newChat);
 
+            getClientsByUserId(ourPlayerKey, this.room).forEach((client) => {
+                this.onChatUpdate(client);
+            });
+            //this.onChatUpdate();
+            getClientsByUserId(otherPlayerKey, this.room).forEach((client) => {
+                this.onChatUpdate(client);
+            });
         }
         else {
-            //add playerId to chat with chatId
+            if (message.chatId != this.globalChat.id) {
+                this.chats.forEach(chat => {
+                    if (chat.id === message.chatId){
+                        
+                    }
+                });
+            }
         }
     }
 }
@@ -177,4 +207,15 @@ function addZero(i) {
         i = "0" + i;
     }
     return i;
+}
+
+//get all the clients (different pcs f.e.) that are connected to userId
+function getClientsByUserId(userId: string, room: Room): Client[] {
+    var clients: Client[] = [];
+    room.clients.forEach((client) => {
+        if (client.sessionId === userId) {
+            clients.push(client);
+        }
+    });
+    return clients;
 }
