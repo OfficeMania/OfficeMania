@@ -141,10 +141,10 @@ export class ChatHandler implements Handler {
 
     onAdd(client: Client, chatMessage: ChatMessage) {
         console.log(chatMessage);
-        var ourPlayerKey: string = getUserId(client);
-        var ourPlayer: PlayerData;
-        var otherPlayerKey: string = chatMessage.message;
-        var otherPlayer: PlayerData;
+        let ourPlayerKey: string = getUserId(client);
+        let ourPlayer: PlayerData;
+        let otherPlayerKey: string = chatMessage.message;
+        let otherPlayer: PlayerData;
         this.room.state.players.forEach((value, key) => { 
             if (key === ourPlayerKey) {
                 ourPlayer = value;
@@ -154,13 +154,15 @@ export class ChatHandler implements Handler {
             }  
         });
         //impossible action filtering
-        if (chatMessage.message === "remove"  && chatMessage.chatId === this.globalChat.id || chatMessage.chatId === "new"){
+        if (chatMessage.message === "remove"  && (chatMessage.chatId === this.globalChat.id || chatMessage.chatId === "new")){
             console.log("nah bruv");
             return;
         }
+
+        //removal of user from a chat
         else if(chatMessage.message === "remove") {
             console.log("removing")
-            var chat: Chat = this.byChatId(chatMessage.chatId)
+            let chat: Chat = this.byChatId(chatMessage.chatId)
             chat.users.splice(chat.users.indexOf(ourPlayerKey), 1);
             chat.name = "";
             chat.users.forEach((user) => {
@@ -169,9 +171,11 @@ export class ChatHandler implements Handler {
             const message = "User left the Chat: " + ourPlayer.name; 
             const chatId = chatMessage.chatId;
             chat.messages.push(makeMessage(this.room, client, { message, chatId }));
+            //check if chat has any participants left
             if(chat.users.length === 0) {
                 this.chats.splice(this.chats.indexOf(chat), 1);
                 console.log(this.chats);
+                return;
             }
             this.room.clients
             .filter(client => chat.users.includes(getUserId(client)))
@@ -182,10 +186,12 @@ export class ChatHandler implements Handler {
             this.onChatUpdate(client);
 
         }
+
+        //create a new chat
         else if (chatMessage.chatId === "new") {
             console.log("create new chat", ourPlayerKey, otherPlayerKey);
             // create new chat between client and playerid
-            var newChat: Chat = new Chat("");
+            let newChat: Chat = new Chat("");
             
             newChat.users.push(ourPlayerKey, otherPlayerKey);
             newChat.users.forEach((user) => {
@@ -201,10 +207,13 @@ export class ChatHandler implements Handler {
                 this.onChatUpdate(client);
             });
         }
+
+        //add user to chat
         else {
+            //check if other user is not in chat already
             if (chatMessage.chatId != this.globalChat.id && !this.byUserId(otherPlayerKey).includes(this.byChatId(chatMessage.chatId)) ) {
                 
-                var chat = this.byChatId(chatMessage.chatId)
+                let chat = this.byChatId(chatMessage.chatId)
                 chat.users.push(otherPlayerKey);
                 chat.name = chat.name + otherPlayer.name;
                 const message = "Add new User to this Chat: " + otherPlayer.name; 
@@ -251,7 +260,7 @@ function addZero(i) {
 
 //get all the clients (different pcs f.e.) that are connected to userId
 function getClientsByUserId(userId: string, room: Room): Client[] {
-    var clients: Client[] = [];
+    let clients: Client[] = [];
     room.clients.forEach((client) => {
         if (client.sessionId === userId) {
             clients.push(client);

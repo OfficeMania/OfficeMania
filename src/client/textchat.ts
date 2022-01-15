@@ -28,16 +28,14 @@ const chats: Chat[] = [];
 function getChatById(chatId: string): Chat {
     const chat = chats.find(chat => chat.id === chatId);
     if (!chat){
-        console.warn("chat not existing");
+        //console.warn("chat not existing");
     }
     return chat;
 }
 
 function updateChat(chatDTO: ChatDTO): void {
     var chat: Chat = getChatById(chatDTO.id);
-    console.log(chat);
     if (!chat) {
-        console.log("hi")
         chat = new Chat(chatDTO.name, chatDTO.id)
         chats.push(chat);
         return;
@@ -46,7 +44,7 @@ function updateChat(chatDTO: ChatDTO): void {
         chat.name = chatDTO.name;
     }
     else {
-        console.log("Name was equal");
+        //console.log("Name was equal");
     }
 }
 
@@ -54,13 +52,12 @@ function updateChat(chatDTO: ChatDTO): void {
 export function initChatListener() {
     textchatButton.addEventListener("click", () => toggleTextchatBar());
 
-    console.log("hello");
-
     //updateParticipatingChats();
     openChatUsers();
-    //update textchatSelect on click, but not selected element??
+    /**update textchatSelect on click, but not selected element??
     textchatSelect.addEventListener("click", () => {
-    });
+    });*/
+
     //changing of inputmode if text area is in use or not
     textchatArea.onfocus = function () {
         setInFocus(true);
@@ -68,6 +65,7 @@ export function initChatListener() {
     textchatArea.onblur = function () {
         setInFocus(false);
     };
+
     textchatArea.addEventListener("keydown", e => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
@@ -77,37 +75,31 @@ export function initChatListener() {
 
     textchatSendButton.addEventListener("click", () => {
         sendMessage(textchatArea.value, textchatSelect.selectedOptions[0].value);
-        console.log(textchatSelect.selectedOptions[0].innerText)
+        //console.log(textchatSelect.selectedOptions[0].innerText)
         textchatArea.value = "";
     });
 
+    textchatUsers.addEventListener("click", () => openChatUsers());
 
     getRoom().onMessage(MessageType.CHAT_UPDATE, (message: string) => onChatUpdate(JSON.parse(message)));
     getRoom().onMessage(MessageType.CHAT_LOG, (message: string) => onMessageLogs(JSON.parse(message)));
     getRoom().send(MessageType.CHAT_UPDATE);
     getRoom().send(MessageType.CHAT_LOG);
-
-    textchatUsers.addEventListener("click", () => openChatUsers());
-
-
-
-    //primitive updating of the chat
-    getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => {
-        onMessage(message);
-    });
+    getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => onMessage(message));
 }
 
+//rewrites all the of the clients chats from scratch
 function onChatUpdate(chatDTOs: ChatDTO[]): void {    
-    console.debug("chatDTOs:", chatDTOs);
+    //console.debug("chatDTOs:", chatDTOs);
     chats.forEach(() => {chats.pop()});
-    console.log(chats, "chats:");
+    //console.log(chats, "chats:");
     chatDTOs.forEach(updateChat);
     updateParticipatingChats();
 }
 
+//
 function onMessageLogs(chatMessages: ChatMessage[]): void {
-    updateParticipatingChats();
-    console.debug("chatMessages:", chatMessages);
+    //console.debug("chatMessages:", chatMessages);
     chatMessages.forEach(onMessage);
 }
 
@@ -116,19 +108,19 @@ export function getInFocus() {
     return _inFocus;
 }
 
-//write message from contents at position x, if not specified, last will be written
-//will need to accept key/position of chatgroupstate
+//write message into chat object, update messagebar if it is selected
 function onMessage(chatMessage: ChatMessage) {
     const chatId: string = chatMessage.chatId;
     const chat: Chat = getChatById(chatId);
     chat.messages.push(chatMessage);
-    //TODO Only add it if the Chat is selected?
+
     if (textchatSelect.selectedOptions[0].value === chatMessage.chatId) {
         addMessageToBar(chatMessage);
     }
 
 }
 
+//add message as "p" into textchatbar
 function addMessageToBar(chatMessage: ChatMessage){
     const messageLine = document.createElement("p");
     messageLine.innerText = `[${chatMessage.timestamp}] ${chatMessage.name}: ${chatMessage.message}`;
@@ -175,6 +167,7 @@ function openChatUsers() {
     while (textchatUsers.firstChild) {
         textchatUsers.firstChild.remove();
     }
+    //default option, only display no finctionality
     var opt = document.createElement("option");
     opt.innerText = "New Chat With";
     opt.value = "default";
@@ -182,7 +175,6 @@ function openChatUsers() {
 
     //add any players online except for player
     getRoom().state.players.forEach((value, key) => {
-        //return is it is the player himself??
         if (key === getOurPlayer().roomId) {
             return;
         }
@@ -191,10 +183,12 @@ function openChatUsers() {
         option.value = key;
         option.addEventListener("click", () => {
             modifyChat(key);
-            console.log(value.name);
+            //console.log(value.name);
         });
         textchatUsers.append(option);
     });
+
+    //leave button
     var opt = document.createElement("option");
     opt.innerText = "Leave Selected";
     opt.value = "remove";
@@ -203,7 +197,8 @@ function openChatUsers() {
     });
     textchatUsers.append(opt);
 }
-//refresh chat list in select
+
+//refresh chat list in select without changing the order/ the selected item
 function updateParticipatingChats() {
     //console.log("chats:", chats);
 
@@ -225,12 +220,12 @@ function updateParticipatingChats() {
             }
         });
         if (wasFound) {
-            console.log("was found, renaming, exiting");
+            //console.log("was found, renaming, exiting");
             return;
         }
         else {
             const option: HTMLOptionElement = document.createElement("option");
-            console.log(chat.id, chat.name);
+            //console.log(chat.id, chat.name);
             option.innerText = chat.name;
             option.value = chat.id;
     
@@ -238,7 +233,7 @@ function updateParticipatingChats() {
                 while(textchatBar.firstChild){
                     textchatBar.firstChild.remove();
                 }
-                onMessageLogs(chat.messages);
+                chat.messages.forEach(addMessageToBar);
             }
             textchatSelect.append(option);
         }
@@ -258,7 +253,7 @@ function updateParticipatingChats() {
             console.log("chats include: " + selectOptions[i].innerText)
         }
     }
-    addTestOption("New: ", "new");
+    addEmptyOption("New: ", "new");
 }
 
 function clearTextchatSelect() {
@@ -267,13 +262,15 @@ function clearTextchatSelect() {
     }
 }
 
-function addTestOption(name: string, id: string) {
+//adds a nonfuncional option to textchatselect
+function addEmptyOption(name: string, id: string) {
     const option = document.createElement("option");
         option.innerText = name;
         option.value = id;
         textchatSelect.append(option);
 }
 
+//for sending the adding/removing command to server
 function modifyChat(whoToAdd: string) {
     //if chat is selected, add to it (even if global, garbage sorting on handler side)
     console.log(whoToAdd);
