@@ -153,12 +153,44 @@ export class ChatHandler implements Handler {
                 otherPlayer = value;
             }  
         });
-        
-        if (chatMessage.chatId == "new") {
+        //impossible action filtering
+        if (chatMessage.message === "remove"  && chatMessage.chatId === this.globalChat.id || chatMessage.chatId === "new"){
+            console.log("nah bruv");
+            return;
+        }
+        else if(chatMessage.message === "remove") {
+            console.log("removing")
+            var chat: Chat = this.byChatId(chatMessage.chatId)
+            chat.users.splice(chat.users.indexOf(ourPlayerKey), 1);
+            chat.name = "";
+            chat.users.forEach((user) => {
+                chat.name += this.room.state.players.get(user).name;
+            });
+            const message = "User left the Chat: " + ourPlayer.name; 
+            const chatId = chatMessage.chatId;
+            chat.messages.push(makeMessage(this.room, client, { message, chatId }));
+            if(chat.users.length === 0) {
+                this.chats.splice(this.chats.indexOf(chat), 1);
+                console.log(this.chats);
+            }
+            this.room.clients
+            .filter(client => chat.users.includes(getUserId(client)))
+            .forEach(client => {
+                this.onChatUpdate(client);
+                client.send(MessageType.CHAT_SEND,{ message, chatId });
+            });
+            this.onChatUpdate(client);
+
+        }
+        else if (chatMessage.chatId === "new") {
             console.log("create new chat", ourPlayerKey, otherPlayerKey);
             // create new chat between client and playerid
-            var newChat: Chat = new Chat(ourPlayer.name + otherPlayer.name);
+            var newChat: Chat = new Chat("");
+            
             newChat.users.push(ourPlayerKey, otherPlayerKey);
+            newChat.users.forEach((user) => {
+                newChat.name += this.room.state.players.get(user).name;
+            });
             this.chats.push(newChat);
 
             getClientsByUserId(ourPlayerKey, this.room).forEach((client) => {
@@ -184,7 +216,6 @@ export class ChatHandler implements Handler {
                     this.onChatUpdate(client);
                     client.send(MessageType.CHAT_SEND,{ message, chatId });
                 });
-
             }
         }
     }

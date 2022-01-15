@@ -99,6 +99,8 @@ export function initChatListener() {
 
 function onChatUpdate(chatDTOs: ChatDTO[]): void {    
     console.debug("chatDTOs:", chatDTOs);
+    chats.forEach(() => {chats.pop()});
+    console.log(chats, "chats:");
     chatDTOs.forEach(updateChat);
     updateParticipatingChats();
 }
@@ -187,13 +189,19 @@ function openChatUsers() {
         const option = document.createElement("option");
         option.innerText = value.name;
         option.value = key;
-        option.addEventListener("click", (e) => {
-            addNewChat(key);
+        option.addEventListener("click", () => {
+            modifyChat(key);
             console.log(value.name);
-
         });
         textchatUsers.append(option);
     });
+    var opt = document.createElement("option");
+    opt.innerText = "Leave Selected";
+    opt.value = "remove";
+    opt.addEventListener("click", () => {
+        modifyChat("remove");
+    });
+    textchatUsers.append(opt);
 }
 //refresh chat list in select
 function updateParticipatingChats() {
@@ -236,13 +244,15 @@ function updateParticipatingChats() {
         }
     });
 
-    //removes any chats
+    //removes any chats user is not in
     var selectOptions: HTMLOptionsCollection = textchatSelect.options;
+    
     for ( var i = 0; i < selectOptions.length; i++) {
-        console.log(chatIds, selectOptions[i].value)
+        console.log("comparison:", chatIds, selectOptions[i].value)
         if (!chatIds.includes(selectOptions[i].value)) {
             console.log("chat not part of list: removing " + selectOptions[i].innerText)
             textchatSelect.removeChild(selectOptions[i]);
+            i--;
         }
         else {
             console.log("chats include: " + selectOptions[i].innerText)
@@ -264,12 +274,11 @@ function addTestOption(name: string, id: string) {
         textchatSelect.append(option);
 }
 
-function addNewChat(roomId: string) {
+function modifyChat(whoToAdd: string) {
     //if chat is selected, add to it (even if global, garbage sorting on handler side)
-    console.log(roomId);
-    console.log(getRoom().state.players)
+    console.log(whoToAdd);
     var chatId: string = textchatSelect.selectedOptions[0].value;
-    var message: string = roomId;
+    var message: string = whoToAdd;
     getRoom().send(MessageType.CHAT_ADD,{ message, chatId });
 }
 
