@@ -212,11 +212,12 @@ function updateParticipatingChats() {
 
         children.forEach(child => {
             if (child.value === chat.id) {
+                child.innerText = chat.name;
                 wasFound = true;
             }
         });
         if (wasFound) {
-            console.log("was found, exiting");
+            console.log("was found, renaming, exiting");
             return;
         }
         else {

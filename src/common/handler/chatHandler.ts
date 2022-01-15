@@ -139,11 +139,11 @@ export class ChatHandler implements Handler {
         client.send(MessageType.CHAT_UPDATE, JSON.stringify(chatDTOs));
     }
 
-    onAdd(client: Client, message: ChatMessage) {
-        console.log(message);
+    onAdd(client: Client, chatMessage: ChatMessage) {
+        console.log(chatMessage);
         var ourPlayerKey: string = getUserId(client);
         var ourPlayer: PlayerData;
-        var otherPlayerKey: string = message.message;
+        var otherPlayerKey: string = chatMessage.message;
         var otherPlayer: PlayerData;
         this.room.state.players.forEach((value, key) => { 
             if (key === ourPlayerKey) {
@@ -154,7 +154,7 @@ export class ChatHandler implements Handler {
             }  
         });
         
-        if (message.chatId == "new") {
+        if (chatMessage.chatId == "new") {
             console.log("create new chat", ourPlayerKey, otherPlayerKey);
             // create new chat between client and playerid
             var newChat: Chat = new Chat(ourPlayer.name + otherPlayer.name);
@@ -170,12 +170,21 @@ export class ChatHandler implements Handler {
             });
         }
         else {
-            if (message.chatId != this.globalChat.id) {
-                this.chats.forEach(chat => {
-                    if (chat.id === message.chatId){
-                        
-                    }
+            if (chatMessage.chatId != this.globalChat.id && !this.byUserId(otherPlayerKey).includes(this.byChatId(chatMessage.chatId)) ) {
+                
+                var chat = this.byChatId(chatMessage.chatId)
+                chat.users.push(otherPlayerKey);
+                chat.name = chat.name + otherPlayer.name;
+                const message = "Add new User to this Chat: " + otherPlayer.name; 
+                const chatId = chatMessage.chatId;
+                chat.messages.push(makeMessage(this.room, client, { message, chatId }));
+                this.room.clients
+                .filter(client => chat.users.includes(getUserId(client)))
+                .forEach(client => {
+                    this.onChatUpdate(client);
+                    client.send(MessageType.CHAT_SEND,{ message, chatId });
                 });
+
             }
         }
     }
