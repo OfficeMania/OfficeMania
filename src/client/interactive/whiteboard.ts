@@ -366,7 +366,13 @@ export class Whiteboard extends Interactive{
         whiteboard.stretchX = 1280 / rect.width
         whiteboard.stretchY = 720 / rect.height
 
-        clearButton.style.top = rect.top + "px";
+        if (parseInt(this.canvas.style.width) > window.innerWidth) {
+            this.canvas.style.width = String(parseInt(this.canvas.style.height) * 2)
+        } else if (parseInt(this.canvas.style.height) > window.innerHeight) {
+            this.canvas.style.height = String(parseInt(this.canvas.style.width) / 2)
+        }
+
+        // clearButton.style.top = rect.top + "px";
     }
 
     drawOthers(clientID: string, whiteboard: Whiteboard) {
