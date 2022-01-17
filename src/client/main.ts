@@ -55,6 +55,7 @@ import { drawPlayers } from "./draw-player";
 import {
     background,
     backpackCanvas,
+    bsWelcomeModal,
     camButton,
     canvas,
     characterPreview,
@@ -300,8 +301,7 @@ function applySettingsWelcome() {
 }
 
 function showWelcomeScreen() {
-    // @ts-ignore
-    $("#welcome-modal").modal();
+    bsWelcomeModal.show();
 }
 
 function checkWelcomeScreen() {

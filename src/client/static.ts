@@ -12,9 +12,8 @@ export const muteButton = $<HTMLButtonElement>("button-mute-audio");
 export const camButton = $<HTMLButtonElement>("button-mute-video");
 export const shareButton = $<HTMLButtonElement>("button-share-video");
 export const settingsModal = $<HTMLDivElement>("settings-modal");
-export const welcomeModal = $<HTMLDivElement>("welcome-modal");
 export const settingsButton = $<HTMLButtonElement>("button-settings");
-export const helpModal = $<HTMLDivElement>("help-modal");
+export const welcomeModal = $<HTMLDivElement>("welcome-modal");
 export const helpButton = $<HTMLButtonElement>("button-help");
 export const usersButton = $<HTMLButtonElement>("button-users");
 export const textchatButton = $<HTMLButtonElement>("button-textchat");
@@ -58,3 +57,6 @@ export const yellowButton = $<HTMLButtonElement>("button-whiteboard-red");
 export const greenButton = $<HTMLButtonElement>("button-whiteboard-red");
 export const blueButton = $<HTMLButtonElement>("button-whiteboard-red");
 export const whiteboardPanel = $<HTMLDivElement>("interactive-bar-whiteboard");
+
+// @ts-ignore
+export const bsWelcomeModal = new bootstrap.Modal(document.getElementById('welcome-modal'));

@@ -14,7 +14,7 @@ import {
     MessageType,
 } from "../common/util";
 import { characters, checkInputMode } from "./main";
-import { panelButtonsInteraction, usernameInputWelcome, welcomeModal } from "./static";
+import { bsWelcomeModal, panelButtonsInteraction, usernameInputWelcome, welcomeModal } from "./static";
 import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
 import AnimationData, { createAnimationData } from "./graphic/animation-data";
 import { PlayerData } from "../common/rooms/schema/state";
@@ -355,25 +355,21 @@ const playerHeight: number = 2 * playerWidth;
 
 export function loadUser(): void {
     //load or ask for name
-    if (!areWeLoggedIn()) {
-        const localDisplayName: string = getLocalDisplayName();
-        if (localDisplayName && localDisplayName !== "") {
-            updateDisplayName(localDisplayName);
-        } else {
-            document.getElementById("name-form").addEventListener(
-                "submit",
-                function (e) {
-                    updateDisplayName(usernameInputWelcome.value);
-                    e.preventDefault();
-                    //janky
-                    // @ts-ignore
-                    $("#welcome-modal").modal("hide");
-                    welcomeModal.style.display = "none";
-                    checkInputMode();
-                },
-                false
-            );
-        }
+    const username = getUsername();
+    if (username && username !== "") {
+        setUsername(username);
+    } else {
+        document.getElementById("name-form").addEventListener(
+            "submit",
+            function (e) {
+                setUsername(usernameInputWelcome.value);
+                e.preventDefault();
+                bsWelcomeModal.hide();
+                welcomeModal.style.display = "none";
+                checkInputMode();
+            },
+            false
+        );
     }
 }
 
