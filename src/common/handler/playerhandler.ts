@@ -11,7 +11,7 @@ import {
     literallyUndefined,
     MessageType,
 } from "../util";
-import User, { findUserById } from "../database/entities/user";
+import { findUserById } from "../database/entities/user";
 
 export interface UserData {
     id: string;
@@ -118,10 +118,13 @@ export class PlayerHandler implements Handler {
             this.updateUsername(client, username);
             return;
         }
-        return findUserById(playerData.userId).then(user => {
-            user.setUsername(username);
-            User.upsert(user).then(() => this.updateUsername(client, username));
-        });
+        return findUserById(playerData.userId)
+            .then(user =>
+                user
+                    .update({ username }, { where: { id: user.getId() } })
+                    .then(() => this.updateUsername(client, username))
+            )
+            .catch(console.error);
     }
 
     private onDisplayNameUpdate(client: Client, displayName?: string): Promise<void> {
@@ -133,10 +136,13 @@ export class PlayerHandler implements Handler {
             this.updateDisplayName(client, ensureDisplayName(displayName));
             return;
         }
-        return findUserById(playerData.userId).then(user => {
-            user.setDisplayName(remove ? null : displayName);
-            User.upsert(user).then(() => this.updateDisplayName(client, remove ? user.getUsername() : displayName));
-        });
+        return findUserById(playerData.userId)
+            .then(user =>
+                user
+                    .update({ displayName }, { where: { id: user.getId() } })
+                    .then(() => this.updateDisplayName(client, remove ? user.getUsername() : displayName))
+            )
+            .catch(console.error);
     }
 
     private onCharacterUpdate(client: Client, character?: string): Promise<void> {
@@ -147,10 +153,13 @@ export class PlayerHandler implements Handler {
             this.updateCharacter(client, character);
             return;
         }
-        return findUserById(playerData.userId).then(user => {
-            user.setCharacter(character);
-            User.upsert(user).then(() => this.updateCharacter(client, character));
-        });
+        return findUserById(playerData.userId)
+            .then(user =>
+                user
+                    .update({ character }, { where: { id: user.getId() } })
+                    .then(() => this.updateCharacter(client, character))
+            )
+            .catch(console.error);
     }
 
     private updateParticipantId(client: Client, value: string): void {
