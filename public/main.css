@@ -140,6 +140,10 @@ body {
     content: '  Chat';
 }
 
+#button-logout:hover span::after {
+    content: '  Logout';
+}
+
 #button-help:hover span:after {
     content: '  Help';
 }
@@ -655,8 +659,8 @@ body {
 #loading-cat {
     position: fixed;
     bottom: 0vh;
-    right: 0vh; 
-    margin-bottom: 60px; 
+    right: 0vh;
+    margin-bottom: 60px;
     height: 10%;
     visibility: visible;
     transition: 0.5s;
