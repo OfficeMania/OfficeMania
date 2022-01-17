@@ -147,6 +147,7 @@ User.init(
         displayName: {
             type: DataTypes.STRING,
             allowNull: true,
+            field: "display_name",
         },
         character: {
             type: DataTypes.STRING,
