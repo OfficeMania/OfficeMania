@@ -62,6 +62,7 @@ import {
     displayNameInput,
     doors,
     interactiveCanvas,
+    loginButton,
     logoutButton,
     muteButton,
     settingsApplyButton,
@@ -111,6 +112,7 @@ function toggleMute(type: string) {
 
 // Settings
 
+loginButton.addEventListener("click", () => login());
 logoutButton.addEventListener("click", () => logout());
 
 settingsButton.addEventListener("click", () => onSettingsOpen());
@@ -141,6 +143,10 @@ export function checkInputMode() {
         setInputMode(InputMode.NORMAL);
     }
     //console.log(getInputMode());
+}
+
+function login() {
+    window.location.href = "/auth/login";
 }
 
 function logout() {
@@ -356,7 +362,9 @@ async function main() {
     setRoom(room);
     setOurPlayer(ourPlayer);
     setupRoomListener(room);
-    logoutButton.hidden = !areWeLoggedIn();
+    const loggedIn: boolean = areWeLoggedIn();
+    loginButton.hidden = loggedIn;
+    logoutButton.hidden = !loggedIn;
 
     /*
      * Then, we wait for our map to load
