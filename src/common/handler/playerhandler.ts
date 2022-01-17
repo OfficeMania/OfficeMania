@@ -3,6 +3,7 @@ import { Client, Room } from "colyseus";
 import { PlayerData, State } from "../rooms/schema/state";
 import {
     checkDisplayName,
+    checkUsername,
     Direction,
     ensureCharacter,
     ensureDisplayName,
@@ -27,16 +28,25 @@ export class PlayerHandler implements Handler {
 
     onCreate(options: any): void {
         //receives movement from all the clients
-        this.room.onMessage(MessageType.MOVE, this.onMove);
+        this.room.onMessage(MessageType.MOVE, (client: Client, message: Direction) => this.onMove(client, message));
         //recives sync message
-        this.room.onMessage(MessageType.SYNC, this.onSync);
-        //receives character changes
-        this.room.onMessage(MessageType.UPDATE_CHARACTER, this.onCharacterUpdate);
+        this.room.onMessage(MessageType.SYNC, (client: Client, message: number[]) => this.onSync(client, message));
         //receives name changes
-        this.room.onMessage(MessageType.UPDATE_DISPLAY_NAME, this.onDisplayNameUpdate);
+        this.room.onMessage(MessageType.UPDATE_USERNAME, (client: Client, message: string) =>
+            this.onUsernameUpdate(client, message)
+        );
+        this.room.onMessage(MessageType.UPDATE_DISPLAY_NAME, (client: Client, message: string) =>
+            this.onDisplayNameUpdate(client, message)
+        );
+        //receives character changes
+        this.room.onMessage(MessageType.UPDATE_CHARACTER, (client: Client, message: string) =>
+            this.onCharacterUpdate(client, message)
+        );
         //receives participant id changes
         //TODO Maybe let the server join the jitsi conference too (without mic/cam) and then authenticate via the jitsi chat, that a player is linked to a participantId, so that one cannot impersonate another one.
-        this.room.onMessage(MessageType.UPDATE_PARTICIPANT_ID, this.updateParticipantId);
+        this.room.onMessage(MessageType.UPDATE_PARTICIPANT_ID, (client: Client, message: string) =>
+            this.updateParticipantId(client, message)
+        );
     }
 
     onJoin(client: Client): void {
@@ -100,20 +110,22 @@ export class PlayerHandler implements Handler {
         playerData.y = coordinates[1];
     }
 
-    private onCharacterUpdate(client: Client, character?: string): Promise<void> {
-        character = ensureCharacter(character);
+    private onUsernameUpdate(client: Client, username: string): Promise<void> {
+        //console.debug(`Incoming Username Update: ${username}`);
+        username = checkUsername(username);
         const playerData: PlayerData = this.getPlayerData(client);
         if (literallyUndefined(playerData.userId)) {
-            this.updateCharacter(client, character);
+            this.updateUsername(client, username);
             return;
         }
         return findUserById(playerData.userId).then(user => {
-            user.setCharacter(character);
-            User.upsert(user).then(() => this.updateCharacter(client, character));
+            user.setUsername(username);
+            User.upsert(user).then(() => this.updateUsername(client, username));
         });
     }
 
     private onDisplayNameUpdate(client: Client, displayName?: string): Promise<void> {
+        //console.debug(`Incoming Display Name Update: ${displayName}`);
         const remove: boolean = !displayName;
         displayName = checkDisplayName(displayName);
         const playerData: PlayerData = this.getPlayerData(client);
@@ -127,10 +139,30 @@ export class PlayerHandler implements Handler {
         });
     }
 
+    private onCharacterUpdate(client: Client, character?: string): Promise<void> {
+        //console.debug(`Incoming Character Update: ${character}`);
+        character = ensureCharacter(character);
+        const playerData: PlayerData = this.getPlayerData(client);
+        if (literallyUndefined(playerData.userId)) {
+            this.updateCharacter(client, character);
+            return;
+        }
+        return findUserById(playerData.userId).then(user => {
+            user.setCharacter(character);
+            User.upsert(user).then(() => this.updateCharacter(client, character));
+        });
+    }
+
     private updateParticipantId(client: Client, value: string): void {
         const playerData: PlayerData = this.getPlayerData(client);
         playerData.participantId = value;
         client.send(MessageType.UPDATE_PARTICIPANT_ID, value);
+    }
+
+    private updateUsername(client: Client, value: string): void {
+        const playerData: PlayerData = this.getPlayerData(client);
+        playerData.name = value;
+        client.send(MessageType.UPDATE_USERNAME, value);
     }
 
     private updateDisplayName(client: Client, value: string): void {
