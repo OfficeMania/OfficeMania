@@ -38,25 +38,24 @@ export class PlayerData extends Schema {
 }
 
 /*
- * state of whiteboard players (new) 
+ * state of whiteboard players (new)
  */
 export class WhiteboardPlayerState extends Schema {
-    @type({array: "number"})
+    @type({ array: "number" })
     paths: ArraySchema<number> = new ArraySchema<number>();
 
-    @type({array: "string"})
+    @type({ array: "string" })
     color: ArraySchema<string> = new ArraySchema<string>();
 
-    @type({array: "number"})
+    @type({ array: "number" })
     sizes: ArraySchema<number> = new ArraySchema<number>();
-
 }
 
 /*
  * state of whiteboard
  */
 export class WhiteboardState extends Schema {
-    @type({map: WhiteboardPlayerState})
+    @type({ map: WhiteboardPlayerState })
     whiteboardPlayer: MapSchema<WhiteboardPlayerState> = new MapSchema<WhiteboardPlayerState>();
 }
 
