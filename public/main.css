@@ -144,6 +144,10 @@ body {
     content: '  Logout';
 }
 
+#button-login:hover span::after {
+    content: '  Login';
+}
+
 #button-help:hover span:after {
     content: '  Help';
 }

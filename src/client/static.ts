@@ -18,6 +18,7 @@ export const helpModal = $<HTMLDivElement>("help-modal");
 export const helpButton = $<HTMLButtonElement>("button-help");
 export const usersButton = $<HTMLButtonElement>("button-users");
 export const textchatButton = $<HTMLButtonElement>("button-textchat");
+export const loginButton = $<HTMLButtonElement>("button-login");
 export const logoutButton = $<HTMLButtonElement>("button-logout");
 export const textchatSendButton = $<HTMLButtonElement>("button-send");
 export const textchatContainer = $<HTMLUListElement>("textchat-container");
