@@ -302,6 +302,7 @@ export async function loadCharacter() {
                 setUsername(usernameInputWelcome.value);
                 e.preventDefault();
                 //janky
+                // @ts-ignore
                 $("#welcome-modal").modal("hide");
                 welcomeModal.style.display = "none";
                 checkInputMode();
