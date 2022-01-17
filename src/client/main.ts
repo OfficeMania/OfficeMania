@@ -303,9 +303,6 @@ async function main() {
 
     checkWelcomeScreen();
 
-    getUsernameIntern = () => ourPlayer.name;
-    getCharacterIntern = () => ourPlayer.character;
-
     //INITIATE CHAT
 
     initChatListener();
