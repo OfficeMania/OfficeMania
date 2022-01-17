@@ -53,7 +53,7 @@ export class PlayerHandler implements Handler {
         const userData: UserData | undefined = client.userData as UserData;
         const playerData: PlayerData = new PlayerData();
         playerData.userId = ensureUserId(userData?.id);
-        playerData.name = ensureDisplayName(userData?.name);
+        playerData.displayName = ensureDisplayName(userData?.name);
         playerData.character = ensureCharacter(userData?.character);
         playerData.x = 0;
         playerData.y = 0;
@@ -170,13 +170,13 @@ export class PlayerHandler implements Handler {
 
     private updateUsername(client: Client, value: string): void {
         const playerData: PlayerData = this.getPlayerData(client);
-        playerData.name = value;
+        playerData.displayName = value;
         client.send(MessageType.UPDATE_USERNAME, value);
     }
 
     private updateDisplayName(client: Client, value: string): void {
         const playerData: PlayerData = this.getPlayerData(client);
-        playerData.name = value;
+        playerData.displayName = value;
         client.send(MessageType.UPDATE_DISPLAY_NAME, value);
     }
 

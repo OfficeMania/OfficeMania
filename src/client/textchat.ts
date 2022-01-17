@@ -89,7 +89,7 @@ export function initChatListener() {
 }
 
 //rewrites all the of the clients chats from scratch
-function onChatUpdate(chatDTOs: ChatDTO[]): void {    
+function onChatUpdate(chatDTOs: ChatDTO[]): void {
     //console.debug("chatDTOs:", chatDTOs);
     chats.forEach(() => {chats.pop()});
     //console.log(chats, "chats:");
@@ -179,7 +179,7 @@ function openChatUsers() {
             return;
         }
         const option = document.createElement("option");
-        option.innerText = value.name;
+        option.innerText = value.displayName;
         option.value = key;
         option.addEventListener("click", () => {
             modifyChat(key);
@@ -228,7 +228,7 @@ function updateParticipatingChats() {
             //console.log(chat.id, chat.name);
             option.innerText = chat.name;
             option.value = chat.id;
-    
+
             option.onclick = function () {
                 while(textchatBar.firstChild){
                     textchatBar.firstChild.remove();
@@ -241,7 +241,7 @@ function updateParticipatingChats() {
 
     //removes any chats user is not in
     var selectOptions: HTMLOptionsCollection = textchatSelect.options;
-    
+
     for ( var i = 0; i < selectOptions.length; i++) {
         console.log("comparison:", chatIds, selectOptions[i].value)
         if (!chatIds.includes(selectOptions[i].value)) {

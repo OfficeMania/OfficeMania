@@ -94,7 +94,7 @@ export class ChatHandler implements Handler {
             //TODO
             return;
         }
-        
+
         const userId: string = getUserId(client);
         if (!chat.users.includes(userId)) {
             chat.users.push(userId);
@@ -145,13 +145,13 @@ export class ChatHandler implements Handler {
         let ourPlayer: PlayerData;
         let otherPlayerKey: string = chatMessage.message;
         let otherPlayer: PlayerData;
-        this.room.state.players.forEach((value, key) => { 
+        this.room.state.players.forEach((value, key) => {
             if (key === ourPlayerKey) {
                 ourPlayer = value;
             }
             else if(key === otherPlayerKey) {
                 otherPlayer = value;
-            }  
+            }
         });
         //impossible action filtering
         if (chatMessage.message === "remove"  && (chatMessage.chatId === this.globalChat.id || chatMessage.chatId === "new")){
@@ -166,9 +166,9 @@ export class ChatHandler implements Handler {
             chat.users.splice(chat.users.indexOf(ourPlayerKey), 1);
             chat.name = "";
             chat.users.forEach((user) => {
-                chat.name += this.room.state.players.get(user).name;
+                chat.name += this.room.state.players.get(user).displayName;
             });
-            const message = "User left the Chat: " + ourPlayer.name; 
+            const message = "User left the Chat: " + ourPlayer.displayName;
             const chatId = chatMessage.chatId;
             chat.messages.push(makeMessage(this.room, client, { message, chatId }));
             //check if chat has any participants left
@@ -191,10 +191,10 @@ export class ChatHandler implements Handler {
             console.log("create new chat", ourPlayerKey, otherPlayerKey);
             // create new chat between client and playerid
             let newChat: Chat = new Chat("");
-            
+
             newChat.users.push(ourPlayerKey, otherPlayerKey);
             newChat.users.forEach((user) => {
-                newChat.name += this.room.state.players.get(user).name;
+                newChat.name += this.room.state.players.get(user).displayName;
             });
             this.chats.push(newChat);
 
@@ -211,11 +211,11 @@ export class ChatHandler implements Handler {
         else {
             //check if other user is not in chat already
             if (chatMessage.chatId != this.globalChat.id && !this.byUserId(otherPlayerKey).includes(this.byChatId(chatMessage.chatId)) ) {
-                
+
                 let chat = this.byChatId(chatMessage.chatId)
                 chat.users.push(otherPlayerKey);
-                chat.name = chat.name + otherPlayer.name;
-                const message = "Add new User to this Chat: " + otherPlayer.name; 
+                chat.name = chat.name + otherPlayer.displayName;
+                const message = "Add new User to this Chat: " + otherPlayer.displayName;
                 const chatId = chatMessage.chatId;
                 chat.messages.push(makeMessage(this.room, client, { message, chatId }));
                 this.room.clients
@@ -234,7 +234,7 @@ function getUserId(client: Client): string {
 }
 
 //message assembly for storage
-function makeMessage(room: Room, client: Client, chatMessage: ChatMessage): ChatMessage { 
+function makeMessage(room: Room, client: Client, chatMessage: ChatMessage): ChatMessage {
     return {
         timestamp: getFormattedTime(),
         name: room.state.players[client.sessionId].name,
