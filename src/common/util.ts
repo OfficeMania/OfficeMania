@@ -1,6 +1,5 @@
 import { v4 as uuid4 } from "uuid";
 
-export const KEY_USERNAME = "username";
 export const KEY_DISPLAY_NAME = "displayName";
 export const KEY_CHARACTER = "character";
 export const KEY_MIC_DEVICE_ID = "micDeviceId";
@@ -97,6 +96,10 @@ export class TaskExecutor<T> {
 
 export function literallyUndefined(value: string): boolean {
     return !value || value === "undefined";
+}
+
+export function checkUsername(value: string): string {
+    return value.slice(0, 20);
 }
 
 export function checkDisplayName(value?: string): string | undefined {
