@@ -33,6 +33,7 @@ export const settingsCancelButton = $<HTMLButtonElement>("button-settings-cancel
 export const settingsApplyButton = $<HTMLButtonElement>("button-settings-apply");
 export const usernameInput = $<HTMLInputElement>("input-settings-username");
 export const usernameInputWelcome = $<HTMLInputElement>("input-welcome-username");
+export const displayNameInput = $<HTMLInputElement>("input-settings-display-name");
 export const welcomeOkButton = $<HTMLButtonElement>("button-welcome-ok");
 export const characterSelect = $<HTMLSelectElement>("character-select");
 export const characterPreview = $<HTMLSelectElement>("character-preview");
