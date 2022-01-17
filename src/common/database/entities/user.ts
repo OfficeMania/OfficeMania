@@ -20,59 +20,51 @@ export enum Role {
 
 export default class User extends Model {
     public getId(): string {
-        return this["id"];
+        return this.getDataValue("id");
     }
 
     public getUsername(): string {
-        return this["username"];
+        return this.getDataValue("username");
     }
 
     public setUsername(username: string): void {
-        this["username"] = username;
+        this.setDataValue("username", username);
     }
 
     public getDisplayName(): string {
-        return this["displayName"];
+        return this.getDataValue("displayName");
     }
 
     public setDisplayName(displayName?: string): void {
-        if (!displayName) {
-            delete this["displayName"];
-        } else {
-            this["displayName"] = displayName;
-        }
+        this.setDataValue("displayName", displayName);
     }
 
     public getCharacter(): string | undefined {
-        return this["character"];
+        return this.getDataValue("character");
     }
 
     public setCharacter(character?: string): void {
-        if (!character) {
-            delete this["character"];
-        } else {
-            this["character"] = character;
-        }
+        this.setDataValue("character", character);
     }
 
     private getPassword(): string {
-        return this["password"];
+        return this.getDataValue("password");
     }
 
     private setPassword(password: string): void {
-        this["password"] = password;
+        this.setDataValue("password", password);
     }
 
     private getPasswordVersion(): PasswordVersion {
-        return this["passwordVersion"];
+        return this.getDataValue("passwordVersion");
     }
 
-    private setPasswordVersion(version: PasswordVersion): void {
-        this["passwordVersion"] = version;
+    private setPasswordVersion(passwordVersion: PasswordVersion): void {
+        this.setDataValue("passwordVersion", passwordVersion);
     }
 
     public getRole(): Role {
-        return this["role"];
+        return this.getDataValue("role");
     }
 
     public checkPassword(password: string): boolean {
