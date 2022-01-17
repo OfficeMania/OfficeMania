@@ -10,6 +10,7 @@ import {
     KEY_MIC_DEVICE_ID,
     KEY_SPEAKER_DEVICE_ID,
     KEY_USERNAME,
+    literallyUndefined,
     MessageType,
 } from "../common/util";
 import { characters, checkInputMode } from "./main";
@@ -90,6 +91,11 @@ export function setChatEnabled(chatEnabled: boolean) {
 
 export function getChatEnabled(): boolean {
     return _chatEnabled;
+}
+
+export function areWeLoggedIn(): boolean {
+    const ourPlayer: Player = getOurPlayer();
+    return !literallyUndefined(ourPlayer.userId);
 }
 
 /*
