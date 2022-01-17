@@ -13,7 +13,11 @@ import {
 } from "../util";
 import { findUserById } from "../database/entities/user";
 
-export interface UserData {
+export interface AuthData {
+    userSettings?: UserSettings;
+}
+
+export interface UserSettings {
     id: string;
     username: string;
     displayName?: string;
@@ -51,12 +55,13 @@ export class PlayerHandler implements Handler {
     }
 
     onJoin(client: Client): void {
-        const userData: UserData | undefined = client.userData as UserData;
+        const authData: AuthData = client.userData as AuthData;
+        const userSettings: UserSettings | undefined = authData.userSettings;
         const playerData: PlayerData = new PlayerData();
-        playerData.userId = ensureUserId(userData?.id);
-        playerData.username = ensureDisplayName(userData?.username);
-        playerData.displayName = ensureDisplayName(userData?.displayName);
-        playerData.character = ensureCharacter(userData?.character);
+        playerData.userId = ensureUserId(userSettings?.id);
+        playerData.username = ensureDisplayName(userSettings?.username);
+        playerData.displayName = ensureDisplayName(userSettings?.displayName);
+        playerData.character = ensureCharacter(userSettings?.character);
         playerData.x = 0;
         playerData.y = 0;
         playerData.cooldown = 0;
