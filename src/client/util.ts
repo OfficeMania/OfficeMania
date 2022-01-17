@@ -526,3 +526,11 @@ export function consumeInteractionClosed() {
     interactionClosed = false;
     return temp;
 }
+
+export function ensureCharacter(value?: string): string {
+    const filenames: string[] = Object.keys(characters);
+    if (filenames.indexOf(value) === -1) {
+        value = filenames[0];
+    }
+    return value;
+}
