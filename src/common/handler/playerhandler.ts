@@ -1,7 +1,15 @@
 import { Handler } from "./handler";
 import { Client, Room } from "colyseus";
 import { PlayerData, State } from "../rooms/schema/state";
-import { Direction, literallyUndefined, MessageType } from "../util";
+import {
+    checkDisplayName,
+    Direction,
+    ensureCharacter,
+    ensureDisplayName,
+    ensureUserId,
+    literallyUndefined,
+    MessageType,
+} from "../util";
 import User, { findUserById } from "../database/entities/user";
 
 export interface UserData {
@@ -11,98 +19,129 @@ export interface UserData {
 }
 
 export class PlayerHandler implements Handler {
-    room: Room<State>;
+    private room: Room<State>;
 
-    init(room: Room<State>) {
+    init(room: Room<State>): void {
         this.room = room;
     }
 
-    onCreate(options: any) {
+    onCreate(options: any): void {
         //receives movement from all the clients
-        this.room.onMessage(MessageType.MOVE, (client, message) => onMove(this.room, client, message));
+        this.room.onMessage(MessageType.MOVE, this.onMove);
         //recives sync message
-        this.room.onMessage(MessageType.SYNC, (client, message) => onSync(this.room, client, message));
+        this.room.onMessage(MessageType.SYNC, this.onSync);
         //receives character changes
-        this.room.onMessage(MessageType.UPDATE_CHARACTER, (client, message) => {
-            const character: string = message;
-            const playerData: PlayerData = this.room.state.players[client.sessionId];
-            if (literallyUndefined(playerData.userId)) {
-                playerData.character = character;
-                return;
-            }
-            findUserById(playerData.userId)
-                .then(user => {
-                    user.setCharacter(character);
-                    User.upsert(user).then(() => (playerData.character = character));
-                })
-                .catch(console.error);
-        });
+        this.room.onMessage(MessageType.UPDATE_CHARACTER, this.onCharacterUpdate);
         //receives name changes
-        this.room.onMessage(MessageType.UPDATE_USERNAME, (client, message) => {
-            const name: string = message;
-            const playerData: PlayerData = this.room.state.players[client.sessionId];
-            if (literallyUndefined(playerData.userId)) {
-                playerData.name = name;
-                return;
-            }
-            findUserById(playerData.userId)
-                .then(user => {
-                    user.setUsername(name);
-                    User.upsert(user).then(() => (playerData.name = name));
-                })
-                .catch(console.error);
-        });
+        this.room.onMessage(MessageType.UPDATE_DISPLAY_NAME, this.onDisplayNameUpdate);
         //receives participant id changes
         //TODO Maybe let the server join the jitsi conference too (without mic/cam) and then authenticate via the jitsi chat, that a player is linked to a participantId, so that one cannot impersonate another one.
-        this.room.onMessage(
-            MessageType.UPDATE_PARTICIPANT_ID,
-            (client, message) => (this.room.state.players[client.sessionId].participantId = message)
-        );
+        this.room.onMessage(MessageType.UPDATE_PARTICIPANT_ID, this.updateParticipantId);
     }
 
-    onJoin(client: Client) {
+    onJoin(client: Client): void {
         const userData: UserData | undefined = client.userData as UserData;
-        this.room.state.players[client.sessionId] = new PlayerData();
-        this.room.state.players[client.sessionId].userId = userData?.id;
-        this.room.state.players[client.sessionId].name = userData?.name || "";
-        this.room.state.players[client.sessionId].character = userData?.character || "Adam_48x48.png";
-        this.room.state.players[client.sessionId].x = 0;
-        this.room.state.players[client.sessionId].y = 0;
-        this.room.state.players[client.sessionId].cooldown = 0;
-        this.room.state.players[client.sessionId].participantId = null;
+        const playerData: PlayerData = new PlayerData();
+        playerData.userId = ensureUserId(userData?.id);
+        playerData.name = ensureDisplayName(userData?.name);
+        playerData.character = ensureCharacter(userData?.character);
+        playerData.x = 0;
+        playerData.y = 0;
+        playerData.cooldown = 0;
+        playerData.participantId = null;
+        this.setPlayerData(client, playerData);
     }
 
-    onLeave(client: Client, consented: boolean) {
-        delete this.room.state.players[client.sessionId];
+    onLeave(client: Client, consented: boolean): void {
+        this.setPlayerData(client, null);
     }
 
-    onDispose() {
+    onDispose(): void {
         //Nothing?
     }
-}
 
-function onMove(room: Room<State>, client: Client, message: Direction) {
-    switch (message) {
-        case Direction.DOWN: {
-            room.state.players[client.sessionId].y++;
-            break;
-        }
-        case Direction.UP: {
-            room.state.players[client.sessionId].y--;
-            break;
-        }
-        case Direction.LEFT: {
-            room.state.players[client.sessionId].x--;
-            break;
-        }
-        case Direction.RIGHT: {
-            room.state.players[client.sessionId].x++;
-            break;
+    private getPlayerData(client: Client): PlayerData {
+        return this.room.state.players[client.sessionId];
+    }
+
+    private setPlayerData(client: Client, playerData?: PlayerData): void {
+        if (playerData) {
+            this.room.state.players[client.sessionId] = playerData;
+        } else {
+            delete this.room.state.players[client.sessionId];
         }
     }
-}
 
-function onSync(room: Room<State>, client: Client, message: number[]) {
-    room.state.players[client.sessionId].x = message[0];
-    room.state.players[client.sessionId].y = message[1];
+    private onMove(client: Client, direction: Direction): void {
+        const playerData: PlayerData = this.getPlayerData(client);
+        switch (direction) {
+            case Direction.DOWN: {
+                playerData.y++;
+                break;
+            }
+            case Direction.UP: {
+                playerData.y--;
+                break;
+            }
+            case Direction.LEFT: {
+                playerData.x--;
+                break;
+            }
+            case Direction.RIGHT: {
+                playerData.x++;
+                break;
+            }
+        }
+    }
+
+    private onSync(client: Client, coordinates: number[]): void {
+        const playerData: PlayerData = this.getPlayerData(client);
+        playerData.x = coordinates[0];
+        playerData.y = coordinates[1];
+    }
+
+    private onCharacterUpdate(client: Client, character?: string): Promise<void> {
+        character = ensureCharacter(character);
+        const playerData: PlayerData = this.getPlayerData(client);
+        if (literallyUndefined(playerData.userId)) {
+            this.updateCharacter(client, character);
+            return;
+        }
+        return findUserById(playerData.userId).then(user => {
+            user.setCharacter(character);
+            User.upsert(user).then(() => this.updateCharacter(client, character));
+        });
+    }
+
+    private onDisplayNameUpdate(client: Client, displayName?: string): Promise<void> {
+        const remove: boolean = !displayName;
+        displayName = checkDisplayName(displayName);
+        const playerData: PlayerData = this.getPlayerData(client);
+        if (literallyUndefined(playerData.userId)) {
+            this.updateDisplayName(client, ensureDisplayName(displayName));
+            return;
+        }
+        return findUserById(playerData.userId).then(user => {
+            user.setDisplayName(remove ? null : displayName);
+            User.upsert(user).then(() => this.updateDisplayName(client, remove ? user.getUsername() : displayName));
+        });
+    }
+
+    private updateParticipantId(client: Client, value: string): void {
+        const playerData: PlayerData = this.getPlayerData(client);
+        playerData.participantId = value;
+        client.send(MessageType.UPDATE_PARTICIPANT_ID, value);
+    }
+
+    private updateDisplayName(client: Client, value: string): void {
+        const playerData: PlayerData = this.getPlayerData(client);
+        playerData.name = value;
+        client.send(MessageType.UPDATE_DISPLAY_NAME, value);
+    }
+
+    private updateCharacter(client: Client, value: string): void {
+        const playerData: PlayerData = this.getPlayerData(client);
+        playerData.character = value;
+        client.send(MessageType.UPDATE_CHARACTER, value);
+    }
 }
