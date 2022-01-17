@@ -9,6 +9,7 @@ import {
     InputMode,
     joinAndSync,
     loadCharacter,
+    loadUser,
     PlayerRecord,
     removeChildren,
     setCharacter,
@@ -311,6 +312,7 @@ async function main() {
     initChatListener();
 
     //loads all the character information
+    loadUser();
     await loadCharacter();
     checkInputMode();
 

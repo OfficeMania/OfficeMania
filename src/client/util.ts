@@ -352,27 +352,31 @@ export function payRespect() {
 const playerWidth: number = 48;
 const playerHeight: number = 2 * playerWidth;
 
-export async function loadCharacter() {
+export function loadUser(): void {
     //load or ask for name
-    const displayName: string = getDisplayName();
-    if (displayName && displayName !== "") {
-        setDisplayName(displayName);
-    } else {
-        document.getElementById("name-form").addEventListener(
-            "submit",
-            function (e) {
-                setDisplayName(usernameInputWelcome.value);
-                e.preventDefault();
-                //janky
-                // @ts-ignore
-                $("#welcome-modal").modal("hide");
-                welcomeModal.style.display = "none";
-                checkInputMode();
-            },
-            false
-        );
+    if (!areWeLoggedIn()) {
+        const localDisplayName: string = getLocalDisplayName();
+        if (localDisplayName && localDisplayName !== "") {
+            updateDisplayName(localDisplayName);
+        } else {
+            document.getElementById("name-form").addEventListener(
+                "submit",
+                function (e) {
+                    updateDisplayName(usernameInputWelcome.value);
+                    e.preventDefault();
+                    //janky
+                    // @ts-ignore
+                    $("#welcome-modal").modal("hide");
+                    welcomeModal.style.display = "none";
+                    checkInputMode();
+                },
+                false
+            );
+        }
     }
+}
 
+export async function loadCharacter(): Promise<void> {
     //loads character animations
     const characterAnimationsJson: { [key: string]: any } = await fetch(
         "/assets/animation/character-animations.json"
