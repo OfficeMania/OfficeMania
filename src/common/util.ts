@@ -98,3 +98,19 @@ export class TaskExecutor<T> {
 export function literallyUndefined(value: string): boolean {
     return !value || value === "undefined";
 }
+
+export function checkDisplayName(value?: string): string | undefined {
+    return value?.slice(0, 20);
+}
+
+export function ensureUserId(value?: string): string {
+    return value || "undefined";
+}
+
+export function ensureDisplayName(value?: string): string {
+    return value || "Jimmy";
+}
+
+export function ensureCharacter(value?: string): string {
+    return value || "Adam_48x48.png"; //TODO This needs to be done from the server, because characters could change
+}
