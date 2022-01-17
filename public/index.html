@@ -3,38 +3,46 @@
     <head>
         <meta charset="UTF-8">
         <meta name="description" content="This is a proximity based video chat application.">
-        <meta name="viewport" content="width=device-width"/>
+        <meta name="viewport" content="width=device-width" />
         <title>OfficeMania</title>
         <link rel="shortcut icon" href="../assets/img/favicon.ico" />
 
-        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css"
+              href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" crossorigin="anonymous">
         <link rel="stylesheet" href="main.css">
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
-<!--        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>-->
+        <!--        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>-->
         <script src="https://meet.jit.si/libs/lib-jitsi-meet.min.js"></script>
-<!--        <script src="/lib/lib-jitsi-meet.min.js"></script>-->
+        <!--        <script src="/lib/lib-jitsi-meet.min.js"></script>-->
 
         <script src="/js/vendors-bundle.js" defer></script>
     </head>
     <body>
-        <canvas id = "loading-screen" width="1000" height="1000"></canvas>
-        <img src="../assets/templates/Modern_Interiors/3_Animated_objects/48x48/gif/animated_cat_48x48.gif" id="loading-cat">
+        <canvas id="loading-screen" width="1000" height="1000"></canvas>
+        <img src="../assets/templates/Modern_Interiors/3_Animated_objects/48x48/gif/animated_cat_48x48.gif"
+             id="loading-cat">
         <div id="panel-buttons">
             <div id="group-left">
-                <button id="button-mute-audio" aria-label="Mute Audio" disabled><em class="fa fa-microphone"></em><span></span></button>
-                <button id="button-mute-video" aria-label="Mute Video" disabled><em class="fa fa-video"></em><span></span></button>
-                <button id="button-share-video" aria-label="Share Desktop" disabled><em class="fa fa-desktop"></em><span></span></button>
+                <button id="button-mute-audio" aria-label="Mute Audio" disabled><em
+                    class="fa fa-microphone"></em><span></span></button>
+                <button id="button-mute-video" aria-label="Mute Video" disabled><em
+                    class="fa fa-video"></em><span></span></button>
+                <button id="button-share-video" aria-label="Share Desktop" disabled><em
+                    class="fa fa-desktop"></em><span></span></button>
             </div>
             <div id="panel-buttons-interaction"></div>
             <div id="group-right">
-                <button id="button-settings" aria-label="Open Settings" data-toggle="modal" data-target="#settings-modal"><em class="fa fa-cog"></em><span></span></button>
+                <button id="button-settings" aria-label="Open Settings" data-toggle="modal"
+                        data-target="#settings-modal"><em class="fa fa-cog"></em><span></span></button>
                 <button id="button-users" aria-label="Show Users"><em class="fa fa-users"></em><span></span></button>
-                <button id="button-textchat" aria-label="Toggle Textchat"><em class="fas fa-comments"></em><span></span></button>
-                <button id="button-help"data-toggle="modal" data-target="#help-modal"><em class="fa fa-question-circle"></em><span></span></button>
+                <button id="button-textchat" aria-label="Toggle Textchat"><em class="fas fa-comments"></em><span></span>
+                </button>
+                <button id="button-help" data-toggle="modal" data-target="#help-modal"><em
+                    class="fa fa-question-circle"></em><span></span></button>
             </div>
         </div>
 
@@ -42,7 +50,8 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Exit Settings">&times;</button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Exit Settings">&times;
+                        </button>
                         <h4 class="modal-title">Settings</h4>
                     </div>
                     <div class="modal-body">
@@ -52,17 +61,20 @@
                                 <input type="text" id="input-settings-username" name="username" autocomplete="off">
                                 <br><br>
                                 <label for="input-settings-display-name">Display Name</label>
-                                <input type="text" id="input-settings-display-name" name="display-name" autocomplete="off">
+                                <input type="text" id="input-settings-display-name" name="display-name"
+                                       autocomplete="off">
                                 <br><br>
                                 <label for="character-select">Character</label>
                                 <select id="character-select"></select>
-                                <br><hr>
+                                <br>
+                                <hr>
                                 <label for="audio-input-select">Audio Input Device</label>
                                 <select id="audio-input-select"></select>
                                 <br><br>
                                 <label for="audio-output-select">Audio Output Device</label>
                                 <select id="audio-output-select"></select>
-                                <br><hr>
+                                <br>
+                                <hr>
                                 <label for="video-input-select">Video Input Device</label>
                                 <select id="video-input-select"></select>
                                 <input type="submit" value="Submit" disabled hidden>
@@ -71,9 +83,15 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button id="button-settings-ok" aria-label="Apply and Exit Settings" type="button" class="btn btn-default" data-dismiss="modal">OK</button>
-                        <button id="button-settings-cancel" aria-label="Exit Settings" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button id="button-settings-apply" aria-label="Apply Settings" type="button" class="btn btn-default">Apply</button>
+                        <button id="button-settings-ok" aria-label="Apply and Exit Settings" type="button"
+                                class="btn btn-default" data-dismiss="modal">OK
+                        </button>
+                        <button id="button-settings-cancel" aria-label="Exit Settings" type="button"
+                                class="btn btn-default" data-dismiss="modal">Cancel
+                        </button>
+                        <button id="button-settings-apply" aria-label="Apply Settings" type="button"
+                                class="btn btn-default">Apply
+                        </button>
                     </div>
                 </div>
             </div>
@@ -88,30 +106,54 @@
                     </div>
                     <div class="modal-body">
                         <div id="help-body">
-                            <img src="../assets/img/transparent_32x32.png" alt="ESC-Key" class="key key-small" style="background-position: -32px calc(5 * -32px);"><p>  Escape from Interaction or Modal</p>
-                            <br><hr>
-                            <img src="../assets/img/transparent_32x32.png" alt="M-Key" class="key key-small" style="background-position: 0 calc(3 * -32px);"><p>  Mute Audio</p>
+                            <img src="../assets/img/transparent_32x32.png" alt="ESC-Key" class="key key-small"
+                                 style="background-position: -32px calc(5 * -32px);">
+                            <p> Escape from Interaction or Modal</p>
+                            <br>
+                            <hr>
+                            <img src="../assets/img/transparent_32x32.png" alt="M-Key" class="key key-small"
+                                 style="background-position: 0 calc(3 * -32px);">
+                            <p> Mute Audio</p>
                             <br><br>
-                            <img src="../assets/img/transparent_32x32.png" alt="N-Key" class="key key-small" style="background-position: -32px calc(3 * -32px);"><p>  Mute Video</p>
+                            <img src="../assets/img/transparent_32x32.png" alt="N-Key" class="key key-small"
+                                 style="background-position: -32px calc(3 * -32px);">
+                            <p> Mute Video</p>
                             <br><br>
-                            <img src="../assets/img/transparent_32x32.png" alt="Comma-Key" class="key key-small" style="background-position: calc(4 * -32px) calc(6 * -32px);"><p>  Share Screen</p>
-                            <br><hr>
-                            <img src="../assets/img/transparent_32x32.png" alt="Q-Key" class="key key-small" style="background-position: calc(4 * -32px) calc(3 * -32px);"><p>  Open Settings</p>
+                            <img src="../assets/img/transparent_32x32.png" alt="Comma-Key" class="key key-small"
+                                 style="background-position: calc(4 * -32px) calc(6 * -32px);">
+                            <p> Share Screen</p>
+                            <br>
+                            <hr>
+                            <img src="../assets/img/transparent_32x32.png" alt="Q-Key" class="key key-small"
+                                 style="background-position: calc(4 * -32px) calc(3 * -32px);">
+                            <p> Open Settings</p>
                             <br><br>
-                            <img src="../assets/img/transparent_32x32.png" alt="H-Key" class="key key-small" style="background-position: calc(2 * -32px) calc(2 * -32px);"><p>  Open Help</p>
-                            <br><hr>
-                            <img src="../assets/img/transparent_32x32.png" alt="C-Key" class="key key-small" style="background-position: calc(4 * -32px) calc(-32px);"><p>  Cycle Character Skin</p>
+                            <img src="../assets/img/transparent_32x32.png" alt="H-Key" class="key key-small"
+                                 style="background-position: calc(2 * -32px) calc(2 * -32px);">
+                            <p> Open Help</p>
+                            <br>
+                            <hr>
+                            <img src="../assets/img/transparent_32x32.png" alt="C-Key" class="key key-small"
+                                 style="background-position: calc(4 * -32px) calc(-32px);">
+                            <p> Cycle Character Skin</p>
                             <br><br>
-                            <img src="../assets/img/transparent_32x32.png" alt="U-Key" class="key key-small" style="background-position: calc(-32px) calc(4 * -32px);"><p>  Show User List</p>
+                            <img src="../assets/img/transparent_32x32.png" alt="U-Key" class="key key-small"
+                                 style="background-position: calc(-32px) calc(4 * -32px);">
+                            <p> Show User List</p>
                             <br><br>
-                            <img src="../assets/img/transparent_32x32.png" alt="E-Key" class="key key-small" style="background-position: calc(6 * -32px) calc(-32px);"><p>  Interact with Object</p>
-                            <br><hr>
-                            <p>Press <strong>E</strong> to interact with Objects like: Doors, Computers, Vending Machines, Whiteboards and more...</p>
+                            <img src="../assets/img/transparent_32x32.png" alt="E-Key" class="key key-small"
+                                 style="background-position: calc(6 * -32px) calc(-32px);">
+                            <p> Interact with Object</p>
+                            <br>
+                            <hr>
+                            <p>Press <strong>E</strong> to interact with Objects like: Doors, Computers, Vending
+                                Machines, Whiteboards and more...</p>
                             <br>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button id="button-help-ok" type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                        <button id="button-help-ok" type="button" class="btn btn-default" data-dismiss="modal">OK
+                        </button>
                     </div>
                 </div>
             </div>
@@ -121,7 +163,9 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Exit Welcome Screen">&times;</button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Exit Welcome Screen">
+                            &times;
+                        </button>
                         <h2 class="modal-title">Welcome to OfficeMania</h2>
                     </div>
                     <div class="modal-body">
@@ -132,13 +176,18 @@
                             </form>
                             <hr>
                             <span>Move around with the Arrow Keys or </span>
-                            <img src="../assets/img/transparent_32x32.png" alt="W-Key" class="key key-small" style="background-position: calc(3 * -32px) calc(4 * -32px);">
-                            <img src="../assets/img/transparent_32x32.png" alt="A-Key" class="key key-small" style="background-position: calc(2 * -32px) -32px;">
-                            <img src="../assets/img/transparent_32x32.png" alt="S-Key" class="key key-small" style="background-position: calc(6 * -32px) calc(3 * -32px);">
-                            <img src="../assets/img/transparent_32x32.png" alt="D-Key" class="key key-small" style="background-position: calc(5 * -32px) calc(1 * -32px);">
+                            <img src="../assets/img/transparent_32x32.png" alt="W-Key" class="key key-small"
+                                 style="background-position: calc(3 * -32px) calc(4 * -32px);">
+                            <img src="../assets/img/transparent_32x32.png" alt="A-Key" class="key key-small"
+                                 style="background-position: calc(2 * -32px) -32px;">
+                            <img src="../assets/img/transparent_32x32.png" alt="S-Key" class="key key-small"
+                                 style="background-position: calc(6 * -32px) calc(3 * -32px);">
+                            <img src="../assets/img/transparent_32x32.png" alt="D-Key" class="key key-small"
+                                 style="background-position: calc(5 * -32px) calc(1 * -32px);">
                             <br><br>
                             <span>Press</span>
-                            <img src="../assets/img/transparent_32x32.png" alt="E-Key" class="key key-small" style="background-position: calc(6 * -32px) calc(-32px);">
+                            <img src="../assets/img/transparent_32x32.png" alt="E-Key" class="key key-small"
+                                 style="background-position: calc(6 * -32px) calc(-32px);">
                             <span>to interact with Objects like: Doors, Computers, Sticky Notes, Whiteboards and more...</span>
                             <br><br>
                             <span>Please remember to give OfficeMania permisson to access the camera and the microphone.</span>
@@ -154,7 +203,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <input type="button" value="OK" id="button-welcome-ok" aria-label="Apply and Exit" class="btn btn-default" data-dismiss="modal">
+                        <input type="button" value="OK" id="button-welcome-ok" aria-label="Apply and Exit"
+                               class="btn btn-default" data-dismiss="modal">
                     </div>
                 </div>
             </div>
@@ -180,7 +230,8 @@
             </div>
             <div id="textchat-bar">
                 <textarea id="typing-field" name="Text" rows="1"></textarea>
-                <button id="button-send" aria-label="Send Message"><em class="fas fa-paper-plane"></em><span></span></button>
+                <button id="button-send" aria-label="Send Message"><em class="fas fa-paper-plane"></em><span></span>
+                </button>
             </div>
         </div>
 
@@ -207,13 +258,13 @@
                         <button id="button-whiteboard-blue"><em class="fa fa-circle"></em><span></span></button>
                     </div>
                 </div>
-                <canvas id="interactive" tabindex='0' width="1280" height="720"></canvas>
-                <canvas id="backpack" tabindex='0' width="1280" height="720"></canvas>
+                <canvas id="interactive" tabindex="0" width="1280" height="720"></canvas>
+                <canvas id="backpack" tabindex="0" width="1280" height="720"></canvas>
             </div>
         </div>
 
         <div id="interactive-bar">
-            <canvas id="interactive" tabindex='0' width="1280" height="720" style="margin-left: 20%;"></canvas>
+            <canvas id="interactive" tabindex="0" width="1280" height="720" style="margin-left: 20%;"></canvas>
             <button id="button-interactive"></button>
             <div id="interactive-bar-chess">
                 <button id="button-chess-export"><em class="fa fa-copy"></em><span></span></button>
