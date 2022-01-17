@@ -15,11 +15,11 @@ import {
     setClient,
     setCollisionInfo,
     setCurrentVersion,
+    setDisplayName,
     setMapInfo,
     setOurPlayer,
     setPlayers,
     setRoom,
-    setUsername,
 } from "./util";
 import { convertMapData, drawMap, fillSolidInfos, MapInfo, solidInfo } from "./map";
 import {
@@ -216,7 +216,7 @@ function loadSettings() {
 
 function applySettings() {
     if (usernameInput.value) {
-        setUsername(usernameInput.value);
+        setDisplayName(usernameInput.value);
     }
     if (characterSelect.value) {
         setCharacter(characterSelect.value);
@@ -226,7 +226,7 @@ function applySettings() {
 
 function applySettingsWelcome() {
     if (usernameInputWelcome.value) {
-        setUsername(usernameInputWelcome.value);
+        setDisplayName(usernameInputWelcome.value);
     }
     setInputMode(InputMode.NORMAL);
 }

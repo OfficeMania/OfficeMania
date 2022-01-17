@@ -270,7 +270,7 @@ export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionI
     return true;
 }
 
-export function setUsername(value: string) {
+export function setDisplayName(value: string) {
     console.warn("REDUNDANCY WARNING, USE INTEGRATED MENU!");
     value = value?.slice(0, 20) || "Jimmy";
     getOurPlayer().name = value;
@@ -294,12 +294,12 @@ export async function loadCharacter() {
     //load or ask for name
     const username = getUsername();
     if (username && username !== "") {
-        setUsername(username);
+        setDisplayName(username);
     } else {
         document.getElementById("name-form").addEventListener(
             "submit",
             function (e) {
-                setUsername(usernameInputWelcome.value);
+                setDisplayName(usernameInputWelcome.value);
                 e.preventDefault();
                 //janky
                 // @ts-ignore
