@@ -389,11 +389,12 @@ export async function loadCharacter() {
             playerHeight
         );
     }
-
-    //load character
-    const character = getCharacter();
-    if (character && character !== "") {
-        setCharacter(character);
+    if (!areWeLoggedIn()) {
+        //load character
+        const character: string = getLocalCharacter();
+        if (character && character !== "") {
+            updateCharacter(character);
+        }
     }
 }
 
