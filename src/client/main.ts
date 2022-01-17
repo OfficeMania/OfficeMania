@@ -269,6 +269,7 @@ async function main() {
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
     setRoom(room);
+    setOurPlayer(ourPlayer);
 
     /*
      * Then, we wait for our map to load
@@ -299,8 +300,6 @@ async function main() {
 
     //i guess it should not be here but i don't know where it should be
     ourPlayer.backpack = new Backpack();
-
-    setOurPlayer(ourPlayer);
 
     checkWelcomeScreen();
 
