@@ -138,6 +138,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 let player: Player = {
                     userId: playerData.userId,
                     roomId: sessionId,
+                    username: playerData.username,
                     displayName: playerData.displayName,
                     participantId: null,
                     character: playerData.character,
@@ -275,11 +276,11 @@ export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionI
 // Get/Set
 
 export function getUsername(): string {
-    return getOurPlayer().displayName;
+    return getOurPlayer().username;
 }
 
 export function setUsername(value: string): void {
-    getOurPlayer().displayName = value;
+    getOurPlayer().username = value;
 }
 
 // Update

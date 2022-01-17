@@ -19,6 +19,9 @@ export class PlayerData extends Schema {
     userId: string;
 
     @type("string")
+    username: string;
+
+    @type("string")
     displayName: string;
 
     @type("string")
