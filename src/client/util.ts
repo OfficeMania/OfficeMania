@@ -278,7 +278,7 @@ export function setDisplayName(value: string) {
     getRoom().send(MessageType.UPDATE_USERNAME, value);
 }
 
-export function getUsername(): string {
+export function getDisplayName(): string {
     return localStorage.getItem(KEY_USERNAME);
 }
 
@@ -292,7 +292,7 @@ const playerHeight: number = 2 * playerWidth;
 
 export async function loadCharacter() {
     //load or ask for name
-    const username = getUsername();
+    const username = getDisplayName();
     if (username && username !== "") {
         setDisplayName(username);
     } else {

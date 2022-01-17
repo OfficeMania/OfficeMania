@@ -4,7 +4,7 @@ import {
     createPlayerAvatar,
     getCharacter,
     getCurrentVersion,
-    getUsername,
+    getDisplayName,
     InitState,
     InputMode,
     joinAndSync,
@@ -157,7 +157,7 @@ usernameInput.addEventListener("input", () => checkValidSettings());
 
 characterSelect.addEventListener("change", () => checkValidSettings());
 
-let getUsernameIntern: () => string = () => getUsername();
+let getUsernameIntern: () => string = () => getDisplayName();
 let getCharacterIntern: () => string = () => getCharacter();
 
 function loadUsernameSettings() {
