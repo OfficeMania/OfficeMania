@@ -1,10 +1,12 @@
-import { Client } from "colyseus.js";
+import { Client, Room } from "colyseus.js";
 import { TILE_SIZE } from "./player";
 import {
+    areWeLoggedIn,
     createPlayerAvatar,
     getCharacter,
     getCurrentVersion,
     getDisplayName,
+    getUsername,
     InitState,
     InputMode,
     joinAndSync,
@@ -17,10 +19,16 @@ import {
     setCollisionInfo,
     setCurrentVersion,
     setDisplayName,
+    setLocalCharacter,
+    setLocalDisplayName,
     setMapInfo,
     setOurPlayer,
     setPlayers,
     setRoom,
+    setUsername,
+    updateCharacter,
+    updateDisplayName,
+    updateUsername,
 } from "./util";
 import { convertMapData, drawMap, fillSolidInfos, MapInfo, solidInfo } from "./map";
 import {
@@ -51,6 +59,7 @@ import {
     canvas,
     characterPreview,
     characterSelect,
+    displayNameInput,
     doors,
     interactiveCanvas,
     muteButton,
@@ -71,6 +80,8 @@ import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen"
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 import { getInFocus, initChatListener } from "./textchat";
 import { Backpack } from "./backpack";
+import { MessageType } from "../common/util";
+import { State } from "../common";
 
 export const characters: { [key: string]: AnimatedSpriteSheet } = {};
 export const START_POSITION_X = 5;
@@ -131,6 +142,9 @@ export function checkInputMode() {
 
 function checkValidSettings() {
     let valid = checkValidUsernameInput();
+    if (!checkValidDisplayNameInput()) {
+        valid = false;
+    }
     if (!checkValidCharacterSelect()) {
         valid = false;
     }
@@ -139,9 +153,25 @@ function checkValidSettings() {
 }
 
 function checkValidUsernameInput(): boolean {
-    const username = usernameInput.value;
-    const valid = !!username.match(/^.{0,20}$/);
+    const value: string = usernameInput.value;
+    const disabled: boolean = usernameInput.disabled;
+    if (disabled || !value || value === "") {
+        displayNameInput.style.color = "red";
+        return disabled;
+    }
+    const valid = !!value.match(/^.{0,20}$/);
     usernameInput.style.color = valid ? null : "red";
+    return valid;
+}
+
+function checkValidDisplayNameInput(): boolean {
+    const value: string = displayNameInput.value;
+    if (!value || value === "") {
+        displayNameInput.style.color = null;
+        return true;
+    }
+    const valid = !!value.match(/^.{0,20}$/);
+    displayNameInput.style.color = valid ? null : "red";
     return valid;
 }
 
@@ -156,19 +186,27 @@ usernameInput.addEventListener("keydown", () => checkValidSettings());
 usernameInput.addEventListener("paste", () => checkValidSettings());
 usernameInput.addEventListener("input", () => checkValidSettings());
 
+displayNameInput.addEventListener("change", () => checkValidSettings());
+displayNameInput.addEventListener("keydown", () => checkValidSettings());
+displayNameInput.addEventListener("paste", () => checkValidSettings());
+displayNameInput.addEventListener("input", () => checkValidSettings());
+
 characterSelect.addEventListener("change", () => checkValidSettings());
 
-let getUsernameIntern: () => string = () => getDisplayName();
-let getCharacterIntern: () => string = () => getCharacter();
-
 function loadUsernameSettings() {
-    if (getUsernameIntern) {
-        usernameInput.value = getUsernameIntern();
+    if (areWeLoggedIn()) {
+        usernameInput.value = getUsername();
+        usernameInput.style.color = null;
         usernameInput.disabled = false;
     } else {
-        usernameInput.value = "";
+        usernameInput.value = "Not Logged In";
+        usernameInput.style.color = "red";
         usernameInput.disabled = true;
     }
+}
+
+function loadDisplayNameSettings() {
+    displayNameInput.value = getDisplayName();
 }
 
 function convertCharacterName(key: string) {
@@ -178,11 +216,11 @@ function convertCharacterName(key: string) {
 function loadCharacterSettings() {
     if (characters) {
         removeChildren(characterSelect);
-        const current = getCharacterIntern?.();
+        const character: string = getCharacter();
         let selectedIndex = -1;
         let counter = 0;
         for (const key of Object.keys(characters)) {
-            if (current && key === current) {
+            if (character && key === character) {
                 selectedIndex = counter;
             }
             counter++;
@@ -210,24 +248,40 @@ function onSettingsOpen() {
 
 function loadSettings() {
     loadUsernameSettings();
+    loadDisplayNameSettings();
     loadCharacterSettings();
     loadConferenceSettings().catch(console.error);
     checkValidSettings();
 }
 
-function applySettings() {
-    if (usernameInput.value) {
-        setDisplayName(usernameInput.value);
+function saveUsernameSettings() {
+    if (!usernameInput.disabled && usernameInput.value) {
+        updateUsername(usernameInput.value);
     }
+}
+
+function saveDisplayNameSettings() {
+    if (displayNameInput.value) {
+        updateDisplayName(displayNameInput.value);
+    }
+}
+
+function saveCharacterSettings() {
     if (characterSelect.value) {
-        setCharacter(characterSelect.value);
+        updateCharacter(characterSelect.value);
     }
+}
+
+function applySettings() {
+    saveUsernameSettings();
+    saveDisplayNameSettings();
+    saveCharacterSettings();
     applyConferenceSettings();
 }
 
 function applySettingsWelcome() {
     if (usernameInputWelcome.value) {
-        setDisplayName(usernameInputWelcome.value);
+        updateDisplayName(usernameInputWelcome.value);
     }
     setInputMode(InputMode.NORMAL);
 }
@@ -243,6 +297,30 @@ function checkWelcomeScreen() {
         showWelcomeScreen();
     }
     setCurrentVersion(version);
+}
+
+function onUsernameUpdate(username: string): void {
+    setUsername(username);
+}
+
+function onDisplayNameUpdate(displayName: string): void {
+    setDisplayName(displayName);
+    if (!areWeLoggedIn()) {
+        setLocalDisplayName(displayName);
+    }
+}
+
+function onCharacterUpdate(character: string): void {
+    setCharacter(character);
+    if (!areWeLoggedIn()) {
+        setLocalCharacter(character);
+    }
+}
+
+function setupRoomListener(room: Room<State>) {
+    room.onMessage(MessageType.UPDATE_USERNAME, onUsernameUpdate);
+    room.onMessage(MessageType.UPDATE_DISPLAY_NAME, onDisplayNameUpdate);
+    room.onMessage(MessageType.UPDATE_CHARACTER, onCharacterUpdate);
 }
 
 // async is necessary here, because we use 'await' to resolve the promises
@@ -270,6 +348,7 @@ async function main() {
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
     setRoom(room);
     setOurPlayer(ourPlayer);
+    setupRoomListener(room);
 
     /*
      * Then, we wait for our map to load
