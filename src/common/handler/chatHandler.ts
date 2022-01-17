@@ -140,7 +140,7 @@ export class ChatHandler implements Handler {
     }
 
     onAdd(client: Client, chatMessage: ChatMessage) {
-        console.log(chatMessage);
+        //console.log(chatMessage);
         let ourPlayerKey: string = getUserId(client);
         let ourPlayer: PlayerData;
         let otherPlayerKey: string = chatMessage.message;
@@ -155,14 +155,14 @@ export class ChatHandler implements Handler {
         });
         //impossible action filtering
         if (chatMessage.message === "remove"  && (chatMessage.chatId === this.globalChat.id || chatMessage.chatId === "new")){
-            console.log("nah bruv");
+            //console.log("nah bruv");
             return;
         }
 
         //removal of user from a chat
         else if(chatMessage.message === "remove") {
-            console.log("removing")
-            let chat: Chat = this.byChatId(chatMessage.chatId)
+            //console.log("removing");
+            let chat: Chat = this.byChatId(chatMessage.chatId);
             chat.users.splice(chat.users.indexOf(ourPlayerKey), 1);
             chat.name = "";
             chat.users.forEach((user) => {
@@ -174,12 +174,11 @@ export class ChatHandler implements Handler {
             //check if chat has any participants left
             if(chat.users.length === 0) {
                 this.chats.splice(this.chats.indexOf(chat), 1);
-                console.log(this.chats);
+                //console.log(this.chats);
             }
             this.room.clients
             .filter(client => chat.users.includes(getUserId(client)))
             .forEach(client => {
-                this.onChatUpdate(client);
                 client.send(MessageType.CHAT_SEND,{ message, chatId });
             });
             this.onChatUpdate(client);
@@ -188,7 +187,7 @@ export class ChatHandler implements Handler {
 
         //create a new chat
         else if (chatMessage.chatId === "new") {
-            console.log("create new chat", ourPlayerKey, otherPlayerKey);
+            console.log("Create new chat:", ourPlayerKey, otherPlayerKey);
             // create new chat between client and playerid
             let newChat: Chat = new Chat("");
 

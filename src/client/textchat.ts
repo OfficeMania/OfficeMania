@@ -11,17 +11,12 @@ import {
 } from "./static";
 import { getOurPlayer, getRoom } from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chatHandler";
-import { PlayerData } from "../common/rooms/schema/state";
 
 //tracks if button/shortcut have been pressed
 let _showTextchat = false;
 
 //tracks if client is using text area, for changing of inputmode
 var _inFocus = false;
-
-var _addToChat = false;
-
-var _clientLogs = new Map();
 
 const chats: Chat[] = [];
 
@@ -243,14 +238,13 @@ function updateParticipatingChats() {
     var selectOptions: HTMLOptionsCollection = textchatSelect.options;
 
     for ( var i = 0; i < selectOptions.length; i++) {
-        console.log("comparison:", chatIds, selectOptions[i].value)
         if (!chatIds.includes(selectOptions[i].value)) {
-            console.log("chat not part of list: removing " + selectOptions[i].innerText)
+            //console.log("chat not part of list: removing " + selectOptions[i].innerText);
             textchatSelect.removeChild(selectOptions[i]);
             i--;
         }
         else {
-            console.log("chats include: " + selectOptions[i].innerText)
+            //console.log("chats include: " + selectOptions[i].innerText);
         }
     }
     addEmptyOption("New: ", "new");
@@ -273,7 +267,7 @@ function addEmptyOption(name: string, id: string) {
 //for sending the adding/removing command to server
 function modifyChat(whoToAdd: string) {
     //if chat is selected, add to it (even if global, garbage sorting on handler side)
-    console.log(whoToAdd);
+    //console.log(whoToAdd);
     var chatId: string = textchatSelect.selectedOptions[0].value;
     var message: string = whoToAdd;
     getRoom().send(MessageType.CHAT_ADD,{ message, chatId });
