@@ -292,9 +292,9 @@ const playerHeight: number = 2 * playerWidth;
 
 export async function loadCharacter() {
     //load or ask for name
-    const username = getDisplayName();
-    if (username && username !== "") {
-        setDisplayName(username);
+    const displayName: string = getDisplayName();
+    if (displayName && displayName !== "") {
+        setDisplayName(displayName);
     } else {
         document.getElementById("name-form").addEventListener(
             "submit",
