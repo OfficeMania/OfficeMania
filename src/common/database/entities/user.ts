@@ -31,6 +31,14 @@ export default class User extends Model {
         this["username"] = username;
     }
 
+    public getDisplayName(): string {
+        return this["displayName"];
+    }
+
+    public setDisplayName(displayName: string): void {
+        this["displayName"] = displayName;
+    }
+
     public getCharacter(): string | undefined {
         return this["character"];
     }
@@ -131,6 +139,10 @@ User.init(
             type: DataTypes.STRING,
             allowNull: false,
             unique: true,
+        },
+        displayName: {
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         character: {
             type: DataTypes.STRING,
