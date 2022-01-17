@@ -66,17 +66,17 @@ export class TURoom extends Room<State> {
     async onAuth(client: Client, options: any, req: http.IncomingMessage): Promise<UserData> {
         const session: { passport: { user: string } } = req["session"];
         if (!session) {
-            return { id: "undefined" };
+            return;
         }
         const userId: string = session?.passport?.user;
         if (!userId) {
-            return { id: "undefined" };
+            return;
         }
         const user: User = await findUserById(userId);
         if (!user) {
-            return { id: "undefined" };
+            return;
         }
-        return { id: user.getId(), name: user.getUsername(), character: user.getCharacter() };
+        return { id: user.getId(), username: user.getUsername(), displayName: user.getDisplayName(), character: user.getCharacter() };
     }
 
     onJoin(client: Client, options: any, auth: UserData) {
