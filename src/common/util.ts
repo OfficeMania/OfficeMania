@@ -31,6 +31,7 @@ export enum MessageType {
     SYNC = "sync",
     UPDATE_CHARACTER = "updateCharacter",
     UPDATE_USERNAME = "updateUsername",
+    UPDATE_DISPLAY_NAME = "updateDisplayName",
     UPDATE_PARTICIPANT_ID = "updateParticipantId",
     // PongHandler
     PONG_MOVE = "pongMove",
