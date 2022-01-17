@@ -15,7 +15,8 @@ import { findUserById } from "../database/entities/user";
 
 export interface UserData {
     id: string;
-    name?: string;
+    username: string;
+    displayName?: string;
     character?: string;
 }
 
@@ -53,7 +54,8 @@ export class PlayerHandler implements Handler {
         const userData: UserData | undefined = client.userData as UserData;
         const playerData: PlayerData = new PlayerData();
         playerData.userId = ensureUserId(userData?.id);
-        playerData.displayName = ensureDisplayName(userData?.name);
+        playerData.username = ensureDisplayName(userData?.username);
+        playerData.displayName = ensureDisplayName(userData?.displayName);
         playerData.character = ensureCharacter(userData?.character);
         playerData.x = 0;
         playerData.y = 0;
