@@ -7,9 +7,9 @@ import {
     KEY_CAMERA_DEVICE_ID,
     KEY_CHARACTER,
     KEY_CURRENT_VERSION,
+    KEY_DISPLAY_NAME,
     KEY_MIC_DEVICE_ID,
     KEY_SPEAKER_DEVICE_ID,
-    KEY_USERNAME,
     literallyUndefined,
     MessageType,
 } from "../common/util";
@@ -274,12 +274,12 @@ export function setDisplayName(value: string) {
     console.warn("REDUNDANCY WARNING, USE INTEGRATED MENU!");
     value = value?.slice(0, 20) || "Jimmy";
     getOurPlayer().name = value;
-    localStorage.setItem(KEY_USERNAME, value);
+    localStorage.setItem(KEY_DISPLAY_NAME, value);
     getRoom().send(MessageType.UPDATE_USERNAME, value);
 }
 
 export function getDisplayName(): string {
-    return localStorage.getItem(KEY_USERNAME);
+    return localStorage.getItem(KEY_DISPLAY_NAME);
 }
 
 export function payRespect() {
