@@ -611,7 +611,7 @@ export function createPlayerState<Type extends HTMLElement>(
     element.classList.add("player-state");
     const playerName = document.createElement("span");
     playerName.classList.add("player-state-name");
-    playerName.innerText = player ? player.name : "You";
+    playerName.innerText = player ? player.displayName : "You";
     if (showMuteState && player && selfUser.participantId !== player.participantId) {
         const user = getUser(player.participantId);
         if (user.isAudioTrackMuted()) {

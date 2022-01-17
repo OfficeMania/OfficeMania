@@ -34,7 +34,7 @@ export function playerLoop(
                 if (player !== ourPlayer) {
                     updatePosition(player, room);
                     player.character = room.state.players[player.roomId].character;
-                    player.name = room.state.players[player.roomId].name;
+                    player.displayName = room.state.players[player.roomId].name;
                     player.participantId = room.state.players[player.roomId].participantId;
                 }
             });
