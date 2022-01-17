@@ -35,8 +35,12 @@ export default class User extends Model {
         return this["displayName"];
     }
 
-    public setDisplayName(displayName: string): void {
-        this["displayName"] = displayName;
+    public setDisplayName(displayName?: string): void {
+        if (!displayName) {
+            delete this["displayName"];
+        } else {
+            this["displayName"] = displayName;
+        }
     }
 
     public getCharacter(): string | undefined {
