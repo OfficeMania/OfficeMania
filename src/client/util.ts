@@ -270,16 +270,78 @@ export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionI
     return true;
 }
 
-export function setDisplayName(value: string) {
-    console.warn("REDUNDANCY WARNING, USE INTEGRATED MENU!");
-    value = value?.slice(0, 20) || "Jimmy";
+// // Username
+
+// Get/Set
+
+export function getUsername(): string {
+    return getOurPlayer().name;
+}
+
+export function setUsername(value: string): void {
     getOurPlayer().name = value;
-    localStorage.setItem(KEY_DISPLAY_NAME, value);
+}
+
+// Update
+
+export function updateUsername(value: string): void {
     getRoom().send(MessageType.UPDATE_USERNAME, value);
 }
 
+// // Display Name
+
+// Get/Set
+
 export function getDisplayName(): string {
+    return getOurPlayer().name;
+}
+
+export function setDisplayName(value: string): void {
+    getOurPlayer().name = value;
+}
+
+// Update
+
+export function updateDisplayName(value?: string): void {
+    getRoom().send(MessageType.UPDATE_DISPLAY_NAME, value);
+}
+
+// Local Get/Set
+
+export function setLocalDisplayName(value?: string): void {
+    localStorage.setItem(KEY_DISPLAY_NAME, value);
+}
+
+export function getLocalDisplayName(): string {
     return localStorage.getItem(KEY_DISPLAY_NAME);
+}
+
+// // Character
+
+// Get/Set
+
+export function getCharacter(): string {
+    return getOurPlayer().character;
+}
+
+export function setCharacter(value: string): void {
+    getOurPlayer().character = value;
+}
+
+// Update
+
+export function updateCharacter(value?: string): void {
+    getRoom().send(MessageType.UPDATE_CHARACTER, value);
+}
+
+// Local Get/Set
+
+export function setLocalCharacter(value: string) {
+    localStorage.setItem(KEY_CHARACTER, value);
+}
+
+export function getLocalCharacter(): string {
+    return localStorage.getItem(KEY_CHARACTER);
 }
 
 export function payRespect() {
@@ -333,20 +395,6 @@ export async function loadCharacter() {
     if (character && character !== "") {
         setCharacter(character);
     }
-}
-
-export function setCharacter(value: string) {
-    const filenames = Object.keys(characters);
-    if (filenames.indexOf(value) === -1) {
-        value = filenames[0];
-    }
-    getOurPlayer().character = value;
-    localStorage.setItem(KEY_CHARACTER, value);
-    getRoom().send(MessageType.UPDATE_CHARACTER, value);
-}
-
-export function getCharacter(): string {
-    return localStorage.getItem(KEY_CHARACTER);
 }
 
 export function setMicDeviceId(value: string) {
