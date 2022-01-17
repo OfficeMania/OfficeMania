@@ -175,7 +175,6 @@ export class ChatHandler implements Handler {
             if(chat.users.length === 0) {
                 this.chats.splice(this.chats.indexOf(chat), 1);
                 console.log(this.chats);
-                return;
             }
             this.room.clients
             .filter(client => chat.users.includes(getUserId(client)))
