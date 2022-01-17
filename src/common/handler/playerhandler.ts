@@ -1,7 +1,7 @@
 import { Handler } from "./handler";
 import { Client, Room } from "colyseus";
 import { PlayerData, State } from "../rooms/schema/state";
-import { Direction, MessageType } from "../util";
+import { Direction, literallyUndefined, MessageType } from "../util";
 import User, { findUserById } from "../database/entities/user";
 
 export interface UserData {
@@ -26,7 +26,7 @@ export class PlayerHandler implements Handler {
         this.room.onMessage(MessageType.UPDATE_CHARACTER, (client, message) => {
             const character: string = message;
             const playerData: PlayerData = this.room.state.players[client.sessionId];
-            if (!playerData.userId || playerData.userId === "undefined") {
+            if (literallyUndefined(playerData.userId)) {
                 playerData.character = character;
                 return;
             }
@@ -41,7 +41,7 @@ export class PlayerHandler implements Handler {
         this.room.onMessage(MessageType.UPDATE_USERNAME, (client, message) => {
             const name: string = message;
             const playerData: PlayerData = this.room.state.players[client.sessionId];
-            if (!playerData.userId || playerData.userId === "undefined") {
+            if (literallyUndefined(playerData.userId)) {
                 playerData.name = name;
                 return;
             }

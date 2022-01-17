@@ -92,3 +92,7 @@ export class TaskExecutor<T> {
         return task();
     }
 }
+
+export function literallyUndefined(value: string): boolean {
+    return !value || value === "undefined";
+}
