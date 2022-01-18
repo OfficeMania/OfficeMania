@@ -224,6 +224,9 @@ body {
     font-size: large;
     display: inline-block;
 }
+.modal-bs-title {
+    margin-top: 0.5rem;
+}
 
 .key {
     background-image: url('../assets/keys/KeysExtended.png');
