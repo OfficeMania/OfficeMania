@@ -273,5 +273,22 @@ function modifyChat(whoToAdd: string) {
     getRoom().send(MessageType.CHAT_ADD,{ message, chatId });
 }
 
+function addUserListOption() {
+    const input = document.createElement("input");
+    input.classList.add("form-check-input");
+    input.type = "checkbox";
+    input.id = "aisfdhiasud";
+    input.style.marginRight = "10px";
+    const label = document.createElement("label");
+    label.append(input);
+    label.classList.add("form-check-label");
+    label.classList.add("dropdown-item");
+    label.innerHTML += "wololo";
+    const li = document.createElement("li");
+    li.append(label);
+    $('#dropdown-user-list').append(li);
+}
+
+
 
 

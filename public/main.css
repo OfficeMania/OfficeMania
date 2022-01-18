@@ -681,8 +681,25 @@ body {
 #menu-bar {
     position: absolute;
     width: 100%;
-    background-color: black;
+    padding: 10px;
 }
+#menu-bar button {
+    color: black;
+    background-color: #f8f8f8;
+    border-radius: 10px;
+}
+#chat-list, #user-list {
+    display: inline;
+}
+#chat-list button{
+    width: 80% - 10px;
+    height: 40px;
+}
+#user-list button{
+    width: 20% - 10px;
+    height: 40px;
+}
+
 #select-textchat{
     float: left;
     width: 80%;
@@ -712,4 +729,9 @@ body {
 #messages-bar p{
     color: white;
     overflow: visible;
+}
+
+#fml input {
+    width: 1em;
+    margin-right: 10px;
 }

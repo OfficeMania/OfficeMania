@@ -211,6 +211,14 @@
 
         <div id="textchat-container" class="horizontal-animation">
             <div id="menu-bar">
+                <div class="btn-group" id="chat-list">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="button-chat-list" data-bs-toggle="dropdown" aria-expanded="false">Active Chat here</button>
+                    <ul class="dropdown-menu" id="dropdown-user-list" aria-labelledby="button-chat-list"></ul>
+                </div>
+                <div class="btn-group" id="user-list">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="button-user-list" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">+</button>
+                    <ul class="dropdown-menu" id="dropdown-user-list" aria-labelledby="button-user-list"></ul>
+                </div>
                 <select id="select-textchat"></select>
                 <select id="select-users"></select>
             </div>
