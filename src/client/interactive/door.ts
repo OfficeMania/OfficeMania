@@ -181,8 +181,7 @@ export class Door extends Interactive {
         iCtx.fillRect(5, 5, this.canvas.width - 10, this.canvas.height - 10);
 
         iCtx.fillStyle = "black";
-        //TODO change font
-        iCtx.font = "50px MobileFont"; 
+        iCtx.font = "50px Comic Sans"; 
         iCtx.lineWidth = 3;
         iCtx.fillText("You cannot close a door", 100, 100);
         iCtx.fillText("that is supossed to be open all the time", 100, 150);
