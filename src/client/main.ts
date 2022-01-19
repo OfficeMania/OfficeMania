@@ -78,7 +78,7 @@ import {
     welcomeModal,
     welcomeOkButton,
 } from "./static";
-import { updateDoors } from "./interactive/door";
+import { sendKnockNotification, updateDoors } from "./interactive/door";
 import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 import { getInFocus, initChatListener } from "./textchat";
@@ -334,6 +334,8 @@ function setupRoomListener(room: Room<State>) {
     room.onMessage(MessageType.UPDATE_USERNAME, onUsernameUpdate);
     room.onMessage(MessageType.UPDATE_DISPLAY_NAME, onDisplayNameUpdate);
     room.onMessage(MessageType.UPDATE_CHARACTER, onCharacterUpdate);
+    //if someone knocks on a door
+    room.onMessage(MessageType.DOOR_NOTIFICATION, (message: string) => sendKnockNotification());
 }
 
 // async is necessary here, because we use 'await' to resolve the promises
@@ -395,6 +397,11 @@ async function main() {
 
     //i guess it should not be here but i don't know where it should be
     ourPlayer.backpack = new Backpack();
+
+    //ask for permission to send notifications
+    if("Notification" in window) {
+        window.Notification.requestPermission();
+    }
 
     checkWelcomeScreen();
 

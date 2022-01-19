@@ -26,6 +26,8 @@ export enum MessageType {
     DOOR_NEW = "door-new",
     DOOR_LOCK = "door-lock",
     DOOR_UNLOCK = "door-unlock",
+    DOOR_KNOCK = "door-knock",
+    DOOR_NOTIFICATION = "door-notification",
     // PlayerHandler
     MOVE = "move",
     SYNC = "sync",

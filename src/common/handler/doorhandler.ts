@@ -15,6 +15,7 @@ export class DoorHandler implements Handler {
         this.room.onMessage(MessageType.DOOR_NEW, ((client, message) => onNew(this.room, client, message)));
         this.room.onMessage(MessageType.DOOR_LOCK, ((client, message) => onLock(this.room, client, message)));
         this.room.onMessage(MessageType.DOOR_UNLOCK, ((client, message) => onUnlock(this.room, client, message)));
+        this.room.onMessage(MessageType.DOOR_KNOCK, ((client, message) => this.onKnock(this.room, client, message)));
     }
 
     onJoin(client: Client) {
@@ -32,6 +33,14 @@ export class DoorHandler implements Handler {
 
     onDispose() {
         //Nothing?
+    }
+
+    onKnock(room: Room<State>, client: Client, message) {
+        this.room.clients.forEach(client => {
+            if(message.includes(client.sessionId)) {
+                client.send(MessageType.DOOR_NOTIFICATION, "knock knock");
+            }
+        });
     }
 
 }
