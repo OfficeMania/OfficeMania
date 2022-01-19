@@ -692,11 +692,11 @@ body {
     display: inline;
 }
 #chat-list button{
-    width: 80% - 10px;
+    width: 80%;
     height: 40px;
 }
 #user-list button{
-    width: 20% - 10px;
+    width: calc(20% - 5px);
     height: 40px;
 }
 
@@ -731,7 +731,7 @@ body {
     overflow: visible;
 }
 
-#fml input {
+#textchat-container input {
     width: 1em;
     margin-right: 10px;
 }
