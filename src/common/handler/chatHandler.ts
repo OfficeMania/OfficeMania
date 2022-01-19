@@ -236,7 +236,7 @@ function getUserId(client: Client): string {
 function makeMessage(room: Room, client: Client, chatMessage: ChatMessage): ChatMessage {
     return {
         timestamp: getFormattedTime(),
-        name: room.state.players[client.sessionId].name,
+        name: room.state.players[client.sessionId].displayName,
         chatId: chatMessage.chatId,
         message: chatMessage.message,
     };
