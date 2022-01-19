@@ -699,7 +699,22 @@ body {
     width: calc(20% - 5px);
     height: 40px;
 }
-
+#user-list li {
+    list-style-type: none;
+}
+#user-list ul {
+    overflow-y: auto;
+    overflow-x: auto;
+    margin: 0;
+    padding: 0;
+}
+#user-list .dropdown-menu {
+    transform: translate(1px, 32px) !important;
+    min-width: 300%;
+}
+#chat-list .dropdown-menu {
+    min-width: 100%;
+}
 #select-textchat{
     float: left;
     width: 80%;

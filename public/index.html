@@ -215,9 +215,19 @@
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="button-chat-list" data-bs-toggle="dropdown" aria-expanded="false">Active Chat here</button>
                     <ul class="dropdown-menu" id="dropdown-chat-list" aria-labelledby="button-chat-list"></ul>
                 </div>
-                <div class="btn-group" id="user-list">
+                <div class="btn-group" id="user-list" >
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="button-user-list" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">+</button>
-                    <ul class="dropdown-menu" id="dropdown-user-list" aria-labelledby="button-user-list"></ul>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="button-user-list" style="width: 50%;">
+                        <ul id="dropdown-user-list" style="height: 10em;"></ul>
+                        <ul id="dropdown-user-divider">
+                            <li><hr class="dropdown-divider" href="#"></li>
+                            <li><a class="dropdown-item" href="#" id="textchat-create-new">create new chat</a></li>
+                            <li><a class="dropdown-item" href="#" id="textchat-add-to-chat">add to chat</a></li>
+                        </ul>
+                    </div>
+                    
+                    
+                    
                 </div>
                 <select id="select-textchat"></select>
                 <select id="select-users"></select>

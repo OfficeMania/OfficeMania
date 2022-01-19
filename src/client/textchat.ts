@@ -8,6 +8,9 @@ import {
     textchatUsers,
     textchatSelect,
     textchatSendButton,
+    textchatDropdownChats,
+    textchatDropdownUsers,
+    textchatDropdownChatsButton,
 } from "./static";
 import { getOurPlayer, getRoom } from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chatHandler";
@@ -49,6 +52,8 @@ export function initChatListener() {
 
     //updateParticipatingChats();
     openChatUsers();
+    updateChatList();
+    updateUserList();
     /**update textchatSelect on click, but not selected element??
     textchatSelect.addEventListener("click", () => {
     });*/
@@ -90,6 +95,7 @@ function onChatUpdate(chatDTOs: ChatDTO[]): void {
     //console.log(chats, "chats:");
     chatDTOs.forEach(updateChat);
     updateParticipatingChats();
+    updateChatList();
 }
 
 //
@@ -250,9 +256,9 @@ function updateParticipatingChats() {
     addEmptyOption("New: ", "new");
 }
 
-function clearTextchatSelect() {
-    while (textchatSelect.firstChild) {
-        textchatSelect.firstChild.remove();
+function clearTextchatBar() {
+    while (textchatBar.firstChild) {
+        textchatBar.firstChild.remove();
     }
 }
 
@@ -273,20 +279,101 @@ function modifyChat(whoToAdd: string) {
     getRoom().send(MessageType.CHAT_ADD,{ message, chatId });
 }
 
-function addUserListOption() {
+function updateChatList() {
+    //add any chats
+    const chatList: string[] = [];
+
+    for (let i = 0; i < textchatDropdownChats.children.length; i++) {
+        chatList.push(textchatDropdownChats.children[i].id);
+    }
+    //console.log(chatList);
+    const chatIds: string[] = [];
+    console.log("ohhimark")
+    chats.forEach(chat => {
+        chatIds.push(chat.id);
+        console.log("chat")
+        if (!chatList.includes(chat.id)) {
+            console.log("adding");
+            addChatListOption(chat);
+        }
+    });
+
+    //remove any chats
+    for (let i = 0; i < textchatDropdownChats.children.length; i++) {
+        if (!chatIds.includes(textchatDropdownChats.children[i].id)){
+            textchatDropdownChats.children[i].remove;
+            console.log("remove")
+            i--;
+        }
+    }
+}
+
+function updateUserList() {
+    const uIdList: string[] = [];
+
+    for (let i = 0; i < textchatDropdownUsers.children.length; i++) {
+        uIdList.push(textchatDropdownUsers.children[i].id);
+    }
+
+    const userIds: string[] = []
+
+    getRoom().state.players.forEach((value, key) => {
+        userIds.push(key);
+
+        if (!uIdList.includes(key)) {
+            console.log("inserting")
+            addUserListOption(value.displayName, key);
+        }
+    });
+
+
+    for (let i = 0; i < textchatDropdownUsers.children.length; i++) {
+        if (!userIds.includes(textchatDropdownUsers.children[i].id)) {
+            textchatDropdownUsers.children[i].remove();
+            i--;
+            console.log("removing")
+        }
+    }
+}
+
+function addChatListOption(chat: Chat) {
+    const a = document.createElement("a");
+    a.innerText = chat.name;
+    a.classList.add("dropdown-item");
+
+    const li = document.createElement("li");
+    li.append(a);
+    li.id = chat.id
+    li.addEventListener("click", () => {
+
+        textchatDropdownChatsButton.innerText = chat.name;
+        textchatDropdownChatsButton.id = chat.id;
+        /**NERFED
+         * clearTextchatBar();
+         * 
+         * chat.messages.forEach(addMessageToBar);      
+         */
+        
+    });
+    textchatDropdownChats.append(li);
+}
+
+function addUserListOption(name: string, key: string) {
     const input = document.createElement("input");
     input.classList.add("form-check-input");
     input.type = "checkbox";
-    input.id = "aisfdhiasud";
     input.style.marginRight = "10px";
+
     const label = document.createElement("label");
     label.append(input);
     label.classList.add("form-check-label");
     label.classList.add("dropdown-item");
-    label.innerHTML += "wololo";
+    label.innerHTML += name;
+
     const li = document.createElement("li");
+    li.id = key;
     li.append(label);
-    $('#dropdown-user-list').append(li);
+    textchatDropdownUsers.append(li);
 }
 
 
