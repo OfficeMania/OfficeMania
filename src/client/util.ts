@@ -18,6 +18,7 @@ import { bsWelcomeModal, panelButtonsInteraction, usernameInputWelcome, welcomeM
 import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
 import AnimationData, { createAnimationData } from "./graphic/animation-data";
 import { PlayerData } from "../common/rooms/schema/state";
+import { updateUserList } from "./textchat";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -172,7 +173,10 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 if (sessionId === room.sessionId) {
                     resolve([room, player]);
                 }
-                //onUserUpdate(players);
+
+                //logic for updating playerinfo for textchat
+                playerOnChange(playerData);
+                updateUserList();
             };
 
             /*
@@ -184,11 +188,18 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
             room.state.players.onRemove = (_, sessionId) => {
                 console.log("Remove", sessionId);
                 delete players[sessionId];
+
+                //logic for updating playerinfo for textchat
+                updateUserList();
                 //onUserUpdate(players);
             };
-            /**room.state.players.onChange = (_, sessionId) => {
-                onUserUpdate(players);
-            }*/
+            //room.state.players.onChange = (_, sessionId) => {}
+
+            //any time a player changes anything this happens:
+            //logic for updating playerinfo for textchat
+            room.state.players.forEach((player, sessionId) => {
+                playerOnChange(player);
+            })
 
             /*
              * If the room has any other state that needs to be observed, the
@@ -535,4 +546,18 @@ export function ensureCharacter(value?: string): string {
         value = filenames[0];
     }
     return value;
+}
+
+
+
+//logic for updating playerinfo for textchat
+function playerOnChange(player: PlayerData) {
+    player.onChange = (changes => {
+        console.log(changes);
+        changes.forEach (change => {
+            if (change.field ==="displayName"){
+               updateUserList();
+            }
+        });
+    });
 }

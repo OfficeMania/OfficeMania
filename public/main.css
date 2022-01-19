@@ -712,6 +712,9 @@ body {
     transform: translate(1px, 32px) !important;
     min-width: 300%;
 }
+#user-list div{
+    float: left;
+}
 #chat-list .dropdown-menu {
     min-width: 100%;
 }
@@ -749,4 +752,5 @@ body {
 #textchat-container input {
     width: 1em;
     margin-right: 10px;
+    float: left;
 }
