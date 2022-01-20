@@ -19,6 +19,7 @@ import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
 import AnimationData, { createAnimationData } from "./graphic/animation-data";
 import { PlayerData } from "../common/rooms/schema/state";
 import { textchatPlayerOnChange } from "./textchat";
+import { updateUsers } from "./conference/conference";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -552,4 +553,5 @@ function playerOnChangeFunctions(player: PlayerData) {
     //for updating textchat stuff
     textchatPlayerOnChange(player);
     //for user online list
+    updateUsers();
 }
