@@ -9,9 +9,9 @@ import {
     textchatDropdownChats,
     textchatDropdownUsers,
     textchatDropdownChatsButton,
-    textchatDropdownUsersButton,
     textchatDropdownAddUsers,
     textchatDropdownNewChat,
+    textchatDropdownUsersButton,
 } from "./static";
 import { getOurPlayer, getRoom } from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chatHandler";
@@ -109,12 +109,22 @@ export function initChatListener() {
 
     textchatDropdownAddUsers.addEventListener("click", () => {
         console.log("add");
-        document.getElementsByClassName("dropdown-menu-end")[0].classList.remove("show");
+        const ids: string[] = [];
+        for (let i = 0; i < textchatDropdownUsers.children.length; i++) {
+            // @ts-ignore
+            if(textchatDropdownUsers.children[i].children[0].children[0].checked) {
+                ids.push(textchatDropdownUsers.children[i].id);
+            }
+        }
+        console.log(ids);
+        modifyChat(ids, textchatDropdownChatsButton.getAttribute("data-id"));
+        textchatDropdownUsersButton.click();
     });
 
     textchatDropdownNewChat.addEventListener("click", () => {
         console.log("new");
-        document.getElementsByClassName("dropdown-menu-end")[0].classList.remove("show");
+        modifyChat(["me"]);
+        textchatDropdownUsersButton.click();
     });
     getRoom().onMessage(MessageType.CHAT_UPDATE, (message: string) => onChatUpdate(JSON.parse(message)));
     getRoom().onMessage(MessageType.CHAT_LOG, (message: string) => onMessageLogs(JSON.parse(message)));
@@ -183,9 +193,13 @@ function addMessageToBar(chatMessage: ChatMessage){
 
 
 //for sending the adding/removing command to server
-function modifyChat(whoToAdd: string) {
+function modifyChat(whoToAdd: string[], chatid?: string) {
     //if chat is selected, add to it (even if global, garbage sorting on handler side)
     console.log("not yet implemented");
+    let message: string = whoToAdd.toString();
+    let chatId: string = chatid;
+    console.log(message);
+    getRoom().send(MessageType.CHAT_ADD, {message, chatId})
 }
 
 function updateChatList() {
@@ -284,6 +298,7 @@ function addUserListOption(name: string, key: string) {
     const input = document.createElement("input");
     input.classList.add("form-check-input");
     input.type = "checkbox";
+    input.id = "input-" + key;
     
     let div = document.createElement("div");
     div.innerText = name;

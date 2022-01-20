@@ -703,7 +703,7 @@ body {
     list-style-type: none;
 }
 #user-list label {
-    height: 28px;
+    height: 32px;
 }
 #user-list ul {
     overflow-y: auto;
