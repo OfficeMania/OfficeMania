@@ -232,7 +232,7 @@ function updateChatList() {
     //remove any chats
     for (let i = 0; i < textchatDropdownChats.children.length; i++) {
         if (!chatIds.includes(textchatDropdownChats.children[i].id)){
-            textchatDropdownChats.children[i].remove;
+            textchatDropdownChats.children[i].remove();
             console.log("remove")
             i--;
         }
@@ -279,6 +279,16 @@ function addChatListOption(chat: Chat) {
     const a = document.createElement("a");
     a.innerText = chat.name;
     a.classList.add("dropdown-item");
+
+    if (chats[0].id !== chat.id) {
+        const bin = document.createElement("i");
+        bin.classList.add("fas");
+        bin.classList.add("fa-trash");
+        bin.addEventListener("click", () => {
+            modifyChat(["remove"], chat.id);
+        });
+        a.appendChild(bin); 
+    }
 
     const li = document.createElement("li");
     li.append(a);

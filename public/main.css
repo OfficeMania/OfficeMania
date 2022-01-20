@@ -721,6 +721,16 @@ body {
 #chat-list .dropdown-menu {
     min-width: 100%;
 }
+
+#chat-list i {
+    float: right;
+    margin: 3px;
+}
+
+#chat-list i:hover {
+    cursor: pointer;
+}
+
 #select-textchat{
     float: left;
     width: 80%;
@@ -757,3 +767,4 @@ body {
     margin-right: 10px;
     float: left;
 }
+
