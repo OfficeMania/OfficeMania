@@ -5,7 +5,6 @@ import {
     canSeeEachOther,
     createPlayerAvatar,
     getCameraDeviceId,
-    getChatEnabled,
     getCollisionInfo,
     getCorrectedPlayerCoordinates,
     getMicDeviceId,
@@ -62,9 +61,6 @@ const videoInputSelect = $<HTMLSelectElement>("video-input-select");
 
 const playerOnlineContainer = $<HTMLUListElement>("player-online-container");
 const playerOnlineList = $<HTMLUListElement>("player-online-list");
-
-const chatContainer = $<HTMLDivElement>("chat-container");
-const chatList = $<HTMLDivElement>("chat-list");
 
 const selfUser = new SelfUser(audioBar, videoBar, focusBar);
 const users: User[] = [];
@@ -167,7 +163,6 @@ function onConnectionSuccess() {
     // conference.on(JitsiMeetJSIntern.events.conference.TRACK_AUDIO_LEVEL_CHANGED, (userID, audioLevel) => console.debug(`${userID} - ${audioLevel}`)); //DEBUG
     // conference.on(JitsiMeetJSIntern.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
     // conference.on(JitsiMeetJSIntern.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${conference.getPhoneNumber()} - ${conference.getPhonePin()}`)); //DEBUG //REMOVE
-    conference.on(JitsiMeetJSIntern.events.conference.MESSAGE_RECEIVED, onMessageReceived);
     if (conferenceData().password) {
         conference.join(conferenceData().password);
     } else {
@@ -223,17 +218,6 @@ function onTrack(track, onLocal, onRemote) {
     }
 }
 
-function onMessageReceived(participantId: string, message: string, ts: number) {
-    // console.debug(`participantId: ${participantId}, ts: ${ts}, message: ${message}`); //DEBUG
-    if (!getChatEnabled()) {
-        return;
-    }
-    const chatItem = createChatItem(getUser(participantId), message);
-    if (chatItem) {
-        ensureChatAppend();
-        chatList.append(chatItem);
-    }
-}
 
 function onLocalTrackCreated(track) {
     // console.debug(`Local Track added: ${track}`); //DEBUG
@@ -509,29 +493,6 @@ function setMediaDevices(select: HTMLSelectElement, devices: MediaDeviceInfo[], 
     select.selectedIndex = selectedIndex;
 }
 
-function createChatItem(user: User, message: string): HTMLLIElement {
-    if (!user || !message) {
-        return null;
-    }
-    const chatItem = document.createElement("li");
-    chatItem.classList.add("chat-list-item");
-    chatItem.setAttribute("data-created", "" + new Date().getTime());
-    const messageItem = document.createElement("span");
-    messageItem.classList.add("chat-list-item-message");
-    messageItem.innerText = message;
-    const playerState = document.createElement("div");
-    const player = getPlayerByParticipantId(user.participantId);
-    chatItem.append(createPlayerState(player, playerState, false, false));
-    chatItem.append(messageItem);
-    return chatItem;
-}
-
-function ensureChatAppend() {
-    while (chatList.childElementCount > 10) {
-        chatList.firstChild.remove();
-    }
-}
-
 // Exported Functions
 
 export function isDesktopSharingSupported() {
@@ -641,21 +602,6 @@ export function updateUsers() {
     Object.values(players).forEach(player =>
         playerOnlineList.append(createPlayerState(player, document.createElement("li"), true))
     );
-}
-
-export function updateChat() {
-    if (!getChatEnabled()) {
-        return;
-    }
-    const now: number = new Date().getTime();
-    const children = chatList.children;
-    for (let i = 0; i < children.length; i++) {
-        const child = children[i];
-        const created: number = Number(child.getAttribute("data-created"));
-        if (now - created > 10000) {
-            child.remove();
-        }
-    }
 }
 
 export function toggleShowParticipantsTab(): boolean {
