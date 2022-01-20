@@ -18,7 +18,7 @@ import { bsWelcomeModal, panelButtonsInteraction, usernameInputWelcome, welcomeM
 import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
 import AnimationData, { createAnimationData } from "./graphic/animation-data";
 import { PlayerData } from "../common/rooms/schema/state";
-import { updateUserList } from "./textchat";
+import { textchatPlayerOnChange } from "./textchat";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -175,8 +175,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 }
 
                 //logic for updating playerinfo for textchat
-                playerOnChange(playerData);
-                updateUserList();
+                playerOnChangeFunctions(playerData);
             };
 
             /*
@@ -185,20 +184,18 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
              *
              * See: https://docs.colyseus.io/state/schema/#onremove-instance-key
              */
-            room.state.players.onRemove = (_, sessionId) => {
+            room.state.players.onRemove = (playerData, sessionId) => {
                 console.log("Remove", sessionId);
                 delete players[sessionId];
-
-                //logic for updating playerinfo for textchat
-                updateUserList();
-                //onUserUpdate(players);
+                //trigger onchange when removing player
+                playerData.triggerAll();
             };
             //room.state.players.onChange = (_, sessionId) => {}
 
             //any time a player changes anything this happens:
             //logic for updating playerinfo for textchat
             room.state.players.forEach((player, sessionId) => {
-                playerOnChange(player);
+                playerOnChangeFunctions(player);
             })
 
             /*
@@ -550,13 +547,9 @@ export function ensureCharacter(value?: string): string {
 
 
 
-//logic for updating playerinfo for textchat
-function playerOnChange(player: PlayerData) {
-    player.onChange = (changes => {
-        changes.forEach (change => {
-            if (change.field ==="displayName"){
-               updateUserList();
-            }
-        });
-    });
+//onchange listeners to be added to the players
+function playerOnChangeFunctions(player: PlayerData) {
+    //for updating textchat stuff
+    textchatPlayerOnChange(player);
+    //for user online list
 }

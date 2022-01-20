@@ -131,6 +131,18 @@ export function initChatListener() {
     
 }
 
+export function textchatPlayerOnChange(player: PlayerData) {
+    if(player) {
+        player.onChange = (changes => {
+            changes.forEach (change => {
+                if (change.field ==="displayName"){
+                   updateUserList();
+                }
+            });
+        });
+    }    
+}
+
 //rewrites all the of the clients chats from scratch
 function onChatUpdate(chatDTOs: ChatDTO[]): void {
     //console.debug("chatDTOs:", chatDTOs);
@@ -217,7 +229,7 @@ function updateChatList() {
     }
 }
 
-export function updateUserList() {
+function updateUserList() {
     const uIdList: string[] = [];
 
     for (let i = 0; i < textchatDropdownUsers.children.length; i++) {
@@ -230,11 +242,11 @@ export function updateUserList() {
     getRoom()?.state.players.forEach((value, key) => {
         userIds.push(key);
 
-        if (!uIdList.includes(key) || key === getOurPlayer().roomId) {
+        if (!uIdList.includes(key) && key != getOurPlayer().roomId) {
             console.log("inserting")
             addUserListOption(value.displayName, key);
         }
-        else {
+        else if (uIdList.includes(key)){
             //renaming logic
             textchatDropdownUsers.children[uIdList.indexOf(key)].children[0].children[1].remove();
             
