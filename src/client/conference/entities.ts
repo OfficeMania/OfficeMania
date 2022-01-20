@@ -55,6 +55,7 @@ class VideoContainer {
         this.container.append(this.overlay);
         this.updatePlayerState(undefined);
         this.buttonToggleSize.classList.add("button-video-toggle-size");
+        this.buttonToggleSize.classList.add("btn");
         appendFAIcon(this.buttonToggleSize, "expand-alt");
         this.container.append(this.buttonToggleSize);
     }
