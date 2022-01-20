@@ -702,6 +702,9 @@ body {
 #user-list li {
     list-style-type: none;
 }
+#user-list label {
+    height: 32px;
+}
 #user-list ul {
     overflow-y: auto;
     overflow-x: auto;
@@ -712,9 +715,22 @@ body {
     transform: translate(1px, 32px) !important;
     min-width: 300%;
 }
+#user-list div{
+    float: left;
+}
 #chat-list .dropdown-menu {
     min-width: 100%;
 }
+
+#chat-list i {
+    float: right;
+    margin: 3px;
+}
+
+#chat-list i:hover {
+    cursor: pointer;
+}
+
 #select-textchat{
     float: left;
     width: 80%;
@@ -749,4 +765,6 @@ body {
 #textchat-container input {
     width: 1em;
     margin-right: 10px;
+    float: left;
 }
+

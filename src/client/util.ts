@@ -18,6 +18,8 @@ import { bsWelcomeModal, panelButtonsInteraction, usernameInputWelcome, welcomeM
 import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
 import AnimationData, { createAnimationData } from "./graphic/animation-data";
 import { PlayerData } from "../common/rooms/schema/state";
+import { textchatPlayerOnChange } from "./textchat";
+import { updateUsers } from "./conference/conference";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -172,7 +174,9 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 if (sessionId === room.sessionId) {
                     resolve([room, player]);
                 }
-                //onUserUpdate(players);
+
+                //logic for updating playerinfo for textchat
+                playerOnChangeFunctions(playerData);
             };
 
             /*
@@ -181,14 +185,19 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
              *
              * See: https://docs.colyseus.io/state/schema/#onremove-instance-key
              */
-            room.state.players.onRemove = (_, sessionId) => {
+            room.state.players.onRemove = (playerData, sessionId) => {
                 console.log("Remove", sessionId);
                 delete players[sessionId];
-                //onUserUpdate(players);
+                //trigger onchange when removing player
+                playerData.triggerAll();
             };
-            /**room.state.players.onChange = (_, sessionId) => {
-                onUserUpdate(players);
-            }*/
+            //room.state.players.onChange = (_, sessionId) => {}
+
+            //any time a player changes anything this happens:
+            //logic for updating playerinfo for textchat
+            room.state.players.forEach((player, sessionId) => {
+                playerOnChangeFunctions(player);
+            })
 
             /*
              * If the room has any other state that needs to be observed, the
@@ -535,4 +544,14 @@ export function ensureCharacter(value?: string): string {
         value = filenames[0];
     }
     return value;
+}
+
+
+
+//onchange listeners to be added to the players
+function playerOnChangeFunctions(player: PlayerData) {
+    //for updating textchat stuff
+    textchatPlayerOnChange(player);
+    //for user online list
+    updateUsers();
 }
