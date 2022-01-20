@@ -123,7 +123,14 @@ export function initChatListener() {
 
     textchatDropdownNewChat.addEventListener("click", () => {
         console.log("new");
-        modifyChat(["me"]);
+        const ids: string[] = [];
+        for (let i = 0; i < textchatDropdownUsers.children.length; i++) {
+            // @ts-ignore
+            if(textchatDropdownUsers.children[i].children[0].children[0].checked) {
+                ids.push(textchatDropdownUsers.children[i].id);
+            }
+        }
+        modifyChat(ids);
         textchatDropdownUsersButton.click();
     });
     getRoom().onMessage(MessageType.CHAT_UPDATE, (message: string) => onChatUpdate(JSON.parse(message)));
@@ -193,7 +200,7 @@ function addMessageToBar(chatMessage: ChatMessage){
 
 
 //for sending the adding/removing command to server
-function modifyChat(whoToAdd: string[], chatid?: string) {
+function modifyChat(whoToAdd: string[], chatid: string = "new") {
     //if chat is selected, add to it (even if global, garbage sorting on handler side)
     console.log("not yet implemented");
     let message: string = whoToAdd.toString();
