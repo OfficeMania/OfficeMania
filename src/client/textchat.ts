@@ -5,8 +5,6 @@ import {
     textchatBar,
     textchatButton,
     textchatContainer,
-    textchatUsers,
-    textchatSelect,
     textchatSendButton,
     textchatDropdownChats,
     textchatDropdownUsers,
@@ -102,7 +100,7 @@ export function initChatListener() {
     });
 
     textchatSendButton.addEventListener("click", () => {
-        sendMessage(textchatArea.value, textchatSelect.selectedOptions[0].value);
+        sendMessage(textchatArea.value, textchatDropdownChatsButton.getAttribute("data-id"));
         //console.log(textchatSelect.selectedOptions[0].innerText)
         textchatArea.value = "";
     });
@@ -118,17 +116,11 @@ export function initChatListener() {
         console.log("new");
         document.getElementsByClassName("dropdown-menu-end")[0].classList.remove("show");
     });
-    //getRoom().state.players.forEach(changeListener);
     getRoom().onMessage(MessageType.CHAT_UPDATE, (message: string) => onChatUpdate(JSON.parse(message)));
     getRoom().onMessage(MessageType.CHAT_LOG, (message: string) => onMessageLogs(JSON.parse(message)));
     getRoom().send(MessageType.CHAT_UPDATE);
     getRoom().send(MessageType.CHAT_LOG);
     getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => onMessage(message));
-    //getRoom().state.players.onAdd = (player,key) => updateUserList;
-    //getRoom().state.players.onRemove = (player, key) => updateUserList;
-
-
-    
 }
 
 export function textchatPlayerOnChange(player: PlayerData) {
@@ -165,7 +157,7 @@ function onMessage(chatMessage: ChatMessage) {
     const chat: Chat = getChatById(chatId);
     chat.messages.push(chatMessage);
 
-    if (textchatSelect.selectedOptions[0].value === chatMessage.chatId) {
+    if (textchatDropdownChatsButton.getAttribute("data-id") === chatMessage.chatId) {
         addMessageToBar(chatMessage);
     }
 
@@ -193,10 +185,7 @@ function addMessageToBar(chatMessage: ChatMessage){
 //for sending the adding/removing command to server
 function modifyChat(whoToAdd: string) {
     //if chat is selected, add to it (even if global, garbage sorting on handler side)
-    //console.log(whoToAdd);
-    var chatId: string = textchatSelect.selectedOptions[0].value;
-    var message: string = whoToAdd;
-    getRoom().send(MessageType.CHAT_ADD,{ message, chatId });
+    console.log("not yet implemented");
 }
 
 function updateChatList() {
@@ -331,7 +320,7 @@ function clearTextchatBar() {
 
 
 
-
+/*
 //update user list in select
 function openChatUsers() {
     while (textchatUsers.firstChild) {
@@ -433,6 +422,6 @@ function addEmptyOption(name: string, id: string) {
         textchatSelect.append(option);
 }
 
-
+*/
 
 
