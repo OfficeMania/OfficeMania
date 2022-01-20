@@ -107,8 +107,7 @@ export function initChatListener() {
         textchatArea.value = "";
     });
 
-    textchatDropdownUsersButton.addEventListener("click", updateUserList);
-
+    updateUserList();
 
     textchatDropdownAddUsers.addEventListener("click", () => {
         console.log("add");
@@ -227,10 +226,11 @@ export function updateUserList() {
 
     const userIds: string[] = []
 
-    getRoom().state.players.forEach((value, key) => {
+    //early in loading cycle, getroom and the state are not yet fetched, so this need to run conditionally
+    getRoom()?.state.players.forEach((value, key) => {
         userIds.push(key);
 
-        if (!uIdList.includes(key)) {
+        if (!uIdList.includes(key) || key === getOurPlayer().roomId) {
             console.log("inserting")
             addUserListOption(value.displayName, key);
         }
@@ -243,7 +243,6 @@ export function updateUserList() {
             textchatDropdownUsers.children[uIdList.indexOf(key)].children[0].append(div);
         }
     });
-
 
     for (let i = 0; i < textchatDropdownUsers.children.length; i++) {
         if (!userIds.includes(textchatDropdownUsers.children[i].id)) {

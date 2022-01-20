@@ -702,6 +702,9 @@ body {
 #user-list li {
     list-style-type: none;
 }
+#user-list label {
+    height: 28px;
+}
 #user-list ul {
     overflow-y: auto;
     overflow-x: auto;

@@ -553,7 +553,6 @@ export function ensureCharacter(value?: string): string {
 //logic for updating playerinfo for textchat
 function playerOnChange(player: PlayerData) {
     player.onChange = (changes => {
-        console.log(changes);
         changes.forEach (change => {
             if (change.field ==="displayName"){
                updateUserList();
