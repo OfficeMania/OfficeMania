@@ -8,6 +8,7 @@
 ```
 
 Welcome to the **OfficeMania** project!
+#
 
 ## Description
 
@@ -20,7 +21,7 @@ In the following you can find a summary of all dependencies we used.
 If you want to host your own instance of OfficeMania you can do so by following the instuctions for the installation on native Linux or on the Windows Subsystem for Linux under Windows 11.
 
 #
-## Installation on native Ubuntu Computer/Server
+## Installation on native Ubuntu
 
 
 - Install Nodejs and typescript:
