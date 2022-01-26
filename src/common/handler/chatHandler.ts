@@ -179,11 +179,32 @@ export class ChatHandler implements Handler {
                 getClientsByUserId(p.id, this.room).forEach((client) => {
                     this.onChatUpdate(client);
                 });
-            })
-            
+            });
+            console.log(newChat.id);
         }
         else if (chatMessage.message === "remove") {
             //remove client from chat
+            let id = getUserId(client);
+            let chat: Chat = this.byChatId(chatMessage.chatId);
+            console.log(chat.id)
+            chat.users.splice(chat.users.indexOf(id), 1);
+            updateChatName(chat, this.room);
+            const message = "User left the Chat.";
+            let chatId = chatMessage.chatId;
+            let mess = makeMessage(this.room, client, { message, chatId })
+            chat.messages.push(mess);
+            //check if chat has any participants left
+            if(chat.users.length === 0) {
+                this.chats.splice(this.chats.indexOf(chat), 1);
+                //console.log(this.chats);
+            }
+            this.room.clients
+            .filter(client => chat.users.includes(getUserId(client)))
+            .forEach(client => {
+                client.send(MessageType.CHAT_SEND, mess);
+                this.onChatUpdate(client);
+            });
+            this.onChatUpdate(client);
         }
         else {
             //add to existing
@@ -312,7 +333,7 @@ export class ChatHandler implements Handler {
     onUpdateUsername(client: Client, name: string) {
         console.log("hello there name has changed", client.sessionId, name);
         this.chats.forEach(chat => {
-            if (chat.users.includes(getUserId(client))) {
+            if (chat.users.includes(getUserId(client)) && chat.id !== this.globalChat.id) {
                 updateChatName(chat, this.room);
                 this.room.clients.filter(client => chat.users.includes(getUserId(client))).forEach(client => {
                     this.onChatUpdate(client);
