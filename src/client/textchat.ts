@@ -118,7 +118,7 @@ export function initChatListener() {
         }
         console.log(ids);
         modifyChat(ids, textchatDropdownChatsButton.getAttribute("data-id"));
-        textchatDropdownUsersButton.click();
+        unCheck();
     });
 
     textchatDropdownNewChat.addEventListener("click", () => {
@@ -131,7 +131,7 @@ export function initChatListener() {
             }
         }
         modifyChat(ids);
-        textchatDropdownUsersButton.click();
+        unCheck();
     });
     getRoom().onMessage(MessageType.CHAT_UPDATE, (message: string) => onChatUpdate(JSON.parse(message)));
     getRoom().onMessage(MessageType.CHAT_LOG, (message: string) => onMessageLogs(JSON.parse(message)));
@@ -343,6 +343,11 @@ function clearTextchatBar() {
     while (textchatBar.firstChild) {
         textchatBar.firstChild.remove();
     }
+}
+
+function unCheck() {
+    textchatDropdownUsersButton.click();
+    $(":checkbox").prop("checked", false);
 }
 
 
