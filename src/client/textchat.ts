@@ -146,7 +146,6 @@ export function textchatPlayerOnChange(player: PlayerData) {
             changes.forEach (change => {
                 if (change.field ==="displayName"){
                    updateUserList();
-                   updateChatList();
                 }
             });
         });
@@ -211,9 +210,6 @@ function modifyChat(whoToAdd: string[], chatid: string = "new") {
 }
 
 function updateChatList() {
-    if (!chats[0]) {
-        return;
-    }
     if (!textchatDropdownChatsButton.getAttribute("data-id")) {
         updateChatListButton(chats[0]);
     }
@@ -238,6 +234,9 @@ function updateChatList() {
         console.log(chat.name)
         // @ts-ignore
         textchatDropdownChats.children[a].children[0].children[0].innerText = chat.name;
+        if(chat.id === textchatDropdownChatsButton.getAttribute("data-id")) {
+            updateChatListButton(chat);
+        }
     });
 
     //remove any chats
