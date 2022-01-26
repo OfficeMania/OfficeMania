@@ -90,10 +90,6 @@ export class ChatHandler implements Handler {
         const chatId: string = chatMessage.chatId || this.globalChat.id;
         console.debug("chatId:", chatId);
         const chat: Chat = this.byChatId(chatId);
-        if (!chat) {
-            //TODO
-            return;
-        }
 
         const userId: string = getUserId(client);
         if (!chat.users.includes(userId)) {
@@ -140,7 +136,9 @@ export class ChatHandler implements Handler {
     }
 
     onAdd(client: Client, chatMessage: ChatMessage) {
-        //console.log(chatMessage);
+        console.log(chatMessage);
+
+        /*
         let ourPlayerKey: string = getUserId(client);
         let ourPlayer: PlayerData;
         let otherPlayerKey: string = chatMessage.message;
@@ -225,6 +223,7 @@ export class ChatHandler implements Handler {
                 });
             }
         }
+        */
     }
 }
 
