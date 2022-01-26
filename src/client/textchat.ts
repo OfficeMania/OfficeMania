@@ -146,6 +146,7 @@ export function textchatPlayerOnChange(player: PlayerData) {
             changes.forEach (change => {
                 if (change.field ==="displayName"){
                    updateUserList();
+                   updateChatList();
                 }
             });
         });
@@ -210,16 +211,22 @@ function modifyChat(whoToAdd: string[], chatid: string = "new") {
 }
 
 function updateChatList() {
+    if (!chats[0]) {
+        return;
+    }
     if (!textchatDropdownChatsButton.getAttribute("data-id")) {
         updateChatListButton(chats[0]);
     }
     //add any chats
+
+    //all chats ids that are displayed
     const chatList: string[] = [];
 
     for (let i = 0; i < textchatDropdownChats.children.length; i++) {
         chatList.push(textchatDropdownChats.children[i].id);
     }
     //console.log(chatList);
+    //all chatids that should be displayed
     const chatIds: string[] = [];
 
     chats.forEach(chat => {
@@ -227,6 +234,10 @@ function updateChatList() {
         if (!chatList.includes(chat.id)) {
             addChatListOption(chat);
         }
+        let a: number = chatIds.indexOf(chat.id);
+        console.log(chat.name)
+        // @ts-ignore
+        textchatDropdownChats.children[a].children[0].children[0].innerText = chat.name;
     });
 
     //remove any chats
@@ -277,8 +288,12 @@ function updateUserList() {
 
 function addChatListOption(chat: Chat) {
     const a = document.createElement("a");
-    a.innerText = chat.name;
+    //a.innerText = chat.name;
     a.classList.add("dropdown-item");
+
+    const i = document.createElement("a");
+    i.innerText = chat.name;
+    a.appendChild(i);
 
     if (chats[0].id !== chat.id) {
         const bin = document.createElement("i");
@@ -349,6 +364,7 @@ function unCheck() {
     textchatDropdownUsersButton.click();
     $(":checkbox").prop("checked", false);
 }
+
 
 
 /**

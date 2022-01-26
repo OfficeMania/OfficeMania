@@ -314,6 +314,7 @@ export function setDisplayName(value: string): void {
 
 export function updateDisplayName(value?: string): void {
     getRoom().send(MessageType.UPDATE_DISPLAY_NAME, value);
+    getRoom().send(MessageType.CHAT_UPD_DISPLAYNAME, value);
 }
 
 // Local Get/Set
