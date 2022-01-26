@@ -21,6 +21,7 @@ import {
     yellowButton,
     greenButton,
     blueButton,
+    blackButton,
     whiteboardPanel
 } from "../static";
 import {ArraySchema} from "@colyseus/schema";
@@ -96,7 +97,10 @@ export class Whiteboard extends Interactive{
         this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
         this.draw(7);
     }
-
+    blackPressed = () => {
+        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
+        this.draw(0);
+    }
 
 
     resized = () => this.resize(this);
@@ -152,6 +156,7 @@ export class Whiteboard extends Interactive{
         yellowButton.removeEventListener("click", this.yellowPressed);
         greenButton.removeEventListener("click", this.greenPressed);
         blueButton.removeEventListener("click", this.bluePressed);
+        blackButton.removeEventListener("click", this.blackPressed);
 
 
         window.removeEventListener('resize', this.resized);
@@ -196,6 +201,9 @@ export class Whiteboard extends Interactive{
         blueButton.style.visibility = "hidden";
         blueButton.setAttribute("aria-label", "");
         blueButton.innerHTML ="";
+        blackButton.style.visibility = "hidden";
+        blackButton.setAttribute("aria-label", "");
+        blackButton.innerHTML ="";
         whiteboardPanel.style.visibility = "hidden";
 
         checkInputMode()
@@ -226,6 +234,7 @@ export class Whiteboard extends Interactive{
         yellowButton.addEventListener("click", this.yellowPressed);
         greenButton.addEventListener("click", this.greenPressed);
         blueButton.addEventListener("click", this.bluePressed);
+        blackButton.addEventListener("click", this.blackPressed);
 
 
         //size changed
@@ -286,6 +295,11 @@ export class Whiteboard extends Interactive{
         blueButton.innerHTML = "<em></em>"
         blueButton.style.visibility = "visible";
         blueButton.style.backgroundColor = "blue";
+
+        blackButton.setAttribute("aria-label", "Draw");
+        blackButton.innerHTML = "<em></em>"
+        blackButton.style.visibility = "visible";
+        blackButton.style.backgroundColor = "black";
 
         whiteboardPanel.style.visibility = "vsible";
 

@@ -54,4 +54,5 @@ export const orangeButton = $<HTMLButtonElement>("button-whiteboard-orange");
 export const yellowButton = $<HTMLButtonElement>("button-whiteboard-yellow");
 export const greenButton = $<HTMLButtonElement>("button-whiteboard-green");
 export const blueButton = $<HTMLButtonElement>("button-whiteboard-blue");
+export const blackButton = $<HTMLButtonElement>("button-whiteboard-black");
 export const whiteboardPanel = $<HTMLDivElement>("interactive-bar-whiteboard");
