@@ -211,7 +211,7 @@ function modifyChat(whoToAdd: string[], chatid: string = "new") {
 
 function updateChatList() {
     if (!textchatDropdownChatsButton.getAttribute("data-id")) {
-        updateChatListButton(chats[0]);
+        updateChatListButton(chats[0].id);
     }
     //add any chats
 
@@ -235,7 +235,7 @@ function updateChatList() {
         // @ts-ignore
         textchatDropdownChats.children[a].children[0].children[0].innerText = chat.name;
         if(chat.id === textchatDropdownChatsButton.getAttribute("data-id")) {
-            updateChatListButton(chat);
+            updateChatListButton(chat.id);
         }
     });
 
@@ -314,7 +314,7 @@ function addChatListOption(chat: Chat) {
             return;
         }
 
-        updateChatListButton(chat);
+        updateChatListButton(chat.id);
 
         clearTextchatBar();
          
@@ -347,9 +347,15 @@ function addUserListOption(name: string, key: string) {
     textchatDropdownUsers.append(li);
 }
 
-function updateChatListButton(chat: Chat) {
-    textchatDropdownChatsButton.innerText = chat.name;
-    textchatDropdownChatsButton.setAttribute("data-id", chat.id);
+function updateChatListButton(id:string) {
+    let a = "";
+    chats.forEach(chat => {
+        if (chat.id === id) {
+            a = chat.name;
+        }
+    });
+    textchatDropdownChatsButton.innerText = a;
+    textchatDropdownChatsButton.setAttribute("data-id", id);
     
 }
 
