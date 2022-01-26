@@ -8,12 +8,10 @@
 ```
 
 Welcome to the **OfficeMania** project! 
-
-SCHICKER SCEENSHOT SOLL HIER HIN UND ALLES EIN WENIG AUFLOCKERN
 #
 ## Description
 
-OfficeMania is an interactive open-source meeting soloution made for you and your team! Talk to people just as in real life, hold private meetings with interactive elements and play some pong. Nearly everything is possible.
+OfficeMania is an interactive open-source meeting soloution made for you and your team! Talk to people just as in real life, hold private meetings with interactive whiteboards or play some pong. Nearly everything is possible.
 
 In the following you can find a summary of all dependencies we used.
 
@@ -25,12 +23,12 @@ If you want to host your own instance of OfficeMania you can do so by following 
 #
 ## Installation
 
-The installation guide for self hosting can be found in the [INSTALLATION.md](INSTALLATION.md)
+The installation guide for self hosting can be found in the [INSTALLATION.md](INSTALLATION.md).
 
 #
 ## Map customization
 
-The guide for customizing or replacing the default map can be found in the [MODIFYMAP.md](MODIFYMAP.md)
+The guide for customizing or replacing the default map can be found in the [MODIFYMAP.md](MODIFYMAP.md).
 
 
 #

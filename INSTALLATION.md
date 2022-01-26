@@ -41,8 +41,6 @@ Here you can find installation instuctions for native Ubuntu systems and for Win
  
 - Done! On http://localhost:3000/ you can find a running instance of OfficeMania.
 
-<br>
-
 #
 
 ## Installation in WSL (Windows Subsystem for Linux) with VSCode and git over HTTPS
@@ -155,8 +153,6 @@ $ npm start
 ```
 
 from the project folder. To check whether the installation was successful open http://localhost:3000/ and discover the world of OfficeMania!
-
-<br>
 
 #
 
