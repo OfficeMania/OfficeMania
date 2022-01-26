@@ -171,9 +171,8 @@ function onMessageLogs(chatMessages: ChatMessage[]): void {
 //write message into chat object, update messagebar if it is selected
 function onMessage(chatMessage: ChatMessage) {
     const chatId: string = chatMessage.chatId;
-    const chat: Chat = getChatById(chatId);
+    const chat: Chat = getChatById(chatMessage.chatId);
     chat.messages.push(chatMessage);
-
     if (textchatDropdownChatsButton.getAttribute("data-id") === chatMessage.chatId) {
         addMessageToBar(chatMessage);
     }
