@@ -1,25 +1,34 @@
-import { Client } from "colyseus.js";
+import { Client, Room } from "colyseus.js";
 import { TILE_SIZE } from "./player";
 import {
+    areWeLoggedIn,
     createPlayerAvatar,
     getCharacter,
     getCurrentVersion,
+    getDisplayName,
     getUsername,
     InitState,
     InputMode,
     joinAndSync,
     loadCharacter,
+    loadUser,
     PlayerRecord,
     removeChildren,
     setCharacter,
     setClient,
     setCollisionInfo,
     setCurrentVersion,
+    setDisplayName,
+    setLocalCharacter,
+    setLocalDisplayName,
     setMapInfo,
     setOurPlayer,
     setPlayers,
     setRoom,
     setUsername,
+    updateCharacter,
+    updateDisplayName,
+    updateUsername,
 } from "./util";
 import { convertMapData, drawMap, fillSolidInfos, MapInfo, solidInfo } from "./map";
 import {
@@ -46,12 +55,16 @@ import { drawPlayers } from "./draw-player";
 import {
     background,
     backpackCanvas,
+    bsWelcomeModal,
     camButton,
     canvas,
     characterPreview,
     characterSelect,
+    displayNameInput,
     doors,
     interactiveCanvas,
+    loginButton,
+    logoutButton,
     muteButton,
     settingsApplyButton,
     settingsButton,
@@ -65,11 +78,13 @@ import {
     welcomeModal,
     welcomeOkButton,
 } from "./static";
-import { updateDoors } from "./interactive/door";
+import { sendKnockNotification, updateDoors } from "./interactive/door";
 import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 import { getInFocus, initChatListener } from "./textchat";
 import { Backpack } from "./backpack";
+import { MessageType } from "../common/util";
+import { State } from "../common";
 
 export const characters: { [key: string]: AnimatedSpriteSheet } = {};
 export const START_POSITION_X = 5;
@@ -98,6 +113,9 @@ function toggleMute(type: string) {
 
 // Settings
 
+loginButton.addEventListener("click", () => login());
+logoutButton.addEventListener("click", () => logout());
+
 settingsButton.addEventListener("click", () => onSettingsOpen());
 usersButton.addEventListener("click", () => toggleShowParticipantsTab());
 
@@ -120,7 +138,7 @@ export function checkInputMode() {
         setInputMode(InputMode.INTERACTION);
     } else if (!backpackCanvas.style.visibility.match(/hidden/)) {
         setInputMode(InputMode.BACKPACK);
-    }else if (getInFocus()) {
+    } else if (getInFocus()) {
         setInputMode(InputMode.IGNORE);
     } else {
         setInputMode(InputMode.NORMAL);
@@ -128,8 +146,19 @@ export function checkInputMode() {
     //console.log(getInputMode());
 }
 
+function login() {
+    window.location.href = "/auth/login";
+}
+
+function logout() {
+    window.location.href = "/auth/logout";
+}
+
 function checkValidSettings() {
     let valid = checkValidUsernameInput();
+    if (!checkValidDisplayNameInput()) {
+        valid = false;
+    }
     if (!checkValidCharacterSelect()) {
         valid = false;
     }
@@ -138,9 +167,25 @@ function checkValidSettings() {
 }
 
 function checkValidUsernameInput(): boolean {
-    const username = usernameInput.value;
-    const valid = !!username.match(/^.{0,20}$/);
+    const value: string = usernameInput.value;
+    const disabled: boolean = usernameInput.disabled;
+    if (disabled || !value || value === "") {
+        displayNameInput.style.color = "red";
+        return disabled;
+    }
+    const valid = !!value.match(/^.{0,20}$/);
     usernameInput.style.color = valid ? null : "red";
+    return valid;
+}
+
+function checkValidDisplayNameInput(): boolean {
+    const value: string = displayNameInput.value;
+    if (!value || value === "") {
+        displayNameInput.style.color = null;
+        return true;
+    }
+    const valid = !!value.match(/^.{0,20}$/);
+    displayNameInput.style.color = valid ? null : "red";
     return valid;
 }
 
@@ -155,19 +200,27 @@ usernameInput.addEventListener("keydown", () => checkValidSettings());
 usernameInput.addEventListener("paste", () => checkValidSettings());
 usernameInput.addEventListener("input", () => checkValidSettings());
 
+displayNameInput.addEventListener("change", () => checkValidSettings());
+displayNameInput.addEventListener("keydown", () => checkValidSettings());
+displayNameInput.addEventListener("paste", () => checkValidSettings());
+displayNameInput.addEventListener("input", () => checkValidSettings());
+
 characterSelect.addEventListener("change", () => checkValidSettings());
 
-let getUsernameIntern: () => string = () => getUsername();
-let getCharacterIntern: () => string = () => getCharacter();
-
 function loadUsernameSettings() {
-    if (getUsernameIntern) {
-        usernameInput.value = getUsernameIntern();
+    if (areWeLoggedIn()) {
+        usernameInput.value = getUsername();
+        usernameInput.style.color = null;
         usernameInput.disabled = false;
     } else {
-        usernameInput.value = "";
+        usernameInput.value = "Not Logged In";
+        usernameInput.style.color = "red";
         usernameInput.disabled = true;
     }
+}
+
+function loadDisplayNameSettings() {
+    displayNameInput.value = getDisplayName();
 }
 
 function convertCharacterName(key: string) {
@@ -177,11 +230,11 @@ function convertCharacterName(key: string) {
 function loadCharacterSettings() {
     if (characters) {
         removeChildren(characterSelect);
-        const current = getCharacterIntern?.();
+        const character: string = getCharacter();
         let selectedIndex = -1;
         let counter = 0;
         for (const key of Object.keys(characters)) {
-            if (current && key === current) {
+            if (character && key === character) {
                 selectedIndex = counter;
             }
             counter++;
@@ -209,31 +262,46 @@ function onSettingsOpen() {
 
 function loadSettings() {
     loadUsernameSettings();
+    loadDisplayNameSettings();
     loadCharacterSettings();
     loadConferenceSettings().catch(console.error);
     checkValidSettings();
 }
 
-function applySettings() {
-    if (usernameInput.value) {
-        setUsername(usernameInput.value);
+function saveUsernameSettings() {
+    if (!usernameInput.disabled && usernameInput.value) {
+        updateUsername(usernameInput.value);
     }
+}
+
+function saveDisplayNameSettings() {
+    if (displayNameInput.value) {
+        updateDisplayName(displayNameInput.value);
+    }
+}
+
+function saveCharacterSettings() {
     if (characterSelect.value) {
-        setCharacter(characterSelect.value);
+        updateCharacter(characterSelect.value);
     }
+}
+
+function applySettings() {
+    saveUsernameSettings();
+    saveDisplayNameSettings();
+    saveCharacterSettings();
     applyConferenceSettings();
 }
 
 function applySettingsWelcome() {
     if (usernameInputWelcome.value) {
-        setUsername(usernameInputWelcome.value);
+        updateDisplayName(usernameInputWelcome.value);
     }
     setInputMode(InputMode.NORMAL);
 }
 
 function showWelcomeScreen() {
-    // @ts-ignore
-    $("#welcome-modal").modal();
+    bsWelcomeModal.show();
 }
 
 function checkWelcomeScreen() {
@@ -242,6 +310,32 @@ function checkWelcomeScreen() {
         showWelcomeScreen();
     }
     setCurrentVersion(version);
+}
+
+function onUsernameUpdate(username: string): void {
+    setUsername(username);
+}
+
+function onDisplayNameUpdate(displayName: string): void {
+    setDisplayName(displayName);
+    if (!areWeLoggedIn()) {
+        setLocalDisplayName(displayName);
+    }
+}
+
+function onCharacterUpdate(character: string): void {
+    setCharacter(character);
+    if (!areWeLoggedIn()) {
+        setLocalCharacter(character);
+    }
+}
+
+function setupRoomListener(room: Room<State>) {
+    room.onMessage(MessageType.UPDATE_USERNAME, onUsernameUpdate);
+    room.onMessage(MessageType.UPDATE_DISPLAY_NAME, onDisplayNameUpdate);
+    room.onMessage(MessageType.UPDATE_CHARACTER, onCharacterUpdate);
+    //if someone knocks on a door
+    room.onMessage(MessageType.DOOR_NOTIFICATION, (message: string) => sendKnockNotification());
 }
 
 // async is necessary here, because we use 'await' to resolve the promises
@@ -268,6 +362,11 @@ async function main() {
      */
     const [room, ourPlayer]: InitState = await joinAndSync(client, players);
     setRoom(room);
+    setOurPlayer(ourPlayer);
+    setupRoomListener(room);
+    const loggedIn: boolean = areWeLoggedIn();
+    loginButton.hidden = loggedIn;
+    logoutButton.hidden = !loggedIn;
 
     /*
      * Then, we wait for our map to load
@@ -299,22 +398,22 @@ async function main() {
     //i guess it should not be here but i don't know where it should be
     ourPlayer.backpack = new Backpack();
 
-
-    setOurPlayer(ourPlayer);
+    //ask for permission to send notifications
+    if("Notification" in window) {
+        window.Notification.requestPermission();
+    }
 
     checkWelcomeScreen();
-
-    getUsernameIntern = () => ourPlayer.name;
-    getCharacterIntern = () => ourPlayer.character;
 
     //INITIATE CHAT
 
     initChatListener();
 
     //loads all the character information
+    loadUser();
     await loadCharacter();
     checkInputMode();
-    
+
     drawMap(currentMap);
 
     let collisionInfo: solidInfo[][] = fillSolidInfos(currentMap);
@@ -363,7 +462,7 @@ async function main() {
 
     function loop(now: number) {
         ctx.clearRect(0, 0, width, height);
-        
+
         //update width and height
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;

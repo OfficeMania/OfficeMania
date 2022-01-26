@@ -1,6 +1,6 @@
 import { v4 as uuid4 } from "uuid";
 
-export const KEY_USERNAME = "username";
+export const KEY_DISPLAY_NAME = "displayName";
 export const KEY_CHARACTER = "character";
 export const KEY_MIC_DEVICE_ID = "micDeviceId";
 export const KEY_SPEAKER_DEVICE_ID = "speakerDeviceId";
@@ -26,11 +26,14 @@ export enum MessageType {
     DOOR_NEW = "door-new",
     DOOR_LOCK = "door-lock",
     DOOR_UNLOCK = "door-unlock",
+    DOOR_KNOCK = "door-knock",
+    DOOR_NOTIFICATION = "door-notification",
     // PlayerHandler
     MOVE = "move",
     SYNC = "sync",
     UPDATE_CHARACTER = "updateCharacter",
     UPDATE_USERNAME = "updateUsername",
+    UPDATE_DISPLAY_NAME = "updateDisplayName",
     UPDATE_PARTICIPANT_ID = "updateParticipantId",
     // PongHandler
     PONG_MOVE = "pongMove",
@@ -91,4 +94,28 @@ export class TaskExecutor<T> {
         }
         return task();
     }
+}
+
+export function literallyUndefined(value: string): boolean {
+    return !value || value === "undefined";
+}
+
+export function checkUsername(value: string): string {
+    return value.slice(0, 20);
+}
+
+export function checkDisplayName(value?: string): string | undefined {
+    return value?.slice(0, 20);
+}
+
+export function ensureUserId(value?: string): string {
+    return value || "undefined";
+}
+
+export function ensureDisplayName(value?: string): string {
+    return value || "Jimmy";
+}
+
+export function ensureCharacter(value?: string): string {
+    return value || "Adam_48x48.png"; //TODO This needs to be done from the server, because characters could change
 }

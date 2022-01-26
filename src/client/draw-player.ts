@@ -129,10 +129,10 @@ function drawPlayer(
     context.font = "18px Arial";
     context.textAlign = "center";
     // Draw Player Name Box
-    const textMetrics = context.measureText(player.name);
+    const textMetrics = context.measureText(player.displayName);
     context.fillStyle = "rgba(100, 100, 100, 0.5)";
     context.fillRect(playerX - textMetrics.width / 2 + 20, playerY - 4, textMetrics.width + 8, 24);
     // Draw Player Name
     context.fillStyle = "rgba(255, 255, 255, 1)";
-    context.fillText(player.name, playerX + 24, playerY + 12);
+    context.fillText(player.displayName, playerX + 24, playerY + 12);
 }

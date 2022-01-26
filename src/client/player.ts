@@ -22,7 +22,8 @@ export var PLAYER_COLORS = ["red", "blue", "green", "yellow", "black"];
 export interface Player {
     userId: string; // user id logged in with
     roomId: string; //players id in the room
-    name: string; //players name
+    username: string; //players username
+    displayName: string; //players display name
     participantId: string; //id of the jitsi participant
     character: string; //the name of the character sprite
     positionX: number; //posX on the Map

@@ -5,7 +5,7 @@ import { generateUUIDv4 } from "../util";
 import { PongHandler } from "../handler/ponghandler";
 import { Handler } from "../handler/handler";
 import { DoorHandler } from "../handler/doorhandler";
-import { PlayerHandler } from "../handler/playerhandler";
+import { AuthData, PlayerHandler } from "../handler/playerhandler";
 import { WhiteboardHandler } from "../handler/whiteboardhandler";
 import { TodoListHandler } from "../handler/todoListhandler";
 import { ChessHandler } from "../handler/chesshandler";
@@ -13,6 +13,7 @@ import { MachineHandler } from "../handler/machinehandler";
 import { NotesHandler } from "../handler/noteshandler";
 import { ChatHandler } from "../handler/chatHandler";
 import http from "http";
+import User, { findUserById } from "../database/entities/user";
 
 const path = require("path");
 
@@ -62,20 +63,31 @@ export class TURoom extends Room<State> {
         handlers.forEach(handler => handler.onCreate(options));
     }
 
-    onAuth(client: Client, options: any, req: http.IncomingMessage) {
+    async onAuth(client: Client, options: any, req: http.IncomingMessage): Promise<AuthData> {
         const session: { passport: { user: string } } = req["session"];
         if (!session) {
-            return "undefined";
+            return {};
         }
         const userId: string = session?.passport?.user;
         if (!userId) {
-            return "undefined";
+            return {};
         }
-        return userId;
+        const user: User = await findUserById(userId);
+        if (!user) {
+            return {};
+        }
+        return {
+            userSettings: {
+                id: user.getId(),
+                username: user.getUsername(),
+                displayName: user.getDisplayName(),
+                character: user.getCharacter(),
+            },
+        };
     }
 
-    onJoin(client: Client, options: any, auth: any) {
-        client.userData = { id: auth as string };
+    onJoin(client: Client, options: any, auth: AuthData) {
+        client.userData = auth;
         handlers.forEach(handler => handler.onJoin(client));
     }
 

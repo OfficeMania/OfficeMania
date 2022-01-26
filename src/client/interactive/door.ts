@@ -7,7 +7,6 @@ import { MessageType } from "../../common/util";
 import { doors, interactiveCanvas } from "../static";
 import { getPlayers, PlayerRecord } from "../util";
 import { Player } from "../player";
-import { sendMessage } from "../textchat";
 import { checkInputMode } from "../main";
 import { setInputMode } from "../input";
 
@@ -18,6 +17,22 @@ export enum DoorDirection {
     SOUTH,
     WEST,
     ALWAYS_OPEN,
+}
+
+export function sendKnockNotification() {
+    //TODO make Notification beautiful
+    if (!("Notification" in window)) {
+      console.warn("This browser does not support desktop notification");
+    }else if (window.Notification.permission === "granted") {
+        new window.Notification("klopf klopf");
+    } else if (window.Notification.permission !== "denied") {
+        //we send even though the person doesnt wqant to get notifications
+        window.Notification.requestPermission(function (permission) {
+            if (permission === "granted") {
+              new window.Notification("klopf klopf");
+            }
+          });
+    }
 }
 
 export class Door extends Interactive {
@@ -166,8 +181,7 @@ export class Door extends Interactive {
         iCtx.fillRect(5, 5, this.canvas.width - 10, this.canvas.height - 10);
 
         iCtx.fillStyle = "black";
-        //TODO change font
-        iCtx.font = "50px MobileFont"; 
+        iCtx.font = "50px Comic Sans"; 
         iCtx.lineWidth = 3;
         iCtx.fillText("You cannot close a door", 100, 100);
         iCtx.fillText("that is supossed to be open all the time", 100, 150);
@@ -202,14 +216,13 @@ export class Door extends Interactive {
         const callPlayers: string[] = [];
         const players: PlayerRecord = getPlayers();
         for (const player of Object.values(players)) {
-            //we dont want to send the server a message if its just us
+            //if player is in the room and the player isn't us
             if (this.checkRoom(player, roomId) && player.roomId !== id) {
-                callPlayers.push(player.participantId);
+                callPlayers.push(player.roomId);
             }
         }
         
-        //TODO ID for chat
-        sendMessage("lass mich rein", null);
+        this.room.send(MessageType.DOOR_KNOCK, callPlayers);
     }
 
     checkRoom(player: Player, roomId: String): boolean {
@@ -251,7 +264,6 @@ export class Door extends Interactive {
         return collisionInfo[roomX][roomY].roomId;
     }
 
-    //TODO: you cann lock as much doors as you want
     startInteraction(playerX: number, playerY: number, playerId: string) {
         const isVertical: boolean = this.direction === DoorDirection.NORTH || this.direction === DoorDirection.SOUTH;
         const isBigger: boolean = this.direction === DoorDirection.EAST || this.direction === DoorDirection.SOUTH;

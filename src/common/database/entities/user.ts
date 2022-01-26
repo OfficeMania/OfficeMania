@@ -1,9 +1,9 @@
 import { DataTypes, Model } from "sequelize";
-import { getEntity, sequelize } from "./database";
+import { getEntity, sequelize } from "../database";
 import { compareSync, hashSync } from "bcrypt";
-import { BCRYPT_SALT_ROUNDS, PASSWORD_SECRET } from "./config";
 import CryptoJS from "crypto-js";
 import { RequestHandler } from "express-serve-static-core";
+import { BCRYPT_SALT_ROUNDS, PASSWORD_SECRET } from "../../config";
 
 enum PasswordVersion {
     NONE,
@@ -19,32 +19,52 @@ export enum Role {
 }
 
 export default class User extends Model {
-    public getId(): Role {
-        return this["id"];
+    public getId(): string {
+        return this.getDataValue("id");
     }
 
-    public getUsername(): Role {
-        return this["username"];
+    public getUsername(): string {
+        return this.getDataValue("username");
+    }
+
+    public setUsername(username: string): void {
+        this.setDataValue("username", username);
+    }
+
+    public getDisplayName(): string {
+        return this.getDataValue("displayName");
+    }
+
+    public setDisplayName(displayName?: string): void {
+        this.setDataValue("displayName", displayName);
+    }
+
+    public getCharacter(): string | undefined {
+        return this.getDataValue("character");
+    }
+
+    public setCharacter(character?: string): void {
+        this.setDataValue("character", character);
     }
 
     private getPassword(): string {
-        return this["password"];
+        return this.getDataValue("password");
     }
 
     private setPassword(password: string): void {
-        this["password"] = password;
+        this.setDataValue("password", password);
     }
 
     private getPasswordVersion(): PasswordVersion {
-        return this["passwordVersion"];
+        return this.getDataValue("passwordVersion");
     }
 
-    private setPasswordVersion(version: PasswordVersion): void {
-        this["passwordVersion"] = version;
+    private setPasswordVersion(passwordVersion: PasswordVersion): void {
+        this.setDataValue("passwordVersion", passwordVersion);
     }
 
     public getRole(): Role {
-        return this["role"];
+        return this.getDataValue("role");
     }
 
     public checkPassword(password: string): boolean {
@@ -115,6 +135,15 @@ User.init(
             type: DataTypes.STRING,
             allowNull: false,
             unique: true,
+        },
+        displayName: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            field: "display_name",
+        },
+        character: {
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         password: {
             type: DataTypes.STRING,

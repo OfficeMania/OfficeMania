@@ -9,8 +9,8 @@ import { TURoom } from "../common/rooms/turoom";
 import { DEBUG, SERVER_PORT } from "./config";
 import { getAuthRouter, getSessionHandler, loggedInOptions, setupAuth } from "./auth";
 import connectionEnsureLogin from "connect-ensure-login";
-import { findOrCreateUserByUsername } from "./user";
-import { connectDatabase } from "./database";
+import { findOrCreateUserByUsername } from "../common/database/entities/user";
+import { connectDatabase } from "../common/database/database";
 import { getApiRouter } from "./api";
 
 async function initDatabase(): Promise<void> {

@@ -61,7 +61,7 @@ export class Todo extends Interactive {
             this.paint();
             this.drawText();
             checkInputMode();
-    
+
             document.addEventListener("keydown", this.inputLam);
         }
     }
@@ -71,9 +71,9 @@ export class Todo extends Interactive {
         document.removeEventListener("keydown", this.inputLam);
 
         if (this.content !== this.contentBeforeEdit && this.content !== "") {
-            this.content = this.content + "\n    '@" + getOurPlayer().name + "'";
+            this.content = this.content + "\n    '@" + getOurPlayer().displayName + "'";
         }
-        
+
         this.syncServer();
         this.room.send(MessageType.LIST_STOPUSE, this.id.toString());
 

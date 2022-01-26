@@ -8,13 +8,12 @@ import {
     InputMode,
     payRespect,
     setCharacter,
-    setUsername
 } from "./util";
-import {toggleShowParticipantsTab} from "./conference/conference";
-import {Direction} from "../common/util";
-import {solidInfo} from "./map";
-import {characters} from "./main";
-import {Interactive} from "./interactive/interactive";
+import { toggleShowParticipantsTab } from "./conference/conference";
+import { Direction } from "../common/util";
+import { solidInfo } from "./map";
+import { characters } from "./main";
+import { Interactive } from "./interactive/interactive";
 import {
     camButton,
     helpButton,
@@ -23,7 +22,7 @@ import {
     muteButton,
     settingsButton,
     settingsCancelButton,
-    shareButton
+    shareButton,
 } from "./static";
 
 let inputMode: InputMode = InputMode.IGNORE;
@@ -84,7 +83,7 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direct
 }
 
 function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Direction) {
-    if (/*!isPureKey(event) || */event.key.toLowerCase() !== key.toLowerCase()) {
+    if (/*!isPureKey(event) || */ event.key.toLowerCase() !== key.toLowerCase()) {
         return;
     }
     let input: Direction[] = null;
@@ -127,7 +126,11 @@ export function loadInputFunctions() {
                 return;
             }
         }
-        if (inputMode === InputMode.IGNORE || (inputMode === InputMode.INTERACTION && interactionIgnore.includes(checkInteraction()?.content?.name)) || inputMode === InputMode.BACKPACK){
+        if (
+            inputMode === InputMode.IGNORE ||
+            (inputMode === InputMode.INTERACTION && interactionIgnore.includes(checkInteraction()?.content?.name)) ||
+            inputMode === InputMode.BACKPACK
+        ) {
             //console.log("exiting");
             return;
         }
@@ -192,7 +195,7 @@ export function loadInputFunctions() {
 }
 
 export function checkInteraction(executeInteraction: boolean = false): solidInfo {
-    if(executeInteraction) {
+    if (executeInteraction) {
         console.log("called manually, want to switch2);");
     }
     const ourPlayer = getOurPlayer();
@@ -211,10 +214,14 @@ const ID_BUTTON_INTERACT = "button-interact";
 const ID_HELP_INTERACTION = "help-interaction";
 const ID_HELP_INTERACTION_ITEM = "help-interaction-item";
 
-const interactionNearbyButton: HTMLButtonElement = createInteractionButton(() => checkInteraction(true), ID_BUTTON_INTERACT, (button) => {
-    button.style.opacity = "0";
-    button.style.display = "none";
-});
+const interactionNearbyButton: HTMLButtonElement = createInteractionButton(
+    () => checkInteraction(true),
+    ID_BUTTON_INTERACT,
+    button => {
+        button.style.opacity = "0";
+        button.style.display = "none";
+    }
+);
 appendFAIcon(interactionNearbyButton, "sign-in-alt");
 const [interactionHelp, interactionHelpItem]: [HTMLDivElement, HTMLSpanElement] = createInteractionHelp();
 interactionHelp.style.opacity = "0";
@@ -265,7 +272,7 @@ function createInteractionHelp(): [HTMLDivElement, HTMLSpanElement] {
 function showElement(element: HTMLElement, fade: boolean = true) {
     element.style.display = null;
     if (fade) {
-        setTimeout(() => element.style.opacity = "1", 10);
+        setTimeout(() => (element.style.opacity = "1"), 10);
     } else {
         element.style.opacity = "1";
     }
@@ -274,7 +281,7 @@ function showElement(element: HTMLElement, fade: boolean = true) {
 function hideElement(element: HTMLElement, fade: boolean = true) {
     element.style.opacity = "0";
     if (fade) {
-        setTimeout(() => element.style.display = interactionInfoShown ? null : "none", 510);
+        setTimeout(() => (element.style.display = interactionInfoShown ? null : "none"), 510);
     } else {
         element.style.display = "none";
     }

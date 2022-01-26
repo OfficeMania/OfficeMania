@@ -7,17 +7,19 @@ import {
     KEY_CAMERA_DEVICE_ID,
     KEY_CHARACTER,
     KEY_CURRENT_VERSION,
+    KEY_DISPLAY_NAME,
     KEY_MIC_DEVICE_ID,
     KEY_SPEAKER_DEVICE_ID,
-    KEY_USERNAME,
+    literallyUndefined,
     MessageType,
 } from "../common/util";
 import { characters, checkInputMode } from "./main";
-import { panelButtonsInteraction, usernameInputWelcome, welcomeModal } from "./static";
+import { bsWelcomeModal, panelButtonsInteraction, usernameInputWelcome, welcomeModal } from "./static";
 import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
 import AnimationData, { createAnimationData } from "./graphic/animation-data";
 import { PlayerData } from "../common/rooms/schema/state";
-import { getUserById, User } from "./api";
+import { textchatPlayerOnChange } from "./textchat";
+import { updateUsers } from "./conference/conference";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -93,6 +95,11 @@ export function getChatEnabled(): boolean {
     return _chatEnabled;
 }
 
+export function areWeLoggedIn(): boolean {
+    const ourPlayer: Player = getOurPlayer();
+    return !literallyUndefined(ourPlayer.userId);
+}
+
 /*
  * This function returns a promise that is resolve when the image is loaded
  * from the url. Note that this function currently does no error handling.
@@ -129,15 +136,14 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
              */
             room.state.players.onAdd = async (playerData: PlayerData, sessionId: string) => {
                 // console.log("Add", sessionId, playerData);
-                const userId: string = playerData.userId;
-                const user: User = await getUserById(userId);
 
                 let player: Player = {
-                    userId: userId,
+                    userId: playerData.userId,
                     roomId: sessionId,
-                    name: user?.username || "",
+                    username: playerData.username,
+                    displayName: playerData.displayName,
                     participantId: null,
-                    character: "Adam_48x48.png",
+                    character: playerData.character,
                     positionX: 0,
                     positionY: 0,
                     scaledX: 0,
@@ -156,7 +162,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                     previousDirection: Direction.DOWN,
                     changeDirection: false,
                     waitBeforeMoving: 0,
-                    backpack: null
+                    backpack: null,
                 };
                 players[sessionId] = player;
 
@@ -168,7 +174,9 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 if (sessionId === room.sessionId) {
                     resolve([room, player]);
                 }
-                //onUserUpdate(players);
+
+                //logic for updating playerinfo for textchat
+                playerOnChangeFunctions(playerData);
             };
 
             /*
@@ -177,14 +185,19 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
              *
              * See: https://docs.colyseus.io/state/schema/#onremove-instance-key
              */
-            room.state.players.onRemove = (_, sessionId) => {
+            room.state.players.onRemove = (playerData, sessionId) => {
                 console.log("Remove", sessionId);
                 delete players[sessionId];
-                //onUserUpdate(players);
+                //trigger onchange when removing player
+                playerData.triggerAll();
             };
-            /**room.state.players.onChange = (_, sessionId) => {
-                onUserUpdate(players);
-            }*/
+            //room.state.players.onChange = (_, sessionId) => {}
+
+            //any time a player changes anything this happens:
+            //logic for updating playerinfo for textchat
+            room.state.players.forEach((player, sessionId) => {
+                playerOnChangeFunctions(player);
+            })
 
             /*
              * If the room has any other state that needs to be observed, the
@@ -267,16 +280,78 @@ export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionI
     return true;
 }
 
-export function setUsername(value: string) {
-    console.warn("REDUNDANCY WARNING, USE INTEGRATED MENU!");
-    value = value?.slice(0, 20) || "Jimmy";
-    getOurPlayer().name = value;
-    localStorage.setItem(KEY_USERNAME, value);
+// // Username
+
+// Get/Set
+
+export function getUsername(): string {
+    return getOurPlayer().username;
+}
+
+export function setUsername(value: string): void {
+    getOurPlayer().username = value;
+}
+
+// Update
+
+export function updateUsername(value: string): void {
     getRoom().send(MessageType.UPDATE_USERNAME, value);
 }
 
-export function getUsername(): string {
-    return localStorage.getItem(KEY_USERNAME);
+// // Display Name
+
+// Get/Set
+
+export function getDisplayName(): string {
+    return getOurPlayer().displayName;
+}
+
+export function setDisplayName(value: string): void {
+    getOurPlayer().displayName = value;
+}
+
+// Update
+
+export function updateDisplayName(value?: string): void {
+    getRoom().send(MessageType.UPDATE_DISPLAY_NAME, value);
+}
+
+// Local Get/Set
+
+export function setLocalDisplayName(value?: string): void {
+    localStorage.setItem(KEY_DISPLAY_NAME, value);
+}
+
+export function getLocalDisplayName(): string {
+    return localStorage.getItem(KEY_DISPLAY_NAME);
+}
+
+// // Character
+
+// Get/Set
+
+export function getCharacter(): string {
+    return getOurPlayer().character;
+}
+
+export function setCharacter(value: string): void {
+    getOurPlayer().character = value;
+}
+
+// Update
+
+export function updateCharacter(value?: string): void {
+    getRoom().send(MessageType.UPDATE_CHARACTER, value);
+}
+
+// Local Get/Set
+
+export function setLocalCharacter(value: string) {
+    localStorage.setItem(KEY_CHARACTER, value);
+}
+
+export function getLocalCharacter(): string {
+    return localStorage.getItem(KEY_CHARACTER);
 }
 
 export function payRespect() {
@@ -287,7 +362,7 @@ export function payRespect() {
 const playerWidth: number = 48;
 const playerHeight: number = 2 * playerWidth;
 
-export async function loadCharacter() {
+export function loadUser(): void {
     //load or ask for name
     const username = getUsername();
     if (username && username !== "") {
@@ -298,15 +373,16 @@ export async function loadCharacter() {
             function (e) {
                 setUsername(usernameInputWelcome.value);
                 e.preventDefault();
-                //janky
-                $("#welcome-modal").modal("hide");
+                bsWelcomeModal.hide();
                 welcomeModal.style.display = "none";
                 checkInputMode();
             },
             false
         );
     }
+}
 
+export async function loadCharacter(): Promise<void> {
     //loads character animations
     const characterAnimationsJson: { [key: string]: any } = await fetch(
         "/assets/animation/character-animations.json"
@@ -323,26 +399,13 @@ export async function loadCharacter() {
             playerHeight
         );
     }
-
-    //load character
-    const character = getCharacter();
-    if (character && character !== "") {
-        setCharacter(character);
+    if (!areWeLoggedIn()) {
+        //load character
+        const character: string = getLocalCharacter();
+        if (character && character !== "") {
+            updateCharacter(character);
+        }
     }
-}
-
-export function setCharacter(value: string) {
-    const filenames = Object.keys(characters);
-    if (filenames.indexOf(value) === -1) {
-        value = filenames[0];
-    }
-    getOurPlayer().character = value;
-    localStorage.setItem(KEY_CHARACTER, value);
-    getRoom().send(MessageType.UPDATE_CHARACTER, value);
-}
-
-export function getCharacter(): string {
-    return localStorage.getItem(KEY_CHARACTER);
 }
 
 export function setMicDeviceId(value: string) {
@@ -473,4 +536,22 @@ export function consumeInteractionClosed() {
     const temp: boolean = interactionClosed;
     interactionClosed = false;
     return temp;
+}
+
+export function ensureCharacter(value?: string): string {
+    const filenames: string[] = Object.keys(characters);
+    if (filenames.indexOf(value) === -1) {
+        value = filenames[0];
+    }
+    return value;
+}
+
+
+
+//onchange listeners to be added to the players
+function playerOnChangeFunctions(player: PlayerData) {
+    //for updating textchat stuff
+    textchatPlayerOnChange(player);
+    //for user online list
+    updateUsers();
 }

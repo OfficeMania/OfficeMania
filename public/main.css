@@ -140,6 +140,14 @@ body {
     content: '  Chat';
 }
 
+#button-logout:hover span::after {
+    content: '  Logout';
+}
+
+#button-login:hover span::after {
+    content: '  Login';
+}
+
 #button-help:hover span:after {
     content: '  Help';
 }
@@ -215,6 +223,9 @@ body {
 #welcome-body {
     font-size: large;
     display: inline-block;
+}
+.modal-bs-title {
+    margin-top: 0.5rem;
 }
 
 .key {
@@ -655,8 +666,8 @@ body {
 #loading-cat {
     position: fixed;
     bottom: 0vh;
-    right: 0vh; 
-    margin-bottom: 60px; 
+    right: 0vh;
+    margin-bottom: 60px;
     height: 10%;
     visibility: visible;
     transition: 0.5s;
@@ -670,8 +681,56 @@ body {
 #menu-bar {
     position: absolute;
     width: 100%;
-    background-color: black;
+    padding: 10px;
 }
+#menu-bar button {
+    color: black;
+    background-color: #f8f8f8;
+    border-radius: 10px;
+}
+#chat-list, #user-list {
+    display: inline;
+}
+#chat-list button{
+    width: 80%;
+    height: 40px;
+}
+#user-list button{
+    width: calc(20% - 5px);
+    height: 40px;
+}
+#user-list li {
+    list-style-type: none;
+}
+#user-list label {
+    height: 32px;
+}
+#user-list ul {
+    overflow-y: auto;
+    overflow-x: auto;
+    margin: 0;
+    padding: 0;
+}
+#user-list .dropdown-menu {
+    transform: translate(1px, 32px) !important;
+    min-width: 300%;
+}
+#user-list div{
+    float: left;
+}
+#chat-list .dropdown-menu {
+    min-width: 100%;
+}
+
+#chat-list i {
+    float: right;
+    margin: 3px;
+}
+
+#chat-list i:hover {
+    cursor: pointer;
+}
+
 #select-textchat{
     float: left;
     width: 80%;
@@ -702,3 +761,10 @@ body {
     color: white;
     overflow: visible;
 }
+
+#textchat-container input {
+    width: 1em;
+    margin-right: 10px;
+    float: left;
+}
+
