@@ -36,15 +36,15 @@ function getChatById(chatId: string): Chat {
 function updateChat(chatDTO: ChatDTO): void {
     var chat: Chat = getChatById(chatDTO.id);
     if (!chat) {
-        chat = new Chat(chatDTO.name, chatDTO.id)
+        chat = new Chat(chatDTO.name, chatDTO.id);
         chats.push(chat);
-        return;
     }
-    if (chat.name !== chatDTO.name) {
-        chat.name = chatDTO.name;
-    }
-    else {
-        //console.log("Name was equal");
+    if (chat.id !== chats[0].id) {
+        while (chat.users.length > 0) {
+            chat.users.pop();
+        }
+        chatDTO.users.forEach(user => chat.users.push(user));
+        updateChatName(chat);
     }
 }
 
@@ -142,10 +142,19 @@ export function initChatListener() {
 
 export function textchatPlayerOnChange(player: PlayerData) {
     if(player) {
+        let uid: string;
+        
         player.onChange = (changes => {
             changes.forEach (change => {
                 if (change.field ==="displayName"){
-                   updateUserList();
+                    getRoom().state.players.forEach((p, key) => {
+                        if (p === player){
+                            uid = key;
+                        }
+                    });
+                    updateUserList();
+                    updatePlayerName(uid);
+                    updateChatList();
                 }
             });
         });
@@ -306,8 +315,14 @@ function addChatListOption(chat: Chat) {
         const bin = document.createElement("i");
         bin.classList.add("fas");
         bin.classList.add("fa-trash");
-        bin.addEventListener("click", () => {
+        //bin.setAttribute()
+        bin.addEventListener("click", (event) => {
+            event.stopPropagation()
             modifyChat(["remove"], chat.id);
+            updateChatListButton(chats[0].id);
+            clearTextchatBar();
+            getChatById(chats[0].id).messages.forEach(addMessageToBar); 
+            textchatDropdownChatsButton.click();
         });
         a.appendChild(bin); 
     }
@@ -316,7 +331,6 @@ function addChatListOption(chat: Chat) {
     li.append(a);
     li.id = chat.id
     li.addEventListener("click", () => {
-
         if (textchatDropdownChatsButton.getAttribute("data-id") === chat.id) {
             console.log("already there");
             return;
@@ -378,6 +392,31 @@ function clearTextchatBar() {
 function unCheck() {
     textchatDropdownUsersButton.click();
     $(":checkbox").prop("checked", false);
+}
+
+function updatePlayerName(userId: string) {
+    console.log("updating plaer: ", userId)
+    const chatList: Chat[] = chats.filter(chat => chat.users.includes(userId));
+    console.log(chatList);
+    chatList.forEach(chat => updateChatName(chat));
+}
+
+function updateChatName(chat: Chat) {
+    chat.name = "";
+    console.log(chat);
+    chat.users.forEach((user) => {
+        if ( user === getOurPlayer().roomId) {return;}
+        if ( chat.name === "") {
+            chat.name = getRoom().state.players.get(user).displayName;
+        }
+        else {
+            chat.name += ", " + getRoom().state.players.get(user).displayName;
+            console.log("add name: ", getRoom().state.players.get(user).displayName)
+        }
+    });
+    if(chat.name ==="") {
+        chat.name = "Empty chat"
+    }
 }
 
 

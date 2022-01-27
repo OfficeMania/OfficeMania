@@ -13,6 +13,7 @@ export interface ChatMessage {
 export interface ChatDTO {
     id: string;
     name: string;
+    users?: string[];
 }
 
 export class Chat {
@@ -128,12 +129,13 @@ export class ChatHandler implements Handler {
         const userId: string = getUserId(client);
         console.log("Request chat update for User:", userId);
         const chats: Chat[] = this.byUserId(userId);
-        //chats.forEach(chat => console.log(chat.messages))
-        chats.unshift(this.globalChat);
+        //chats.forEach(chat => console.log(chat.messages));
         const chatDTOs: ChatDTO[] = chats.map(chat => ({
             id: chat.id,
             name: chat.name,
+            users: chat.users,
         }));
+        chatDTOs.unshift({ id: this.globalChat.id, name: this.globalChat.name });
         client.send(MessageType.CHAT_UPDATE, JSON.stringify(chatDTOs));
     }
 
@@ -336,9 +338,6 @@ export class ChatHandler implements Handler {
         this.chats.forEach(chat => {
             if (chat.users.includes(getUserId(client)) && chat.id !== this.globalChat.id) {
                 updateChatName(chat, this.room);
-                this.room.clients.filter(client => chat.users.includes(getUserId(client))).forEach(client => {
-                    this.onChatUpdate(client);
-                })
             }
         });
     }
