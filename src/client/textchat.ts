@@ -142,19 +142,21 @@ export function initChatListener() {
 
 export function textchatPlayerOnChange(player: PlayerData) {
     if(player) {
-        let uid: string;
+        let uid: string = "";
         
         player.onChange = (changes => {
             changes.forEach (change => {
                 if (change.field ==="displayName"){
-                    getRoom().state.players.forEach((p, key) => {
+                    getRoom()?.state.players.forEach((p, key) => {
                         if (p === player){
                             uid = key;
                         }
                     });
                     updateUserList();
-                    updatePlayerName(uid);
-                    updateChatList();
+                    if(uid !== "") {
+                        updatePlayerName(uid);
+                        updateChatList();
+                    }
                 }
             });
         });
