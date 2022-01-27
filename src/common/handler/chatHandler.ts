@@ -128,6 +128,7 @@ export class ChatHandler implements Handler {
         const userId: string = getUserId(client);
         console.log("Request chat update for User:", userId);
         const chats: Chat[] = this.byUserId(userId);
+        //chats.forEach(chat => console.log(chat.messages))
         chats.unshift(this.globalChat);
         const chatDTOs: ChatDTO[] = chats.map(chat => ({
             id: chat.id,

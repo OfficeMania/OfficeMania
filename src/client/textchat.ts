@@ -155,9 +155,18 @@ export function textchatPlayerOnChange(player: PlayerData) {
 //rewrites all the of the clients chats from scratch
 function onChatUpdate(chatDTOs: ChatDTO[]): void {
     //console.debug("chatDTOs:", chatDTOs);
-    chats.forEach(() => {chats.pop()});
+    //chats.forEach(() => {chats.pop()});
     //console.log(chats, "chats:");
-    chatDTOs.forEach(updateChat);
+    let ids: string[] = [];
+    chatDTOs.forEach(chat => {
+        updateChat(chat);
+        ids.push(chat.id)
+    });
+    chats.forEach(chat => {
+        if(!ids.includes(chat.id)) {
+            chats.splice(ids.indexOf(chat.id))
+        }
+    })
     //updateParticipatingChats(); 
     updateChatList();
 }
@@ -317,7 +326,9 @@ function addChatListOption(chat: Chat) {
 
         clearTextchatBar();
          
-        chat.messages.forEach(addMessageToBar);      
+        getChatById(chat.id).messages.forEach(addMessageToBar);   
+        
+        console.log(getChatById(chat.id))
 
         
     });
