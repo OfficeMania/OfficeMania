@@ -96,7 +96,9 @@ export var lowestX;
 export var lowestY;
 
 // Mute Buttons
-
+if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
+    window.location.href = "https://google.com";
+}
 muteButton.addEventListener("click", () => toggleMute("audio"));
 camButton.addEventListener("click", () => toggleMute("video"));
 shareButton.addEventListener("click", () => toggleMute("desktop")); //TODO Maybe make a confirmation dialog to confirm the stopping of a screenshare?
