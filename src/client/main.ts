@@ -63,6 +63,7 @@ import {
     displayNameInput,
     doors,
     interactiveCanvas,
+    loadingScreen,
     loginButton,
     logoutButton,
     muteButton,
@@ -95,10 +96,16 @@ const MS_PER_UPDATE2 = 15;
 export var lowestX;
 export var lowestY;
 
-// Mute Buttons
+
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
-    window.location.href = "https://google.com";
+    let ctx: CanvasRenderingContext2D = loadingScreen.getContext("2d");
+    ctx.fillStyle = "black";
+    ctx.fillText("get to the computer",0,0);
+    loadingScreen.style.display = "visible";
+    window.stop();
 }
+
+// Mute Buttons
 muteButton.addEventListener("click", () => toggleMute("audio"));
 camButton.addEventListener("click", () => toggleMute("video"));
 shareButton.addEventListener("click", () => toggleMute("desktop")); //TODO Maybe make a confirmation dialog to confirm the stopping of a screenshare?
