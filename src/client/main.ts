@@ -102,7 +102,8 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phon
     ctx.fillStyle = "black";
     ctx.fillText("get to the computer",0,0);
     loadingScreen.style.display = "visible";
-    window.stop();
+    let timer = setInterval(Function, 1000);
+    //window.stop();
 }
 
 // Mute Buttons

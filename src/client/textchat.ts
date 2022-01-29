@@ -152,8 +152,8 @@ export function textchatPlayerOnChange(player: PlayerData) {
                             uid = key;
                         }
                     });
-                    updateUserList();
                     if(uid !== "") {
+                        updateUserList();
                         updatePlayerName(uid);
                         updateChatList();
                     }
