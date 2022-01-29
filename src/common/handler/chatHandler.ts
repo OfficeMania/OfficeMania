@@ -54,6 +54,8 @@ export class ChatHandler implements Handler {
 
     globalChat: Chat;
 
+    nearbyChat: Chat;
+
     byChatId(chatId: string): Chat {
         return this.chats.find(chat => chat.id === chatId);
     }
@@ -65,10 +67,12 @@ export class ChatHandler implements Handler {
     init(room: Room<State>) {
         this.room = room;
         this.globalChat = new Chat("Global");
+        this.nearbyChat = new Chat("Nearby");
     }
 
     onCreate(options?: any) {
         this.chats.push(this.globalChat);
+        this.chats.push(this.nearbyChat);
         this.room.onMessage(MessageType.CHAT_SEND, (client, message: ChatMessage) => this.onSend(client, message));
         this.room.onMessage(MessageType.CHAT_UPDATE, client => this.onChatUpdate(client));
         this.room.onMessage(MessageType.CHAT_LOG, (client, message: string) => this.onLog(client, message));
@@ -91,21 +95,30 @@ export class ChatHandler implements Handler {
         console.debug("Message received:", message);
         const chatId: string = chatMessage.chatId || this.globalChat.id;
         console.debug("chatId:", chatId);
-        const chat: Chat = this.byChatId(chatId);
+        
 
-        const userId: string = getUserId(client);
-        if (!chat.users.includes(userId)) {
-            chat.users.push(userId);
+        if(chatId.charAt(0) !== ",") {
+            const serverMessage: ChatMessage = makeMessage(this.room, client, chatMessage);
+            
+            const chat: Chat = this.byChatId(chatId);
+            const userId: string = getUserId(client);
+            if (!chat.users.includes(userId)) {
+                chat.users.push(userId);
+            }
+            chat.messages.push(serverMessage);
+            //chat.messages.forEach(chatMessage => console.log("chatMessage:", JSON.stringify(chatMessage)));
+            if (chatId === this.globalChat.id) {
+                this.room.clients.forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
+            } else {
+                this.room.clients
+                    .filter(client => chat.users.includes(getUserId(client)))
+                    .forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
+            }
         }
-        const serverMessage: ChatMessage = makeMessage(this.room, client, chatMessage);
-        chat.messages.push(serverMessage);
-        //chat.messages.forEach(chatMessage => console.log("chatMessage:", JSON.stringify(chatMessage)));
-        if (chatId === this.globalChat.id) {
-            this.room.clients.forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
-        } else {
-            this.room.clients
-                .filter(client => chat.users.includes(getUserId(client)))
-                .forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
+        else {
+            const serverMessage: ChatMessage = makeMessage(this.room, client, { message: chatMessage.message, chatId: this.chats[1].id });
+            let users: string[] = chatId.split(",");
+            this.room.clients.filter(client => users.includes(client.sessionId)).forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
         }
     }
 
@@ -119,6 +132,7 @@ export class ChatHandler implements Handler {
             console.log("Request log for User:", userId);
             const chats: Chat[] = this.byUserId(userId);
             if (!chats.includes(this.globalChat)) {
+                chats.unshift(this.nearbyChat);
                 chats.unshift(this.globalChat);
             }
             client.send(MessageType.CHAT_LOG, JSON.stringify(chats.flatMap(chat => chat.messages)));
@@ -135,6 +149,7 @@ export class ChatHandler implements Handler {
             name: chat.name,
             users: chat.users,
         }));
+        chatDTOs.unshift({ id: this.nearbyChat.id, name: this.nearbyChat.name });
         chatDTOs.unshift({ id: this.globalChat.id, name: this.globalChat.name });
         client.send(MessageType.CHAT_UPDATE, JSON.stringify(chatDTOs));
     }

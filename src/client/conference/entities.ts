@@ -288,6 +288,10 @@ class User {
         this.update();
     }
 
+    getDisabled() {
+        return this.disabled;
+    }
+
     updatePlayer(player: Player) {
         this.videoContainer?.updatePlayerState(player);
     }

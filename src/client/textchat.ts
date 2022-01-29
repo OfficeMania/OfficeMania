@@ -16,6 +16,7 @@ import {
 import { getOurPlayer, getRoom } from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chatHandler";
 import { PlayerData } from "../common/rooms/schema/state";
+import { getUser } from "./conference/conference";
 
 //tracks if button/shortcut have been pressed
 let _showTextchat = false;
@@ -39,7 +40,7 @@ function updateChat(chatDTO: ChatDTO): void {
         chat = new Chat(chatDTO.name, chatDTO.id);
         chats.push(chat);
     }
-    if (chat.id !== chats[0].id) {
+    if (chat.id !== chats[0].id && chat.id !== chats[1].id) {
         while (chat.users.length > 0) {
             chat.users.pop();
         }
@@ -148,7 +149,7 @@ export function textchatPlayerOnChange(player: PlayerData) {
             changes.forEach (change => {
                 if (change.field ==="displayName"){
                     getRoom()?.state.players.forEach((p, key) => {
-                        if (p === player){
+                        if (p === player && chats[0]){
                             uid = key;
                         }
                     });
@@ -171,13 +172,14 @@ function onChatUpdate(chatDTOs: ChatDTO[]): void {
     let ids: string[] = [];
     chatDTOs.forEach(chat => {
         updateChat(chat);
-        ids.push(chat.id)
+        ids.push(chat.id);
     });
     chats.forEach(chat => {
         if(!ids.includes(chat.id)) {
             chats.splice(ids.indexOf(chat.id))
         }
-    })
+    });
+    
     //updateParticipatingChats(); 
     updateChatList();
 }
@@ -202,9 +204,18 @@ function onMessage(chatMessage: ChatMessage) {
 //sends text message to server (if its not empty)
 function sendMessage(message: string, chatId: string) {
     //console.log(message);
+    if (textchatDropdownChatsButton.getAttribute("data-id") === chats[1].id) {
+        chatId = "";
+        getRoom().state.players.forEach((p, k) => {
+            if (!getUser(p.participantId).getDisabled()) {
+                chatId += "," + k;
+            }
+        });
+    }
     if (message && message !== "") {
         getRoom().send(MessageType.CHAT_SEND, { message, chatId });
     }
+    
 }
 
 
@@ -313,7 +324,7 @@ function addChatListOption(chat: Chat) {
     i.innerText = chat.name;
     a.appendChild(i);
 
-    if (chats[0].id !== chat.id) {
+    if (chats[0].id !== chat.id && chats[1].id !== chat.id) {
         const bin = document.createElement("i");
         bin.classList.add("fas");
         bin.classList.add("fa-trash");

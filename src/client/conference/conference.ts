@@ -307,7 +307,7 @@ function onUserLeft(participantId) {
 
 // Functions
 
-function getUser(participantId: string): User {
+export function getUser(participantId: string): User {
     let user = users.find(value => value.participantId === participantId);
     if (!user) {
         user = new User(conference, audioBar, videoBar, focusBar, participantId);
