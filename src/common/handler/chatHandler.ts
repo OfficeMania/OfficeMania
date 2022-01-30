@@ -85,7 +85,29 @@ export class ChatHandler implements Handler {
 
     onJoin() {}
 
-    onLeave() {}
+    onLeave(client: Client, consented: boolean) {
+        const id: string = client.id;
+        const formattedTime: string = getFormattedTime();
+        this.chats.forEach(chat => {
+            if (chat.id === this.globalChat.id || chat.id === this.nearbyChat.id) {
+                return;
+            }
+            const index: number = chat.users.indexOf(id);
+            if (index < 0) {
+                return;
+            }
+            chat.users.slice(index, 1);
+            const serverMessage: ChatMessage = {
+                timestamp: formattedTime,
+                name: "Server",
+                chatId: chat.id,
+                message: `User ${id} left the Chat`,
+            };
+            this.room.clients
+                .filter(client => chat.users.includes(getUserId(client)))
+                .forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
+        });
+    }
 
     onDispose() {}
 
