@@ -381,6 +381,13 @@ export function loadUser(): void {
             false
         );
     }
+    if (!areWeLoggedIn()) {
+        //load displayName
+        const displayName: string = getLocalDisplayName();
+        if (displayName && displayName !== "") {
+            updateDisplayName(displayName);
+        }
+    }
 }
 
 export async function loadCharacter(): Promise<void> {
