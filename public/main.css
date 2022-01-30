@@ -720,15 +720,29 @@ body {
 }
 #chat-list .dropdown-menu {
     min-width: 100%;
+    width: 100%;
 }
-
+#chat-list li {
+    display: inline-grid;
+    width: 100%;
+    overflow-y: scroll;
+    scrollbar-width: none;
+}
 #chat-list i {
-    float: right;
     margin: 3px;
+    display: inline-block;
+    position: absolute;
+    right: 10px;
+    background-color: white;
+    color: grey;
 }
 
 #chat-list i:hover {
     cursor: pointer;
+}
+
+#chat-list a {
+    padding-right: 20px;
 }
 
 #select-textchat{
