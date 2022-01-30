@@ -5,13 +5,13 @@ import {
     textchatBar,
     textchatButton,
     textchatContainer,
-    textchatSendButton,
-    textchatDropdownChats,
-    textchatDropdownUsers,
-    textchatDropdownChatsButton,
     textchatDropdownAddUsers,
+    textchatDropdownChats,
+    textchatDropdownChatsButton,
     textchatDropdownNewChat,
+    textchatDropdownUsers,
     textchatDropdownUsersButton,
+    textchatSendButton,
 } from "./static";
 import { getOurPlayer, getRoom } from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chatHandler";
@@ -28,7 +28,7 @@ const chats: Chat[] = [];
 
 function getChatById(chatId: string): Chat {
     const chat = chats.find(chat => chat.id === chatId);
-    if (!chat){
+    if (!chat) {
         //console.warn("chat not existing");
     }
     return chat;
@@ -53,6 +53,7 @@ function setInFocus(set) {
     _inFocus = set;
     checkInputMode();
 }
+
 //getter for _inFocus
 export function getInFocus() {
     return _inFocus;
@@ -84,12 +85,12 @@ function setShowTextchatBar(set: boolean) {
 export function initChatListener() {
     textchatButton.addEventListener("click", () => toggleTextchatBar());
 
-    
+
     //changing of inputmode if text area is in use or not
-    textchatArea.onfocus = function () {
+    textchatArea.onfocus = function() {
         setInFocus(true);
     };
-    textchatArea.onblur = function () {
+    textchatArea.onblur = function() {
         setInFocus(false);
     };
 
@@ -113,7 +114,7 @@ export function initChatListener() {
         const ids: string[] = [];
         for (let i = 0; i < textchatDropdownUsers.children.length; i++) {
             // @ts-ignore
-            if(textchatDropdownUsers.children[i].children[0].children[0].checked) {
+            if (textchatDropdownUsers.children[i].children[0].children[0].checked) {
                 ids.push(textchatDropdownUsers.children[i].id);
             }
         }
@@ -127,7 +128,7 @@ export function initChatListener() {
         const ids: string[] = [];
         for (let i = 0; i < textchatDropdownUsers.children.length; i++) {
             // @ts-ignore
-            if(textchatDropdownUsers.children[i].children[0].children[0].checked) {
+            if (textchatDropdownUsers.children[i].children[0].children[0].checked) {
                 ids.push(textchatDropdownUsers.children[i].id);
             }
         }
@@ -142,18 +143,18 @@ export function initChatListener() {
 }
 
 export function textchatPlayerOnChange(player: PlayerData) {
-    if(player) {
+    if (player) {
         let uid: string = "";
-        
+
         player.onChange = (changes => {
-            changes.forEach (change => {
-                if (change.field ==="displayName"){
+            changes.forEach(change => {
+                if (change.field === "displayName") {
                     getRoom()?.state.players.forEach((p, key) => {
-                        if (p === player && chats[0]){
+                        if (p === player && chats[0]) {
                             uid = key;
                         }
                     });
-                    if(uid !== "") {
+                    if (uid !== "") {
                         updateUserList();
                         updatePlayerName(uid);
                         updateChatList();
@@ -161,7 +162,7 @@ export function textchatPlayerOnChange(player: PlayerData) {
                 }
             });
         });
-    }    
+    }
 }
 
 //rewrites all the of the clients chats from scratch
@@ -175,12 +176,12 @@ function onChatUpdate(chatDTOs: ChatDTO[]): void {
         ids.push(chat.id);
     });
     chats.forEach(chat => {
-        if(!ids.includes(chat.id)) {
-            chats.splice(ids.indexOf(chat.id))
+        if (!ids.includes(chat.id)) {
+            chats.splice(ids.indexOf(chat.id));
         }
     });
-    
-    //updateParticipatingChats(); 
+
+    //updateParticipatingChats();
     updateChatList();
 }
 
@@ -215,18 +216,16 @@ function sendMessage(message: string, chatId: string) {
     if (message && message !== "") {
         getRoom().send(MessageType.CHAT_SEND, { message, chatId });
     }
-    
+
 }
 
 
 //add message as "p" into textchatbar
-function addMessageToBar(chatMessage: ChatMessage){
+function addMessageToBar(chatMessage: ChatMessage) {
     const messageLine = document.createElement("p");
     messageLine.innerText = `[${chatMessage.timestamp}] ${chatMessage.name}: ${chatMessage.message}`;
     textchatBar.prepend(messageLine);
 }
-
-
 
 
 //for sending the adding/removing command to server
@@ -236,7 +235,7 @@ function modifyChat(whoToAdd: string[], chatid: string = "new") {
     let message: string = whoToAdd.toString();
     let chatId: string = chatid;
     console.log(message);
-    getRoom().send(MessageType.CHAT_ADD, {message, chatId})
+    getRoom().send(MessageType.CHAT_ADD, { message, chatId });
 }
 
 function updateChatList() {
@@ -261,19 +260,19 @@ function updateChatList() {
             addChatListOption(chat);
         }
         let a: number = chatIds.indexOf(chat.id);
-        console.log(chat.name)
+        console.log(chat.name);
         // @ts-ignore
         textchatDropdownChats.children[a].children[0].children[0].innerText = chat.name;
-        if(chat.id === textchatDropdownChatsButton.getAttribute("data-id")) {
+        if (chat.id === textchatDropdownChatsButton.getAttribute("data-id")) {
             updateChatListButton(chat.id);
         }
     });
 
     //remove any chats
     for (let i = 0; i < textchatDropdownChats.children.length; i++) {
-        if (!chatIds.includes(textchatDropdownChats.children[i].id)){
+        if (!chatIds.includes(textchatDropdownChats.children[i].id)) {
             textchatDropdownChats.children[i].remove();
-            console.log("remove")
+            console.log("remove");
             i--;
         }
     }
@@ -286,20 +285,19 @@ function updateUserList() {
         uIdList.push(textchatDropdownUsers.children[i].id);
     }
 
-    const userIds: string[] = []
+    const userIds: string[] = [];
 
     //early in loading cycle, getroom and the state are not yet fetched, so this need to run conditionally
     getRoom()?.state.players.forEach((value, key) => {
         userIds.push(key);
 
         if (!uIdList.includes(key) && key != getOurPlayer().roomId) {
-            console.log("inserting")
+            console.log("inserting");
             addUserListOption(value.displayName, key);
-        }
-        else if (uIdList.includes(key)){
+        } else if (uIdList.includes(key)) {
             //renaming logic
             textchatDropdownUsers.children[uIdList.indexOf(key)].children[0].children[1].remove();
-            
+
             let div = document.createElement("div");
             div.innerText = value.displayName;
             textchatDropdownUsers.children[uIdList.indexOf(key)].children[0].append(div);
@@ -310,7 +308,7 @@ function updateUserList() {
         if (!userIds.includes(textchatDropdownUsers.children[i].id)) {
             textchatDropdownUsers.children[i].remove();
             i--;
-            console.log("removing")
+            console.log("removing");
         }
     }
 }
@@ -330,19 +328,19 @@ function addChatListOption(chat: Chat) {
         bin.classList.add("fa-trash");
         //bin.setAttribute()
         bin.addEventListener("click", (event) => {
-            event.stopPropagation()
+            event.stopPropagation();
             modifyChat(["remove"], chat.id);
             updateChatListButton(chats[0].id);
             clearTextchatBar();
-            getChatById(chats[0].id).messages.forEach(addMessageToBar); 
+            getChatById(chats[0].id).messages.forEach(addMessageToBar);
             textchatDropdownChatsButton.click();
         });
-        a.appendChild(bin); 
+        a.appendChild(bin);
     }
 
     const li = document.createElement("li");
     li.append(a);
-    li.id = chat.id
+    li.id = chat.id;
     li.addEventListener("click", () => {
         if (textchatDropdownChatsButton.getAttribute("data-id") === chat.id) {
             console.log("already there");
@@ -352,12 +350,12 @@ function addChatListOption(chat: Chat) {
         updateChatListButton(chat.id);
 
         clearTextchatBar();
-         
-        getChatById(chat.id).messages.forEach(addMessageToBar);   
-        
-        console.log(getChatById(chat.id))
 
-        
+        getChatById(chat.id).messages.forEach(addMessageToBar);
+
+        console.log(getChatById(chat.id));
+
+
     });
     textchatDropdownChats.append(li);
 }
@@ -367,7 +365,7 @@ function addUserListOption(name: string, key: string) {
     input.classList.add("form-check-input");
     input.type = "checkbox";
     input.id = "input-" + key;
-    
+
     let div = document.createElement("div");
     div.innerText = name;
 
@@ -375,7 +373,7 @@ function addUserListOption(name: string, key: string) {
     label.append(input);
     label.classList.add("form-check-label");
     label.classList.add("dropdown-item");
-    label.style.alignContent = "inline"
+    label.style.alignContent = "inline";
     label.append(div);
 
     const li = document.createElement("li");
@@ -384,7 +382,7 @@ function addUserListOption(name: string, key: string) {
     textchatDropdownUsers.append(li);
 }
 
-function updateChatListButton(id:string) {
+function updateChatListButton(id: string) {
     let a = "";
     chats.forEach(chat => {
         if (chat.id === id) {
@@ -393,7 +391,7 @@ function updateChatListButton(id:string) {
     });
     textchatDropdownChatsButton.innerText = a;
     textchatDropdownChatsButton.setAttribute("data-id", id);
-    
+
 }
 
 function clearTextchatBar() {
@@ -408,7 +406,7 @@ function unCheck() {
 }
 
 function updatePlayerName(userId: string) {
-    console.log("updating plaer: ", userId)
+    console.log("updating plaer: ", userId);
     const chatList: Chat[] = chats.filter(chat => chat.users.includes(userId));
     console.log(chatList);
     chatList.forEach(chat => updateChatName(chat));
@@ -418,26 +416,25 @@ function updateChatName(chat: Chat) {
     chat.name = "";
     console.log(chat);
     chat.users.forEach((user) => {
-        if ( user === getOurPlayer().roomId) {return;}
-        if ( chat.name === "") {
-            chat.name = getRoom().state.players.get(user).displayName;
+        if (user === getOurPlayer().roomId) {
+            return;
         }
-        else {
+        if (chat.name === "") {
+            chat.name = getRoom().state.players.get(user).displayName;
+        } else {
             chat.name += ", " + getRoom().state.players.get(user).displayName;
-            console.log("add name: ", getRoom().state.players.get(user).displayName)
+            console.log("add name: ", getRoom().state.players.get(user).displayName);
         }
     });
-    if(chat.name ==="") {
-        chat.name = "Empty chat"
+    if (chat.name === "") {
+        chat.name = "Empty chat";
     }
 }
-
 
 
 /**
  * Old Textchat logic
  */
-
 
 
 /*
