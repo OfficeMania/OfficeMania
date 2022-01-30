@@ -77,7 +77,7 @@ export class ChatHandler implements Handler {
         this.room.onMessage(MessageType.CHAT_UPDATE, client => this.onChatUpdate(client));
         this.room.onMessage(MessageType.CHAT_LOG, (client, message: string) => this.onLog(client, message));
         this.room.onMessage(MessageType.CHAT_ADD, (client, message) => this.onAdd(client, message));
-        this.room.onMessage(MessageType.CHAT_UPD_DISPLAYNAME, (client: Client, message: string) =>
+        this.room.onMessage(MessageType.CHAT_UPDATE_DISPLAY_NAME, (client: Client, message: string) =>
             this.onUpdateUsername(client, message)
         );
     }
