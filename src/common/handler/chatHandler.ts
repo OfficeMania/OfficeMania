@@ -117,8 +117,8 @@ export class ChatHandler implements Handler {
         const messageIdArray: string[] = JSON.parse(chatMessage.chatId);
         console.debug("chatId:", messageIdArray);
         const chatIds: string[] = this.chats.map(chat => chat.id);
-        if (chatIds.includes(messageIdArray[1])) {
-            const chatId = messageIdArray[1];
+        if (chatIds.includes(messageIdArray[0])) {
+            const chatId = messageIdArray[0];
             console.log(chatId);
             const serverMessage: ChatMessage = makeMessage(this.room, client, { chatId: chatId, message: chatMessage.message });
 

@@ -205,7 +205,7 @@ function onMessage(chatMessage: ChatMessage) {
 //sends text message to server (if its not empty)
 function sendMessage(message: string, chatId: string) {
     //console.log(message);
-    chatId = JSON.stringify(["chat", chatId]);
+    chatId = JSON.stringify([chatId]);
     if (textchatDropdownChatsButton.getAttribute("data-id") === chats[1].id) {
         const ids: string[] = [];
         chatId = "";
