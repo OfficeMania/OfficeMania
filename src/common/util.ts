@@ -67,6 +67,7 @@ export enum MessageType {
     CHAT_LOG = "chatLog",
     CHAT_UPDATE = "chatUpdate",
     CHAT_ADD = "chatAdd",
+    CHAT_LEAVE = "chatLeave",
     CHAT_UPDATE_DISPLAY_NAME = "chatUpdateDisplayName",
 }
 

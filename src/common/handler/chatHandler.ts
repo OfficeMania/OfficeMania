@@ -77,6 +77,7 @@ export class ChatHandler implements Handler {
         this.room.onMessage(MessageType.CHAT_UPDATE, client => this.onChatUpdate(client));
         this.room.onMessage(MessageType.CHAT_LOG, (client, message: string) => this.onLog(client, message));
         this.room.onMessage(MessageType.CHAT_ADD, (client, message) => this.onAdd(client, message));
+        this.room.onMessage(MessageType.CHAT_LEAVE, (client, message) => this.onChatLeave(client, message));
         this.room.onMessage(MessageType.CHAT_UPDATE_DISPLAY_NAME, (client: Client, message: string) =>
             this.onUpdateUsername(client, message)
         );
@@ -159,6 +160,62 @@ export class ChatHandler implements Handler {
         client.send(MessageType.CHAT_UPDATE, JSON.stringify(chatDTOs));
     }
 
+    sendChatMessage(chat: Chat, chatMessage: ChatMessage): void {
+        chat.messages.push(chatMessage);
+        this.room.clients
+            .filter(client => chat.users.includes(getUserId(client)))
+            .forEach(client => client.send(MessageType.CHAT_SEND, chatMessage));
+    }
+
+    triggerChatUpdate(chat: Chat): void {
+        this.room.clients
+            .filter(client => chat.users.includes(getUserId(client)))
+            .forEach(client => this.onChatUpdate(client));
+    }
+
+    onChatLeave(client: Client, chatMessage: ChatMessage) {
+        const chatId: string = chatMessage.chatId;
+        const sendMessage: boolean = chatId !== this.globalChat.id && chatId !== this.nearbyChat.id;
+        const userId: string = getUserId(client);
+        const chat: Chat = this.byChatId(chatId);
+        if (!chat) {
+            // Chat no longer exists
+            return;
+        }
+        console.debug(`User ${userId} left Chat ${chatId}`);
+        const userIndex: number = chat.users.indexOf(userId);
+        if (userIndex < 0) {
+            // Client is not part of Chat
+            console.debug(`User ${userId} already left Chat ${chatId}`);
+            return;
+        }
+        chat.users.splice(userIndex, 1);
+        updateChatName(chat, this.room);
+        if (sendMessage) {
+            const name: string = this.room.state.players[client.sessionId].displayName;
+            const leaveMessage: ChatMessage = {
+                timestamp: getFormattedTime(),
+                name,
+                chatId,
+                message: `User "${name}" left the Chat`,
+            };
+            this.sendChatMessage(chat, leaveMessage);
+        } else {
+            this.triggerChatUpdate(chat);
+        }
+        this.onChatUpdate(client);
+        // Check if chat has any participants left
+        if (chat.users.length === 0) {
+            const chatIndex: number = this.chats.indexOf(chat);
+            if (chatIndex < 0) {
+                // Chat no longer exists
+                return;
+            }
+            this.chats.splice(chatIndex, 1);
+            console.debug(`Removed empty chat ${chatId}`);
+        }
+    }
+
     onAdd(client: Client, chatMessage: ChatMessage) {
         console.log(chatMessage, client.id);
         if (!chatMessage.message || chatMessage.message === "") {
@@ -205,29 +262,6 @@ export class ChatHandler implements Handler {
                 });
             });
             console.log(newChat.id);
-        } else if (chatMessage.message === "remove") {
-            //remove client from chat
-            let id = getUserId(client);
-            let chat: Chat = this.byChatId(chatMessage.chatId);
-            console.log(chat.id);
-            chat.users.splice(chat.users.indexOf(id), 1);
-            updateChatName(chat, this.room);
-            const message = "User left the Chat.";
-            let chatId = chatMessage.chatId;
-            let mess = makeMessage(this.room, client, { message, chatId });
-            chat.messages.push(mess);
-            //check if chat has any participants left
-            if (chat.users.length === 0) {
-                this.chats.splice(this.chats.indexOf(chat), 1);
-                //console.log(this.chats);
-            }
-            this.room.clients
-                .filter(client => chat.users.includes(getUserId(client)))
-                .forEach(client => {
-                    client.send(MessageType.CHAT_SEND, mess);
-                    this.onChatUpdate(client);
-                });
-            this.onChatUpdate(client);
         } else {
             //add to existing
             if (chatMessage.chatId === this.globalChat.id) {

@@ -229,13 +229,16 @@ function addMessageToBar(chatMessage: ChatMessage) {
 
 
 //for sending the adding/removing command to server
-function modifyChat(whoToAdd: string[], chatid: string = "new") {
+function modifyChat(whoToAdd: string[], chatId: string = "new") {
     //if chat is selected, add to it (even if global, garbage sorting on handler side)
     console.log("not yet implemented");
-    let message: string = whoToAdd.toString();
-    let chatId: string = chatid;
+    const message: string = whoToAdd.toString();
     console.log(message);
     getRoom().send(MessageType.CHAT_ADD, { message, chatId });
+}
+
+function leaveChat(chatId: string) {
+    getRoom().send(MessageType.CHAT_LEAVE, { message: "", chatId });
 }
 
 function updateChatList() {
@@ -329,7 +332,7 @@ function addChatListOption(chat: Chat) {
         //bin.setAttribute()
         bin.addEventListener("click", (event) => {
             event.stopPropagation();
-            modifyChat(["remove"], chat.id);
+            leaveChat(chat.id);
             updateChatListButton(chats[0].id);
             clearTextchatBar();
             getChatById(chats[0].id).messages.forEach(addMessageToBar);
