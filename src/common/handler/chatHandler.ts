@@ -93,20 +93,14 @@ export class ChatHandler implements Handler {
             if (chat.id === this.globalChat.id || chat.id === this.nearbyChat.id) {
                 return;
             }
+            /*
             const index: number = chat.users.indexOf(id);
             if (index < 0) {
                 return;
             }
-            chat.users.slice(index, 1);
-            const serverMessage: ChatMessage = {
-                timestamp: formattedTime,
-                name: "Server",
-                chatId: chat.id,
-                message: `User ${id} left the Chat`,
-            };
-            this.room.clients
-                .filter(client => chat.users.includes(getUserId(client)))
-                .forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
+            chat.users.slice(index, 1);*/
+            console.log("ho");
+            this.onChatLeave(client, { message: "remove", chatId: chat.id });
         });
     }
 
@@ -215,8 +209,8 @@ export class ChatHandler implements Handler {
         }
         chat.users.splice(userIndex, 1);
         updateChatName(chat, this.room);
-        if (sendMessage) {
-            const name: string = this.room.state.players[client.sessionId].displayName;
+        const name: string = this.room.state.players[client.sessionId]?.displayName;
+        if (name) {
             const leaveMessage: ChatMessage = {
                 timestamp: getFormattedTime(),
                 name,
@@ -224,9 +218,10 @@ export class ChatHandler implements Handler {
                 message: `User "${name}" left the Chat`,
             };
             this.sendChatMessage(chat, leaveMessage);
-        } else {
-            this.triggerChatUpdate(chat);
         }
+        
+        this.triggerChatUpdate(chat);
+
         this.onChatUpdate(client);
         // Check if chat has any participants left
         if (chat.users.length === 0) {
