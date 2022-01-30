@@ -77,7 +77,9 @@ export class ChatHandler implements Handler {
         this.room.onMessage(MessageType.CHAT_UPDATE, client => this.onChatUpdate(client));
         this.room.onMessage(MessageType.CHAT_LOG, (client, message: string) => this.onLog(client, message));
         this.room.onMessage(MessageType.CHAT_ADD, (client, message) => this.onAdd(client, message));
-        this.room.onMessage(MessageType.CHAT_UPD_DISPLAYNAME, (client: Client, message: string) => this.onUpdateUsername(client, message))
+        this.room.onMessage(MessageType.CHAT_UPD_DISPLAYNAME, (client: Client, message: string) =>
+            this.onUpdateUsername(client, message)
+        );
     }
 
     onJoin() {}
@@ -95,11 +97,10 @@ export class ChatHandler implements Handler {
         console.debug("Message received:", message);
         const chatId: string = chatMessage.chatId || this.globalChat.id;
         console.debug("chatId:", chatId);
-        
 
-        if(chatId.charAt(0) !== ",") {
+        if (chatId.charAt(0) !== ",") {
             const serverMessage: ChatMessage = makeMessage(this.room, client, chatMessage);
-            
+
             const chat: Chat = this.byChatId(chatId);
             const userId: string = getUserId(client);
             if (!chat.users.includes(userId)) {
@@ -114,11 +115,15 @@ export class ChatHandler implements Handler {
                     .filter(client => chat.users.includes(getUserId(client)))
                     .forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
             }
-        }
-        else {
-            const serverMessage: ChatMessage = makeMessage(this.room, client, { message: chatMessage.message, chatId: this.chats[1].id });
+        } else {
+            const serverMessage: ChatMessage = makeMessage(this.room, client, {
+                message: chatMessage.message,
+                chatId: this.chats[1].id,
+            });
             let users: string[] = chatId.split(",");
-            this.room.clients.filter(client => users.includes(client.sessionId)).forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
+            this.room.clients
+                .filter(client => users.includes(client.sessionId))
+                .forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
         }
     }
 
@@ -156,31 +161,32 @@ export class ChatHandler implements Handler {
 
     onAdd(client: Client, chatMessage: ChatMessage) {
         console.log(chatMessage, client.id);
-        if (!chatMessage.message ||chatMessage.message ==="") {
+        if (!chatMessage.message || chatMessage.message === "") {
             return;
         }
         let ids: string[] = chatMessage.message.split(",");
         console.log(ids);
 
-        let ourPlayer: { data: PlayerData, id: string }; 
-        let otherPlayers: { data: PlayerData, id: string }[] = [];
+        let ourPlayer: { data: PlayerData; id: string };
+        let otherPlayers: { data: PlayerData; id: string }[] = [];
 
         //fill our and other players with valid data
         this.room.state.players.forEach((player, key) => {
             if (key === getUserId(client)) {
                 ourPlayer = { data: player, id: key };
-            }
-            else if (ids.includes(key)) {
-                otherPlayers.push({ data: player, id: key })
+            } else if (ids.includes(key)) {
+                otherPlayers.push({ data: player, id: key });
             }
         });
-        console.log(otherPlayers, ourPlayer)
+        console.log(otherPlayers, ourPlayer);
 
         if (chatMessage.chatId === "new") {
             //add new chat
             console.log("Create new chat:", ourPlayer.id);
-            otherPlayers.forEach(p => {console.log(p.id)})
-            
+            otherPlayers.forEach(p => {
+                console.log(p.id);
+            });
+
             // create new chat between client and playerid
             let newChat: Chat = new Chat("");
 
@@ -189,52 +195,48 @@ export class ChatHandler implements Handler {
             updateChatName(newChat, this.room);
             this.chats.push(newChat);
 
-            getClientsByUserId(ourPlayer.id, this.room).forEach((client) => {
+            getClientsByUserId(ourPlayer.id, this.room).forEach(client => {
                 this.onChatUpdate(client);
             });
             //this.onChatUpdate();
             otherPlayers.forEach(p => {
-                getClientsByUserId(p.id, this.room).forEach((client) => {
+                getClientsByUserId(p.id, this.room).forEach(client => {
                     this.onChatUpdate(client);
                 });
             });
             console.log(newChat.id);
-        }
-        else if (chatMessage.message === "remove") {
+        } else if (chatMessage.message === "remove") {
             //remove client from chat
             let id = getUserId(client);
             let chat: Chat = this.byChatId(chatMessage.chatId);
-            console.log(chat.id)
+            console.log(chat.id);
             chat.users.splice(chat.users.indexOf(id), 1);
             updateChatName(chat, this.room);
             const message = "User left the Chat.";
             let chatId = chatMessage.chatId;
-            let mess = makeMessage(this.room, client, { message, chatId })
+            let mess = makeMessage(this.room, client, { message, chatId });
             chat.messages.push(mess);
             //check if chat has any participants left
-            if(chat.users.length === 0) {
+            if (chat.users.length === 0) {
                 this.chats.splice(this.chats.indexOf(chat), 1);
                 //console.log(this.chats);
             }
             this.room.clients
-            .filter(client => chat.users.includes(getUserId(client)))
-            .forEach(client => {
-                client.send(MessageType.CHAT_SEND, mess);
-                this.onChatUpdate(client);
-            });
+                .filter(client => chat.users.includes(getUserId(client)))
+                .forEach(client => {
+                    client.send(MessageType.CHAT_SEND, mess);
+                    this.onChatUpdate(client);
+                });
             this.onChatUpdate(client);
-        }
-        else {
+        } else {
             //add to existing
             if (chatMessage.chatId === this.globalChat.id) {
-                console.log("is globul")
+                console.log("is globul");
                 return;
-            }
-            else {
+            } else {
                 let chat = this.byChatId(chatMessage.chatId);
                 otherPlayers.forEach(otherPlayer => {
                     if (!chat.users.includes(otherPlayer.id)) {
-
                         chat.users.push(otherPlayer.id);
 
                         //make a message
@@ -250,17 +252,15 @@ export class ChatHandler implements Handler {
                             .filter(client => chat.users.includes(getUserId(client)))
                             .forEach(client => {
                                 this.onChatUpdate(client);
-                                client.send(MessageType.CHAT_SEND,{ message, chatId });
+                                client.send(MessageType.CHAT_SEND, { message, chatId });
                             });
-                    }
-                    else {
+                    } else {
                         console.log("user " + otherPlayer.id + " already in chat " + chat.id);
                     }
                 });
             }
         }
 
-        
         /*
         let ourPlayerKey: string = getUserId(client);
         let ourPlayer: PlayerData;
@@ -348,6 +348,7 @@ export class ChatHandler implements Handler {
         }
         */
     }
+
     onUpdateUsername(client: Client, name: string) {
         console.log("hello there name has changed", client.sessionId, name);
         this.chats.forEach(chat => {
@@ -389,20 +390,20 @@ function addZero(i) {
 //get all the clients (different pcs f.e.) that are connected to userId
 function getClientsByUserId(userId: string, room: Room): Client[] {
     let clients: Client[] = [];
-    room.clients.forEach((client) => {
+    room.clients.forEach(client => {
         if (client.sessionId === userId) {
             clients.push(client);
         }
     });
     return clients;
 }
+
 function updateChatName(chat: Chat, room: Room) {
     chat.name = "";
     chat.users.forEach((user) => {
-        if ( chat.name === "") {
+        if (chat.name === "") {
             chat.name = room.state.players.get(user).displayName;
-        }
-        else {
+        } else {
             chat.name += ", " + room.state.players.get(user).displayName;
         }
     });
