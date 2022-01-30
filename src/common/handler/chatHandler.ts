@@ -433,12 +433,5 @@ function getClientsByUserId(userId: string, room: Room): Client[] {
 }
 
 function updateChatName(chat: Chat, room: Room) {
-    chat.name = "";
-    chat.users.forEach((user) => {
-        if (chat.name === "") {
-            chat.name = room.state.players.get(user).displayName;
-        } else {
-            chat.name += ", " + room.state.players.get(user).displayName;
-        }
-    });
+    chat.name = chat.users.filter(user => !!room.state.players.get(user)).map(user => room.state.players.get(user).displayName).join(", ");
 }
