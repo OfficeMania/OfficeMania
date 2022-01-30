@@ -76,7 +76,7 @@ export class ChatHandler implements Handler {
         this.room.onMessage(MessageType.CHAT_SEND, (client, message: ChatMessage) => this.onSend(client, message));
         this.room.onMessage(MessageType.CHAT_UPDATE, client => this.onChatUpdate(client));
         this.room.onMessage(MessageType.CHAT_LOG, (client, message: string) => this.onLog(client, message));
-        this.room.onMessage(MessageType.CHAT_ADD, (client, message) => this.onAdd(client, message));
+        this.room.onMessage(MessageType.CHAT_ADD, (client, message) => this.onChatAdd(client, message));
         this.room.onMessage(MessageType.CHAT_LEAVE, (client, message) => this.onChatLeave(client, message));
         this.room.onMessage(MessageType.CHAT_UPDATE_DISPLAY_NAME, (client: Client, message: string) =>
             this.onUpdateUsername(client, message),
@@ -240,7 +240,7 @@ export class ChatHandler implements Handler {
         }
     }
 
-    onAdd(client: Client, chatMessage: ChatMessage) {
+    onChatAdd(client: Client, chatMessage: ChatMessage) {
         console.log(chatMessage, client.id);
         if (!chatMessage.message || chatMessage.message === "") {
             return;
