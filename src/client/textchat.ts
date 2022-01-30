@@ -205,13 +205,16 @@ function onMessage(chatMessage: ChatMessage) {
 //sends text message to server (if its not empty)
 function sendMessage(message: string, chatId: string) {
     //console.log(message);
+    chatId = JSON.stringify(["chat", chatId]);
     if (textchatDropdownChatsButton.getAttribute("data-id") === chats[1].id) {
+        const ids: string[] = [];
         chatId = "";
         getRoom().state.players.forEach((p, k) => {
             if (!getUser(p.participantId).getDisabled()) {
-                chatId += "," + k;
+                ids.push(k);
             }
         });
+        chatId = JSON.stringify(ids);
     }
     if (message && message !== "") {
         getRoom().send(MessageType.CHAT_SEND, { message, chatId });

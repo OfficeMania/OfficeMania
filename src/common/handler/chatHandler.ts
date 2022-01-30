@@ -114,11 +114,13 @@ export class ChatHandler implements Handler {
             return;
         }
         console.debug("Message received:", message);
-        const chatId: string = chatMessage.chatId || this.globalChat.id;
-        console.debug("chatId:", chatId);
-
-        if (chatId.charAt(0) !== ",") {
-            const serverMessage: ChatMessage = makeMessage(this.room, client, chatMessage);
+        const messageIdArray: string[] = JSON.parse(chatMessage.chatId);
+        console.debug("chatId:", messageIdArray);
+        const chatIds: string[] = this.chats.map(chat => chat.id);
+        if (chatIds.includes(messageIdArray[1])) {
+            const chatId = messageIdArray[1];
+            console.log(chatId);
+            const serverMessage: ChatMessage = makeMessage(this.room, client, { chatId: chatId, message: chatMessage.message });
 
             const chat: Chat = this.byChatId(chatId);
             const userId: string = getUserId(client);
@@ -139,7 +141,7 @@ export class ChatHandler implements Handler {
                 message: chatMessage.message,
                 chatId: this.chats[1].id,
             });
-            let users: string[] = chatId.split(",");
+            let users: string[] = messageIdArray;
             this.room.clients
                 .filter(client => users.includes(client.sessionId))
                 .forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
