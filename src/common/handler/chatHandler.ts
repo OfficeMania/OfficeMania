@@ -79,11 +79,12 @@ export class ChatHandler implements Handler {
         this.room.onMessage(MessageType.CHAT_ADD, (client, message) => this.onAdd(client, message));
         this.room.onMessage(MessageType.CHAT_LEAVE, (client, message) => this.onChatLeave(client, message));
         this.room.onMessage(MessageType.CHAT_UPDATE_DISPLAY_NAME, (client: Client, message: string) =>
-            this.onUpdateUsername(client, message)
+            this.onUpdateUsername(client, message),
         );
     }
 
-    onJoin() {}
+    onJoin() {
+    }
 
     onLeave(client: Client, consented: boolean) {
         const id: string = client.id;
@@ -109,7 +110,8 @@ export class ChatHandler implements Handler {
         });
     }
 
-    onDispose() {}
+    onDispose() {
+    }
 
     onSend(client: Client, chatMessage: ChatMessage) {
         const message: string = chatMessage.message;
