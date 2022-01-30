@@ -245,11 +245,11 @@ export class ChatHandler implements Handler {
         if (!chatMessage.message || chatMessage.message === "") {
             return;
         }
-        let ids: string[] = chatMessage.message.split(",");
+        const ids: string[] = chatMessage.message.split(",");
         console.log(ids);
 
         let ourPlayer: { data: PlayerData; id: string };
-        let otherPlayers: { data: PlayerData; id: string }[] = [];
+        const otherPlayers: { data: PlayerData; id: string }[] = [];
 
         //fill our and other players with valid data
         this.room.state.players.forEach((player, key) => {
@@ -269,7 +269,7 @@ export class ChatHandler implements Handler {
             });
 
             // create new chat between client and playerid
-            let newChat: Chat = new Chat("");
+            const newChat: Chat = new Chat("");
 
             newChat.users.push(ourPlayer.id);
             otherPlayers.forEach(p => newChat.users.push(p.id));
@@ -292,7 +292,7 @@ export class ChatHandler implements Handler {
                 console.log("is globul");
                 return;
             } else {
-                let chat = this.byChatId(chatMessage.chatId);
+                const chat: Chat = this.byChatId(chatMessage.chatId);
                 otherPlayers.forEach(otherPlayer => {
                     if (!chat.users.includes(otherPlayer.id)) {
                         chat.users.push(otherPlayer.id);
