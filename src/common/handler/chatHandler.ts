@@ -211,8 +211,8 @@ export class ChatHandler implements Handler {
         }
         chat.users.splice(userIndex, 1);
         updateChatName(chat, this.room);
-        const name: string = this.room.state.players[client.sessionId]?.displayName;
-        if (name) {
+        if (this.room.state.players.has(client.sessionId)) {
+            const name: string = this.room.state.players[client.sessionId]?.displayName || client.sessionId;
             const leaveMessage: ChatMessage = {
                 timestamp: getFormattedTime(),
                 name,
