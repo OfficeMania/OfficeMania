@@ -163,15 +163,15 @@ world of OfficeMania!
 
 ## Installation in a Docker Container
 
-## Application Setup
+### Application Setup
 
 Access the container at http://dockerhost:8080.
 
-## Usage
+### Usage
 
 Here are some example snippets to help you get started creating a container.
 
-### docker-compose (recommended)
+#### docker-compose (recommended)
 
 ```yaml
 ---
@@ -187,7 +187,7 @@ services:
     restart: unless-stopped
 ```
 
-### docker cli
+#### docker cli
 
 ```bash
 docker run -d \
@@ -198,7 +198,7 @@ docker run -d \
   index.docker.io/panzer1119/officemania
 ```
 
-## Parameters
+### Parameters
 
 Container images are configured using parameters passed at runtime (such as those above). These parameters are separated
 by a colon and indicate `<external>:<internal>` respectively. For example, `-p 8080:8080` would expose port `8080` from
@@ -209,7 +209,7 @@ inside the container to be accessible from the host's IP on port `8080` outside 
 | `-p 8080` | will map the container's port 8080 to port 8080 on the host    |
 |  `-v ./database.sqlite`  | this will store the database the app |
 
-## Building locally
+### Building locally
 
 If you want to make local modifications to these images for development purposes or just to customize the logic:
 
