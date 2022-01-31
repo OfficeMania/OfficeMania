@@ -208,3 +208,16 @@ inside the container to be accessible from the host's IP on port `8080` outside 
 |:---------:|----------------------------------------------------------------|
 | `-p 8080` | will map the container's port 8080 to port 8080 on the host    |
 |  `-v ./database.sqlite`  | this will store the database the app |
+
+## Building locally
+
+If you want to make local modifications to these images for development purposes or just to customize the logic:
+
+```bash
+git clone https://git.rz.tu-bs.de/systemsicherheit/teamprojekt/officemania.git
+cd officemania
+docker build \
+  --no-cache \
+  --pull \
+  -t index.docker.io/panzer1119/officemania:latest .
+```
