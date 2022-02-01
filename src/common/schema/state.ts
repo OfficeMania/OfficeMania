@@ -1,15 +1,5 @@
 import { ArraySchema, MapSchema, Schema, type } from "@colyseus/schema";
-
-export class ConferenceData extends Schema {
-    @type("string")
-    id: string;
-
-    @type("string")
-    password: string;
-
-    @type("string")
-    serverParticipantId: string;
-}
+import { Conference } from "./conference";
 
 /*
  * Class to sync the playerdata with the server
@@ -172,8 +162,8 @@ export class State extends Schema {
     @type({ array: "string" })
     templatePaths = new ArraySchema<string>();
 
-    @type(ConferenceData)
-    conference: ConferenceData = new ConferenceData();
+    @type(Conference)
+    conference: Conference = new Conference();
 
     @type({ array: WhiteboardState })
     whiteboard: ArraySchema<WhiteboardState> = new ArraySchema<WhiteboardState>();

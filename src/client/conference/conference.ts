@@ -69,14 +69,14 @@ let showParticipantsTab = false;
 
 // Options
 
-function conferenceData() {
+function conferenceState() {
     return getRoom().state.conference;
 }
 
 function optionsHosts() {
     return {
         domain: "8x8.vc",
-        muc: `conference.${conferenceData().id}.8x8.vc`,
+        muc: `conference.${conferenceState().id}.8x8.vc`,
         focus: "focus.8x8.vc",
     };
 }
@@ -84,7 +84,7 @@ function optionsHosts() {
 function optionsConnection() {
     return {
         hosts: optionsHosts(),
-        serviceUrl: "wss://8x8.vc/xmpp-websocket?room=" + conferenceData().id,
+        serviceUrl: "wss://8x8.vc/xmpp-websocket?room=" + conferenceState().id,
         clientNode: "https://jitsi.org/jitsimeet",
     };
 }
@@ -151,7 +151,7 @@ function onConnectionFailed() {
  * This is called after successfully establishing a connection
  */
 function onConnectionSuccess() {
-    conference = connection.initJitsiConference(conferenceData().id, optionsConference);
+    conference = connection.initJitsiConference(conferenceState().id, optionsConference);
     //conference.setStartMutedPolicy({audio: true});
     conference.on(JitsiMeetJSIntern.events.conference.TRACK_ADDED, onTrackAdded);
     conference.on(JitsiMeetJSIntern.events.conference.TRACK_REMOVED, onTrackRemoved);
@@ -163,8 +163,8 @@ function onConnectionSuccess() {
     // conference.on(JitsiMeetJSIntern.events.conference.TRACK_AUDIO_LEVEL_CHANGED, (userID, audioLevel) => console.debug(`${userID} - ${audioLevel}`)); //DEBUG
     // conference.on(JitsiMeetJSIntern.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
     // conference.on(JitsiMeetJSIntern.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${conference.getPhoneNumber()} - ${conference.getPhonePin()}`)); //DEBUG //REMOVE
-    if (conferenceData().password) {
-        conference.join(conferenceData().password);
+    if (conferenceState().password) {
+        conference.join(conferenceState().password);
     } else {
         conference.join();
     }
