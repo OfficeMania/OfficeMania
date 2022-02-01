@@ -12,7 +12,7 @@ import {
     MessageType,
 } from "../../common/util";
 import { findUserById } from "../database/entities/user";
-import { PlayerState } from "../../common/schema/player";
+import { PlayerState } from "../../common/schema/player-state";
 
 export interface AuthData {
     userSettings?: UserSettings;

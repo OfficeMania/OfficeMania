@@ -1,6 +1,6 @@
 import { ArraySchema, MapSchema, Schema, type } from "@colyseus/schema";
 import { ConferenceState } from "./conference-state";
-import { PlayerState } from "./player";
+import { PlayerState } from "./player-state";
 
 /*
  * state of whiteboard players (new)

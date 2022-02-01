@@ -2,7 +2,7 @@ import { Client, Room } from "colyseus";
 import { MessageType } from "../../common/util";
 import { Handler } from "./handler";
 import { State } from "../../common/schema/state";
-import { PlayerState } from "../../common/schema/player";
+import { PlayerState } from "../../common/schema/player-state";
 import { Chat, ChatDTO, ChatMessage } from "../../common/handler/chat-handler";
 
 export class ChatHandler implements Handler {
