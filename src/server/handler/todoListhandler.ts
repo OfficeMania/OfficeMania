@@ -1,6 +1,7 @@
 import {Handler} from "./handler";
 import {Client, Room} from "colyseus";
-import {State, TodoState} from "../../common/schema/state";
+import {State} from "../../common/schema/state";
+import { TodoState } from "../../common/schema/todo-state";
 import {MessageType} from "../../common/util";
 import {MapSchema} from "@colyseus/schema";
 

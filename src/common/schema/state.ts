@@ -4,17 +4,7 @@ import { PlayerState } from "./player-state";
 import { WhiteboardState } from "./whiteboard-state";
 import { PongState } from "./pong-state";
 import { DoorState } from "./door-state";
-
-export class TodoState extends Schema {
-    @type("string")
-    listId: string;
-
-    @type("string")
-    content: string;
-
-    @type("string")
-    isUsed: string;
-}
+import { TodoState } from "./todo-state";
 
 export class NotesState extends Schema {
     //content in a single line
