@@ -2,47 +2,7 @@ import { ArraySchema, MapSchema, Schema, type } from "@colyseus/schema";
 import { ConferenceState } from "./conference-state";
 import { PlayerState } from "./player-state";
 import { WhiteboardState } from "./whiteboard-state";
-
-/*
- *state of pong game
- */
-export class PongState extends Schema {
-    @type("string")
-    playerA: string;
-
-    @type("string")
-    playerB: string;
-
-    @type("number")
-    posBallX: number;
-    @type("number")
-    posBallY: number;
-
-    //proportional velocities
-    @type("number")
-    velBallX: number;
-    @type("number")
-    velBallY: number;
-
-    @type("number")
-    posPlayerA: number;
-
-    @type("number")
-    posPlayerB: number;
-
-    @type("number")
-    scoreA: number;
-
-    @type("number")
-    scoreB: number;
-
-    //0: sizeBall, 1: sizeBat
-    @type({ array: "number" })
-    sizes = new ArraySchema<number>();
-    //maximum velocities per frame: 0: ball, 1: bat
-    @type({ array: "number" })
-    velocities = new ArraySchema<number>();
-}
+import { PongState } from "./pong-state";
 
 export class DoorState extends Schema {
     @type("string")
