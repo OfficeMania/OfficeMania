@@ -1,7 +1,6 @@
 import { Client, Presence, Room } from "colyseus";
-import { State } from "../../common/states/state";
+import { generateUUIDv4, State } from "../../common";
 import fs from "fs";
-import { generateUUIDv4 } from "../../common/util";
 import { PongHandler } from "../handler/ponghandler";
 import { Handler } from "../handler/handler";
 import { DoorHandler } from "../handler/doorhandler";

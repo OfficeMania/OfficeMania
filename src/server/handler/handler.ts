@@ -1,5 +1,5 @@
-import {Client, Room} from "colyseus";
-import {State} from "../../common";
+import { Client, Room } from "colyseus";
+import { State } from "../../common";
 
 export interface Handler {
 

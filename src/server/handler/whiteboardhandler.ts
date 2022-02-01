@@ -1,10 +1,7 @@
-import {Handler} from "./handler";
-import {Client, Room} from "colyseus";
-import {State} from "../../common/states/state";
-import { WhiteboardState } from "../../common/states/whiteboard-state";
-import { WhiteboardPlayerState } from "../../common/states/whiteboard-player-state";
-import {MessageType} from "../../common/util";
-import {ArraySchema} from "@colyseus/schema";
+import { Handler } from "./handler";
+import { Client, Room } from "colyseus";
+import { MessageType, State, WhiteboardPlayerState, WhiteboardState } from "../../common";
+import { ArraySchema } from "@colyseus/schema";
 
 let whiteboardCount = 300
 

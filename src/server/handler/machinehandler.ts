@@ -1,8 +1,6 @@
 import { Client, Room } from "colyseus";
-import { State } from "../../common";
-import { MessageType } from "../../common/util";
+import { MachineType, MessageType, State } from "../../common";
 import { Handler } from "./handler";
-import { MachineType } from "../../common/handler/machine-handler";
 
 export class MachineHandler implements Handler {
 

@@ -1,6 +1,5 @@
 import { Client, Room } from "colyseus";
-import { State } from "../../common";
-import { Direction, MessageType } from "../../common/util";
+import { Direction, MessageType, State } from "../../common";
 import { Handler } from "./handler";
 
 

@@ -1,9 +1,6 @@
-import { Direction, MessageType, TaskExecutor } from "../../common/util";
-import { State } from "../../common/states/state";
-import { PongState } from "../../common/states/pong-state";
+import { Direction, MessageType, PongMessage, PongState, State, TaskExecutor } from "../../common";
 import { Client, Room } from "colyseus";
 import { Handler } from "./handler";
-import { PongMessage } from "../../common/handler/pong-handler";
 
 const batSections: number[] = [-0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5]
 let hasScored: boolean = false;
