@@ -3,14 +3,7 @@ import { ConferenceState } from "./conference-state";
 import { PlayerState } from "./player-state";
 import { WhiteboardState } from "./whiteboard-state";
 import { PongState } from "./pong-state";
-
-export class DoorState extends Schema {
-    @type("string")
-    playerId: string;
-
-    @type("boolean")
-    isClosed: boolean;
-}
+import { DoorState } from "./door-state";
 
 export class TodoState extends Schema {
     @type("string")
