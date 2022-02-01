@@ -1,20 +1,7 @@
 import { ArraySchema, MapSchema, Schema, type } from "@colyseus/schema";
 import { ConferenceState } from "./conference-state";
 import { PlayerState } from "./player-state";
-
-/*
- * state of whiteboard players (new)
- */
-export class WhiteboardPlayerState extends Schema {
-    @type({ array: "number" })
-    paths: ArraySchema<number> = new ArraySchema<number>();
-
-    @type({ array: "string" })
-    color: ArraySchema<string> = new ArraySchema<string>();
-
-    @type({ array: "number" })
-    sizes: ArraySchema<number> = new ArraySchema<number>();
-}
+import { WhiteboardPlayerState } from "./whiteboard-player-state";
 
 /*
  * state of whiteboard
