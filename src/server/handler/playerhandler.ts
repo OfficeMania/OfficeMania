@@ -12,7 +12,7 @@ import {
     MessageType,
 } from "../../common/util";
 import { findUserById } from "../database/entities/user";
-import { PlayerData } from "../../common/schema/player";
+import { PlayerState } from "../../common/schema/player";
 
 export interface AuthData {
     userSettings?: UserSettings;
@@ -58,16 +58,16 @@ export class PlayerHandler implements Handler {
     onJoin(client: Client): void {
         const authData: AuthData = client.userData as AuthData;
         const userSettings: UserSettings | undefined = authData.userSettings;
-        const playerData: PlayerData = new PlayerData();
-        playerData.userId = ensureUserId(userSettings?.id);
-        playerData.username = ensureDisplayName(userSettings?.username);
-        playerData.displayName = ensureDisplayName(userSettings?.displayName);
-        playerData.character = ensureCharacter(userSettings?.character);
-        playerData.x = 0;
-        playerData.y = 0;
-        playerData.cooldown = 0;
-        playerData.participantId = null;
-        this.setPlayerData(client, playerData);
+        const playerState: PlayerState = new PlayerState();
+        playerState.userId = ensureUserId(userSettings?.id);
+        playerState.username = ensureDisplayName(userSettings?.username);
+        playerState.displayName = ensureDisplayName(userSettings?.displayName);
+        playerState.character = ensureCharacter(userSettings?.character);
+        playerState.x = 0;
+        playerState.y = 0;
+        playerState.cooldown = 0;
+        playerState.participantId = null;
+        this.setPlayerData(client, playerState);
     }
 
     onLeave(client: Client, consented: boolean): void {
@@ -78,55 +78,55 @@ export class PlayerHandler implements Handler {
         //Nothing?
     }
 
-    private getPlayerData(client: Client): PlayerData {
+    private getPlayerData(client: Client): PlayerState {
         return this.room.state.players[client.sessionId];
     }
 
-    private setPlayerData(client: Client, playerData?: PlayerData): void {
-        if (playerData) {
-            this.room.state.players[client.sessionId] = playerData;
+    private setPlayerData(client: Client, playerState?: PlayerState): void {
+        if (playerState) {
+            this.room.state.players[client.sessionId] = playerState;
         } else {
             delete this.room.state.players[client.sessionId];
         }
     }
 
     private onMove(client: Client, direction: Direction): void {
-        const playerData: PlayerData = this.getPlayerData(client);
+        const playerState: PlayerState = this.getPlayerData(client);
         switch (direction) {
             case Direction.DOWN: {
-                playerData.y++;
+                playerState.y++;
                 break;
             }
             case Direction.UP: {
-                playerData.y--;
+                playerState.y--;
                 break;
             }
             case Direction.LEFT: {
-                playerData.x--;
+                playerState.x--;
                 break;
             }
             case Direction.RIGHT: {
-                playerData.x++;
+                playerState.x++;
                 break;
             }
         }
     }
 
     private onSync(client: Client, coordinates: number[]): void {
-        const playerData: PlayerData = this.getPlayerData(client);
-        playerData.x = coordinates[0];
-        playerData.y = coordinates[1];
+        const playerState: PlayerState = this.getPlayerData(client);
+        playerState.x = coordinates[0];
+        playerState.y = coordinates[1];
     }
 
     private onUsernameUpdate(client: Client, username: string): Promise<void> {
         //console.debug(`Incoming Username Update: ${username}`);
         username = checkUsername(username);
-        const playerData: PlayerData = this.getPlayerData(client);
-        if (literallyUndefined(playerData.userId)) {
+        const playerState: PlayerState = this.getPlayerData(client);
+        if (literallyUndefined(playerState.userId)) {
             this.updateUsername(client, username);
             return;
         }
-        return findUserById(playerData.userId)
+        return findUserById(playerState.userId)
             .then(user =>
                 user
                     .update({ username }, { where: { id: user.getId() } })
@@ -139,12 +139,12 @@ export class PlayerHandler implements Handler {
         //console.debug(`Incoming Display Name Update: ${displayName}`);
         const remove: boolean = !displayName;
         displayName = checkDisplayName(displayName);
-        const playerData: PlayerData = this.getPlayerData(client);
-        if (literallyUndefined(playerData.userId)) {
+        const playerState: PlayerState = this.getPlayerData(client);
+        if (literallyUndefined(playerState.userId)) {
             this.updateDisplayName(client, ensureDisplayName(displayName));
             return;
         }
-        return findUserById(playerData.userId)
+        return findUserById(playerState.userId)
             .then(user =>
                 user
                     .update({ displayName }, { where: { id: user.getId() } })
@@ -156,12 +156,12 @@ export class PlayerHandler implements Handler {
     private onCharacterUpdate(client: Client, character?: string): Promise<void> {
         //console.debug(`Incoming Character Update: ${character}`);
         character = ensureCharacter(character);
-        const playerData: PlayerData = this.getPlayerData(client);
-        if (literallyUndefined(playerData.userId)) {
+        const playerState: PlayerState = this.getPlayerData(client);
+        if (literallyUndefined(playerState.userId)) {
             this.updateCharacter(client, character);
             return;
         }
-        return findUserById(playerData.userId)
+        return findUserById(playerState.userId)
             .then(user =>
                 user
                     .update({ character }, { where: { id: user.getId() } })
@@ -171,26 +171,26 @@ export class PlayerHandler implements Handler {
     }
 
     private updateParticipantId(client: Client, value: string): void {
-        const playerData: PlayerData = this.getPlayerData(client);
-        playerData.participantId = value;
+        const playerState: PlayerState = this.getPlayerData(client);
+        playerState.participantId = value;
         client.send(MessageType.UPDATE_PARTICIPANT_ID, value);
     }
 
     private updateUsername(client: Client, value: string): void {
-        const playerData: PlayerData = this.getPlayerData(client);
-        playerData.displayName = value;
+        const playerState: PlayerState = this.getPlayerData(client);
+        playerState.displayName = value;
         client.send(MessageType.UPDATE_USERNAME, value);
     }
 
     private updateDisplayName(client: Client, value: string): void {
-        const playerData: PlayerData = this.getPlayerData(client);
-        playerData.displayName = value;
+        const playerState: PlayerState = this.getPlayerData(client);
+        playerState.displayName = value;
         client.send(MessageType.UPDATE_DISPLAY_NAME, value);
     }
 
     private updateCharacter(client: Client, value: string): void {
-        const playerData: PlayerData = this.getPlayerData(client);
-        playerData.character = value;
+        const playerState: PlayerState = this.getPlayerData(client);
+        playerState.character = value;
         client.send(MessageType.UPDATE_CHARACTER, value);
     }
 }

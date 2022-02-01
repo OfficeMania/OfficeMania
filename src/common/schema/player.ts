@@ -3,7 +3,7 @@
  */
 import { Schema, type } from "@colyseus/schema";
 
-export class PlayerData extends Schema {
+export class PlayerState extends Schema {
     @type("string")
     userId: string;
 

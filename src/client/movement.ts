@@ -3,7 +3,7 @@ import { Room } from "colyseus.js";
 import { PlayerRecord } from "./util";
 import { choosePlayerSprites } from "./draw-player";
 import { solidInfo } from "./map";
-import { PlayerData } from "../common/schema/player";
+import { PlayerState } from "../common/schema/player";
 
 const MS_PER_UPDATE = 10;
 const MS_PER_UPDATE2 = 15;
@@ -34,11 +34,11 @@ export function playerLoop(
             Object.values(players).forEach((player: Player) => {
                 if (player !== ourPlayer) {
                     updatePosition(player, room);
-                    const playerData: PlayerData = room.state.players[player.roomId];
-                    player.username = playerData.username;
-                    player.displayName = playerData.displayName;
-                    player.character = playerData.character;
-                    player.participantId = playerData.participantId;
+                    const playerState: PlayerState = room.state.players[player.roomId];
+                    player.username = playerState.username;
+                    player.displayName = playerState.displayName;
+                    player.character = playerState.character;
+                    player.participantId = playerState.participantId;
                 }
             });
             //Update own player

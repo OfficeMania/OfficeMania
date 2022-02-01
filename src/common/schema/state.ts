@@ -1,6 +1,6 @@
 import { ArraySchema, MapSchema, Schema, type } from "@colyseus/schema";
 import { Conference } from "./conference";
-import { PlayerData } from "./player";
+import { PlayerState } from "./player";
 
 /*
  * state of whiteboard players (new)
@@ -125,8 +125,8 @@ export class ChessState extends Schema {
  * to every schema.
  */
 export class State extends Schema {
-    @type({ map: PlayerData })
-    players: MapSchema<PlayerData> = new MapSchema<PlayerData>();
+    @type({ map: PlayerState })
+    players: MapSchema<PlayerState> = new MapSchema<PlayerState>();
 
     @type({ array: "string" })
     playerSpritePaths = new ArraySchema<string>();

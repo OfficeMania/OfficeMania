@@ -2,7 +2,7 @@ import { Client, Room } from "colyseus";
 import { MessageType } from "../../common/util";
 import { Handler } from "./handler";
 import { State } from "../../common/schema/state";
-import { PlayerData } from "../../common/schema/player";
+import { PlayerState } from "../../common/schema/player";
 import { Chat, ChatDTO, ChatMessage } from "../../common/handler/chat-handler";
 
 export class ChatHandler implements Handler {
@@ -202,8 +202,8 @@ export class ChatHandler implements Handler {
         const ids: string[] = chatMessage.message.split(",");
         console.log(ids);
 
-        let ourPlayer: { data: PlayerData; id: string };
-        const otherPlayers: { data: PlayerData; id: string }[] = [];
+        let ourPlayer: { data: PlayerState; id: string };
+        const otherPlayers: { data: PlayerState; id: string }[] = [];
 
         //fill our and other players with valid data
         this.room.state.players.forEach((player, key) => {

@@ -17,7 +17,7 @@ import { characters, checkInputMode } from "./main";
 import { bsWelcomeModal, panelButtonsInteraction, usernameInputWelcome, welcomeModal } from "./static";
 import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
 import AnimationData, { createAnimationData } from "./graphic/animation-data";
-import { PlayerData } from "../common/schema/player";
+import { PlayerState } from "../common/schema/player";
 import { textchatPlayerOnChange } from "./textchat";
 import { updateUsers } from "./conference/conference";
 
@@ -134,16 +134,16 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
              *
              * See: https://docs.colyseus.io/state/schema/#onadd-instance-key
              */
-            room.state.players.onAdd = async (playerData: PlayerData, sessionId: string) => {
-                // console.log("Add", sessionId, playerData);
+            room.state.players.onAdd = async (playerState: PlayerState, sessionId: string) => {
+                // console.log("Add", sessionId, playerState);
 
                 let player: Player = {
-                    userId: playerData.userId,
+                    userId: playerState.userId,
                     roomId: sessionId,
-                    username: playerData.username,
-                    displayName: playerData.displayName,
+                    username: playerState.username,
+                    displayName: playerState.displayName,
                     participantId: null,
-                    character: playerData.character,
+                    character: playerState.character,
                     positionX: 0,
                     positionY: 0,
                     scaledX: 0,
@@ -176,7 +176,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 }
 
                 //logic for updating playerinfo for textchat
-                playerOnChangeFunctions(playerData);
+                playerOnChangeFunctions(playerState);
             };
 
             /*
@@ -557,9 +557,9 @@ export function ensureCharacter(value?: string): string {
 
 
 //onchange listeners to be added to the players
-function playerOnChangeFunctions(player: PlayerData) {
+function playerOnChangeFunctions(playerState: PlayerState) {
     //for updating textchat stuff
-    textchatPlayerOnChange(player);
+    textchatPlayerOnChange(playerState);
     //for user online list
     updateUsers();
 }

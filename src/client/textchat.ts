@@ -15,7 +15,7 @@ import {
 } from "./static";
 import { getOurPlayer, getRoom } from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chat-handler";
-import { PlayerData } from "../common/schema/player";
+import { PlayerState } from "../common/schema/player";
 import { getUser } from "./conference/conference";
 
 //tracks if button/shortcut have been pressed
@@ -142,15 +142,15 @@ export function initChatListener() {
     getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => onMessage(message));
 }
 
-export function textchatPlayerOnChange(player: PlayerData) {
-    if (player) {
+export function textchatPlayerOnChange(playerState: PlayerState) {
+    if (playerState) {
         let uid: string = "";
 
-        player.onChange = (changes => {
+        playerState.onChange = (changes => {
             changes.forEach(change => {
                 if (change.field === "displayName") {
                     getRoom()?.state.players.forEach((p, key) => {
-                        if (p === player && chats[0]) {
+                        if (p === playerState && chats[0]) {
                             uid = key;
                         }
                     });
