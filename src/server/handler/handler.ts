@@ -1,5 +1,5 @@
 import {Client, Room} from "colyseus";
-import {State} from "../schema/state";
+import {State} from "../../common/schema/state";
 
 export interface Handler {
 

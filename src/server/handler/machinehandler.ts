@@ -1,7 +1,7 @@
 
 import { Client, Room } from "colyseus";
-import { State } from "../schema/state";
-import { MessageType } from "../util";
+import { State } from "../../common/schema/state";
+import { MessageType } from "../../common/util";
 import { Handler } from "./handler";
 
 export enum MachineType {

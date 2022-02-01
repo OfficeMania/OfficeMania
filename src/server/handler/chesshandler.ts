@@ -1,7 +1,7 @@
 import {Handler} from "./handler";
 import {Client, Room} from "colyseus";
-import {ChessState, State} from "../schema/state";
-import {generateUUIDv4, MessageType, TaskExecutor} from "../util";
+import {ChessState, State} from "../../common/schema/state";
+import {generateUUIDv4, MessageType, TaskExecutor} from "../../common/util";
 
 const jsChessEngine = require('js-chess-engine');
 

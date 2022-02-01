@@ -1,7 +1,7 @@
 import { Client, Room } from "colyseus";
-import { generateUUIDv4, MessageType } from "../util";
+import { generateUUIDv4, MessageType } from "../../common/util";
 import { Handler } from "./handler";
-import { PlayerData, State } from "../schema/state";
+import { PlayerData, State } from "../../common/schema/state";
 
 export interface ChatMessage {
     timestamp?: string;
