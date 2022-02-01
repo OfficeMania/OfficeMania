@@ -1,6 +1,6 @@
 import { Direction, MessageType, TaskExecutor } from "../../common/util";
-import { State } from "../../common/schema/state";
-import { PongState } from "../../common/schema/pong-state";
+import { State } from "../../common/states/state";
+import { PongState } from "../../common/states/pong-state";
 import { Client, Room } from "colyseus";
 import { Handler } from "./handler";
 import { PongMessage } from "../../common/handler/pong-handler";

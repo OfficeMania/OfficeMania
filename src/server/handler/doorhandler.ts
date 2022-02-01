@@ -1,7 +1,7 @@
 import {Handler} from "./handler";
 import {Client, Room} from "colyseus";
-import {State} from "../../common/schema/state";
-import { DoorState } from "../../common/schema/door-state";
+import {State} from "../../common/states/state";
+import { DoorState } from "../../common/states/door-state";
 import {MessageType} from "../../common/util";
 
 export class DoorHandler implements Handler {

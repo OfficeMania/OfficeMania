@@ -1,6 +1,7 @@
 import { Handler } from "./handler";
 import { Client, Room } from "colyseus";
-import { State } from "../../common/schema/state";
+import { State } from "../../common/states/state";
+import { PlayerState } from "../../common/states/player-state";
 import {
     checkDisplayName,
     checkUsername,
@@ -12,7 +13,6 @@ import {
     MessageType,
 } from "../../common/util";
 import { findUserById } from "../database/entities/user";
-import { PlayerState } from "../../common/schema/player-state";
 
 export interface AuthData {
     userSettings?: UserSettings;
