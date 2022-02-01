@@ -1,15 +1,8 @@
-import {Direction, MessageType, TaskExecutor} from "../../common/util";
-import {PongState, State} from "../../common/schema/state";
-import {Client, Room} from "colyseus";
-import {Handler} from "./handler";
-
-export enum PongMessage {
-    ON_INTERACTION = "pong",
-    INIT = "pong-init",
-    UPDATE = "pong-update",
-    LEAVE = "pong-leave",
-    END = "pong-end"
-}
+import { Direction, MessageType, TaskExecutor } from "../../common/util";
+import { PongState, State } from "../../common/schema/state";
+import { Client, Room } from "colyseus";
+import { Handler } from "./handler";
+import { PongMessage } from "../../common/handler/pong";
 
 const batSections: number[] = [-0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5]
 let hasScored: boolean = false;

@@ -14,7 +14,7 @@ import {
 } from "../util";
 import { Interactive } from "./interactive";
 import { Pong, PongPlayer } from "./pong";
-import { PongMessage } from "../../server/handler/ponghandler";
+import { PongMessage } from "../../common/handler/pong";
 
 let ourGame: Pong;
 
