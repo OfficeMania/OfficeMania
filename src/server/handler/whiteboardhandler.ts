@@ -1,9 +1,10 @@
 import {Handler} from "./handler";
 import {Client, Room} from "colyseus";
-import {State, WhiteboardState} from "../../common/schema/state";
+import {State} from "../../common/schema/state";
 import { WhiteboardPlayerState } from "../../common/schema/whiteboard-player-state";
 import {MessageType} from "../../common/util";
 import {ArraySchema} from "@colyseus/schema";
+import { WhiteboardState } from "../../common/schema/whiteboard-state";
 
 let whiteboardCount = 300
 

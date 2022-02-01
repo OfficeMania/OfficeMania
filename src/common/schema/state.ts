@@ -1,15 +1,7 @@
 import { ArraySchema, MapSchema, Schema, type } from "@colyseus/schema";
 import { ConferenceState } from "./conference-state";
 import { PlayerState } from "./player-state";
-import { WhiteboardPlayerState } from "./whiteboard-player-state";
-
-/*
- * state of whiteboard
- */
-export class WhiteboardState extends Schema {
-    @type({ map: WhiteboardPlayerState })
-    whiteboardPlayer: MapSchema<WhiteboardPlayerState> = new MapSchema<WhiteboardPlayerState>();
-}
+import { WhiteboardState } from "./whiteboard-state";
 
 /*
  *state of pong game
