@@ -4,8 +4,7 @@ import { ChessColor, ChessState, getOppositeChessColor, MessageType, State } fro
 import { createCloseInteractionButton, getRoom, removeCloseInteractionButton } from "../util";
 import { checkInputMode } from "../main";
 import { chessExportButton, chessImportButton, interactiveBarChess } from "../static";
-
-const jsChessEngine = require('js-chess-engine'); //@Paul
+import jsChessEngine from "js-chess-engine";
 
 enum ChessSquareColor {
     NORMAL_WHITE = "white",
