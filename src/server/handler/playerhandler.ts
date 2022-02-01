@@ -11,7 +11,7 @@ import {
     literallyUndefined,
     MessageType,
 } from "../../common/util";
-import { findUserById } from "../../common/database/entities/user";
+import { findUserById } from "../database/entities/user";
 
 export interface AuthData {
     userSettings?: UserSettings;

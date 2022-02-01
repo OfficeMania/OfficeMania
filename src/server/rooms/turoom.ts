@@ -13,7 +13,7 @@ import { MachineHandler } from "../handler/machinehandler";
 import { NotesHandler } from "../handler/noteshandler";
 import { ChatHandler } from "../handler/chatHandler";
 import http from "http";
-import User, { findUserById } from "../../common/database/entities/user";
+import User, { findUserById } from "../database/entities/user";
 
 const path = require("path");
 

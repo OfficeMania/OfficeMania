@@ -3,9 +3,9 @@ import passport from "passport";
 import { DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, LDAP_OPTIONS, SESSION_SECRET } from "./config";
 import path from "path";
 import connectionEnsureLogin, { LoggedInOptions } from "connect-ensure-login";
-import User, { createUser, findUserById, findUserByUsername, getUsername } from "../common/database/entities/user";
+import User, { createUser, findUserById, findUserByUsername, getUsername } from "./database/entities/user";
 import session from "express-session";
-import { getId } from "../common/database/database";
+import { getId } from "./database/database";
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
