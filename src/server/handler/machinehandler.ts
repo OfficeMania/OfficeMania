@@ -1,5 +1,5 @@
 import { Client, Room } from "colyseus";
-import { State } from "../../common/schema/state";
+import { State } from "../../common";
 import { MessageType } from "../../common/util";
 import { Handler } from "./handler";
 import { MachineType } from "../../common/handler/machine-handler";
