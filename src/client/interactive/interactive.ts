@@ -16,11 +16,11 @@ export class Interactive {
     input: Direction[] = [null];
     direction: DoorDirection;
 
-    constructor(name: string, singleton: boolean = true, maxPlayer: number = 1) {
+    constructor(name: string, singleton: boolean = true, maxPlayer: number = 1, canvasElement: HTMLCanvasElement = interactiveCanvas) {
         this._name = name;
         this._singleton = singleton;
         this._maxPlayer = maxPlayer;
-        this.canvas = interactiveCanvas;
+        this.canvas = canvasElement;
     }
 
     /**

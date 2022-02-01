@@ -66,7 +66,8 @@ body {
 
 #panel-buttons button,
 #textchat-bar button,
-#interactive-bar button {
+#chess-wrapper button,
+#whiteboard-wrapper button {
     height: 40px;
     width: 40px;
     cursor: pointer;
@@ -83,13 +84,15 @@ body {
 
 #panel-buttons button:hover,
 #textchat-bar button:hover,
-#interactive-bar button:hover {
+#chess-wrapper button:hover,
+#whiteboard-wrapper button:hover {
     transition: 0.5s;
 }
 
 #panel-buttons button span,
 #textchat-bar button span,
-#interactive-bar span {
+#chess-wrapper span,
+#whiteboard-wrapper span {
     display: none;
     position: absolute;
     background: rgba(248, 248, 248, 0.8);
@@ -102,13 +105,15 @@ body {
 
 #panel-buttons button:hover span,
 #textchat-bar button:hover span,
-#interactive-bar button:hover span {
+#chess-wrapper button:hover span,
+#whiteboard-wrapper button:hover span {
     display: block;
 }
 
 #panel-buttons button span:after,
 #textchat-bar button span:after,
-#interactive-bar button span:after {
+#chess-wrapper button span:after,
+#whiteboard-wrapper button span:after {
     transition: 0.5s;
     right: 0;
 }
@@ -321,12 +326,26 @@ body {
 #focus-bar video {
     height: 65vh;
 }
-#interactive-bar {
+
+#chess-wrapper {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    top: 0;
+}
+
+#whiteboard-wrapper {
+    display: flex;
+    flex-flow: row;
     align-items: center;
     justify-content: center;
 }
 
-#interactive-bar p{
+#chess-wrapper p,
+#whiteboard-wrapper p{
     position: absolute;
     width: 100%;
     text-align: center;
@@ -340,7 +359,8 @@ body {
     -webkit-text-stroke-color: black;
 }
 
-#interactive-bar iframe {
+#chess-wrapper iframe,
+#whiteboard-wrapper iframe {
     margin-top: 15%;
     margin-left: 20%;
     width: 1280px;
@@ -350,7 +370,8 @@ body {
     position: absolute;
 }
 
-#interactive {
+
+#chess-canvas, #whiteboard-canvas {
     position:absolute;
     z-index: 1;
     width: 60%;
@@ -368,30 +389,15 @@ body {
     border: 5px black;
 }
 
-#interactive-whiteboard-wrapper {
-    display: flex;
-    flex-flow: row;
-    align-items: center;
-    justify-content: inherit;
-}
-
-#interactive-bar-whiteboard-wrapper {
-    height: 100vh;
-    position: relative;
-    right: 34%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#interactive-bar-whiteboard {
+#whiteboard-button-panel-wrapper {
     display: inline-grid;
     position: relative;
-    height: 602px;
+    position: relative;
+    right: 34%;
 }
 
-
-#interactive-bar button {
+#chess-wrapper button,
+#whiteboard-wrapper button {
     height: 40px;
     width: 40px;
     cursor: pointer;
@@ -407,7 +413,7 @@ body {
     visibility: hidden;
 }
 
-#interactive-bar-chess {
+#chess-button-wrapper {
     position: absolute;
     top: 30%;
     right: 30%;
@@ -415,7 +421,7 @@ body {
     display: flex;
 }
 
-#interactive-bar-chess button {
+#chess-button-wrapper button {
     position: unset;
 }
 
@@ -427,25 +433,6 @@ body {
     visibility: hidden;
     height: 80%;
 }
-
-/*#interactive-bar button {
-    height: 40px;
-    width: 40px;
-    cursor: pointer;
-    font-size: 110%;
-    font-weight: bold;
-    margin: 5px;
-    color: #3a3a50;
-    background: #f8f8f8;
-    border: solid;
-    border-width: 2px;
-    border-radius: 10px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    visibility: hidden;
-}*/
 
 .player-state {
     display: flex;
