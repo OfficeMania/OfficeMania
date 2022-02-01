@@ -1,6 +1,6 @@
 import { Schema, type } from "@colyseus/schema";
 
-export class Conference extends Schema {
+export class ConferenceState extends Schema {
     @type("string")
     id: string;
 

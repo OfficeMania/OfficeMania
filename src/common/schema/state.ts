@@ -1,5 +1,5 @@
 import { ArraySchema, MapSchema, Schema, type } from "@colyseus/schema";
-import { Conference } from "./conference";
+import { ConferenceState } from "./conference-state";
 import { PlayerState } from "./player";
 
 /*
@@ -134,8 +134,8 @@ export class State extends Schema {
     @type({ array: "string" })
     templatePaths = new ArraySchema<string>();
 
-    @type(Conference)
-    conference: Conference = new Conference();
+    @type(ConferenceState)
+    conference: ConferenceState = new ConferenceState();
 
     @type({ array: WhiteboardState })
     whiteboard: ArraySchema<WhiteboardState> = new ArraySchema<WhiteboardState>();
