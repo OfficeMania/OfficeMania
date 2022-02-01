@@ -1,14 +1,8 @@
-
 import { Client, Room } from "colyseus";
 import { State } from "../../common/schema/state";
 import { MessageType } from "../../common/util";
 import { Handler } from "./handler";
-
-export enum MachineType {
-    COFFEE = "coffee",
-    VENDING = "vending",
-    WATER = "water"
-}//hello
+import { MachineType } from "../../common/handler/machine";
 
 export class MachineHandler implements Handler {
 
