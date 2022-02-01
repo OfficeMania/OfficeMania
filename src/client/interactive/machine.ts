@@ -5,7 +5,7 @@ import {createCloseInteractionButton, getRoom, InputMode, removeCloseInteraction
 import { MessageType } from "../../common/util";
 import { checkInputMode } from "../main";
 import { State } from "../../common";
-import { MachineType } from "../../common/handler/machine";
+import { MachineType } from "../../common/handler/machine-handler";
 export class Machine extends Interactive {
 
 

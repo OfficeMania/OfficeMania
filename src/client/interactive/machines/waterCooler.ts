@@ -1,5 +1,5 @@
 
-import { MachineType } from "../../../common/handler/machine";
+import { MachineType } from "../../../common/handler/machine-handler";
 import { Machine } from "../machine";
 
 export class WaterCooler extends Machine{

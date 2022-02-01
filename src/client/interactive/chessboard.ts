@@ -5,7 +5,7 @@ import {createCloseInteractionButton, getRoom, removeCloseInteractionButton} fro
 import {ChessState} from "../../common/schema/state";
 import {MessageType} from "../../common/util";
 import {checkInputMode} from "../main";
-import { ChessColor, getOppositeChessColor } from "../../common/handler/chess";
+import { ChessColor, getOppositeChessColor } from "../../common/handler/chess-handler";
 import {chessExportButton, chessImportButton, interactiveBarChess} from "../static";
 import { createTextChangeRange } from "typescript";
 
