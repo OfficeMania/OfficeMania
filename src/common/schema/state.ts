@@ -6,17 +6,7 @@ import { PongState } from "./pong-state";
 import { DoorState } from "./door-state";
 import { TodoState } from "./todo-state";
 import { NotesState } from "./notes-state";
-
-export class ChessState extends Schema {
-    @type("string")
-    playerWhite: string;
-
-    @type("string")
-    playerBlack: string;
-
-    @type("string")
-    configuration: string;
-}
+import { ChessState } from "./chess-state";
 
 /*
  * The state of a room. Each variable that is annotated with a @type decorator

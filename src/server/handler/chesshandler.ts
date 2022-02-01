@@ -1,6 +1,7 @@
 import { Handler } from "./handler";
 import { Client, Room } from "colyseus";
-import { ChessState, State } from "../../common/schema/state";
+import { State } from "../../common/schema/state";
+import { ChessState } from "../../common/schema/chess-state";
 import { generateUUIDv4, MessageType, TaskExecutor } from "../../common/util";
 import { ChessColor } from "../../common/handler/chess-handler";
 
