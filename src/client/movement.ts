@@ -3,7 +3,7 @@ import { Room } from "colyseus.js";
 import { PlayerRecord } from "./util";
 import { choosePlayerSprites } from "./draw-player";
 import { solidInfo } from "./map";
-import { PlayerData } from "../common/schema/state";
+import { PlayerData } from "../common/schema/player";
 
 const MS_PER_UPDATE = 10;
 const MS_PER_UPDATE2 = 15;

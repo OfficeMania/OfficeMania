@@ -1,34 +1,6 @@
 import { ArraySchema, MapSchema, Schema, type } from "@colyseus/schema";
 import { Conference } from "./conference";
-
-/*
- * Class to sync the playerdata with the server
- */
-export class PlayerData extends Schema {
-    @type("string")
-    userId: string;
-
-    @type("string")
-    username: string;
-
-    @type("string")
-    displayName: string;
-
-    @type("string")
-    character: string;
-
-    @type("number")
-    x: number;
-
-    @type("number")
-    y: number;
-
-    @type("number")
-    cooldown: number;
-
-    @type("string")
-    participantId: string;
-}
+import { PlayerData } from "./player";
 
 /*
  * state of whiteboard players (new)

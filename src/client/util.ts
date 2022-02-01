@@ -17,7 +17,7 @@ import { characters, checkInputMode } from "./main";
 import { bsWelcomeModal, panelButtonsInteraction, usernameInputWelcome, welcomeModal } from "./static";
 import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
 import AnimationData, { createAnimationData } from "./graphic/animation-data";
-import { PlayerData } from "../common/schema/state";
+import { PlayerData } from "../common/schema/player";
 import { textchatPlayerOnChange } from "./textchat";
 import { updateUsers } from "./conference/conference";
 
