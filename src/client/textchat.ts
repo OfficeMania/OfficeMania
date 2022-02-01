@@ -14,7 +14,7 @@ import {
     textchatSendButton,
 } from "./static";
 import { getOurPlayer, getRoom } from "./util";
-import { Chat, ChatDTO, ChatMessage } from "../common/handler/chatHandler";
+import { Chat, ChatDTO, ChatMessage } from "../server/handler/chatHandler";
 import { PlayerData } from "../common/schema/state";
 import { getUser } from "./conference/conference";
 

@@ -5,9 +5,9 @@ import {createCloseInteractionButton, getRoom, InputMode, removeCloseInteraction
 import { MessageType } from "../../common/util";
 import { checkInputMode } from "../main";
 import { State } from "../../common";
-import { MachineType} from "../../common/handler/machinehandler";
+import { MachineType} from "../../server/handler/machinehandler";
 export class Machine extends Interactive {
-    
+
 
     ctx: CanvasRenderingContext2D;
     room: Room<State>;
@@ -34,7 +34,7 @@ export class Machine extends Interactive {
             this.room.send(MessageType.MACHINE_INTERACT, this.mtype);
         }
         else this.leave();
-        
+
     }
 
 
@@ -53,7 +53,7 @@ export class Machine extends Interactive {
             this.ctx.fillRect(5, 5, this.canvas.width - 10, this.canvas.height - 10);
 
             this.ctx.fillStyle = "white";
-            this.ctx.font = "50px MobileFont"; 
+            this.ctx.font = "50px MobileFont";
             this.ctx.lineWidth = 3;
 
             var subs = message.split('\n');
@@ -73,7 +73,7 @@ export class Machine extends Interactive {
                 i++;
             }
         })
-        
+
     }
     getMessageType(){
         if (this.mtype === MachineType.COFFEE) {
