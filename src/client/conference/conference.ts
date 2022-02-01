@@ -23,7 +23,7 @@ import { SelfUser, User } from "./entities";
 import { Room } from "colyseus.js";
 import { solidInfo } from "../map";
 import { Player } from "../player";
-import { MessageType } from "../../common/util";
+import { MessageType } from "../../common";
 import { camButton, muteButton, shareButton } from "../static";
 
 export { init as initConference, trackTypeAudio, trackTypeVideo, trackTypeDesktop };

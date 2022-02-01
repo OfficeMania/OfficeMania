@@ -1,13 +1,9 @@
-import {Interactive} from "./interactive";
-import {Room} from "colyseus.js";
-import {State} from "../../common";
-import {createCloseInteractionButton, getRoom, removeCloseInteractionButton} from "../util";
-import { ChessState } from "../../common/states/chess-state";
-import {MessageType} from "../../common/util";
-import {checkInputMode} from "../main";
-import { ChessColor, getOppositeChessColor } from "../../common/handler/chess-handler";
-import {chessExportButton, chessImportButton, interactiveBarChess} from "../static";
-import { createTextChangeRange } from "typescript";
+import { Interactive } from "./interactive";
+import { Room } from "colyseus.js";
+import { ChessColor, ChessState, getOppositeChessColor, MessageType, State } from "../../common";
+import { createCloseInteractionButton, getRoom, removeCloseInteractionButton } from "../util";
+import { checkInputMode } from "../main";
+import { chessExportButton, chessImportButton, interactiveBarChess } from "../static";
 
 const jsChessEngine = require('js-chess-engine'); //@Paul
 

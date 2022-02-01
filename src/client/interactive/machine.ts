@@ -1,11 +1,10 @@
 import { Room } from "colyseus.js";
-import {Interactive} from "./interactive";
-import {getInputMode, setInputMode} from "../input";
-import {createCloseInteractionButton, getRoom, InputMode, removeCloseInteractionButton, } from "../util";
-import { MessageType } from "../../common/util";
+import { Interactive } from "./interactive";
+import { getInputMode, setInputMode } from "../input";
+import { createCloseInteractionButton, getRoom, InputMode, removeCloseInteractionButton } from "../util";
+import { MachineType, MessageType, State } from "../../common";
 import { checkInputMode } from "../main";
-import { State } from "../../common";
-import { MachineType } from "../../common/handler/machine-handler";
+
 export class Machine extends Interactive {
 
 

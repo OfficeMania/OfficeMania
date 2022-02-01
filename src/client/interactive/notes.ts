@@ -1,7 +1,5 @@
-
 import { Room } from "colyseus.js";
-import { State } from "../../common";
-import { MessageType } from "../../common/util";
+import { MessageType, State } from "../../common";
 import { checkInputMode } from "../main";
 import { Player } from "../player";
 import { createCloseInteractionButton, getOurPlayer, getRoom, removeCloseInteractionButton } from "../util";
@@ -28,7 +26,7 @@ export class Notes extends Interactive {
         else {
             console.log("Cannot type " + e.key);
         }
-        
+
         //console.log("sent request to add key");
     }
     constructor() {
@@ -59,7 +57,7 @@ export class Notes extends Interactive {
         this.drawText();
     }
 
-    loop() { 
+    loop() {
     }
 
     leave() {
@@ -118,8 +116,8 @@ export class Notes extends Interactive {
             j++;
             i++;
         }
-    
-        
+
+
 
     }
 }

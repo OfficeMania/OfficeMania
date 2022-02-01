@@ -1,11 +1,19 @@
 import { Interactive } from "./interactive";
-import { createCloseInteractionButton, getCollisionInfo, getCorrectedPlayerCoordinates, getOurPlayer, getRoom, InputMode, removeCloseInteractionButton } from "../util";
+import {
+    createCloseInteractionButton,
+    getCollisionInfo,
+    getCorrectedPlayerCoordinates,
+    getOurPlayer,
+    getPlayers,
+    getRoom,
+    InputMode,
+    PlayerRecord,
+    removeCloseInteractionButton,
+} from "../util";
 import { Chunk, MapInfo, solidInfo, TileSet } from "../map";
 import { Room } from "colyseus.js";
-import { State } from "../../common";
-import { MessageType } from "../../common/util";
+import { MessageType, State } from "../../common";
 import { doors, interactiveCanvas } from "../static";
-import { getPlayers, PlayerRecord } from "../util";
 import { Player } from "../player";
 import { checkInputMode } from "../main";
 import { setInputMode } from "../input";
@@ -181,7 +189,7 @@ export class Door extends Interactive {
         iCtx.fillRect(5, 5, this.canvas.width - 10, this.canvas.height - 10);
 
         iCtx.fillStyle = "black";
-        iCtx.font = "50px Comic Sans"; 
+        iCtx.font = "50px Comic Sans";
         iCtx.lineWidth = 3;
         iCtx.fillText("You cannot close a door", 100, 100);
         iCtx.fillText("that is supossed to be open all the time", 100, 150);
@@ -221,7 +229,7 @@ export class Door extends Interactive {
                 callPlayers.push(player.roomId);
             }
         }
-        
+
         this.room.send(MessageType.DOOR_KNOCK, callPlayers);
     }
 

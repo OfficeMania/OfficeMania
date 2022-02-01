@@ -1,9 +1,8 @@
-import {Room} from "colyseus.js";
-import {State} from "../../common";
-import {MessageType} from "../../common/util";
-import {Interactive} from "./interactive";
-import {setInputMode} from "../input";
-import {createCloseInteractionButton, getOurPlayer, getRoom, InputMode, removeCloseInteractionButton} from "../util";
+import { Room } from "colyseus.js";
+import { MessageType, State } from "../../common";
+import { Interactive } from "./interactive";
+import { setInputMode } from "../input";
+import { createCloseInteractionButton, getOurPlayer, getRoom, InputMode, removeCloseInteractionButton } from "../util";
 import { checkInputMode } from "../main";
 
 export class Todo extends Interactive {

@@ -1,4 +1,4 @@
-import {Direction} from "../../common/util";
+import {Direction} from "../../common";
 import { interactiveCanvas } from "../static";
 import { DoorDirection } from "./door";
 

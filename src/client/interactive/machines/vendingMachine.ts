@@ -1,5 +1,5 @@
 
-import { MachineType } from "../../../common/handler/machine-handler";
+import { MachineType } from "../../../common";
 import { Machine } from "../machine";
 
 export class VendingMachine extends Machine {
