@@ -1,18 +1,10 @@
-import {Handler} from "./handler";
-import {Client, Room} from "colyseus";
-import {ChessState, State} from "../../common/schema/state";
-import {generateUUIDv4, MessageType, TaskExecutor} from "../../common/util";
+import { Handler } from "./handler";
+import { Client, Room } from "colyseus";
+import { ChessState, State } from "../../common/schema/state";
+import { generateUUIDv4, MessageType, TaskExecutor } from "../../common/util";
+import { ChessColor } from "../../common/handler/chess";
 
 const jsChessEngine = require('js-chess-engine');
-
-export enum ChessColor {
-    BLACK = "black",
-    WHITE = "white"
-}
-
-export function getOppositeChessColor(chessColor: ChessColor): ChessColor {
-    return chessColor === ChessColor.WHITE ? ChessColor.BLACK : ChessColor.WHITE;
-}
 
 const taskExecutor: TaskExecutor<void> = new TaskExecutor<void>();
 const games: { [key: string]: any } = {};
