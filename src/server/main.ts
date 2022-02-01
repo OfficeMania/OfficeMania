@@ -5,7 +5,7 @@ import compression from "compression";
 import path from "path";
 import { Server } from "colyseus";
 
-import { TURoom } from "../common/rooms/turoom";
+import { TURoom } from "./rooms/turoom";
 import { DEBUG, SERVER_PORT } from "./config";
 import { getAuthRouter, getSessionHandler, loggedInOptions, setupAuth } from "./auth";
 import connectionEnsureLogin from "connect-ensure-login";

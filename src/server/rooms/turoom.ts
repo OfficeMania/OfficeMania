@@ -1,19 +1,19 @@
 import { Client, Presence, Room } from "colyseus";
-import { State } from "./schema/state";
+import { State } from "../../common/rooms/schema/state";
 import fs from "fs";
-import { generateUUIDv4 } from "../util";
-import { PongHandler } from "../handler/ponghandler";
-import { Handler } from "../handler/handler";
-import { DoorHandler } from "../handler/doorhandler";
-import { AuthData, PlayerHandler } from "../handler/playerhandler";
-import { WhiteboardHandler } from "../handler/whiteboardhandler";
-import { TodoListHandler } from "../handler/todoListhandler";
-import { ChessHandler } from "../handler/chesshandler";
-import { MachineHandler } from "../handler/machinehandler";
-import { NotesHandler } from "../handler/noteshandler";
-import { ChatHandler } from "../handler/chatHandler";
+import { generateUUIDv4 } from "../../common/util";
+import { PongHandler } from "../../common/handler/ponghandler";
+import { Handler } from "../../common/handler/handler";
+import { DoorHandler } from "../../common/handler/doorhandler";
+import { AuthData, PlayerHandler } from "../../common/handler/playerhandler";
+import { WhiteboardHandler } from "../../common/handler/whiteboardhandler";
+import { TodoListHandler } from "../../common/handler/todoListhandler";
+import { ChessHandler } from "../../common/handler/chesshandler";
+import { MachineHandler } from "../../common/handler/machinehandler";
+import { NotesHandler } from "../../common/handler/noteshandler";
+import { ChatHandler } from "../../common/handler/chatHandler";
 import http from "http";
-import User, { findUserById } from "../database/entities/user";
+import User, { findUserById } from "../../common/database/entities/user";
 
 const path = require("path");
 
