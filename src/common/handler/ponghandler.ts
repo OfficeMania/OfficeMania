@@ -1,5 +1,5 @@
 import {Direction, MessageType, TaskExecutor} from "../util";
-import {PongState, State} from "../rooms/schema/state";
+import {PongState, State} from "../schema/state";
 import {Client, Room} from "colyseus";
 import {Handler} from "./handler";
 

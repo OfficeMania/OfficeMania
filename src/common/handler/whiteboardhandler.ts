@@ -1,6 +1,6 @@
 import {Handler} from "./handler";
 import {Client, Room} from "colyseus";
-import {State, WhiteboardPlayerState, WhiteboardState} from "../rooms/schema/state";
+import {State, WhiteboardPlayerState, WhiteboardState} from "../schema/state";
 import {MessageType} from "../util";
 import {ArraySchema} from "@colyseus/schema";
 

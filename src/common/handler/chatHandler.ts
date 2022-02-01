@@ -1,7 +1,7 @@
 import { Client, Room } from "colyseus";
 import { generateUUIDv4, MessageType } from "../util";
 import { Handler } from "./handler";
-import { PlayerData, State } from "../rooms/schema/state";
+import { PlayerData, State } from "../schema/state";
 
 export interface ChatMessage {
     timestamp?: string;
@@ -221,7 +221,7 @@ export class ChatHandler implements Handler {
             };
             this.sendChatMessage(chat, leaveMessage);
         }
-        
+
         this.triggerChatUpdate(chat);
 
         this.onChatUpdate(client);

@@ -1,7 +1,7 @@
 import {Room} from "colyseus.js";
 import {getPlayerByRoomId, PlayerRecord} from "../util";
 import {State} from "../../common";
-import {PongState} from "../../common/rooms/schema/state";
+import {PongState} from "../../common/schema/state";
 
 export class Pong {
 

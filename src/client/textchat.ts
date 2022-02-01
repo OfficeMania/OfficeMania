@@ -15,7 +15,7 @@ import {
 } from "./static";
 import { getOurPlayer, getRoom } from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chatHandler";
-import { PlayerData } from "../common/rooms/schema/state";
+import { PlayerData } from "../common/schema/state";
 import { getUser } from "./conference/conference";
 
 //tracks if button/shortcut have been pressed

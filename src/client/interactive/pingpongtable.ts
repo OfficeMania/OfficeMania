@@ -1,6 +1,6 @@
 import { Room } from "colyseus.js";
 import { State } from "../../common";
-import { PongState } from "../../common/rooms/schema/state";
+import { PongState } from "../../common/schema/state";
 import { Direction, MessageType } from "../../common/util";
 import { checkInputMode } from "../main";
 import { Player } from "../player";

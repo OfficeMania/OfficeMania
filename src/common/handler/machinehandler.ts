@@ -1,6 +1,6 @@
 
 import { Client, Room } from "colyseus";
-import { State } from "../rooms/schema/state";
+import { State } from "../schema/state";
 import { MessageType } from "../util";
 import { Handler } from "./handler";
 
@@ -12,7 +12,7 @@ export enum MachineType {
 
 export class MachineHandler implements Handler {
 
-    
+
     room: Room<State>;
     //TODO Giulia does not good english speaking
     //TODO More options
@@ -102,7 +102,7 @@ export class MachineHandler implements Handler {
     searchText(room: Room<State>, client: Client, message: MachineType) {
         //console.log("searching");
         let text: string;
-        
+
         if (message === MachineType.COFFEE) {
             text = this.searchTextCoffee(room, client);
             client.send(MessageType.MACHINE_COFFEE, text);
@@ -116,13 +116,13 @@ export class MachineHandler implements Handler {
             client.send(MessageType.MACHINE_WATER, text);
         }
         //console.log(text);
-        
-        
+
+
     }
 
 
     searchTextCoffee(room: Room<State>, client: Client): string  {
-        
+
         //CHANGE SIZE OF BACKLOG HERE
         this.lastOutputsC.length > 3 && this.lastOutputsC.pop();
 
@@ -171,19 +171,19 @@ export class MachineHandler implements Handler {
 
 
     searchTextWater(room: Room<State>, client: Client): string  {
-        
+
         //CHANGE SIZE OF BACKLOG HERE
         this.lastOutputsW.length > 3 && this.lastOutputsW.pop();
-        
+
         let index = this.getRandomInt(0, this.outputsWater.length);
-        
+
         if (this.lastOutputsW.includes(index)) {
 
             let text = this.searchTextWater(room, client);
             return text;
         }
         this.lastOutputsW.unshift(index);
-        
+
         return this.outputsWater[index];;
     }
 

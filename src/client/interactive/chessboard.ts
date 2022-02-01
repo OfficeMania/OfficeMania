@@ -2,7 +2,7 @@ import {Interactive} from "./interactive";
 import {Room} from "colyseus.js";
 import {State} from "../../common";
 import {createCloseInteractionButton, getRoom, removeCloseInteractionButton} from "../util";
-import {ChessState} from "../../common/rooms/schema/state";
+import {ChessState} from "../../common/schema/state";
 import {MessageType} from "../../common/util";
 import {checkInputMode} from "../main";
 import {ChessColor, getOppositeChessColor} from "../../common/handler/chesshandler";

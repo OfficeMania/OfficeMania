@@ -1,5 +1,5 @@
 import { Client, Presence, Room } from "colyseus";
-import { State } from "../../common/rooms/schema/state";
+import { State } from "../../common/schema/state";
 import fs from "fs";
 import { generateUUIDv4 } from "../../common/util";
 import { PongHandler } from "../../common/handler/ponghandler";

@@ -1,5 +1,5 @@
 import { Client, Room } from "colyseus";
-import { State } from "../rooms/schema/state";
+import { State } from "../schema/state";
 import { Direction, MessageType } from "../util";
 import { Handler } from "./handler";
 
@@ -8,7 +8,7 @@ import { Handler } from "./handler";
 export class NotesHandler implements Handler{
 
     room: Room<State>;
-    
+
     oldContents: string[] = [];
     init(room: Room<State>) {
         this.room = room;
@@ -28,7 +28,7 @@ export class NotesHandler implements Handler{
 
     }
     onDispose() {
-        
+
     }
 
     private initNotes(client: Client) {
@@ -121,16 +121,16 @@ export class NotesHandler implements Handler{
                 this.room.state.notesState.change = !this.room.state.notesState.change;
 
         }
-        
+
     }
 
     //handles moving all the markers, correcting the line lengths
     //direction: either of 4, currently never right, thats being handled manually
-    //fromposx: position of marker before insertion/deletion 
+    //fromposx: position of marker before insertion/deletion
     private moveEverything(direction: Direction, fromPosX: number, line: number){
         let old: string[] = [];
         let counter = 0;
-        
+
         switch (direction) {
             case Direction.UP:
                 this.room.state.notesState.contents.forEach(content => old.push(content));
@@ -201,9 +201,9 @@ export class NotesHandler implements Handler{
                     //cant happen
 
             }
-            
-        }); 
-        
+
+        });
+
     }
     //moves markers
     private modifyMarkers(markerX: number, line: number, clientid: string, direction: Direction) {
@@ -246,7 +246,7 @@ export class NotesHandler implements Handler{
                 }
             }
             this.room.state.notesState.markersX.set(clientid, markerX - 1);
-            
+
         }
 
         //move marker right or down if possible, adjust y position if necessary
@@ -265,12 +265,12 @@ export class NotesHandler implements Handler{
             }
             this.room.state.notesState.markersX.set(clientid, markerX + 1);
         }
-        
+
     }
     private checkNotes(client: Client, id: number) {
-        
-        
+
+
     }
 
 
-} 
+}

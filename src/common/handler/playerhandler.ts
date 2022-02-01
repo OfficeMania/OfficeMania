@@ -1,6 +1,6 @@
 import { Handler } from "./handler";
 import { Client, Room } from "colyseus";
-import { PlayerData, State } from "../rooms/schema/state";
+import { PlayerData, State } from "../schema/state";
 import {
     checkDisplayName,
     checkUsername,
