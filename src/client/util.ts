@@ -312,9 +312,9 @@ export function setDisplayName(value: string): void {
 
 // Update
 
-export function updateDisplayName(value?: string): void {
+export function updateDisplayName(old:string, value?: string): void {
     getRoom().send(MessageType.UPDATE_DISPLAY_NAME, value);
-    getRoom().send(MessageType.CHAT_UPDATE_DISPLAY_NAME, value);
+    getRoom().send(MessageType.CHAT_UPDATE_DISPLAY_NAME, old);
 }
 
 // Local Get/Set
@@ -385,7 +385,7 @@ export function loadUser(): void {
         //load displayName
         const displayName: string = getLocalDisplayName();
         if (displayName && displayName !== "") {
-            updateDisplayName(displayName);
+            updateDisplayName(getOurPlayer().displayName, displayName);
         }
     }
 }

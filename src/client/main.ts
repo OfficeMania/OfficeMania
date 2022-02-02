@@ -6,6 +6,7 @@ import {
     getCharacter,
     getCurrentVersion,
     getDisplayName,
+    getOurPlayer,
     getUsername,
     InitState,
     InputMode,
@@ -286,7 +287,7 @@ function saveUsernameSettings() {
 
 function saveDisplayNameSettings() {
     if (displayNameInput.value) {
-        updateDisplayName(displayNameInput.value);
+        updateDisplayName(getOurPlayer().displayName, displayNameInput.value);
     }
 }
 
@@ -305,7 +306,7 @@ function applySettings() {
 
 function applySettingsWelcome() {
     if (usernameInputWelcome.value) {
-        updateDisplayName(usernameInputWelcome.value);
+        updateDisplayName(getOurPlayer().displayName, usernameInputWelcome.value);
     }
     setInputMode(InputMode.NORMAL);
 }
