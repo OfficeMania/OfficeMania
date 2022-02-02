@@ -141,6 +141,9 @@ export class PlayerHandler implements Handler {
         displayName = checkDisplayName(displayName);
         const playerState: PlayerState = this.getPlayerData(client);
         if (literallyUndefined(playerState.userId)) {
+            if (remove) {
+                return;
+            }
             this.updateDisplayName(client, ensureDisplayName(displayName));
             return;
         }
