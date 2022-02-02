@@ -250,7 +250,8 @@ export class ChatHandler implements Handler {
                         //make a message
                         const message = "Add new User to this Chat: " + otherPlayer.data.displayName;
                         const chatId = chatMessage.chatId;
-                        chat.messages.push(makeMessage(this.room, client, { message, chatId }));
+                        const serverMessage = makeMessage(this.room, client, { message, chatId })
+                        chat.messages.push(serverMessage);
 
                         //change the name of the chat
                         updateChatName(chat, this.room);
@@ -260,7 +261,7 @@ export class ChatHandler implements Handler {
                             .filter(client => chat.users.includes(getUserId(client, this.room)))
                             .forEach(client => {
                                 this.onChatUpdate(client);
-                                client.send(MessageType.CHAT_SEND, { message, chatId });
+                                client.send(MessageType.CHAT_SEND, serverMessage);
                             });
                     } else {
                         console.log("user " + otherPlayer.id + " already in chat " + chat.id);
@@ -273,15 +274,22 @@ export class ChatHandler implements Handler {
     onUpdateUsername(client: Client, name: string) {
         console.log("hello there name has changed", client.sessionId, name);
         this.chats.forEach(chat => {
-            if (chat.users.includes(getUserId(client, this.room)) && chat.id !== this.globalChat.id) {
+            if (chat.users.includes(getUserId(client, this.room)) && chat.id !== this.globalChat.id && chat.id !== this.nearbyChat.id) {
                 updateChatName(chat, this.room);
-                /*const serverMessage: ChatMessage =  {
+                let displayName: string;
+                this.room.state.players.forEach((p, k) => {if(k === client.sessionId) {displayName = p.displayName;}});
+                const serverMessage: ChatMessage =  {
                     timestamp: getFormattedTime(),
                     name,
-                    chatId,
-                    message: `User "${name}" left the Chat`,
-
-                }*/
+                    chatId: chat.id,
+                    message: `User "${name}" changed names to "${displayName}"`,
+                }
+                chat.messages.push(serverMessage);
+                this.room.clients
+                    .filter(client => chat.users.includes(getUserId(client, this.room)))
+                    .forEach(client => {
+                        client.send(MessageType.CHAT_SEND, serverMessage);
+                    });
             }
         });
     }
