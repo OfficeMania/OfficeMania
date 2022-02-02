@@ -212,8 +212,8 @@ function onMessageLogs(chatMessages: ChatMessage[]): void {
             clearTextchatBar();
         }
     });
-    chatMessages.forEach(mesage => {
-        onMessage(mesage)
+    chatMessages.forEach(message => {
+        onMessage(message)
     });
 }
 
