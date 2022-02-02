@@ -422,6 +422,13 @@ function updateChatName(chat: Chat) {
     chat.name = "";
     console.log(chat);
     chat.users.forEach((user) => {
+        if (user.length !== 9) {
+            getRoom().state.players.forEach((p,k,) => {
+                if(p.userId && p.userId === user) {
+                    user = k;
+                }
+            });
+        }
         if (user === getOurPlayer().roomId) {
             return;
         }
