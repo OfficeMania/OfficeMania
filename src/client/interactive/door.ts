@@ -27,7 +27,7 @@ export enum DoorDirection {
     ALWAYS_OPEN,
 }
 
-export function sendKnockNotification(message: string) {
+export function sendNotification(message: string) {
     //TODO make Notification beautiful
     if (!("Notification" in window)) {
       console.warn("This browser does not support desktop notification");

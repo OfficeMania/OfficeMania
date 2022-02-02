@@ -80,7 +80,7 @@ import {
     welcomeModal,
     welcomeOkButton,
 } from "./static";
-import { sendKnockNotification, updateDoors } from "./interactive/door";
+import { sendNotification, updateDoors } from "./interactive/door";
 import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 import { getInFocus, initChatListener } from "./textchat";
@@ -343,8 +343,8 @@ function setupRoomListener(room: Room<State>) {
     room.onMessage(MessageType.UPDATE_DISPLAY_NAME, onDisplayNameUpdate);
     room.onMessage(MessageType.UPDATE_CHARACTER, onCharacterUpdate);
     //if someone knocks on a door
-    room.onMessage(MessageType.DOOR_NOTIFICATION, (message: string) => sendKnockNotification(message));
-    room.onMessage(MessageType.DOOR_KNOCK_SUCCESS, (message: string) => sendKnockNotification(message));
+    room.onMessage(MessageType.DOOR_NOTIFICATION, (message: string) => sendNotification(message));
+    room.onMessage(MessageType.DOOR_KNOCK_SUCCESS, (message: string) => sendNotification(message));
 }
 
 // async is necessary here, because we use 'await' to resolve the promises
