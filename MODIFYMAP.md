@@ -14,22 +14,22 @@ Want to customize it even more? OfficeMania supports map swaps. Build your own m
 
 ## Modifying the Map
 
-To modify the existing map, you need to download [the Tiled map editor](https://thorbjorn.itch.io/tiled). Open the current `Map.json` file via `Import file...`. In the center you can see the provided map and on the top right there are all available layers. Layers can be turned on or of with the small eye symbol in each line. Please read about the usage of layers in the section below.
+To modify the existing map, you need to download [the Tiled map editor](https://thorbjorn.itch.io/tiled). Open the current `Map.json` file via `Import file...`. In the middle you can see the provided map and on the top right there are all available layers. Layers can be toggled on or off with the eye symbol in each line. Please read about the usage of layers in the next section.
 
 # 
 
 ## Creating a new Map
 
 To create a new `.json` file for a new map we recommend using [the Tiled map editor](https://thorbjorn.itch.io/tiled).
-You also need textures of the things you want to create. Either use our provided texture pack or imort your own. There are also two nessecary files called "pixel.png" and "rooms.png" provided in `/assets/templates`. Be aware: all textures must be 48*48 pixels in size!
+You also need textures of the things you want to create. Either use our provided texture pack or import your own. There are two nessecary files called `pixel.png` and `rooms.png` provided in `/assets/templates`. Be aware: all textures must be 48x48 pixels in size!
 
 To create a new project click on `File > new > new map`. The new window shows a few options:
-Switch `map size` to `unlimited` and `Kachelgröße` to 48 pixels.
+Toggle `Map size` to `infinite` and `Tile size` to 48 pixels.
 
 We recommend by starting with the visual layers. You can create as many new layers as you want as long as they are not called
-"Solid", "Content", "Rooms" or "Conference rooms". These names are reserved for special purposes. The editor also shows a preview of how your creation will look like. Please keep in mind that the player spawn coordinates are fixed at (TODO).
+"Solid", "Content", "Rooms" or "Conference rooms". These names are reserved for special purposes. The editor also shows a preview of how your creation will look like. Please keep in mind that the player's spawn coordinates are fixed at `(x = 5, y = -10)`.
 
-Following that, we create the functional layers. Create a layer called "Solid". On this Layer you can place the tiles from `pixel.png` to create an outline of solid walls. The black color marks all spots, where the player is not able to walk into. Pleace do not place other textures on this layer. Also, do not mark the player spawn as solid. Users might not be able to walk away.
+Now, we create the functional layers. Create a layer called "Solid". On this Layer you can place the tiles from `pixel.png` to create an outline of solid walls. The black color marks all spots, where the player is not able to walk into. Pleace do not place other textures on this layer. Also, do not mark the player spawn as solid. Users might not be able to walk away.
 
 After that, create a layer called "Rooms" in which you mark all rooms. Each room gets a different color from `rooms.png`. Please no not leave any room uncolored. Every color represents a zone for the proximity based video chat to stop people from talking through walls. It is possible to color all parts of the hallway in the same color, but not nessecary. Doors must not be colored, resulting in a `room id` for doors equal to 0.
 
@@ -50,7 +50,7 @@ Besides their use in the "Rooms" layer, the colors in `rooms.png` represent diff
 2. doors with room on the west
 3. doors with room on the south
 4. doors with room on the east
-5. doors that is supposed to be always open
+5. door that is supposed to be always open
 6. pingpong table
 7. whiteboard
 8. Post-its
