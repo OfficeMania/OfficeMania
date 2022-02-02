@@ -209,7 +209,7 @@ export class ChatHandler implements Handler {
                 otherPlayers.push({ data: player, id: key });
             }
         });
-        console.log(otherPlayers, ourPlayer);
+        //console.log(otherPlayers, ourPlayer);
 
         if (chatMessage.chatId === "new") {
             //add new chat
@@ -224,22 +224,28 @@ export class ChatHandler implements Handler {
             newChat.users.push(ourPlayer.id);
             otherPlayers.forEach(p => newChat.users.push(p.id));
             updateChatName(newChat, this.room);
+            const message = "Created chat";
+            const serverMessage = makeMessage(this.room, client, { message, chatId: newChat.id });
+            newChat.messages.push(serverMessage);
             this.chats.push(newChat);
 
             getClientsByUserId(ourPlayer.id, this.room).forEach(client => {
                 this.onChatUpdate(client);
+                this.onLog(client, newChat.id);
             });
+
             //this.onChatUpdate();
             otherPlayers.forEach(p => {
                 getClientsByUserId(p.id, this.room).forEach(client => {
                     this.onChatUpdate(client);
+                    this.onLog(client, newChat.id);
                 });
             });
             console.log(newChat.id);
         } else {
             //add to existing
-            if (chatMessage.chatId === this.globalChat.id) {
-                console.log("is globul");
+            if (chatMessage.chatId === this.globalChat.id || chatMessage.chatId === this.nearbyChat.id) {
+                console.log("is globul or nearby");
                 return;
             } else {
                 const chat: Chat = this.byChatId(chatMessage.chatId);
@@ -261,7 +267,7 @@ export class ChatHandler implements Handler {
                             .filter(client => chat.users.includes(getUserId(client, this.room)))
                             .forEach(client => {
                                 this.onChatUpdate(client);
-                                client.send(MessageType.CHAT_SEND, serverMessage);
+                                this.onLog(client, chat.id);
                             });
                     } else {
                         console.log("user " + otherPlayer.id + " already in chat " + chat.id);

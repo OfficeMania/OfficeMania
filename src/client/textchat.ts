@@ -188,12 +188,27 @@ function onChatUpdate(chatDTOs: ChatDTO[]): void {
 //
 function onMessageLogs(chatMessages: ChatMessage[]): void {
     //console.debug("chatMessages:", chatMessages);
-    chatMessages.forEach(onMessage);
+    let chatIds: string[] = [];
+    chatMessages.forEach(message => {
+        if (!chatIds.includes(message.chatId)) {
+            chatIds.push(message.chatId);
+        }
+    });
+    chats.forEach(chat => {
+        if (chatIds.includes(chat.id)) {
+            chat.messages.forEach(() => chat.messages.pop());
+        }
+        if (textchatDropdownChatsButton.getAttribute("data-id") === chat.id) {
+            clearTextchatBar();
+        }
+    });
+    chatMessages.forEach(mesage => {
+        onMessage(mesage)
+    });
 }
 
 //write message into chat object, update messagebar if it is selected
 function onMessage(chatMessage: ChatMessage) {
-    const chatId: string = chatMessage.chatId;
     const chat: Chat = getChatById(chatMessage.chatId);
     chat.messages.push(chatMessage);
     if (textchatDropdownChatsButton.getAttribute("data-id") === chatMessage.chatId) {
