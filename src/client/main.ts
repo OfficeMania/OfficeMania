@@ -99,12 +99,9 @@ export var lowestY;
 
 
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
-    let ctx: CanvasRenderingContext2D = loadingScreen.getContext("2d");
-    ctx.fillStyle = "black";
-    ctx.fillText("get to the computer",0,0);
-    loadingScreen.style.display = "visible";
-    let timer = setInterval(Function, 1000);
-    //window.stop();
+    if (!window.location.search) {
+        window.location.href = "https://dev.officemania.de/mobile.html";
+    }
 }
 
 // Mute Buttons
