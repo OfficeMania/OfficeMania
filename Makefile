@@ -8,3 +8,5 @@ run:
   -v ./database.sqlite:/app/database.sqlite \
   --restart unless-stopped \
   officemania:latest
+
+up: build run
