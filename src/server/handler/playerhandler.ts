@@ -10,6 +10,8 @@ import {
     literallyUndefined,
     MessageType,
     PlayerState,
+    sanitizeDisplayName,
+    sanitizeUsername,
     State,
 } from "../../common";
 import { findUserById } from "../database/entities/user";
@@ -120,7 +122,12 @@ export class PlayerHandler implements Handler {
 
     private onUsernameUpdate(client: Client, username: string): Promise<void> {
         //console.debug(`Incoming Username Update: ${username}`);
-        username = checkUsername(username);
+        if (!checkUsername(username)) {
+            //TODO Somehow notify the Player about the wrong username?
+            this.updateUsername(client, this.getPlayerData(client).username);
+            return;
+        }
+        username = sanitizeUsername(username);
         const playerState: PlayerState = this.getPlayerData(client);
         if (literallyUndefined(playerState.userId)) {
             this.updateUsername(client, username);
@@ -138,7 +145,12 @@ export class PlayerHandler implements Handler {
     private onDisplayNameUpdate(client: Client, displayName?: string): Promise<void> {
         //console.debug(`Incoming Display Name Update: ${displayName}`);
         const remove: boolean = !displayName;
-        displayName = checkDisplayName(displayName);
+        if (!checkDisplayName(displayName)) {
+            //TODO Somehow notify the Player about the wrong display name?
+            this.updateDisplayName(client, this.getPlayerData(client).displayName);
+            return;
+        }
+        displayName = sanitizeDisplayName(displayName);
         const playerState: PlayerState = this.getPlayerData(client);
         if (literallyUndefined(playerState.userId)) {
             if (remove) {

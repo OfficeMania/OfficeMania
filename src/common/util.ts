@@ -1,4 +1,5 @@
 import { v4 as uuid4 } from "uuid";
+import * as stringSanitizer from "string-sanitizer";
 
 export const KEY_DISPLAY_NAME = "displayName";
 export const KEY_CHARACTER = "character";
@@ -103,12 +104,28 @@ export function literallyUndefined(value: string): boolean {
     return !value || value === "undefined";
 }
 
-export function checkUsername(value: string): string {
-    return value.slice(0, 20);
+export function checkUsername(value: string): boolean {
+    // @ts-ignore
+    return stringSanitizer.validate.isUsername(value);
 }
 
-export function checkDisplayName(value?: string): string | undefined {
-    return value?.slice(0, 20);
+export function sanitizeUsername(value: string): string {
+    return stringSanitizer.sanitize(value).slice(0, 20);
+}
+
+export function checkDisplayName(value?: string): boolean {
+    if (!value) {
+        return true;
+    }
+    // @ts-ignore
+    return stringSanitizer.validate.isUsername(value);
+}
+
+export function sanitizeDisplayName(value?: string): string | undefined {
+    if (!value) {
+        return;
+    }
+    return stringSanitizer.sanitize(value).slice(0, 20);
 }
 
 export function ensureUserId(value?: string): string {
