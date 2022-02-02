@@ -100,7 +100,7 @@ export var lowestY;
 
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
     if (!window.location.search) {
-        window.location.href = "https://dev.officemania.de/mobile.html";
+        window.location.href = "/mobile.html";
     }
 }
 
