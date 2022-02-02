@@ -324,6 +324,7 @@ function checkWelcomeScreen() {
 
 function onUsernameUpdate(username: string): void {
     setUsername(username);
+    usernameInput.value = username;
 }
 
 function onDisplayNameUpdate(displayName: string): void {
@@ -331,6 +332,7 @@ function onDisplayNameUpdate(displayName: string): void {
     if (!areWeLoggedIn()) {
         setLocalDisplayName(displayName);
     }
+    displayNameInput.value = displayName;
 }
 
 function onCharacterUpdate(character: string): void {
