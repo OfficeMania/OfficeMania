@@ -188,12 +188,27 @@ function onChatUpdate(chatDTOs: ChatDTO[]): void {
 //
 function onMessageLogs(chatMessages: ChatMessage[]): void {
     //console.debug("chatMessages:", chatMessages);
-    chatMessages.forEach(onMessage);
+    let chatIds: string[] = [];
+    chatMessages.forEach(message => {
+        if (!chatIds.includes(message.chatId)) {
+            chatIds.push(message.chatId);
+        }
+    });
+    chats.forEach(chat => {
+        if (chatIds.includes(chat.id)) {
+            chat.messages.forEach(() => chat.messages.pop());
+        }
+        if (textchatDropdownChatsButton.getAttribute("data-id") === chat.id) {
+            clearTextchatBar();
+        }
+    });
+    chatMessages.forEach(mesage => {
+        onMessage(mesage)
+    });
 }
 
 //write message into chat object, update messagebar if it is selected
 function onMessage(chatMessage: ChatMessage) {
-    const chatId: string = chatMessage.chatId;
     const chat: Chat = getChatById(chatMessage.chatId);
     chat.messages.push(chatMessage);
     if (textchatDropdownChatsButton.getAttribute("data-id") === chatMessage.chatId) {
@@ -422,6 +437,13 @@ function updateChatName(chat: Chat) {
     chat.name = "";
     console.log(chat);
     chat.users.forEach((user) => {
+        if (user.length !== 9) {
+            getRoom().state.players.forEach((p,k,) => {
+                if(p.userId && p.userId === user) {
+                    user = k;
+                }
+            });
+        }
         if (user === getOurPlayer().roomId) {
             return;
         }
@@ -436,115 +458,3 @@ function updateChatName(chat: Chat) {
         chat.name = "Empty chat";
     }
 }
-
-
-/**
- * Old Textchat logic
- */
-
-
-/*
-//update user list in select
-function openChatUsers() {
-    while (textchatUsers.firstChild) {
-        textchatUsers.firstChild.remove();
-    }
-    //default option, only display no finctionality
-    var opt = document.createElement("option");
-    opt.innerText = "New Chat With";
-    opt.value = "default";
-    textchatUsers.append(opt);
-
-    //add any players online except for player
-    getRoom().state.players.forEach((value, key) => {
-        if (key === getOurPlayer().roomId) {
-            return;
-        }
-        const option = document.createElement("option");
-        option.innerText = value.displayName;
-        option.value = key;
-        option.addEventListener("click", () => {
-            modifyChat(key);
-            //console.log(value.name);
-        });
-        textchatUsers.append(option);
-    });
-
-    //leave button
-    var opt = document.createElement("option");
-    opt.innerText = "Leave Selected";
-    opt.value = "remove";
-    opt.addEventListener("click", () => {
-        modifyChat("remove");
-    });
-    textchatUsers.append(opt);
-}
-
-
-//refresh chat list in select without changing the order/ the selected item
-function updateParticipatingChats() {
-    //console.log("chats:", chats);
-
-    var childrenItems: HTMLOptionsCollection = textchatSelect.options;
-    var children: HTMLOptionElement[] = Array.from(childrenItems);
-    var wasFound: boolean = false;
-
-    //keeps log of all the chatids
-    var chatIds: string[] = [];
-    chats.forEach(chat => {
-        chatIds.push(chat.id);
-
-        wasFound = false;
-
-        children.forEach(child => {
-            if (child.value === chat.id) {
-                child.innerText = chat.name;
-                wasFound = true;
-            }
-        });
-        if (wasFound) {
-            //console.log("was found, renaming, exiting");
-            return;
-        }
-        else {
-            const option: HTMLOptionElement = document.createElement("option");
-            //console.log(chat.id, chat.name);
-            option.innerText = chat.name;
-            option.value = chat.id;
-
-            option.onclick = function () {
-                while(textchatBar.firstChild){
-                    textchatBar.firstChild.remove();
-                }
-                chat.messages.forEach(addMessageToBar);
-            }
-            textchatSelect.append(option);
-        }
-    });
-    //removes any chats user is not in
-    var selectOptions: HTMLOptionsCollection = textchatSelect.options;
-
-    for ( var i = 0; i < selectOptions.length; i++) {
-        if (!chatIds.includes(selectOptions[i].value)) {
-            //console.log("chat not part of list: removing " + selectOptions[i].innerText);
-            textchatSelect.removeChild(selectOptions[i]);
-            i--;
-        }
-        else {
-            //console.log("chats include: " + selectOptions[i].innerText);
-        }
-    }
-    addEmptyOption("New: ", "new");
-}
-
-//adds a nonfuncional option to textchatselect
-function addEmptyOption(name: string, id: string) {
-    const option = document.createElement("option");
-        option.innerText = name;
-        option.value = id;
-        textchatSelect.append(option);
-}
-
-*/
-
-

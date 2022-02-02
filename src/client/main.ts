@@ -6,6 +6,7 @@ import {
     getCharacter,
     getCurrentVersion,
     getDisplayName,
+    getOurPlayer,
     getUsername,
     InitState,
     InputMode,
@@ -98,12 +99,9 @@ export var lowestY;
 
 
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
-    let ctx: CanvasRenderingContext2D = loadingScreen.getContext("2d");
-    ctx.fillStyle = "black";
-    ctx.fillText("get to the computer",0,0);
-    loadingScreen.style.display = "visible";
-    let timer = setInterval(Function, 1000);
-    //window.stop();
+    if (!window.location.search) {
+        window.location.href = "/mobile.html";
+    }
 }
 
 // Mute Buttons
@@ -286,7 +284,7 @@ function saveUsernameSettings() {
 
 function saveDisplayNameSettings() {
     if (displayNameInput.value) {
-        updateDisplayName(displayNameInput.value);
+        updateDisplayName(getOurPlayer().displayName, displayNameInput.value);
     }
 }
 
@@ -305,7 +303,7 @@ function applySettings() {
 
 function applySettingsWelcome() {
     if (usernameInputWelcome.value) {
-        updateDisplayName(usernameInputWelcome.value);
+        updateDisplayName(getOurPlayer().displayName, usernameInputWelcome.value);
     }
     setInputMode(InputMode.NORMAL);
 }
