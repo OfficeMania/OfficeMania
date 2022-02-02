@@ -142,7 +142,13 @@ export function initChatListener() {
     getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => {
         onMessage(message);
         if (message.userId && message.userId !== getOurPlayer().roomId) {
-            sendNotification(message.name + ": " + message.message);
+            let chatSuffix: string = "";
+            if (chats[0].id === message.chatId) {
+                chatSuffix = " in Global";
+            } else if (chats[1].id === message.chatId) {
+                chatSuffix = " in Nearby";
+            }
+            sendNotification(`${message.name}${chatSuffix} says: ${message.message}`);
         }
     });
 }
