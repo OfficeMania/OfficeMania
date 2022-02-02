@@ -27,17 +27,17 @@ export enum DoorDirection {
     ALWAYS_OPEN,
 }
 
-export function sendKnockNotification() {
+export function sendKnockNotification(message: string) {
     //TODO make Notification beautiful
     if (!("Notification" in window)) {
       console.warn("This browser does not support desktop notification");
     }else if (window.Notification.permission === "granted") {
-        new window.Notification("klopf klopf");
+        new window.Notification(message);
     } else if (window.Notification.permission !== "denied") {
         //we send even though the person doesnt wqant to get notifications
         window.Notification.requestPermission(function (permission) {
             if (permission === "granted") {
-              new window.Notification("klopf klopf");
+              new window.Notification(message);
             }
           });
     }

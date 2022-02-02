@@ -37,9 +37,10 @@ export class DoorHandler implements Handler {
     onKnock(room: Room<State>, client: Client, message) {
         this.room.clients.forEach(client => {
             if(message.includes(client.sessionId)) {
-                client.send(MessageType.DOOR_NOTIFICATION, "knock knock");
+                client.send(MessageType.DOOR_NOTIFICATION, "Someone knocked on your door.");
             }
         });
+        client.send(MessageType.DOOR_KNOCK_SUCCESS, "You successfully knocked.")
     }
 
 }

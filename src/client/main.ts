@@ -345,7 +345,8 @@ function setupRoomListener(room: Room<State>) {
     room.onMessage(MessageType.UPDATE_DISPLAY_NAME, onDisplayNameUpdate);
     room.onMessage(MessageType.UPDATE_CHARACTER, onCharacterUpdate);
     //if someone knocks on a door
-    room.onMessage(MessageType.DOOR_NOTIFICATION, (message: string) => sendKnockNotification());
+    room.onMessage(MessageType.DOOR_NOTIFICATION, (message: string) => sendKnockNotification(message));
+    room.onMessage(MessageType.DOOR_KNOCK_SUCCESS, (message: string) => sendKnockNotification(message));
 }
 
 // async is necessary here, because we use 'await' to resolve the promises
