@@ -240,30 +240,34 @@
                 </button>
             </div>
         </div>
-        
-        <div id="whiteboard-wrapper">
-            <div id="whiteboard-button-panel-wrapper">
-                <button id="button-whiteboard-save"><em class="fas fa-save"></em><span></span></button>
-                <button id="button-whiteboard-clear"><em class="fa fa-trash"></em><span></span></button>
-                <button id="button-whiteboard-pen"><em class="fas fa-pen"></em><span></span></button>
-                <button id="button-whiteboard-eraser"><em class="fa fa-eraser"></em><span></span></button>
-                <button id="button-whiteboard-size5"><em class="fa fa-circle"></em><span></span></button>
-                <button id="button-whiteboard-size10"><em class="fa fa-circle fa-2x"></em><span></span></button>
-                <button id="button-whiteboard-red"><em class="fa fa-circle"></em><span></span></button>
-                <button id="button-whiteboard-pink"><em class="fa fa-circle"></em><span></span></button>
-                <button id="button-whiteboard-orange"><em class="fa fa-circle"></em><span></span></button>
-                <button id="button-whiteboard-yellow"><em class="fa fa-circle"></em><span></span></button>
-                <button id="button-whiteboard-green"><em class="fa fa-circle"></em><span></span></button>
-                <button id="button-whiteboard-blue"><em class="fa fa-circle"></em><span></span></button>
-                <button id="button-whiteboard-black"><em class="fa fa-circle"></em><span></span></button>
+        <div id="interactive-bar">
+            <div id="interactive-whiteboard-wrapper">
+                <div id="interactive-bar-whiteboard-wrapper">
+                    <div id="interactive-bar-whiteboard">
+                        <button id="button-whiteboard-save"><em class="fas fa-save"></em><span></span></button>
+                        <button id="button-whiteboard-clear"><em class="fa fa-trash"></em><span></span></button>
+                        <button id="button-whiteboard-pen"><em class="fas fa-pen"></em><span></span></button>
+                        <button id="button-whiteboard-eraser"><em class="fa fa-eraser"></em><span></span></button>
+                        <button id="button-whiteboard-size5"><em class="fa fa-circle"></em><span></span></button>
+                        <button id="button-whiteboard-size10"><em class="fa fa-circle fa-2x"></em><span></span></button>
+                        <button id="button-whiteboard-red"><em class="fa fa-circle"></em><span></span></button>
+                        <button id="button-whiteboard-pink"><em class="fa fa-circle"></em><span></span></button>
+                        <button id="button-whiteboard-orange"><em class="fa fa-circle"></em><span></span></button>
+                        <button id="button-whiteboard-yellow"><em class="fa fa-circle"></em><span></span></button>
+                        <button id="button-whiteboard-green"><em class="fa fa-circle"></em><span></span></button>
+                        <button id="button-whiteboard-blue"><em class="fa fa-circle"></em><span></span></button>
+                        <button id="button-whiteboard-black"><em class="fa fa-circle"></em><span></span></button>
+                    </div>
+                </div>
+                <canvas id="interactive" tabindex="0" width="1280" height="720"></canvas>
+                <canvas id="backpack" tabindex="0" width="1280" height="720"></canvas>
             </div>
-            <canvas id="whiteboard-canvas" tabindex="0" width="1280" height="720"></canvas>
-            <canvas id="backpack" tabindex="0" width="1280" height="720"></canvas>
         </div>
 
-        <div id="chess-wrapper">
-            <canvas id="chess-canvas" tabindex="0" width="1280" height="720" style="margin-left: 20%;"></canvas>
-            <div id="chess-button-wrapper">
+        <div id="interactive-bar">
+            <canvas id="interactive" tabindex="0" width="1280" height="720" style="margin-left: 20%;"></canvas>
+            <button id="button-interactive"></button>
+            <div id="interactive-bar-chess">
                 <button id="button-chess-export"><em class="fa fa-copy"></em><span></span></button>
                 <button id="button-chess-import"><em class="fa fa-paste"></em><span></span></button>
             </div>

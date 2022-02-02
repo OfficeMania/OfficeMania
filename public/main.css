@@ -66,8 +66,7 @@ body {
 
 #panel-buttons button,
 #textchat-bar button,
-#chess-wrapper button,
-#whiteboard-wrapper button {
+#interactive-bar button{
     height: 40px;
     width: 40px;
     cursor: pointer;
@@ -84,15 +83,13 @@ body {
 
 #panel-buttons button:hover,
 #textchat-bar button:hover,
-#chess-wrapper button:hover,
-#whiteboard-wrapper button:hover {
+#interactive-bar button:hover{
     transition: 0.5s;
 }
 
 #panel-buttons button span,
 #textchat-bar button span,
-#chess-wrapper span,
-#whiteboard-wrapper span {
+#interactive-bar span {
     display: none;
     position: absolute;
     background: rgba(248, 248, 248, 0.8);
@@ -105,15 +102,14 @@ body {
 
 #panel-buttons button:hover span,
 #textchat-bar button:hover span,
-#chess-wrapper button:hover span,
-#whiteboard-wrapper button:hover span {
+#interactive-bar button:hover span {
     display: block;
 }
 
 #panel-buttons button span:after,
 #textchat-bar button span:after,
-#chess-wrapper button span:after,
-#whiteboard-wrapper button span:after {
+#interactive-bar button span:after {
+
     transition: 0.5s;
     right: 0;
 }
@@ -327,25 +323,12 @@ body {
     height: 65vh;
 }
 
-#chess-wrapper {
-    display: flex;
-    flex-flow: row;
-    align-items: center;
-    position: absolute;
-    height: 100vh;
-    width: 100vw;
-    top: 0;
-}
-
-#whiteboard-wrapper {
-    display: flex;
-    flex-flow: row;
+#interactive-bar {
     align-items: center;
     justify-content: center;
 }
 
-#chess-wrapper p,
-#whiteboard-wrapper p{
+#interactive-bar p{
     position: absolute;
     width: 100%;
     text-align: center;
@@ -359,8 +342,7 @@ body {
     -webkit-text-stroke-color: black;
 }
 
-#chess-wrapper iframe,
-#whiteboard-wrapper iframe {
+#interactive-bar iframe {
     margin-top: 15%;
     margin-left: 20%;
     width: 1280px;
@@ -371,7 +353,7 @@ body {
 }
 
 
-#chess-canvas, #whiteboard-canvas {
+#interactive{
     position:absolute;
     z-index: 1;
     width: 60%;
@@ -389,15 +371,29 @@ body {
     border: 5px black;
 }
 
-#whiteboard-button-panel-wrapper {
-    display: inline-grid;
-    position: relative;
-    position: relative;
-    right: 34%;
+#interactive-whiteboard-wrapper {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: inherit;
 }
 
-#chess-wrapper button,
-#whiteboard-wrapper button {
+#interactive-bar-whiteboard-wrapper {
+    height: 100vh;
+    position: relative;
+    right: 34%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#interactive-bar-whiteboard {
+    display: inline-grid;
+    position: relative;
+    height: 602px;
+}
+
+#interactive-bar button {
     height: 40px;
     width: 40px;
     cursor: pointer;
@@ -413,7 +409,7 @@ body {
     visibility: hidden;
 }
 
-#chess-button-wrapper {
+#interactive-bar-chess{
     position: absolute;
     top: 30%;
     right: 30%;
@@ -421,7 +417,7 @@ body {
     display: flex;
 }
 
-#chess-button-wrapper button {
+#interactive-bar-chess button {
     position: unset;
 }
 

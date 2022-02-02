@@ -1,5 +1,5 @@
-import {Room} from "colyseus.js";
-import {State} from "../../common";
+import { Room } from "colyseus.js";
+import { MessageType, State } from "../../common";
 import {
     createCloseInteractionButton,
     getPlayers,
@@ -22,13 +22,11 @@ import {
     size10Button,
     size5Button,
     whiteboardPanel,
-    yellowButton,
-    interactiveWhiteboard
+    yellowButton
 } from "../static";
-import {ArraySchema} from "@colyseus/schema";
-import {MessageType} from "../../common/util";
-import {Interactive} from "./interactive";
-import {checkInputMode} from "../main";
+import { ArraySchema } from "@colyseus/schema";
+import { Interactive } from "./interactive";
+import { checkInputMode } from "../main"; 
 
 export class Whiteboard extends Interactive{
 
@@ -108,7 +106,7 @@ export class Whiteboard extends Interactive{
 
     constructor() {
 
-        super("whiteboard", false, 1, interactiveWhiteboard)
+        super("whiteboard", false, 1)
 
         this.wID = Whiteboard.whiteboardCount;
         Whiteboard.whiteboardCount++;
@@ -357,8 +355,8 @@ export class Whiteboard extends Interactive{
         if (whiteboard.wID != message) {
             return;
         }
-        // This code will automatically save the current canvas as a .png file. 
-        var canvas = <HTMLCanvasElement> document.getElementById("whiteboard-canvas");
+        // This code will automatically save the current canvas as a .png file.
+        var canvas = <HTMLCanvasElement> document.getElementById("interactive");
         // Convert the canvas to data
         var image = canvas.toDataURL();
         // Create a link

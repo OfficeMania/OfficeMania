@@ -3,7 +3,7 @@ import { Room } from "colyseus.js";
 import { ChessColor, ChessState, getOppositeChessColor, MessageType, State } from "../../common";
 import { createCloseInteractionButton, getRoom, removeCloseInteractionButton } from "../util";
 import { checkInputMode } from "../main";
-import { chessExportButton, chessImportButton, interactiveBarChess, interactiveCanvas } from "../static";
+import { chessExportButton, chessImportButton, interactiveBarChess } from "../static";
 import jsChessEngine from "js-chess-engine";
 
 enum ChessSquareColor {
@@ -325,7 +325,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
     context: CanvasRenderingContext2D = this.canvas.getContext("2d");
 
     constructor() {
-        super("Chess Board", false, 2, interactiveCanvas);
+        super("Chess Board", false, 2);
         this.room = getRoom();
     }
 

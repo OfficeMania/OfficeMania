@@ -32,7 +32,7 @@ export const textchatDropdownUsersButton = $<HTMLButtonElement>("button-user-lis
 export const textchatDropdownUsers = $<HTMLUListElement>("dropdown-user-list");
 export const textchatDropdownNewChat = $<HTMLElement>("textchat-create-new");
 export const textchatDropdownAddUsers = $<HTMLElement>("textchat-add-to-chat");
-export const interactiveBarChess = $<HTMLDivElement>("chess-button-wrapper");
+export const interactiveBarChess = $<HTMLDivElement>("interactive-bar-chess");
 export const chessExportButton = $<HTMLButtonElement>("button-chess-export");
 export const chessImportButton = $<HTMLButtonElement>("button-chess-import");
 export const settingsOkButton = $<HTMLButtonElement>("button-settings-ok");
@@ -45,8 +45,7 @@ export const welcomeOkButton = $<HTMLButtonElement>("button-welcome-ok");
 export const characterSelect = $<HTMLSelectElement>("character-select");
 export const characterPreview = $<HTMLSelectElement>("character-preview");
 export const helpExitButton = $<HTMLSelectElement>("button-help-ok");
-export const interactiveCanvas = $<HTMLCanvasElement>("chess-canvas");
-export const interactiveWhiteboard = $<HTMLCanvasElement>("whiteboard-canvas");
+export const interactiveCanvas = $<HTMLCanvasElement>("interactive");
 export const backpackCanvas = $<HTMLCanvasElement>("backpack");
 export const canvas = $<HTMLCanvasElement>("canvas");
 export const background = $<HTMLCanvasElement>("background");
@@ -64,7 +63,7 @@ export const yellowButton = $<HTMLButtonElement>("button-whiteboard-yellow");
 export const greenButton = $<HTMLButtonElement>("button-whiteboard-green");
 export const blueButton = $<HTMLButtonElement>("button-whiteboard-blue");
 export const blackButton = $<HTMLButtonElement>("button-whiteboard-black");
-export const whiteboardPanel = $<HTMLDivElement>("whiteboard-button-panel-wrapper");
+export const whiteboardPanel = $<HTMLDivElement>("interactive-bar-whiteboard");
 
 // @ts-ignore
 export const bsWelcomeModal = new bootstrap.Modal(document.getElementById('welcome-modal'));
