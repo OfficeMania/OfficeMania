@@ -159,16 +159,21 @@ export class ChatHandler implements Handler {
         }
         chat.users.splice(userIndex, 1);
         updateChatName(chat, this.room);
-        if (this.room.state.players.has(client.sessionId)) {
-            const name: string = this.room.state.players[client.sessionId]?.displayName || client.sessionId;
-            const leaveMessage: ChatMessage = {
-                timestamp: getFormattedTime(),
-                name,
-                chatId,
-                message: `User "${name}" left the Chat`,
-            };
-            this.sendChatMessage(chat, leaveMessage);
+        const name: string = this.room.state.players[client.sessionId]?.displayName || client.sessionId;
+        const leaveMessage: ChatMessage = {
+            timestamp: getFormattedTime(),
+            chatId,
+            message: `User "${name}" left the Chat`,
         }
+        if (this.room.state.players.has(client.sessionId)) {
+            leaveMessage.name = name;
+        }
+        else {
+            leaveMessage.name = "Server";
+            leaveMessage.message = `User "${name}" was removed from the Chat`
+        }
+        
+        this.sendChatMessage(chat, leaveMessage);
 
         this.triggerChatUpdate(chat);
 
@@ -270,6 +275,13 @@ export class ChatHandler implements Handler {
         this.chats.forEach(chat => {
             if (chat.users.includes(getUserId(client, this.room)) && chat.id !== this.globalChat.id) {
                 updateChatName(chat, this.room);
+                /*const serverMessage: ChatMessage =  {
+                    timestamp: getFormattedTime(),
+                    name,
+                    chatId,
+                    message: `User "${name}" left the Chat`,
+
+                }*/
             }
         });
     }
