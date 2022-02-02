@@ -13,7 +13,7 @@ import {
     textchatDropdownUsersButton,
     textchatSendButton,
 } from "./static";
-import { getOurPlayer, getRoom } from "./util";
+import { getOurPlayer, getRoom, sendNotification } from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chat-handler";
 import { PlayerState } from "../common/states/player-state";
 import { getUser } from "./conference/conference";
@@ -139,13 +139,17 @@ export function initChatListener() {
     getRoom().onMessage(MessageType.CHAT_LOG, (message: string) => onMessageLogs(JSON.parse(message)));
     getRoom().send(MessageType.CHAT_UPDATE);
     getRoom().send(MessageType.CHAT_LOG);
-    getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => onMessage(message));
+    getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => {
+        onMessage(message);
+        if (message.userId && message.userId !== getOurPlayer().roomId) {
+            sendNotification(message.name + ": " + message.message);
+        }
+    });
 }
 
 export function textchatPlayerOnChange(playerState: PlayerState) {
     if (playerState) {
         let uid: string = "";
-
         playerState.onChange = (changes => {
             changes.forEach(change => {
                 if (change.field === "displayName") {
