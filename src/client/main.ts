@@ -283,9 +283,11 @@ function saveUsernameSettings() {
 }
 
 function saveDisplayNameSettings() {
-    if (displayNameInput.value) {
-        updateDisplayName(getOurPlayer().displayName, displayNameInput.value);
+    if (!displayNameInput.value && !areWeLoggedIn()) {
+        displayNameInput.value = getOurPlayer().displayName;
+        return;
     }
+    updateDisplayName(getOurPlayer().displayName, displayNameInput.value);
 }
 
 function saveCharacterSettings() {
