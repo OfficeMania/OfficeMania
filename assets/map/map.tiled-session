@@ -1,0 +1,101 @@
+{
+    "activeFile": "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map.json",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "Alle Dateien (*)",
+    "fileStates": {
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map.json": {
+            "scale": 0.27708333333333335,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 386.16541353383445,
+                "y": -765.1127819548872
+            }
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/10_Birthday_party_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/12_Kitchen_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/13_Conference_Hall_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/14_Basement_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/17_Visibile_Upstairs_System_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/19_Hospital_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/1_Generic_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/2_LivingRoom_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/3_Bathroom_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/5_Classroom_and_library_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/6_Music_and_sport_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/8_Gym_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/Floors_original_shading_TILESET_A5_.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/New_Piskel.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/Office_interiors_shadowless2_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/Office_interiors_shadowless_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/Office_walls_floors_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/Rooms.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/Schachtisch.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/animated_cat_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/animated_door_big_2_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/animated_door_big_2_locked_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/animated_door_glass_double_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/animated_door_vertical_left_2_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/animated_fishtank_red_48x48.tsx": {
+            "scaleInDock": 1
+        },
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map/animated_sprout_48x48.tsx": {
+            "scaleInDock": 1
+        }
+    },
+    "openFiles": [
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map.json"
+    ],
+    "project": "unbenannt.tiled-project",
+    "recentFiles": [
+        "//wsl.localhost/Ubuntu/home/giulia/officemania/assets/map/Map.json"
+    ]
+}
