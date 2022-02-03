@@ -141,15 +141,7 @@ export function initChatListener() {
     getRoom().send(MessageType.CHAT_LOG);
     getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => {
         onMessage(message);
-        if (message.userId && message.userId !== getOurPlayer().roomId) {
-            let chatSuffix: string = "";
-            if (chats[0].id === message.chatId) {
-                chatSuffix = " in Global";
-            } else if (chats[1].id === message.chatId) {
-                chatSuffix = " in Nearby";
-            }
-            sendNotification(`${message.name}${chatSuffix} says: ${message.message}`);
-        }
+        sendChatNotification(message);
     });
 }
 
@@ -466,5 +458,17 @@ function updateChatName(chat: Chat) {
     });
     if (chat.name === "") {
         chat.name = "Empty chat";
+    }
+}
+
+function sendChatNotification(message: ChatMessage) {
+    if (message.userId && message.userId !== getOurPlayer().roomId) {
+        let chatSuffix: string = "";
+        if (chats[0].id === message.chatId) {
+            chatSuffix = " in Global";
+        } else if (chats[1].id === message.chatId) {
+            chatSuffix = " in Nearby";
+        }
+        sendNotification(`${message.name}${chatSuffix} says: ${message.message}`);
     }
 }
