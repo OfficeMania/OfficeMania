@@ -10,7 +10,8 @@
     "build-webpack": "TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" && webpack --config webpack.config.ts",
     "start-production": "ts-node --transpile-only --project ./src/server/tsconfig.json src/server/main.ts",
     "start": "concurrently \"TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack -w\" \"ts-node-dev --project ./src/server/tsconfig.json src/server/main.ts\"",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "typeorm": "ts-node --project ./src/server/tsconfig.json ./node_modules/typeorm/cli.js"
   },
   "author": "",
   "license": "UNLICENSED",
