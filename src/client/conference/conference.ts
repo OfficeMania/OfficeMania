@@ -25,6 +25,7 @@ import { solidInfo } from "../map";
 import { Player } from "../player";
 import { MessageType } from "../../common";
 import { camButton, muteButton, shareButton } from "../static";
+import { setShowTextchatBar } from "../textchat";
 
 export { init as initConference, trackTypeAudio, trackTypeVideo, trackTypeDesktop };
 
@@ -606,6 +607,7 @@ export function updateUsers() {
 
 export function toggleShowParticipantsTab(): boolean {
     setShowParticipantsTab(!getShowParticipantsTab());
+    setShowTextchatBar(false);
     return getShowParticipantsTab();
 }
 

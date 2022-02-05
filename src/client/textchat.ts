@@ -16,7 +16,8 @@ import {
 import { getOurPlayer, getRoom, sendNotification } from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chat-handler";
 import { PlayerState } from "../common/states/player-state";
-import { getUser } from "./conference/conference";
+import { getUser, setShowParticipantsTab } from "./conference/conference";
+import { setShowLoadingscreen } from "./loadingscreen";
 
 //tracks if button/shortcut have been pressed
 let _showTextchat = false;
@@ -64,6 +65,7 @@ function toggleTextchatBar() {
     if (getShowTextchatBar()) setShowTextchatBar(false);
     else setShowTextchatBar(true);
     checkInputMode();
+    setShowParticipantsTab(false);
 }
 
 //getter of _showTextchat
@@ -72,7 +74,7 @@ function getShowTextchatBar(): boolean {
 }
 
 //setter of _showTextchat
-function setShowTextchatBar(set: boolean) {
+export function setShowTextchatBar(set: boolean) {
     if (set) {
         textchatContainer.classList.add("hover");
     } else {
