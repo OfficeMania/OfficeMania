@@ -11,8 +11,32 @@ export const PASSWORD_SECRET: string = process.env.PASSWORD_SECRET || "USE_A_SEC
 export const SERVER_PORT = Number(process.env.PORT) || 3000;
 export const WEBPACK_PORT = 8085; // For dev environment only
 
-export const FORCE_LOGIN: boolean = process.env.FORCE_LOGIN === "true";
-export const DISABLE_SIGNUP: boolean = process.env.DISABLE_SIGNUP !== "false";
-export const REQUIRE_INVITE_CODE: boolean = process.env.REQUIRE_INVITE_CODE === "true";
+// SQLite Database
+export const DB_FILE: string | undefined = process.env.DB_FILE;
+
+// PostgreSQL Database
+export const DB_HOST: string | undefined = process.env.DB_HOST;
+export const DB_PORT: number | undefined = toInt(process.env.DB_PORT, 10);
+export const DB_USERNAME: string | undefined = process.env.DB_USERNAME;
+export const DB_PASSWORD: string | undefined = process.env.DB_PASSWORD;
+export const DB_DATABASE: string | undefined = process.env.DB_DATABASE;
+
+export const FORCE_LOGIN: boolean = toBoolean(process.env.FORCE_LOGIN) || false;
+export const DISABLE_SIGNUP: boolean = toBoolean(process.env.DISABLE_SIGNUP) || true;
+export const REQUIRE_INVITE_CODE: boolean = toBoolean(process.env.REQUIRE_INVITE_CODE) || false;
 
 export const LDAP_OPTIONS = null;
+
+function toInt(input?: string, radix = 10): number | undefined {
+    if (input === undefined || input === null) {
+        return undefined;
+    }
+    return parseInt(input, radix);
+}
+
+function toBoolean(input?: string): boolean | undefined {
+    if (input === undefined || input === null) {
+        return undefined;
+    }
+    return !!input && input.toLowerCase() === "true";
+}
