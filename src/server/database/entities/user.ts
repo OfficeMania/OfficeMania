@@ -137,6 +137,14 @@ export function serializePassword(password: string, version: PasswordVersion): s
     }
 }
 
+export function createUser(
+    username: string,
+    password: string = undefined,
+    passwordVersion: PasswordVersion = PasswordVersion.LATEST
+): Promise<User> {
+    return User.create({ username, password: serializePassword(password, passwordVersion), passwordVersion }).save();
+}
+
 export async function findOrCreateUserByUsername(
     username: string,
     password: string = undefined,

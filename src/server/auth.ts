@@ -3,7 +3,7 @@ import passport from "passport";
 import { DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, LDAP_OPTIONS, REQUIRE_INVITE_CODE, SESSION_SECRET } from "./config";
 import path from "path";
 import connectionEnsureLogin, { LoggedInOptions } from "connect-ensure-login";
-import { User } from "./database/entities/user";
+import { createUser, User } from "./database/entities/user";
 import session from "express-session";
 import { InviteCode } from "./database/entities/invite-code";
 
@@ -95,9 +95,9 @@ function setupSignup(): void {
                     req.session.signupError = AuthError.USERNAME_TAKEN;
                     return res.redirect("/auth/signup");
                 }
-                return User.create({ username, password: password[0] })
-                    .save()
-                    .catch(() => {
+                return createUser(username, password[0])
+                    .catch((reason) => {
+                        console.error(reason);
                         req.session.signupError = AuthError.USER_CREATION_FAILED;
                         res.redirect("/auth/signup");
                     });
