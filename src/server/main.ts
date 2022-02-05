@@ -8,7 +8,7 @@ import path from "path";
 import { Server } from "colyseus";
 
 import { TURoom } from "./rooms/turoom";
-import { DEBUG, SERVER_PORT } from "./config";
+import { DEBUG, IS_DEV, SERVER_PORT } from "./config";
 import { getAuthRouter, getSessionHandler, loggedInOptions, setupAuth } from "./auth";
 import connectionEnsureLogin from "connect-ensure-login";
 import { findOrCreateUserByUsername, PasswordVersion } from "./database/entities/user";
@@ -46,7 +46,7 @@ app.use(compression());
 
 app.set("view engine", "ejs");
 
-connectDatabase()
+connectDatabase(IS_DEV)
     .then(() => initDatabase())
     .catch(console.error);
 
