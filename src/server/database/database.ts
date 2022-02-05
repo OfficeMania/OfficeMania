@@ -8,11 +8,13 @@ import { DB, DB_DATABASE, DB_FILE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } 
 import { EntitySchema } from "typeorm/entity-schema/EntitySchema";
 
 const entities: (Function | string | EntitySchema)[] = [InviteCode, User];
+const migrations: (Function | string)[] = [];
 
 function createSqliteConnectionOptions(synchronize: boolean): SqliteConnectionOptions {
     return {
         type: "sqlite",
         entities,
+        migrations,
         synchronize,
         database: DB_FILE || "database.sqlite",
     };
@@ -22,6 +24,7 @@ function createPostgresConnectionOptions(synchronize: boolean): PostgresConnecti
     return {
         type: "postgres",
         entities,
+        migrations,
         synchronize,
         host: DB_HOST || "localhost",
         port: DB_PORT || 5432,
