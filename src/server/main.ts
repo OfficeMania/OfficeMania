@@ -11,7 +11,7 @@ import { TURoom } from "./rooms/turoom";
 import { DEBUG, SERVER_PORT } from "./config";
 import { getAuthRouter, getSessionHandler, loggedInOptions, setupAuth } from "./auth";
 import connectionEnsureLogin from "connect-ensure-login";
-import { findOrCreateUserByUsername, PasswordVersion } from "./database/entities/user";
+import { findOrCreateUserByUsername, PasswordVersion } from "./database/entities/old-user";
 import { connectDatabase } from "./database/database";
 import { getApiRouter } from "./api";
 

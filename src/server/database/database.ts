@@ -1,7 +1,7 @@
 import { Model, Sequelize } from "sequelize";
 import { createNamespace, Namespace } from "cls-hooked";
 import { Transaction } from "sequelize/dist/lib/transaction";
-import User from "./entities/user";
+import User from "./entities/old-user";
 import { DEBUG } from "../config";
 
 const namespace: Namespace = createNamespace("namespace-officemania-sequelize");

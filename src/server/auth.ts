@@ -3,7 +3,7 @@ import passport from "passport";
 import { DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, LDAP_OPTIONS, SESSION_SECRET } from "./config";
 import path from "path";
 import connectionEnsureLogin, { LoggedInOptions } from "connect-ensure-login";
-import User, { createUser, findUserById, findUserByUsername, getUsername } from "./database/entities/user";
+import User, { createUser, findUserById, findUserByUsername, getUsername } from "./database/entities/old-user";
 import session from "express-session";
 import { getId } from "./database/database";
 

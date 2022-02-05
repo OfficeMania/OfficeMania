@@ -13,7 +13,7 @@ import { NotesHandler } from "../handler/noteshandler";
 import { ChatHandler } from "../handler/chatHandler";
 import http from "http";
 import path from "path";
-import User, { findUserById } from "../database/entities/user";
+import User, { findUserById } from "../database/entities/old-user";
 
 const chessHandler: ChessHandler = new ChessHandler();
 const doorHandler: DoorHandler = new DoorHandler();

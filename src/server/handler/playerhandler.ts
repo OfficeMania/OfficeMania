@@ -14,7 +14,7 @@ import {
     sanitizeUsername,
     State,
 } from "../../common";
-import { findUserById } from "../database/entities/user";
+import { findUserById } from "../database/entities/old-user";
 
 export interface AuthData {
     userSettings?: UserSettings;
