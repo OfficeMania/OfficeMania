@@ -91,6 +91,7 @@ function setupSignup(): void {
     router.get("/signup", (req, res) =>
         res.render("pages/signup", {
             error: authErrorToString(req.session.signupError),
+            requireInviteCode: false
         })
     );
 }
