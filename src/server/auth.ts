@@ -29,6 +29,7 @@ enum AuthError {
     INVALID_CREDENTIALS,
     INVITE_CODE_REQUIRED,
     INVALID_INVITE_CODE,
+    INVITE_CODE_EXPIRED
 }
 
 function authErrorToString(error: AuthError): string {
@@ -48,6 +49,8 @@ function authErrorToString(error: AuthError): string {
             return "Invite Code required";
         case AuthError.INVALID_INVITE_CODE:
             return "Invalid Invite Code";
+        case AuthError.INVITE_CODE_EXPIRED:
+            return "Invite Code expired";
     }
 }
 
