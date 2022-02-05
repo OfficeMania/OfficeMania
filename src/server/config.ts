@@ -24,9 +24,9 @@ export const DB_USERNAME: string | undefined = process.env.DB_USERNAME;
 export const DB_PASSWORD: string | undefined = process.env.DB_PASSWORD;
 export const DB_DATABASE: string | undefined = process.env.DB_DATABASE;
 
-export const FORCE_LOGIN: boolean = toBoolean(process.env.FORCE_LOGIN) || false;
-export const DISABLE_SIGNUP: boolean = toBoolean(process.env.DISABLE_SIGNUP) || true;
-export const REQUIRE_INVITE_CODE: boolean = toBoolean(process.env.REQUIRE_INVITE_CODE) || false;
+export const FORCE_LOGIN: boolean = toBoolean(process.env.FORCE_LOGIN) ?? false;
+export const DISABLE_SIGNUP: boolean = toBoolean(process.env.DISABLE_SIGNUP) ?? true;
+export const REQUIRE_INVITE_CODE: boolean = toBoolean(process.env.REQUIRE_INVITE_CODE) ?? false;
 
 export const LDAP_OPTIONS = null;
 
