@@ -1,5 +1,4 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { RequestHandler } from "express-serve-static-core";
 import { compareSync, hashSync } from "bcrypt";
 import { BCRYPT_SALT_ROUNDS, PASSWORD_SECRET } from "../../config";
 import CryptoJS from "crypto-js";
@@ -99,6 +98,7 @@ export class User extends BaseEntity {
     }
 }
 
+/*
 export function ensureHasRole(...roles): RequestHandler {
     return (req, res, next) => {
         const user: User = req.user as User;
@@ -113,6 +113,7 @@ export function ensureHasRole(...roles): RequestHandler {
         return next();
     };
 }
+*/
 
 function encryptPassword(password: string): string {
     return CryptoJS.AES.encrypt(password, PASSWORD_SECRET).toString();
