@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({ name: "invite_code" })
 export class InviteCode extends BaseEntity {
@@ -13,4 +13,10 @@ export class InviteCode extends BaseEntity {
 
     @Column({ name: "usages_left", type: "int", default: -1 })
     usagesLeft: number;
+
+    @CreateDateColumn({ name: "created_at" })
+    createdAt: Date;
+
+    @UpdateDateColumn({ name: "updated_at" })
+    updatedAt: Date;
 }
