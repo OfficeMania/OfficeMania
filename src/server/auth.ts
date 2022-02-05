@@ -33,6 +33,7 @@ enum AuthError {
 
 function authErrorToString(error: AuthError): string {
     switch (error) {
+        default:
         case AuthError.UNKNOWN:
             return "Unknown Error";
         case AuthError.NO_ERROR:
@@ -43,6 +44,10 @@ function authErrorToString(error: AuthError): string {
             return "Passwords do not match";
         case AuthError.INVALID_CREDENTIALS:
             return "Invalid Credentials";
+        case AuthError.INVITE_CODE_REQUIRED:
+            return "Invite Code required";
+        case AuthError.INVALID_INVITE_CODE:
+            return "Invalid Invite Code";
     }
 }
 
