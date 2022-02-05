@@ -1,6 +1,6 @@
 import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 import { RequestHandler } from "express-serve-static-core";
-import { hashSync } from "bcrypt";
+import { compareSync, hashSync } from "bcrypt";
 import { BCRYPT_SALT_ROUNDS, PASSWORD_SECRET } from "../../config";
 import CryptoJS from "crypto-js";
 
@@ -42,6 +42,58 @@ export class User extends BaseEntity {
 
     @Column({ name: "display_name", type: "varchar", length: 255, nullable: true })
     displayName: string;
+
+    public checkPassword(password: string): boolean {
+        if (!this.passwordVersion) {
+            return false;
+        }
+        switch (this.passwordVersion) {
+            case PasswordVersion.NONE:
+                return true;
+            case PasswordVersion.PLAIN:
+                return password === this.password;
+            case PasswordVersion.BCRYPT:
+            case PasswordVersion.ENCRYPTED_BCRYPT:
+                let passwordHash: string = this.password;
+                if (this.passwordVersion === PasswordVersion.ENCRYPTED_BCRYPT) {
+                    passwordHash = CryptoJS.AES.decrypt(passwordHash, PASSWORD_SECRET).toString(CryptoJS.enc.Utf8);
+                }
+                return compareSync(password, passwordHash);
+            default:
+                throw new Error(`Unsupported Password Version: ${this.passwordVersion}`);
+        }
+    }
+
+    private upgradePasswordOnce(): boolean {
+        const password: string = this.password;
+        const version: PasswordVersion = this.passwordVersion;
+        const nextVersion: PasswordVersion = version + 1;
+        switch (version) {
+            case PasswordVersion.NONE:
+                return false;
+            case PasswordVersion.PLAIN:
+            case PasswordVersion.BCRYPT:
+                this.password = serializePassword(password, nextVersion);
+                this.passwordVersion = nextVersion;
+                return true;
+            case PasswordVersion.ENCRYPTED_BCRYPT:
+                return false;
+            default:
+                throw new Error(`Unsupported Password Version: ${version}`);
+        }
+    }
+
+    public upgradePassword(version: PasswordVersion): boolean {
+        if (this.passwordVersion > version) {
+            throw new Error("Cannot downgrade Password");
+        }
+        while (this.passwordVersion < version) {
+            if (!this.upgradePasswordOnce()) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 export function ensureHasRole(...roles): RequestHandler {
