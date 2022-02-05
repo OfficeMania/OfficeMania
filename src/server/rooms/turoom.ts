@@ -13,7 +13,7 @@ import { NotesHandler } from "../handler/noteshandler";
 import { ChatHandler } from "../handler/chatHandler";
 import http from "http";
 import path from "path";
-import User, { findUserById } from "../database/entities/old-user";
+import { User } from "../database/entities/user";
 
 const chessHandler: ChessHandler = new ChessHandler();
 const doorHandler: DoorHandler = new DoorHandler();
@@ -70,16 +70,16 @@ export class TURoom extends Room<State> {
         if (!userId) {
             return {};
         }
-        const user: User = await findUserById(userId);
+        const user: User = await User.findOne(userId);
         if (!user) {
             return {};
         }
         return {
             userSettings: {
-                id: user.getId(),
-                username: user.getUsername(),
-                displayName: user.getDisplayName(),
-                character: user.getCharacter(),
+                id: user.id,
+                username: user.username,
+                displayName: user.displayName,
+                character: user.character,
             },
         };
     }
