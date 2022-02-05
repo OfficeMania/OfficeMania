@@ -13,5 +13,6 @@ export const WEBPACK_PORT = 8085; // For dev environment only
 
 export const FORCE_LOGIN: boolean = process.env.FORCE_LOGIN === "true";
 export const DISABLE_SIGNUP: boolean = process.env.DISABLE_SIGNUP !== "false";
+export const REQUIRE_INVITE_CODE: boolean = process.env.REQUIRE_INVITE_CODE === "true";
 
 export const LDAP_OPTIONS = null;

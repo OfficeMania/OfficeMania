@@ -1,6 +1,6 @@
 import express, { Express, Router } from "express";
 import passport from "passport";
-import { DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, LDAP_OPTIONS, SESSION_SECRET } from "./config";
+import { DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, LDAP_OPTIONS, REQUIRE_INVITE_CODE, SESSION_SECRET } from "./config";
 import path from "path";
 import connectionEnsureLogin, { LoggedInOptions } from "connect-ensure-login";
 import { User } from "./database/entities/user";
@@ -92,7 +92,7 @@ function setupSignup(): void {
     router.get("/signup", (req, res) =>
         res.render("pages/signup", {
             error: authErrorToString(req.session.signupError),
-            requireInviteCode: false,
+            requireInviteCode: REQUIRE_INVITE_CODE,
         })
     );
 }
