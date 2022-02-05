@@ -14,7 +14,7 @@ import {
     sanitizeUsername,
     State,
 } from "../../common";
-import { findUserById } from "../database/entities/old-user";
+import { User } from "../database/entities/user";
 
 export interface AuthData {
     userSettings?: UserSettings;
@@ -133,12 +133,11 @@ export class PlayerHandler implements Handler {
             this.updateUsername(client, username);
             return;
         }
-        return findUserById(playerState.userId)
-            .then(user =>
-                user
-                    .update({ username }, { where: { id: user.getId() } })
-                    .then(() => this.updateUsername(client, username))
-            )
+        return User.findOne(playerState.userId)
+            .then(user => {
+                user.username = username;
+                return user.save().then(() => this.updateUsername(client, username));
+            })
             .catch(console.error);
     }
 
@@ -159,12 +158,11 @@ export class PlayerHandler implements Handler {
             this.updateDisplayName(client, ensureDisplayName(displayName));
             return;
         }
-        return findUserById(playerState.userId)
-            .then(user =>
-                user
-                    .update({ displayName }, { where: { id: user.getId() } })
-                    .then(() => this.updateDisplayName(client, remove ? user.getUsername() : displayName))
-            )
+        return User.findOne(playerState.userId)
+            .then(user => {
+                user.displayName = displayName;
+                return user.save().then(() => this.updateDisplayName(client, remove ? user.username : displayName));
+            })
             .catch(console.error);
     }
 
@@ -176,12 +174,11 @@ export class PlayerHandler implements Handler {
             this.updateCharacter(client, character);
             return;
         }
-        return findUserById(playerState.userId)
-            .then(user =>
-                user
-                    .update({ character }, { where: { id: user.getId() } })
-                    .then(() => this.updateCharacter(client, character))
-            )
+        return User.findOne(playerState.userId)
+            .then(user => {
+                user.character = character;
+                return user.save().then(() => this.updateCharacter(client, character));
+            })
             .catch(console.error);
     }
 
