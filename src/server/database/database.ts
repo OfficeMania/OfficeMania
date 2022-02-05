@@ -9,13 +9,11 @@ import { EntitySchema } from "typeorm/entity-schema/EntitySchema";
 import { createDatabase } from "typeorm-extension";
 
 const entities: (Function | string | EntitySchema)[] = [InviteCode, User];
-const migrations: (Function | string)[] = [];
 
 function createSqliteConnectionOptions(synchronize: boolean): SqliteConnectionOptions {
     return {
         type: "sqlite",
         entities,
-        migrations,
         synchronize,
         database: DB_FILE || "database.sqlite",
     };
@@ -25,8 +23,9 @@ function createPostgresConnectionOptions(synchronize: boolean): PostgresConnecti
     return {
         type: "postgres",
         entities,
-        migrations,
-        synchronize,
+        migrations: ["src/server/database/migration/**/*.ts"],
+        migrationsRun: true,
+        synchronize: false,
         host: DB_HOST || "localhost",
         port: DB_PORT || 5432,
         username: DB_USERNAME || "officemania",
