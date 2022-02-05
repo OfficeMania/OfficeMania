@@ -86,8 +86,12 @@ function setupSignup(): void {
             return res.redirect("/auth/signup");
         } else if (inviteCodeString) {
             const inviteCode: InviteCode | undefined = await InviteCode.findOne({ where: { code: inviteCodeString } });
-            if (!inviteCode || inviteCode.usagesLeft === 0) {
+            if (!inviteCode) {
                 req.session.signupError = AuthError.INVALID_INVITE_CODE;
+                return res.redirect("/auth/signup");
+            }
+            if (inviteCode.usagesLeft === 0) {
+                req.session.signupError = AuthError.INVITE_CODE_EXPIRED;
                 return res.redirect("/auth/signup");
             }
             inviteCode.usages++;
