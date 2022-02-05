@@ -9,12 +9,16 @@ import { TURoom } from "./rooms/turoom";
 import { DEBUG, SERVER_PORT } from "./config";
 import { getAuthRouter, getSessionHandler, loggedInOptions, setupAuth } from "./auth";
 import connectionEnsureLogin from "connect-ensure-login";
-import { findOrCreateUserByUsername } from "./database/entities/user";
+import { findOrCreateUserByUsername, PasswordVersion } from "./database/entities/user";
 import { connectDatabase } from "./database/database";
 import { getApiRouter } from "./api";
 
 async function initDatabase(): Promise<void> {
     // TODO Remove this and use proper user creation etc.
+    for (let i = 0; i < 10; i++) {
+        const name = `test${i}`;
+        await findOrCreateUserByUsername(name, name, PasswordVersion.PLAIN);
+    }
     return findOrCreateUserByUsername("officemania", "sec-sep21-project").then(user => {
         if (!user) {
             console.error("Something went wrong when creating the default user");

@@ -5,7 +5,7 @@ import CryptoJS from "crypto-js";
 import { RequestHandler } from "express-serve-static-core";
 import { BCRYPT_SALT_ROUNDS, PASSWORD_SECRET } from "../../config";
 
-enum PasswordVersion {
+export enum PasswordVersion {
     NONE,
     PLAIN,
     BCRYPT,
