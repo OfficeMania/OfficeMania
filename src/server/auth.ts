@@ -2,7 +2,7 @@ import express, { Express, Router } from "express";
 import passport from "passport";
 import { DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, LDAP_OPTIONS, REQUIRE_INVITE_CODE, SESSION_SECRET } from "./config";
 import path from "path";
-import connectionEnsureLogin, { LoggedInOptions } from "connect-ensure-login";
+import { LoggedInOptions } from "connect-ensure-login";
 import { createUser, User } from "./database/entities/user";
 import session from "express-session";
 import { InviteCode } from "./database/entities/invite-code";
@@ -73,7 +73,7 @@ export function getSessionHandler(): express.RequestHandler {
 }
 
 function setupSignup(): void {
-    router.post("/signup", connectionEnsureLogin.ensureLoggedOut(), async (req, res, next) => {
+    router.post("/signup", async (req, res, next) => {
         const username: string = req.body.username;
         const password: string[] = req.body.password;
         const inviteCodeString: string | undefined = req.body["invite-code"];
