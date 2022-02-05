@@ -188,20 +188,3 @@ export function findOrCreateUserByUsername(
     }).then(getEntity);
 }
 
-function serializePassword(password: string, version: PasswordVersion): string {
-    switch (version) {
-        case PasswordVersion.NONE:
-            return;
-        case PasswordVersion.PLAIN:
-            return password;
-        case PasswordVersion.BCRYPT:
-        case PasswordVersion.ENCRYPTED_BCRYPT:
-            const passwordHash: string = hashSync(password, BCRYPT_SALT_ROUNDS);
-            if (version === PasswordVersion.BCRYPT) {
-                return passwordHash;
-            }
-            return encryptPassword(passwordHash);
-        default:
-            throw new Error(`Unsupported Password Version: ${version}`);
-    }
-}

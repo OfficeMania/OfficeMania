@@ -1,5 +1,8 @@
 import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 import { RequestHandler } from "express-serve-static-core";
+import { hashSync } from "bcrypt";
+import { BCRYPT_SALT_ROUNDS, PASSWORD_SECRET } from "../../config";
+import CryptoJS from "crypto-js";
 
 export enum PasswordVersion {
     NONE,
@@ -54,4 +57,26 @@ export function ensureHasRole(...roles): RequestHandler {
         }
         return next();
     };
+}
+
+function encryptPassword(password: string): string {
+    return CryptoJS.AES.encrypt(password, PASSWORD_SECRET).toString();
+}
+
+export function serializePassword(password: string, version: PasswordVersion): string {
+    switch (version) {
+        case PasswordVersion.NONE:
+            return;
+        case PasswordVersion.PLAIN:
+            return password;
+        case PasswordVersion.BCRYPT:
+        case PasswordVersion.ENCRYPTED_BCRYPT:
+            const passwordHash: string = hashSync(password, BCRYPT_SALT_ROUNDS);
+            if (version === PasswordVersion.BCRYPT) {
+                return passwordHash;
+            }
+            return encryptPassword(passwordHash);
+        default:
+            throw new Error(`Unsupported Password Version: ${version}`);
+    }
 }
