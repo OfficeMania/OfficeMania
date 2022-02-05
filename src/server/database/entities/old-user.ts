@@ -4,19 +4,7 @@ import { compareSync, hashSync } from "bcrypt";
 import CryptoJS from "crypto-js";
 import { RequestHandler } from "express-serve-static-core";
 import { BCRYPT_SALT_ROUNDS, PASSWORD_SECRET } from "../../config";
-
-export enum PasswordVersion {
-    NONE,
-    PLAIN,
-    BCRYPT,
-    ENCRYPTED_BCRYPT,
-    LATEST = ENCRYPTED_BCRYPT,
-}
-
-export enum Role {
-    USER,
-    ADMIN,
-}
+import { PasswordVersion, Role } from "./user";
 
 export default class User extends Model {
     public getId(): string {

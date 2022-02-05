@@ -1,5 +1,18 @@
 import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 
+export enum PasswordVersion {
+    NONE,
+    PLAIN,
+    BCRYPT,
+    ENCRYPTED_BCRYPT,
+    LATEST = ENCRYPTED_BCRYPT,
+}
+
+export enum Role {
+    USER,
+    ADMIN,
+}
+
 @Entity()
 export class User extends BaseEntity {
     @PrimaryColumn({ type: "uuid" })
