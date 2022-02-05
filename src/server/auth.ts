@@ -3,9 +3,8 @@ import passport from "passport";
 import { DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, LDAP_OPTIONS, SESSION_SECRET } from "./config";
 import path from "path";
 import connectionEnsureLogin, { LoggedInOptions } from "connect-ensure-login";
-import User, { createUser, findUserById, findUserByUsername, getUsername } from "./database/entities/old-user";
+import { User } from "./database/entities/user";
 import session from "express-session";
-import { getId } from "./database/database";
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
@@ -70,17 +69,19 @@ function setupSignup(): void {
             req.session.signupError = AuthError.PASSWORDS_MISMATCH;
             return res.redirect("/auth/signup");
         }
-        findUserByUsername(username)
+        User.findOne({ where: { username } })
             .then(user => {
                 req.session.signupError = AuthError.NO_ERROR;
                 if (user) {
                     req.session.signupError = AuthError.USERNAME_TAKEN;
                     return res.redirect("/auth/signup");
                 }
-                return createUser(username, password[0]).catch(() => {
-                    req.session.signupError = AuthError.USER_CREATION_FAILED;
-                    res.redirect("/auth/signup");
-                });
+                return User.create({ username, password: password[0] })
+                    .save()
+                    .catch(() => {
+                        req.session.signupError = AuthError.USER_CREATION_FAILED;
+                        res.redirect("/auth/signup");
+                    });
             })
             .then(() => res.redirect("/auth/login"))
             .catch(() => {
@@ -91,7 +92,7 @@ function setupSignup(): void {
     router.get("/signup", (req, res) =>
         res.render("pages/signup", {
             error: authErrorToString(req.session.signupError),
-            requireInviteCode: false
+            requireInviteCode: false,
         })
     );
 }
@@ -161,7 +162,7 @@ function setupLocalStrategy(): void {
     console.debug("Setup Passport with LocalStrategy");
     passport.use(
         new LocalStrategy(function (username, password, done) {
-            findUserByUsername(username)
+            User.findOne({ where: { username } })
                 .then(user => {
                     if (!user || !user.checkPassword(password)) {
                         if (!user) {
@@ -169,14 +170,14 @@ function setupLocalStrategy(): void {
                         }
                         return done(null, false, { message: "Username or Password incorrect." });
                     }
-                    return done(null, { id: getId(user), username: getUsername(user) });
+                    return done(null, { id: user.id, username: user.username });
                 })
                 .catch(error => done(error, null));
         })
     );
-    passport.serializeUser((user: User, done) => done(null, getId(user)));
+    passport.serializeUser((user: User, done) => done(null, user.id));
     passport.deserializeUser((id: string, done) =>
-        findUserById(id)
+        User.findOne(id)
             .then(user => done(null, user))
             .catch(error => done(error, null))
     );
