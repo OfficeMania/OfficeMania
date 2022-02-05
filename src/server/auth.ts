@@ -5,6 +5,7 @@ import path from "path";
 import connectionEnsureLogin, { LoggedInOptions } from "connect-ensure-login";
 import { User } from "./database/entities/user";
 import session from "express-session";
+import { InviteCode } from "./database/entities/invite-code";
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
@@ -26,6 +27,8 @@ enum AuthError {
     USER_CREATION_FAILED,
     PASSWORDS_MISMATCH,
     INVALID_CREDENTIALS,
+    INVITE_CODE_REQUIRED,
+    INVALID_INVITE_CODE,
 }
 
 function authErrorToString(error: AuthError): string {
@@ -62,12 +65,28 @@ export function getSessionHandler(): express.RequestHandler {
 }
 
 function setupSignup(): void {
-    router.post("/signup", connectionEnsureLogin.ensureLoggedOut(), (req, res, next) => {
+    router.post("/signup", connectionEnsureLogin.ensureLoggedOut(), async (req, res, next) => {
         const username: string = req.body.username;
         const password: string[] = req.body.password;
+        const inviteCodeString: string | undefined = req.body["invite-code"];
         if (password.length !== 2 || password[0] !== password[1]) {
             req.session.signupError = AuthError.PASSWORDS_MISMATCH;
             return res.redirect("/auth/signup");
+        }
+        if (REQUIRE_INVITE_CODE && !inviteCodeString) {
+            req.session.signupError = AuthError.INVITE_CODE_REQUIRED;
+            return res.redirect("/auth/signup");
+        } else if (inviteCodeString) {
+            const inviteCode: InviteCode | undefined = await InviteCode.findOne({ where: { code: inviteCodeString } });
+            if (!inviteCode || inviteCode.usagesLeft === 0) {
+                req.session.signupError = AuthError.INVALID_INVITE_CODE;
+                return res.redirect("/auth/signup");
+            }
+            inviteCode.usages++;
+            if (inviteCode.usagesLeft > 0) {
+                inviteCode.usagesLeft--;
+            }
+            await inviteCode.save();
         }
         User.findOne({ where: { username } })
             .then(user => {
