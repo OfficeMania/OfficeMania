@@ -1,4 +1,5 @@
 import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
+import { RequestHandler } from "express-serve-static-core";
 
 export enum PasswordVersion {
     NONE,
@@ -38,4 +39,19 @@ export class User extends BaseEntity {
 
     @Column({ name: "display_name", type: "varchar", length: 255, nullable: true })
     displayName: string;
+}
+
+export function ensureHasRole(...roles): RequestHandler {
+    return (req, res, next) => {
+        const user: User = req.user as User;
+        if (!user) {
+            return res.redirect("/auth/login");
+        }
+        const userRole: Role = user.role;
+        const hasRole: boolean = roles.find(role => userRole === role);
+        if (!hasRole) {
+            res.sendStatus(401);
+        }
+        return next();
+    };
 }

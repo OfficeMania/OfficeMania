@@ -205,18 +205,3 @@ function serializePassword(password: string, version: PasswordVersion): string {
             throw new Error(`Unsupported Password Version: ${version}`);
     }
 }
-
-export function ensureHasRole(...roles): RequestHandler {
-    return (req, res, next) => {
-        const user: User = req.user as User;
-        if (!user) {
-            return res.redirect("/auth/login");
-        }
-        const userRole: Role = user.getRole();
-        const hasRole: boolean = roles.find(role => userRole === role);
-        if (!hasRole) {
-            res.sendStatus(401);
-        }
-        return next();
-    };
-}
