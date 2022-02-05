@@ -73,7 +73,7 @@ export function getSessionHandler(): express.RequestHandler {
 }
 
 function setupSignup(): void {
-    router.post("/signup", async (req, res, next) => {
+    router.post("/signup", async (req, res) => {
         const username: string = req.body.username;
         const password: string[] = req.body.password;
         const inviteCodeString: string | undefined = req.body["invite-code"];
