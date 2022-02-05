@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { RequestHandler } from "express-serve-static-core";
 import { compareSync, hashSync } from "bcrypt";
 import { BCRYPT_SALT_ROUNDS, PASSWORD_SECRET } from "../../config";
@@ -19,7 +19,7 @@ export enum Role {
 
 @Entity()
 export class User extends BaseEntity {
-    @PrimaryColumn({ type: "uuid" })
+    @PrimaryGeneratedColumn("uuid")
     id: string;
 
     @Column({ type: "varchar", length: 255, unique: true })
@@ -31,8 +31,11 @@ export class User extends BaseEntity {
     @Column({ name: "password_version", type: "int", nullable: true })
     passwordVersion: number;
 
-    @Column({ name: "created_at", type: "datetime", default: "now()" })
+    @CreateDateColumn({ name: "created_at", type: "datetime" })
     createdAt: Date;
+
+    @UpdateDateColumn({ name: "updated_at", type: "datetime" })
+    updatedAt: Date;
 
     @Column({ type: "int", default: 0 })
     role: number;
