@@ -6,6 +6,7 @@ import { InviteCode } from "./entities/invite-code";
 import { User } from "./entities/user";
 import { DB, DB_DATABASE, DB_FILE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from "../config";
 import { EntitySchema } from "typeorm/entity-schema/EntitySchema";
+import { createDatabase } from "typeorm-extension";
 
 const entities: (Function | string | EntitySchema)[] = [InviteCode, User];
 const migrations: (Function | string)[] = [];
@@ -48,7 +49,15 @@ export async function connectDatabase(synchronize = false): Promise<Connection> 
         default:
             throw new Error(`Unsupported Database "${DB}"`);
     }
-    return createConnection(connectionOptions);
+    return createConnection(connectionOptions).then(async (connection: Connection) => {
+        switch (DB.toLowerCase()) {
+            case "postgres":
+            case "postgresql":
+                await createDatabase({ ifNotExist: true, characterSet: "UTF8" }, connectionOptions);
+                break;
+        }
+        return connection;
+    });
 }
 
 export async function testDatabase(): Promise<void> {
