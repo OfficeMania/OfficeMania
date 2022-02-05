@@ -49,6 +49,7 @@ export async function connectDatabase(synchronize = false): Promise<Connection> 
         default:
             throw new Error(`Unsupported Database "${DB}"`);
     }
+    console.debug(`Connecting to ${connectionOptions.type} Database`);
     return createConnection(connectionOptions).then(async (connection: Connection) => {
         switch (DB.toLowerCase()) {
             case "postgres":
