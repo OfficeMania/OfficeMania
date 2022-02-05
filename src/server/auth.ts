@@ -105,17 +105,24 @@ function setupSignup(): void {
                 req.session.signupError = AuthError.NO_ERROR;
                 if (user) {
                     req.session.signupError = AuthError.USERNAME_TAKEN;
-                    return res.redirect("/auth/signup");
+                    return;
                 }
                 return createUser(username, password[0])
                     .catch((reason) => {
                         console.error(reason);
                         req.session.signupError = AuthError.USER_CREATION_FAILED;
-                        res.redirect("/auth/signup");
                     });
             })
-            .then(() => res.redirect("/auth/login"))
-            .catch(() => {
+            .then((user: User) =>  {
+                if (user) {
+                    req.session.loginError = AuthError.NO_ERROR;
+                    res.redirect("/auth/login");
+                } else {
+                    res.redirect("/auth/signup");
+                }
+            })
+            .catch((reason) => {
+                console.error(reason);
                 req.session.signupError = AuthError.UNKNOWN;
                 res.redirect("/auth/signup");
             });
