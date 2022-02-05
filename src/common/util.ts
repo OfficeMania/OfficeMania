@@ -105,8 +105,11 @@ export function literallyUndefined(value: string): boolean {
 }
 
 export function checkUsername(value: string): boolean {
-    // @ts-ignore
-    return stringSanitizer.validate.isUsername(value);
+    if (value.length < 2 || value.length > 20) {
+        return false;
+    }
+    const lowerCase: string = value.toLowerCase();
+    return lowerCase === sanitizeUsername(lowerCase);
 }
 
 export function sanitizeUsername(value: string): string {
@@ -114,18 +117,18 @@ export function sanitizeUsername(value: string): string {
 }
 
 export function checkDisplayName(value?: string): boolean {
-    if (!value) {
-        return true;
+    if (!value || value.length < 2 || value.length > 20) {
+        return false;
     }
-    // @ts-ignore
-    return stringSanitizer.validate.isUsername(value);
+    const lowerCase: string = value.toLowerCase();
+    return lowerCase === sanitizeDisplayName(lowerCase);
 }
 
 export function sanitizeDisplayName(value?: string): string | undefined {
     if (!value) {
         return;
     }
-    return stringSanitizer.sanitize(value).slice(0, 20);
+    return stringSanitizer.sanitize.keepUnicode(value).slice(0, 20);
 }
 
 export function ensureUserId(value?: string): string {
