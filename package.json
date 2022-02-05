@@ -33,7 +33,6 @@
     "@babel/preset-typescript": "^7.12.7",
     "@colyseus/loadtest": "^0.14.0",
     "@types/bcrypt": "^5.0.0",
-    "@types/cls-hooked": "^4.3.3",
     "@types/connect-ensure-login": "^0.1.7",
     "@types/connect-flash": "^0.0.37",
     "@types/cors": "^2.8.6",
