@@ -132,3 +132,18 @@ export function serializePassword(password: string, version: PasswordVersion): s
             throw new Error(`Unsupported Password Version: ${version}`);
     }
 }
+
+export async function findOrCreateUserByUsername(
+    username: string,
+    password: string = undefined,
+    passwordVersion: PasswordVersion = PasswordVersion.LATEST
+): Promise<User> {
+    const user: User | undefined = await User.findOne({ where: { username } });
+    if (user) {
+        return user;
+    }
+    return User.create({
+        password: serializePassword(password, passwordVersion),
+        passwordVersion,
+    }).save();
+}
