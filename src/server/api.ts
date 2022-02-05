@@ -1,5 +1,5 @@
 import { Router } from "express";
-import User, { findUserById } from "./database/entities/old-user";
+import { User } from "./database/entities/user";
 
 const router: Router = Router();
 
@@ -13,12 +13,12 @@ function setupRouter(): void {
     router.get("/test", (req, res) => res.sendStatus(200));
     router.get("/user/:id", (req, res) => {
         const id: string = req.params.id;
-        findUserById(id)
+        User.findOne(id)
             .then((user: User) => {
                 if (!user) {
                     return res.sendStatus(404);
                 }
-                res.json({ id: user.getId(), username: user.getUsername(), role: user.getRole() });
+                res.json({ id: user.id, username: user.username, role: user.role });
             })
             .catch(() => res.sendStatus(500));
     });
