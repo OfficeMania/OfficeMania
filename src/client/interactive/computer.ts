@@ -46,7 +46,7 @@ export class Computer extends Interactive {
     leave() {
         removeCloseInteractionButton();
         this.canvas.style.visibility = "hidden";
-        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);e
+        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
         document.getElementById("computer-iframe").remove();
         setInputMode(InputMode.NORMAL);
     }
