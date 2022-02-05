@@ -30,10 +30,10 @@ export class User extends BaseEntity {
     @Column({ name: "password_version", type: "int", nullable: true })
     passwordVersion: number;
 
-    @CreateDateColumn({ name: "created_at", type: "datetime" })
+    @CreateDateColumn({ name: "created_at" })
     createdAt: Date;
 
-    @UpdateDateColumn({ name: "updated_at", type: "datetime" })
+    @UpdateDateColumn({ name: "updated_at" })
     updatedAt: Date;
 
     @Column({ type: "int", default: 0 })
