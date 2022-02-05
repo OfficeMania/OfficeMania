@@ -155,6 +155,7 @@ export async function findOrCreateUserByUsername(
         return user;
     }
     return User.create({
+        username,
         password: serializePassword(password, passwordVersion),
         passwordVersion,
     }).save();
