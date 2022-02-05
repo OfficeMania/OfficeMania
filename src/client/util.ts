@@ -369,6 +369,7 @@ export function loadUser(): void {
     if (username && username !== "") {
         setUsername(username);
     } else {
+        //replaced by html onsubmit="return false"
         document.getElementById("name-form").addEventListener(
             "submit",
             function (e) {
