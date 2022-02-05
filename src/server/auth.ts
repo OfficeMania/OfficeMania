@@ -3,9 +3,9 @@ import passport from "passport";
 import { DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, LDAP_OPTIONS, REQUIRE_INVITE_CODE, SESSION_SECRET } from "./config";
 import path from "path";
 import { LoggedInOptions } from "connect-ensure-login";
-import { createUser, User } from "./database/entities/user";
+import { createUser, User } from "./database/entity/user";
 import session from "express-session";
-import { InviteCode } from "./database/entities/invite-code";
+import { InviteCode } from "./database/entity/invite-code";
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;

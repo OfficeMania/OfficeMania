@@ -14,7 +14,7 @@ import {
     sanitizeUsername,
     State,
 } from "../../common";
-import { User } from "../database/entities/user";
+import { User } from "../database/entity/user";
 
 export interface AuthData {
     userSettings?: UserSettings;
