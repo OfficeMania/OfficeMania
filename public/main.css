@@ -79,12 +79,21 @@ body {
     border: 0;
     border-radius: 10px;
     position: relative;
+    box-shadow: 0 4px #999;
 }
 
 #panel-buttons button:hover,
 #textchat-bar button:hover,
 #interactive-bar button:hover{
-    transition: 0.5s;
+    background-color: #dddddd;
+}
+
+#panel-buttons button:active,
+#textchat-bar button:active,
+#interactive-bar button:active{
+    background-color: #cccccc;
+    box-shadow: 0 2px #666;
+    transform: translateY(2px);
 }
 
 #panel-buttons button span,
@@ -109,7 +118,6 @@ body {
 #panel-buttons button span:after,
 #textchat-bar button span:after,
 #interactive-bar button span:after {
-
     transition: 0.5s;
     right: 0;
 }
