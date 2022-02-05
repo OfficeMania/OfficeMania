@@ -85,7 +85,7 @@ const gameServer = new Server({
 app.use(
     "/img",
     connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-    express.static(path.join(process.cwd(), "assets", "img"), { maxAge: 31536000000 })
+    express.static(path.join(process.cwd(), "assets", "img"), { maxAge: 31536000000 }),
 );
 
 /*
@@ -99,7 +99,7 @@ app.use("/map", express.static(path.join(process.cwd(), "assets", "map")));
 app.use(
     "/lib",
     connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-    express.static(path.join(process.cwd(), "assets", "lib"), { maxAge: 86400000 })
+    express.static(path.join(process.cwd(), "assets", "lib"), { maxAge: 86400000 }),
 );
 
 /*
@@ -108,7 +108,7 @@ app.use(
 app.use(
     "/templates",
     connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-    express.static(path.join(process.cwd(), "assets", "templates"), { maxAge: 31536000000 })
+    express.static(path.join(process.cwd(), "assets", "templates"), { maxAge: 31536000000 }),
 );
 
 /*
@@ -117,7 +117,7 @@ app.use(
 app.use(
     "/assets",
     connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-    express.static(path.join(process.cwd(), "assets"))
+    express.static(path.join(process.cwd(), "assets")),
 );
 
 /*
@@ -130,7 +130,7 @@ app.use(
 app.use(
     "/js",
     connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-    express.static(path.join(process.cwd(), "js", "client"))
+    express.static(path.join(process.cwd(), "js", "client")),
 );
 
 // Register the TURoom (defined in src/common/rooms/turoom.ts)
