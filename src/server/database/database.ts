@@ -1,58 +1,34 @@
-import { Model, Sequelize } from "sequelize";
-import { createNamespace, Namespace } from "cls-hooked";
-import { Transaction } from "sequelize/dist/lib/transaction";
-import User from "./entities/old-user";
-import { DEBUG } from "../config";
+import { Connection, createConnection, EntityManager, getConnection } from "typeorm";
+import { SqliteConnectionOptions } from "typeorm/driver/sqlite/SqliteConnectionOptions";
+import { InviteCode } from "./entities/invite-code";
+import { User } from "./entities/user";
 
-const namespace: Namespace = createNamespace("namespace-officemania-sequelize");
-Sequelize.useCLS(namespace);
-
-enum SyncMode {
-    DEFAULT = "Creating (if not existing)",
-    ALTER = "Altering",
-    FORCE = "Force syncing",
+export async function connectDatabase(synchronize = false): Promise<Connection> {
+    const connectionOptions: SqliteConnectionOptions = {
+        type: "sqlite",
+        database: "database.sqlite",
+        entities: [InviteCode, User],
+        synchronize,
+    };
+    return createConnection(connectionOptions);
 }
 
-async function authenticateDatabase(): Promise<void> {
-    return sequelize
-        .authenticate()
-        .then(() => console.log("Connection to the Database has been established successfully"));
-}
-
-async function syncDatabase(syncMode: SyncMode = SyncMode.DEFAULT): Promise<void> {
-    return User.sync({ force: syncMode === SyncMode.FORCE, alter: syncMode === SyncMode.ALTER }).then(value => {
-        if (!value) {
-            console.error(`Something went wrong when ${syncMode.toString().toLowerCase()} the Database`);
-        } else if (DEBUG) {
-            console.debug(`${syncMode} the Database was successful`);
-        }
-    });
-}
-
-export async function connectDatabase(syncMode: SyncMode = SyncMode.DEFAULT): Promise<void> {
-    return authenticateDatabase().then(() => syncDatabase(syncMode));
+export async function testDatabase(): Promise<void> {
+    InviteCode.find()
+        .then(inviteCodes => console.debug(inviteCodes))
+        .catch(reason => console.error(reason));
+    User.find()
+        .then(users => console.debug(users))
+        .catch(reason => console.error(reason));
 }
 
 export async function disconnectDatabase(): Promise<void> {
     console.log("Disconnecting from the Database");
-    return sequelize.close();
+    return getConnection().close();
 }
-
-export const sequelize: Sequelize = new Sequelize({
-    dialect: "sqlite",
-    storage: "database.sqlite",
-});
 
 process.on("exit", disconnectDatabase);
 
-export async function withTransaction<T>(autoCallback: (t: Transaction) => PromiseLike<T>): Promise<T> {
-    return sequelize.transaction(autoCallback);
-}
-
-export function getEntity<T>(array: [T, boolean]): T {
-    return array[0];
-}
-
-export function getId(entity: Model): string {
-    return entity["id"];
+export async function withTransaction<T>(autoCallback: (entityManager: EntityManager) => Promise<T>): Promise<T> {
+    return getConnection().transaction(autoCallback);
 }
