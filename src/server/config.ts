@@ -11,6 +11,9 @@ export const PASSWORD_SECRET: string = process.env.PASSWORD_SECRET || "USE_A_SEC
 export const SERVER_PORT = Number(process.env.PORT) || 3000;
 export const WEBPACK_PORT = 8085; // For dev environment only
 
+// Which Database to use, defaults to sqlite
+export const DB: string = process.env.DB || "sqlite";
+
 // SQLite Database
 export const DB_FILE: string | undefined = process.env.DB_FILE;
 
