@@ -1,3 +1,5 @@
+import { ConfigEntry } from "./database/entity/config-entry";
+
 function toNumber(input?: string, radix = 10): number | undefined {
     if (input === undefined || input === null) {
         return undefined;
@@ -40,3 +42,27 @@ export const DISABLE_SIGNUP: boolean = toBoolean(process.env.DISABLE_SIGNUP) ?? 
 export const REQUIRE_INVITE_CODE: boolean = toBoolean(process.env.REQUIRE_INVITE_CODE) ?? false;
 
 export const LDAP_OPTIONS = null;
+
+export async function getStringOrElse(key: string, envValue?: string, defaultValue?: string): Promise<string | undefined> {
+    const configEntry: ConfigEntry | undefined = await ConfigEntry.findOne(key);
+    if (!configEntry) {
+        return envValue ?? defaultValue;
+    }
+    return configEntry.value;
+}
+
+export async function getNumberOrElse(key: string, envValue?: number, defaultValue?: number): Promise<number | undefined> {
+    const configEntry: ConfigEntry | undefined = await ConfigEntry.findOne(key);
+    if (!configEntry) {
+        return envValue ?? defaultValue;
+    }
+    return toNumber(configEntry.value);
+}
+
+export async function getBooleanOrElse(key: string, envValue?: boolean, defaultValue?: boolean): Promise<boolean | undefined> {
+    const configEntry: ConfigEntry | undefined = await ConfigEntry.findOne(key);
+    if (!configEntry) {
+        return envValue ?? defaultValue;
+    }
+    return toBoolean(configEntry.value);
+}
