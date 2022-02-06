@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { User } from "./database/entity/user";
+import { ensureHasRole, Role, User } from "./database/entity/user";
 
 const router: Router = Router();
 
@@ -11,7 +11,7 @@ export function getApiRouter(): Router {
 
 function setupRouter(): void {
     router.get("/test", (req, res) => res.sendStatus(200));
-    router.get("/user/:id", (req, res) => {
+    router.get("/user/:id", ensureHasRole(Role.ADMIN), (req, res) => {
         const id: string = req.params.id;
         User.findOne(id)
             .then((user: User) => {
