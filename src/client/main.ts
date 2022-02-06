@@ -15,6 +15,7 @@ import {
     loadUser,
     PlayerRecord,
     removeChildren,
+    sendNotification,
     setCharacter,
     setClient,
     setCollisionInfo,
@@ -82,7 +83,7 @@ import {
     welcomeModal,
     welcomeOkButton,
 } from "./static";
-import { sendNotification, updateDoors } from "./interactive/door";
+import { updateDoors } from "./interactive/door";
 import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 import { getInFocus, initChatListener } from "./textchat";
