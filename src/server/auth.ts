@@ -1,6 +1,6 @@
 import express, { Express, Router } from "express";
 import passport from "passport";
-import { FORCE_LOGIN, IS_DEV, isInviteCodeRequired, isSignupDisabled, LDAP_OPTIONS, SESSION_SECRET } from "./config";
+import { REQUIRE_LOGIN, IS_DEV, isInviteCodeRequired, isSignupDisabled, LDAP_OPTIONS, SESSION_SECRET } from "./config";
 import path from "path";
 import { LoggedInOptions } from "connect-ensure-login";
 import { createUser, User } from "./database/entity/user";
@@ -233,7 +233,7 @@ export function setupAuth(app: Express): void {
     }
     app.use(passport.initialize());
     app.use(passport.session());
-    if (IS_DEV && !FORCE_LOGIN) {
+    if (IS_DEV && !REQUIRE_LOGIN) {
         app.use((req, res, next) => {
             req.isAuthenticated = () => true;
             next();

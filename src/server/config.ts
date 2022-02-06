@@ -37,7 +37,7 @@ export const DB_USERNAME: string | undefined = process.env.DB_USERNAME;
 export const DB_PASSWORD: string | undefined = process.env.DB_PASSWORD;
 export const DB_DATABASE: string | undefined = process.env.DB_DATABASE;
 
-export const FORCE_LOGIN: boolean = toBoolean(process.env.FORCE_LOGIN) ?? false;
+export const REQUIRE_LOGIN: boolean = toBoolean(process.env.FORCE_LOGIN) ?? false;
 const DISABLE_SIGNUP: boolean | undefined = toBoolean(process.env.DISABLE_SIGNUP);
 const REQUIRE_INVITE_CODE: boolean | undefined = toBoolean(process.env.REQUIRE_INVITE_CODE);
 
