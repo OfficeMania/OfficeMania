@@ -41,8 +41,12 @@ function setupRouter(): void {
         if (!key) {
             return res.status(500).send("Missing query parameter 'key'");
         }
+        const type: number | undefined = req.query.type ? Number(req.query.type) : undefined;
+        if (!type) {
+            return res.status(500).send("Missing query parameter 'type'");
+        }
         const value: string | null = req.query.value ? String(req.query.value) : null;
-        createOrUpdate(getManager(), ConfigEntry, { key, value })
+        createOrUpdate(getManager(), ConfigEntry, { key, type, value })
             .then(configEntry => res.send(configEntry))
             .catch(reason => res.status(500).send(reason));
     });
@@ -51,8 +55,9 @@ function setupRouter(): void {
         if (!key) {
             return res.status(500).send("Missing query parameter 'key'");
         }
+        const type: number | undefined = req.query.type ? Number(req.query.type) : undefined;
         const value: string | null = req.query.value ? String(req.query.value) : null;
-        createOrUpdate(getManager(), ConfigEntry, { key, value })
+        createOrUpdate(getManager(), ConfigEntry, { key, type, value })
             .then(configEntry => res.send(configEntry))
             .catch(reason => res.status(500).send(reason));
     });
