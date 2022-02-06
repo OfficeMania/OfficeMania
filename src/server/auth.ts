@@ -269,10 +269,21 @@ function setupLocalStrategy(): void {
 }
 
 const ensureSession: express.RequestHandler = (req, res, next) => {
-    if (!req.session) {
-        return next(new Error("Session is missing"));
+    let tries = 3;
+    function lookupSession(error?: any): void {
+        if (error) {
+            return next(error);
+        }
+        tries--;
+        if (req.session) {
+            return next();
+        }
+        if (tries < 0) {
+            return next(new Error("Session is missing"));
+        }
+        sessionHandler(req, res, lookupSession);
     }
-    next();
+    lookupSession();
 };
 
 export async function setupAuth(app: Express): Promise<void> {
