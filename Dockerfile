@@ -1,4 +1,4 @@
-FROM node:14.13-alpine AS DEV
+FROM node:16.13-alpine AS DEV
 
 ENV NODE_ENV dev
 
@@ -18,7 +18,7 @@ EXPOSE 8080
 
 CMD  [ "npm", "run", "start-ts-node-dev" ]
 
-FROM node:14.13-alpine AS PRODUCTION
+FROM node:16.13-alpine AS PRODUCTION
 
 ENV NODE_ENV production
 
