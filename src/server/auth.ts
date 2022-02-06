@@ -55,12 +55,7 @@ function authErrorToString(error: AuthError): string {
 }
 
 const router: Router = Router();
-const sessionHandler: express.RequestHandler = session({
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
-});
+let sessionHandler: express.RequestHandler = undefined;
 
 setupRouter();
 
@@ -70,6 +65,15 @@ export function getAuthRouter(): Router {
 
 export function getSessionHandler(): express.RequestHandler {
     return sessionHandler;
+}
+
+function setupSessionHandler(): void {
+    sessionHandler = session({
+        secret: SESSION_SECRET,
+        resave: false,
+        saveUninitialized: true,
+        cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
+    });
 }
 
 function setupSignup(): void {
@@ -225,6 +229,7 @@ function setupLocalStrategy(): void {
 }
 
 export async function setupAuth(app: Express): Promise<void> {
+    setupSessionHandler();
     app.use(sessionHandler);
     if (LDAP_OPTIONS) {
         setupLDAPStrategy();
