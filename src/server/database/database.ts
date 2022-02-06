@@ -2,13 +2,14 @@ import { Connection, createConnection, DeepPartial, EntityManager, EntityTarget,
 import { ConnectionOptions } from "typeorm/connection/ConnectionOptions";
 import { SqliteConnectionOptions } from "typeorm/driver/sqlite/SqliteConnectionOptions";
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
+import { ConfigEntry } from "./entity/config-entry";
 import { InviteCode } from "./entity/invite-code";
 import { User } from "./entity/user";
 import { DB, DB_DATABASE, DB_FILE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from "../config";
 import { EntitySchema } from "typeorm/entity-schema/EntitySchema";
 import { createDatabase } from "typeorm-extension";
 
-const entities: (Function | string | EntitySchema)[] = [InviteCode, User];
+const entities: (Function | string | EntitySchema)[] = [ConfigEntry, InviteCode, User];
 
 function createSqliteConnectionOptions(synchronize: boolean): SqliteConnectionOptions {
     return {
