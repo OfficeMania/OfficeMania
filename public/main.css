@@ -786,7 +786,20 @@ body {
     float: left;
 }
 
-#messages-bar div {
+.sent-message {
+    position: relative;
+    font-family: sans-serif;
+    font-size: 16px;
+    width: 90%;
+    background: lightsteelblue;
+    border-radius: 20px;
+    padding: 15px;
+    text-align: left;
+    color: #000;
+    margin: 10px;
+}
+
+.received-message {
     position: relative;
     font-family: sans-serif;
     font-size: 16px;
@@ -799,15 +812,28 @@ body {
     margin: 10px;
 }
 
-#messages-bar div:before {
+.sent-message:before {
     content: "";
     width: 0px;
     height: 0px;
     position: absolute;
-    border-left: 15px solid #fff;
+    border-left: 15px solid lightsteelblue;
     border-right: 12px solid transparent;
-    border-top: 12px solid #fff;
+    border-top: 12px solid lightsteelblue;
     border-bottom: 20px solid transparent;
     left: 10px;
+    bottom: -14px;
+}
+
+.received-message:before {
+    content: "";
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    border-left: 12px solid transparent;
+    border-right: 15px solid #fff;
+    border-top: 12px solid #fff;
+    border-bottom: 20px solid transparent;
+    right: 10px;
     bottom: -14px;
 }

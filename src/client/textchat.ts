@@ -253,6 +253,11 @@ function addMessageToBar(chatMessage: ChatMessage) {
     messageLine.innerText = `${chatMessage.name}: ${chatMessage.message}`;
     messageDiv.append(messageTime);
     messageDiv.append(messageLine);
+    if (chatMessage.userId === getOurPlayer().roomId) {
+        messageDiv.classList.add("sent-message");
+    } else {
+        messageDiv.classList.add("received-message");
+    }
     textchatBar.prepend(messageDiv);
 }
 
