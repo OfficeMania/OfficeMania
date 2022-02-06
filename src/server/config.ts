@@ -37,6 +37,11 @@ export const DB_USERNAME: string | undefined = process.env.DB_USERNAME;
 export const DB_PASSWORD: string | undefined = process.env.DB_PASSWORD;
 export const DB_DATABASE: string | undefined = process.env.DB_DATABASE;
 
+// Redis
+export const REDIS_HOST: string | undefined = process.env.REDIS_HOST;
+export const REDIS_PORT: number | undefined = toNumber(process.env.REDIS_PORT, 10);
+export const REDIS_PASSWORD: string | undefined = process.env.REDIS_PASSWORD;
+
 const REQUIRE_LOGIN: boolean | undefined = toBoolean(process.env.FORCE_LOGIN);
 const DISABLE_SIGNUP: boolean | undefined = toBoolean(process.env.DISABLE_SIGNUP);
 const REQUIRE_INVITE_CODE: boolean | undefined = toBoolean(process.env.REQUIRE_INVITE_CODE);
