@@ -56,7 +56,12 @@ async function setupApp(): Promise<Express> {
     await setupAuth(app);
     app.use("/auth", getAuthRouter());
 
-    app.use("/api", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), getApiRouter());
+    app.use("/api", (req, res, next) => {
+        if (!req.isAuthenticated || !req.isAuthenticated()) {
+            return res.sendStatus(401);
+        }
+        next();
+    }, getApiRouter());
 
     // Expose public directory
     app.use("/", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), express.static("public"));
