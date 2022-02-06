@@ -101,6 +101,11 @@ export function areWeLoggedIn(): boolean {
     return !literallyUndefined(ourPlayer.userId);
 }
 
+export function areWeAdmin(): boolean {
+    const ourPlayer: Player = getOurPlayer();
+    return ourPlayer.userRole === 1;
+}
+
 /*
  * This function returns a promise that is resolve when the image is loaded
  * from the url. Note that this function currently does no error handling.
