@@ -268,9 +268,17 @@ function setupLocalStrategy(): void {
     );
 }
 
+const ensureSession: express.RequestHandler = (req, res, next) => {
+    if (!req.session) {
+        return next(new Error("Session is missing"));
+    }
+    next();
+};
+
 export async function setupAuth(app: Express): Promise<void> {
     setupSessionHandler();
     app.use(sessionHandler);
+    app.use(ensureSession);
     if (LDAP_OPTIONS) {
         setupLDAPStrategy();
     } else {
