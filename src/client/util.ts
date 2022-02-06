@@ -140,6 +140,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
 
                 let player: Player = {
                     userId: playerState.userId,
+                    userRole: playerState.userRole,
                     roomId: sessionId,
                     username: playerState.username,
                     displayName: playerState.displayName,

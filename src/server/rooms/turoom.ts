@@ -77,6 +77,7 @@ export class TURoom extends Room<State> {
         return {
             userSettings: {
                 id: user.id,
+                role: String(user.role),
                 username: user.username,
                 displayName: user.displayName,
                 character: user.character,

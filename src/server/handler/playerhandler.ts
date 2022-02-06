@@ -6,6 +6,7 @@ import {
     Direction,
     ensureCharacter,
     ensureDisplayName,
+    ensureRole,
     ensureUserId,
     literallyUndefined,
     MessageType,
@@ -22,6 +23,7 @@ export interface AuthData {
 
 export interface UserSettings {
     id: string;
+    role: string;
     username: string;
     displayName?: string;
     character?: string;
@@ -62,6 +64,7 @@ export class PlayerHandler implements Handler {
         const userSettings: UserSettings | undefined = authData.userSettings;
         const playerState: PlayerState = new PlayerState();
         playerState.userId = ensureUserId(userSettings?.id);
+        playerState.userRole = ensureRole(userSettings?.role);
         playerState.username = ensureDisplayName(userSettings?.username);
         playerState.displayName = ensureDisplayName(userSettings?.displayName);
         playerState.character = ensureCharacter(userSettings?.character);

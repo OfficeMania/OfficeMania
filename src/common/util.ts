@@ -135,6 +135,10 @@ export function ensureUserId(value?: string): string {
     return value || "undefined";
 }
 
+export function ensureRole(value?: string): number {
+    return value ? parseInt(value, 10) : 0;
+}
+
 export function ensureDisplayName(value?: string): string {
     return value || "Jimmy";
 }
