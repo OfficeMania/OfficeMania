@@ -1,6 +1,6 @@
 import express, { Express, Router } from "express";
 import passport from "passport";
-import { DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, isInviteCodeRequired, LDAP_OPTIONS, SESSION_SECRET } from "./config";
+import { isSignupDisabled, FORCE_LOGIN, IS_DEV, isInviteCodeRequired, LDAP_OPTIONS, SESSION_SECRET } from "./config";
 import path from "path";
 import { LoggedInOptions } from "connect-ensure-login";
 import { createUser, User } from "./database/entity/user";
@@ -62,7 +62,7 @@ const sessionHandler: express.RequestHandler = session({
     cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
 });
 
-setupRouter();
+setupRouter().catch(reason => console.error(reason));
 
 export function getAuthRouter(): Router {
     return router;
@@ -156,10 +156,10 @@ function setupLogin(): void {
             });
         })(req, res, next);
     });
-    router.get("/login", (req, res) =>
+    router.get("/login", async (req, res) =>
         res.render("pages/login", {
             error: authErrorToString(req.session.loginError),
-            disableSignup: DISABLE_SIGNUP,
+            disableSignup: await isSignupDisabled(),
         })
     );
 }
@@ -171,9 +171,9 @@ function setupLogout(): void {
     });
 }
 
-function setupRouter(): void {
+async function setupRouter(): Promise<void> {
     router.get("/auth.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "auth.css")));
-    if (!DISABLE_SIGNUP) {
+    if (!await isSignupDisabled()) {
         setupSignup();
     }
     setupLogin();

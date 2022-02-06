@@ -38,7 +38,7 @@ export const DB_PASSWORD: string | undefined = process.env.DB_PASSWORD;
 export const DB_DATABASE: string | undefined = process.env.DB_DATABASE;
 
 export const FORCE_LOGIN: boolean = toBoolean(process.env.FORCE_LOGIN) ?? false;
-export const DISABLE_SIGNUP: boolean = toBoolean(process.env.DISABLE_SIGNUP) ?? true;
+const DISABLE_SIGNUP: boolean | undefined = toBoolean(process.env.DISABLE_SIGNUP);
 const REQUIRE_INVITE_CODE: boolean | undefined = toBoolean(process.env.REQUIRE_INVITE_CODE);
 
 export const LDAP_OPTIONS = null;
@@ -65,6 +65,10 @@ export async function getBooleanOrElse(key: string, envValue: boolean | undefine
         return envValue ?? defaultValue;
     }
     return toBoolean(configEntry.value) ?? defaultValue;
+}
+
+export function isSignupDisabled(defaultValue = true): Promise<boolean> {
+    return getBooleanOrElse("DISABLE_SIGNUP", DISABLE_SIGNUP, defaultValue);
 }
 
 export function isInviteCodeRequired(defaultValue = false): Promise<boolean> {
