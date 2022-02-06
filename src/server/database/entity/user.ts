@@ -108,7 +108,7 @@ export function ensureHasRole(...roles): RequestHandler {
         const userRole: Role = user.role;
         const hasRole: boolean = roles.find(role => userRole === role);
         if (!hasRole) {
-            res.sendStatus(401);
+            return res.sendStatus(401);
         }
         return next();
     };
