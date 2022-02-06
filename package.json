@@ -36,6 +36,7 @@
     "@types/bcrypt": "^5.0.0",
     "@types/connect-ensure-login": "^0.1.7",
     "@types/connect-flash": "^0.0.37",
+    "@types/connect-redis": "^0.0.18",
     "@types/cors": "^2.8.6",
     "@types/crypto-js": "^4.0.2",
     "@types/ejs": "^3.1.0",
