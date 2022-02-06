@@ -1,11 +1,25 @@
 import express, { Express, Router } from "express";
 import passport from "passport";
-import { isInviteCodeRequired, isLoginRequired, isSignupDisabled, LDAP_OPTIONS, SESSION_SECRET } from "./config";
+import {
+    IS_DEV,
+    isInviteCodeRequired,
+    isLoginRequired,
+    isSignupDisabled,
+    LDAP_OPTIONS,
+    REDIS_HOST,
+    REDIS_PASSWORD,
+    REDIS_PORT,
+    SESSION_SECRET,
+} from "./config";
 import path from "path";
 import { LoggedInOptions } from "connect-ensure-login";
 import { createUser, User } from "./database/entity/user";
 import session from "express-session";
 import { InviteCode } from "./database/entity/invite-code";
+import Redis from "ioredis";
+import connect_redis from "connect-redis";
+
+const RedisStore = connect_redis(session);
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
@@ -76,8 +90,30 @@ function createDefaultSessionHandler(): express.RequestHandler {
     });
 }
 
+function createRedisSessionHandler(): express.RequestHandler {
+    const redisClient = new Redis({
+        host: REDIS_HOST,
+        port: REDIS_PORT || 6379,
+        password: REDIS_PASSWORD,
+    });
+    redisClient.on("error", console.error);
+    return session({
+        store: new RedisStore({ client: redisClient }),
+        secret: SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: { secure: !IS_DEV, maxAge: 60 * 60 * 1000 }, // 1 hour
+    });
+}
+
 function setupSessionHandler(): void {
-    sessionHandler = createDefaultSessionHandler();
+    if (REDIS_HOST) {
+        console.debug("Setup Redis Session Store");
+        sessionHandler = createRedisSessionHandler();
+    } else {
+        console.debug("Setup In-Memory Session Store");
+        sessionHandler = createDefaultSessionHandler();
+    }
 }
 
 function setupSignup(): void {
@@ -180,7 +216,7 @@ function setupLogin(): void {
 function setupLogout(): void {
     router.get("/logout", (req, res) => {
         req.logout();
-        res.redirect("/");
+        req.session.destroy(() => res.redirect("/"));
     });
 }
 
