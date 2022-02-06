@@ -567,17 +567,27 @@ function playerOnChangeFunctions(playerState: PlayerState) {
 
 
 export function sendNotification(message: string) {
-    //TODO make Notification beautiful
     if (!("Notification" in window)) {
         console.warn("This browser does not support desktop notifications.");
     } else if (window.Notification.permission === "granted") {
-        new window.Notification(message);
+        makeNotification(message);
     } else if (window.Notification.permission !== "denied") {
         //we send even though the person doesnt want to get notifications
         window.Notification.requestPermission(function (permission) {
             if (permission === "granted") {
-                new window.Notification(message);
+                makeNotification(message);
             }
         });
     }
+}
+
+function makeNotification(message: string) {
+    let notification = new window.Notification("OfficeMania", {
+        body: message,
+        icon: "../../assets/img/favicon.ico"
+    });
+    notification.onclick = function () {
+        window.focus();
+    }
+    return notification;
 }
