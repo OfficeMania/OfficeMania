@@ -1,6 +1,6 @@
 import express, { Express, Router } from "express";
 import passport from "passport";
-import { REQUIRE_LOGIN, IS_DEV, isInviteCodeRequired, isSignupDisabled, LDAP_OPTIONS, SESSION_SECRET } from "./config";
+import { isInviteCodeRequired, isLoginRequired, isSignupDisabled, LDAP_OPTIONS, SESSION_SECRET } from "./config";
 import path from "path";
 import { LoggedInOptions } from "connect-ensure-login";
 import { createUser, User } from "./database/entity/user";
@@ -224,7 +224,7 @@ function setupLocalStrategy(): void {
     );
 }
 
-export function setupAuth(app: Express): void {
+export async function setupAuth(app: Express): Promise<void> {
     app.use(sessionHandler);
     if (LDAP_OPTIONS) {
         setupLDAPStrategy();
@@ -233,7 +233,7 @@ export function setupAuth(app: Express): void {
     }
     app.use(passport.initialize());
     app.use(passport.session());
-    if (IS_DEV && !REQUIRE_LOGIN) {
+    if (!(await isLoginRequired())) {
         app.use((req, res, next) => {
             req.isAuthenticated = () => true;
             next();

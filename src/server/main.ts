@@ -51,7 +51,7 @@ async function setupApp(): Promise<Express> {
         .then(() => initDatabase())
         .catch(console.error);
 
-    setupAuth(app);
+    await setupAuth(app);
     app.use("/auth", getAuthRouter());
 
     app.use("/api", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), getApiRouter());
