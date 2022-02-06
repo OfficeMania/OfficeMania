@@ -11,6 +11,19 @@
     </head>
     <body>
         <h1>Admin Interface</h1>
+        <div id="settings">
+            <form id="settings-form">
+                <template id="template-setting">
+                    <div id="template-setting-div">
+                        <label id="template-setting-label" for="template-setting-input">template-setting-input</label>
+                        <input id="template-setting-input" type="text" name="template-setting-input"
+                               value="template-setting-input">
+                        <br><br>
+                    </div>
+                </template>
+                <input type="submit" value="Submit" disabled hidden>
+            </form>
+        </div>
         <script src="/js/admin-bundle.js" defer></script>
     </body>
 </html>
