@@ -11,7 +11,7 @@ import { TURoom } from "./rooms/turoom";
 import { DEBUG, IS_DEV, SERVER_PORT } from "./config";
 import { getAuthRouter, getSessionHandler, loggedInOptions, setupAuth } from "./auth";
 import connectionEnsureLogin from "connect-ensure-login";
-import { findOrCreateUserByUsername, PasswordVersion } from "./database/entity/user";
+import { ensureHasRole, findOrCreateUserByUsername, PasswordVersion, Role } from "./database/entity/user";
 import { connectDatabase } from "./database/database";
 import { getApiRouter } from "./api";
 
@@ -65,6 +65,9 @@ async function setupApp(): Promise<Express> {
 
     // Expose public directory
     app.use("/", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), express.static("public"));
+
+    // Expose admin directory
+    app.use("/admin", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), ensureHasRole(Role.ADMIN), express.static("admin"));
 
     // "Mount" the public folder as the root of the website
     //app.use('/', serveIndex(path.join(process.cwd(), "public"), {'icons': true}));
