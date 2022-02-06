@@ -1,6 +1,6 @@
 import express, { Express, Router } from "express";
 import passport from "passport";
-import { isSignupDisabled, FORCE_LOGIN, IS_DEV, isInviteCodeRequired, LDAP_OPTIONS, SESSION_SECRET } from "./config";
+import { FORCE_LOGIN, IS_DEV, isInviteCodeRequired, isSignupDisabled, LDAP_OPTIONS, SESSION_SECRET } from "./config";
 import path from "path";
 import { LoggedInOptions } from "connect-ensure-login";
 import { createUser, User } from "./database/entity/user";
@@ -29,7 +29,7 @@ enum AuthError {
     INVALID_CREDENTIALS,
     INVITE_CODE_REQUIRED,
     INVALID_INVITE_CODE,
-    INVITE_CODE_EXPIRED
+    INVITE_CODE_EXPIRED,
 }
 
 function authErrorToString(error: AuthError): string {
@@ -81,7 +81,7 @@ function setupSignup(): void {
             req.session.signupError = AuthError.PASSWORDS_MISMATCH;
             return res.redirect("/auth/signup");
         }
-        if (await isInviteCodeRequired() && !inviteCodeString) {
+        if ((await isInviteCodeRequired()) && !inviteCodeString) {
             req.session.signupError = AuthError.INVITE_CODE_REQUIRED;
             return res.redirect("/auth/signup");
         } else if (inviteCodeString) {
@@ -107,13 +107,12 @@ function setupSignup(): void {
                     req.session.signupError = AuthError.USERNAME_TAKEN;
                     return;
                 }
-                return createUser(username, password[0])
-                    .catch((reason) => {
-                        console.error(reason);
-                        req.session.signupError = AuthError.USER_CREATION_FAILED;
-                    });
+                return createUser(username, password[0]).catch(reason => {
+                    console.error(reason);
+                    req.session.signupError = AuthError.USER_CREATION_FAILED;
+                });
             })
-            .then((user: User) =>  {
+            .then((user: User) => {
                 if (user) {
                     req.session.loginError = AuthError.NO_ERROR;
                     res.redirect("/auth/login");
@@ -121,7 +120,7 @@ function setupSignup(): void {
                     res.redirect("/auth/signup");
                 }
             })
-            .catch((reason) => {
+            .catch(reason => {
                 console.error(reason);
                 req.session.signupError = AuthError.UNKNOWN;
                 res.redirect("/auth/signup");
