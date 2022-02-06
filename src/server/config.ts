@@ -48,7 +48,11 @@ const REQUIRE_INVITE_CODE: boolean | undefined = toBoolean(process.env.REQUIRE_I
 
 export const LDAP_OPTIONS = null;
 
-export async function getStringOrElse(key: string, envValue: string | undefined, defaultValue: string): Promise<string> {
+export async function getStringOrElse(
+    key: string,
+    envValue: string | undefined,
+    defaultValue: string
+): Promise<string> {
     const configEntry: ConfigEntry | undefined = await ConfigEntry.findOne(key);
     if (!configEntry) {
         return envValue ?? defaultValue;
@@ -56,7 +60,11 @@ export async function getStringOrElse(key: string, envValue: string | undefined,
     return configEntry.value ?? defaultValue;
 }
 
-export async function getNumberOrElse(key: string, envValue: number | undefined, defaultValue: number): Promise<number> {
+export async function getNumberOrElse(
+    key: string,
+    envValue: number | undefined,
+    defaultValue: number
+): Promise<number> {
     const configEntry: ConfigEntry | undefined = await ConfigEntry.findOne(key);
     if (!configEntry) {
         return envValue ?? defaultValue;
@@ -64,7 +72,11 @@ export async function getNumberOrElse(key: string, envValue: number | undefined,
     return toNumber(configEntry.value) ?? defaultValue;
 }
 
-export async function getBooleanOrElse(key: string, envValue: boolean | undefined, defaultValue: boolean): Promise<boolean> {
+export async function getBooleanOrElse(
+    key: string,
+    envValue: boolean | undefined,
+    defaultValue: boolean
+): Promise<boolean> {
     const configEntry: ConfigEntry | undefined = await ConfigEntry.findOne(key);
     if (!configEntry) {
         return envValue ?? defaultValue;
