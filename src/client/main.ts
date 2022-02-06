@@ -459,6 +459,13 @@ async function main() {
 
     //loads all the character information
     loadUser();
+    document.getElementById("name-form").addEventListener(
+        "submit",
+        function (e) {
+            e.preventDefault();
+        },
+        false
+    );
     await loadCharacter();
     checkInputMode();
 

@@ -249,7 +249,7 @@ function addMessageToBar(chatMessage: ChatMessage) {
     const messageTime = document.createElement("p");
     messageTime.id = "message-time";
     messageLine.id = "message-line";
-    messageTime.innerText = `${chatMessage.timestamp}  `
+    messageTime.innerText = `${chatMessage.timestamp}  `;
     messageLine.innerText = `${chatMessage.name}: ${chatMessage.message}`;
     messageDiv.append(messageTime);
     messageDiv.append(messageLine);

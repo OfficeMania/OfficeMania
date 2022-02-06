@@ -20,6 +20,7 @@ import AnimationData, { createAnimationData } from "./graphic/animation-data";
 import { PlayerState } from "../common/states/player-state";
 import { textchatPlayerOnChange } from "./textchat";
 import { updateUsers } from "./conference/conference";
+import { convertCompilerOptionsFromJson } from "typescript";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -368,19 +369,6 @@ export function loadUser(): void {
     const username = getUsername();
     if (username && username !== "") {
         setUsername(username);
-    } else {
-        //replaced by html onsubmit="return false"
-        document.getElementById("name-form").addEventListener(
-            "submit",
-            function (e) {
-                setUsername(usernameInputWelcome.value);
-                e.preventDefault();
-                bsWelcomeModal.hide();
-                welcomeModal.style.display = "none";
-                checkInputMode();
-            },
-            false
-        );
     }
     if (!areWeLoggedIn()) {
         //load displayName
