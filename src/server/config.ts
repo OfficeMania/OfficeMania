@@ -19,7 +19,7 @@ export const DB_FILE: string | undefined = process.env.DB_FILE;
 
 // PostgreSQL Database
 export const DB_HOST: string | undefined = process.env.DB_HOST;
-export const DB_PORT: number | undefined = toInt(process.env.DB_PORT, 10);
+export const DB_PORT: number | undefined = toNumber(process.env.DB_PORT, 10);
 export const DB_USERNAME: string | undefined = process.env.DB_USERNAME;
 export const DB_PASSWORD: string | undefined = process.env.DB_PASSWORD;
 export const DB_DATABASE: string | undefined = process.env.DB_DATABASE;
@@ -30,7 +30,7 @@ export const REQUIRE_INVITE_CODE: boolean = toBoolean(process.env.REQUIRE_INVITE
 
 export const LDAP_OPTIONS = null;
 
-function toInt(input?: string, radix = 10): number | undefined {
+function toNumber(input?: string, radix = 10): number | undefined {
     if (input === undefined || input === null) {
         return undefined;
     }
