@@ -45,6 +45,8 @@ async function setupApp(): Promise<Express> {
     // Compress all responses
     app.use(compression());
 
+    app.set("trust proxy", 1);
+
     app.set("view engine", "ejs");
 
     await connectDatabase(IS_DEV)
