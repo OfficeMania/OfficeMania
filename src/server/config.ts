@@ -48,7 +48,7 @@ const REQUIRE_INVITE_CODE: boolean | undefined = toBoolean(process.env.REQUIRE_I
 
 export const LDAP_OPTIONS = null;
 
-export async function getStringOrElse(
+async function getStringOrElse(
     key: string,
     envValue: string | undefined,
     defaultValue: string
@@ -60,7 +60,7 @@ export async function getStringOrElse(
     return configEntry.value ?? defaultValue;
 }
 
-export async function getNumberOrElse(
+async function getNumberOrElse(
     key: string,
     envValue: number | undefined,
     defaultValue: number
@@ -72,7 +72,7 @@ export async function getNumberOrElse(
     return toNumber(configEntry.value) ?? defaultValue;
 }
 
-export async function getBooleanOrElse(
+async function getBooleanOrElse(
     key: string,
     envValue: boolean | undefined,
     defaultValue: boolean
