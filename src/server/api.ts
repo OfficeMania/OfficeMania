@@ -28,7 +28,9 @@ function setupRouter(): void {
     router.get("/config", ensureHasRole(Role.ADMIN), (req, res) => {
         const key = req.query.key;
         if (!key) {
-            return res.status(500).send("Missing query parameter 'key'");
+            return ConfigEntry.find()
+                .then(configEntries => res.send(configEntries))
+                .catch(reason => res.status(500).send(reason));
         }
         ConfigEntry.findOne(String(key))
             .then(configEntry => (configEntry ? res.send(configEntry) : res.sendStatus(404)))
