@@ -67,13 +67,17 @@ export function getSessionHandler(): express.RequestHandler {
     return sessionHandler;
 }
 
-function setupSessionHandler(): void {
-    sessionHandler = session({
+function createDefaultSessionHandler(): express.RequestHandler {
+    return session({
         secret: SESSION_SECRET,
         resave: false,
         saveUninitialized: true,
         cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
     });
+}
+
+function setupSessionHandler(): void {
+    sessionHandler = createDefaultSessionHandler();
 }
 
 function setupSignup(): void {
