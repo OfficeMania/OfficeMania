@@ -175,6 +175,15 @@ function createSetting(
     const div: HTMLDivElement = <HTMLDivElement>documentFragment.querySelector("#template-setting-div");
     const input: HTMLInputElement = <HTMLInputElement>documentFragment.querySelector("#template-setting-input");
     const label: HTMLLabelElement = <HTMLLabelElement>documentFragment.querySelector("#template-setting-label");
+    const descriptionContainer: HTMLDivElement = <HTMLDivElement>(
+        documentFragment.querySelector("#template-setting-description-container")
+    );
+    if (!description) {
+        descriptionContainer.remove();
+    } else {
+        const element: HTMLElement = <HTMLElement>descriptionContainer.querySelector("#template-setting-description");
+        element.innerText = description;
+    }
     return new Setting(div, label, input, name, key, type, value, description);
 }
 
