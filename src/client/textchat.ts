@@ -253,7 +253,7 @@ function addMessageToBar(chatMessage: ChatMessage) {
     messageLine.innerText = `${chatMessage.name}: ${chatMessage.message}`;
     messageDiv.append(messageTime);
     messageDiv.append(messageLine);
-    if (chatMessage.userId === getOurPlayer().roomId) {
+    if (checkIfOwnMessage(chatMessage)) {
         messageDiv.classList.add("sent-message");
     } else {
         messageDiv.classList.add("received-message");
@@ -261,6 +261,13 @@ function addMessageToBar(chatMessage: ChatMessage) {
     textchatBar.prepend(messageDiv);
 }
 
+function checkIfOwnMessage(message: ChatMessage) {
+    if (message.userId === getOurPlayer().roomId) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 //for sending the adding/removing command to server
 function modifyChat(whoToAdd: string[], chatId: string = "new") {
