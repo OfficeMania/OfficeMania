@@ -74,6 +74,9 @@ export function getSessionHandler(): express.RequestHandler {
 
 function setupSignup(): void {
     router.post("/signup", async (req, res) => {
+        if (await isSignupDisabled()) {
+            return res.sendStatus(404);
+        }
         const username: string = req.body.username;
         const password: string[] = req.body.password;
         const inviteCodeString: string | undefined = req.body["invite-code"];
@@ -126,12 +129,15 @@ function setupSignup(): void {
                 res.redirect("/auth/signup");
             });
     });
-    router.get("/signup", async (req, res) =>
+    router.get("/signup", async (req, res) => {
+        if (await isSignupDisabled()) {
+            return res.redirect("/auth/login");
+        }
         res.render("pages/signup", {
             error: authErrorToString(req.session.signupError),
             requireInviteCode: await isInviteCodeRequired(),
-        })
-    );
+        });
+    });
 }
 
 function setupLogin(): void {
