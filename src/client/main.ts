@@ -1,6 +1,7 @@
 import { Client, Room } from "colyseus.js";
 import { TILE_SIZE } from "./player";
 import {
+    areWeAdmin,
     areWeLoggedIn,
     createPlayerAvatar,
     getCharacter,
@@ -55,6 +56,7 @@ import {
 } from "./input";
 import { drawPlayers } from "./draw-player";
 import {
+    adminButton,
     background,
     backpackCanvas,
     bsWelcomeModal,
@@ -125,6 +127,7 @@ function toggleMute(type: string) {
 
 // Settings
 
+adminButton.addEventListener("click", () => admin());
 loginButton.addEventListener("click", () => login());
 logoutButton.addEventListener("click", () => logout());
 
@@ -156,6 +159,10 @@ export function checkInputMode() {
         setInputMode(InputMode.NORMAL);
     }
     //console.log(getInputMode());
+}
+
+function admin() {
+    window.location.href = "/admin";
 }
 
 function login() {
@@ -384,6 +391,8 @@ async function main() {
     const loggedIn: boolean = areWeLoggedIn();
     loginButton.hidden = loggedIn;
     logoutButton.hidden = !loggedIn;
+    const admin: boolean = areWeAdmin();
+    adminButton.hidden = !admin;
 
     /*
      * Then, we wait for our map to load

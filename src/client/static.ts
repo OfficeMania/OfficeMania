@@ -13,6 +13,7 @@ export const camButton = $<HTMLButtonElement>("button-mute-video");
 export const shareButton = $<HTMLButtonElement>("button-share-video");
 export const settingsModal = $<HTMLDivElement>("settings-modal");
 export const settingsButton = $<HTMLButtonElement>("button-settings");
+export const adminButton = $<HTMLButtonElement>("button-admin");
 export const welcomeModal = $<HTMLDivElement>("welcome-modal");
 export const helpButton = $<HTMLButtonElement>("button-help");
 export const usersButton = $<HTMLButtonElement>("button-users");
