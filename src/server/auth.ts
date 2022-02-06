@@ -62,7 +62,7 @@ const sessionHandler: express.RequestHandler = session({
     cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
 });
 
-setupRouter().catch(reason => console.error(reason));
+setupRouter();
 
 export function getAuthRouter(): Router {
     return router;
@@ -171,11 +171,9 @@ function setupLogout(): void {
     });
 }
 
-async function setupRouter(): Promise<void> {
+function setupRouter(): void {
     router.get("/auth.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "auth.css")));
-    if (!await isSignupDisabled()) {
-        setupSignup();
-    }
+    setupSignup();
     setupLogin();
     setupLogout();
 }
