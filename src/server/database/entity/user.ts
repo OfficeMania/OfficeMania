@@ -103,12 +103,12 @@ export function ensureHasRole(...roles): RequestHandler {
     return (req, res, next) => {
         const user: User = req.user as User;
         if (!user) {
-            return res.redirect("/auth/login");
+            return res.sendStatus(401);
         }
         const userRole: Role = user.role;
         const hasRole: boolean = roles.find(role => userRole === role);
         if (!hasRole) {
-            return res.sendStatus(401);
+            return res.sendStatus(403);
         }
         return next();
     };
