@@ -67,6 +67,6 @@ export async function getBooleanOrElse(key: string, envValue: boolean | undefine
     return toBoolean(configEntry.value) ?? defaultValue;
 }
 
-export function isRequireInviteCode(defaultValue = false): Promise<boolean> {
+export function isInviteCodeRequired(defaultValue = false): Promise<boolean> {
     return getBooleanOrElse("REQUIRE_INVITE_CODE", REQUIRE_INVITE_CODE, defaultValue);
 }

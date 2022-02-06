@@ -1,6 +1,6 @@
 import express, { Express, Router } from "express";
 import passport from "passport";
-import { DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, isRequireInviteCode, LDAP_OPTIONS, SESSION_SECRET } from "./config";
+import { DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, isInviteCodeRequired, LDAP_OPTIONS, SESSION_SECRET } from "./config";
 import path from "path";
 import { LoggedInOptions } from "connect-ensure-login";
 import { createUser, User } from "./database/entity/user";
@@ -81,7 +81,7 @@ function setupSignup(): void {
             req.session.signupError = AuthError.PASSWORDS_MISMATCH;
             return res.redirect("/auth/signup");
         }
-        if (await isRequireInviteCode() && !inviteCodeString) {
+        if (await isInviteCodeRequired() && !inviteCodeString) {
             req.session.signupError = AuthError.INVITE_CODE_REQUIRED;
             return res.redirect("/auth/signup");
         } else if (inviteCodeString) {
@@ -130,7 +130,7 @@ function setupSignup(): void {
     router.get("/signup", async (req, res) =>
         res.render("pages/signup", {
             error: authErrorToString(req.session.signupError),
-            requireInviteCode: await isRequireInviteCode(),
+            requireInviteCode: await isInviteCodeRequired(),
         })
     );
 }
