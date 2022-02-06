@@ -31,7 +31,7 @@ import {
     updateDisplayName,
     updateUsername,
 } from "./util";
-import { convertMapData, drawMap, fillSolidInfos, MapInfo, solidInfo } from "./map";
+import { convertMapData, fillSolidInfos, MapInfo, solidInfo } from "./map";
 import {
     applyConferenceSettings,
     initConference,
@@ -63,6 +63,7 @@ import {
     characterSelect,
     displayNameInput,
     doors,
+    foreground,
     interactiveCanvas,
     loadingScreen,
     loginButton,
@@ -73,6 +74,7 @@ import {
     settingsModal,
     settingsOkButton,
     shareButton,
+    spriteSheet,
     usernameInput,
     usernameInputWelcome,
     usersButton,
@@ -87,6 +89,7 @@ import { getInFocus, initChatListener } from "./textchat";
 import { Backpack } from "./backpack";
 import { MessageType } from "../common/util";
 import { State } from "../common";
+import {createMapJson, drawMap, GroundType, TileList} from "./newMap";
 
 export const characters: { [key: string]: AnimatedSpriteSheet } = {};
 export const START_POSITION_X = 5;
@@ -385,6 +388,37 @@ async function main() {
      * Then, we wait for our map to load
      */
 
+    
+
+    let newMap = await createMapJson(room, spriteSheet);
+    newMap.mergeAnimation();
+    background.width = Math.abs(newMap._highestPosx + 1 - newMap._lowestPosx) * 48;
+    background.height = Math.abs(newMap._highestPosy + 1 - newMap._lowestPosy) * 48;
+    foreground.width = background.width;
+    foreground.height = background.height;
+    let ctxB = background.getContext("2d");
+    let ctxF = foreground.getContext("2d");
+
+    await newMap.updateAnimationCounter();
+
+    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround);
+    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround1);
+    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround2);
+    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround3);
+    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround4);
+    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround5);
+    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround6);
+    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround7);
+    drawMap(newMap, spriteSheet, foreground, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.ForeGround);
+
+    //For getting the SpriteSheet as png
+    //let img = background.toDataURL("image/png");
+    //document.write('<img src="' + img + '"/>');
+
+    /*
+     * Then, we wait for our map to load
+     */
+
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     let width = canvas.width;
@@ -393,7 +427,7 @@ async function main() {
 
     //load map from server
     const mapJson = await fetch("/map/Map.json").then(response => response.json());
-    const map: MapInfo = await convertMapData(mapJson, room, background);
+    const map: MapInfo = await convertMapData(mapJson, room, foreground); // foreground is for testing;
     setMapInfo(map);
 
     let currentMap = new MapInfo(
@@ -427,8 +461,6 @@ async function main() {
     await loadCharacter();
     checkInputMode();
 
-    drawMap(currentMap);
-
     let collisionInfo: solidInfo[][] = fillSolidInfos(currentMap);
     setCollisionInfo(collisionInfo);
     // console.log(collisionInfo);
@@ -444,6 +476,8 @@ async function main() {
     //start position
     let posX: number = (START_POSITION_X + Math.floor(currentMap.widthOfMap / 2)) * currentMap.resolution;
     let posY: number = (START_POSITION_Y + Math.floor(currentMap.heightOfMap / 2)) * currentMap.resolution;
+    let coordinateX: number;
+    let coordinateY: number;
 
     /* (from movement)
      * movement inputs
@@ -473,7 +507,12 @@ async function main() {
 
     let playerNearbyTimer = 0;
 
-    function loop(now: number) {
+    async function loop(now: number) {
+
+        //update the animationloop
+        await newMap.updateAnimationCounter();
+
+        //clear the canvas
         ctx.clearRect(0, 0, width, height);
 
         //update width and height
@@ -490,9 +529,10 @@ async function main() {
          */
 
         //the new Position of yourself in relation to the map
-        posX = (ourPlayer.positionX / TILE_SIZE + START_POSITION_X + Math.floor(currentMap.widthOfMap / 2)) * TILE_SIZE;
-        posY =
-            (ourPlayer.positionY / TILE_SIZE + START_POSITION_Y + Math.floor(currentMap.heightOfMap / 2)) * TILE_SIZE;
+        coordinateX = (ourPlayer.positionX / TILE_SIZE) + START_POSITION_X;
+        posX = Math.abs(coordinateX - newMap._lowestPosx) * TILE_SIZE;
+        coordinateY = (ourPlayer.positionY / TILE_SIZE) + START_POSITION_Y;
+        posY = Math.abs(coordinateY- newMap._lowestPosy) * TILE_SIZE;
 
         //detection if someone is nearby, executed only every 20th time
         playerNearbyTimer++;
@@ -507,31 +547,42 @@ async function main() {
         //check if interaction is nearby
         checkInteractionNearby();
 
+        for (const ANIMATION of newMap._animationList) {
+            if (Math.abs(coordinateX - ANIMATION.posx) <= Math.floor(width / 2 / TILE_SIZE) && Math.abs(coordinateY - ANIMATION.posy) <= Math.floor(height / 2 / TILE_SIZE)) {
+                let startx = ANIMATION.posx;
+                let starty = ANIMATION.posy;
+                ctxB.clearRect(
+                    (startx + Math.abs(newMap._lowestPosx)) * TILE_SIZE, 
+                    (starty + Math.abs(newMap._lowestPosy)) * TILE_SIZE, 
+                    ANIMATION.width * TILE_SIZE, ANIMATION.height * TILE_SIZE);
+
+                for (let i = GroundType.BackGround; i < GroundType.ForeGround; i++) {
+                    drawMap(
+                        newMap, 
+                        spriteSheet, 
+                        background, 
+                        startx, 
+                        starty, 
+                        startx + ANIMATION.width - 1, 
+                        starty + ANIMATION.height - 1, 
+                        i);
+                }
+            }
+        }
+
         ctx.drawImage(
-            background,
-            posX - Math.floor(width / 2),
-            posY - Math.floor(height / 2),
-            width,
-            height,
-            0,
-            0,
-            width,
-            height
-        );
-        ctx.drawImage(
-            doors,
-            posX - Math.floor(width / 2),
-            posY - Math.floor(height / 2),
-            width,
-            height,
-            0,
-            0,
-            width,
-            height
-        );
+            background, 
+            posX - Math.floor(width / 2), 
+            posY - Math.floor(height / 2), 
+            width, 
+            height, 
+            0, 
+            0, 
+            width, 
+            height);
 
         //check if a doorState changed
-        updateDoors();
+        //updateDoors();
 
         ctx.save();
 
