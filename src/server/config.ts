@@ -1,6 +1,17 @@
-/*
- * You can place general (server-)configurations here
- */
+function toNumber(input?: string, radix = 10): number | undefined {
+    if (input === undefined || input === null) {
+        return undefined;
+    }
+    return parseInt(input, radix);
+}
+
+function toBoolean(input?: string): boolean | undefined {
+    if (input === undefined || input === null) {
+        return undefined;
+    }
+    return !!input && input.toLowerCase() === "true";
+}
+
 export const IS_DEV = process.env.NODE_ENV !== "production";
 export const DEBUG: boolean = !!process.env.DEBUG;
 
@@ -29,17 +40,3 @@ export const DISABLE_SIGNUP: boolean = toBoolean(process.env.DISABLE_SIGNUP) ?? 
 export const REQUIRE_INVITE_CODE: boolean = toBoolean(process.env.REQUIRE_INVITE_CODE) ?? false;
 
 export const LDAP_OPTIONS = null;
-
-function toNumber(input?: string, radix = 10): number | undefined {
-    if (input === undefined || input === null) {
-        return undefined;
-    }
-    return parseInt(input, radix);
-}
-
-function toBoolean(input?: string): boolean | undefined {
-    if (input === undefined || input === null) {
-        return undefined;
-    }
-    return !!input && input.toLowerCase() === "true";
-}
