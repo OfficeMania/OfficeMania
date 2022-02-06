@@ -169,6 +169,10 @@ body {
     content: '  Send';
 }
 
+#button-admin:hover span:after {
+    content: '  Admin';
+}
+
 #button-send {
     position: relative;
     padding-right: 5px;
