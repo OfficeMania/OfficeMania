@@ -12,7 +12,7 @@ export class ConfigEntry extends BaseEntity {
     @PrimaryColumn({ type: "varchar", length: 64 })
     key: string;
 
-    @Column({ type: "enum", enum: ConfigEntryType, default: ConfigEntryType.STRING })
+    @Column({ type: "simple-enum", enum: ConfigEntryType, default: ConfigEntryType.STRING })
     type: ConfigEntryType;
 
     @Column({ type: "varchar", length: 1024, nullable: true })
