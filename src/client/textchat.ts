@@ -244,9 +244,16 @@ function sendMessage(message: string, chatId: string) {
 
 //add message as "p" into textchatbar
 function addMessageToBar(chatMessage: ChatMessage) {
+    const messageDiv = document.createElement("div");
     const messageLine = document.createElement("p");
-    messageLine.innerText = `[${chatMessage.timestamp}] ${chatMessage.name}: ${chatMessage.message}`;
-    textchatBar.prepend(messageLine);
+    const messageTime = document.createElement("p");
+    messageTime.id = "message-time";
+    messageLine.id = "message-line";
+    messageTime.innerText = `${chatMessage.timestamp}  `
+    messageLine.innerText = `${chatMessage.name}: ${chatMessage.message}`;
+    messageDiv.append(messageTime);
+    messageDiv.append(messageLine);
+    textchatBar.prepend(messageDiv);
 }
 
 

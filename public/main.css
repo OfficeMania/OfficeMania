@@ -749,6 +749,7 @@ body {
     margin-left: 3%;
     height: 40px;
 }
+
 #messages-bar {
     width: 90%;
     overflow-wrap: break-word;
@@ -758,11 +759,25 @@ body {
     flex-direction: column-reverse;
     align-content: flex-start;
     overflow: auto;
+    padding-bottom: 5px;
 
 }
-#messages-bar p{
-    color: white;
+
+#message-line {
+    color: black;
     overflow: visible;
+    margin-top: 0;
+    margin-bottom: 0;
+    display: inline;
+}
+
+#message-time {
+    color: gray;
+    overflow: visible;
+    font-size: 10px;
+    margin-top: 0;
+    margin-bottom: 0;
+    display: inline;
 }
 
 #textchat-container input {
@@ -771,7 +786,7 @@ body {
     float: left;
 }
 
-#messages-bar p {
+#messages-bar div {
     position: relative;
     font-family: sans-serif;
     font-size: 16px;
@@ -781,9 +796,10 @@ body {
     padding: 15px;
     text-align: left;
     color: #000;
+    margin: 10px;
 }
 
-#messages-bar p:before {
+#messages-bar div:before {
     content: "";
     width: 0px;
     height: 0px;
