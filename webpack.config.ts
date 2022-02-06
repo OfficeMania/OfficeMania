@@ -11,7 +11,10 @@ const targets = IS_DEV ? {chrome: '79', firefox: '72'} : '> 0.25%, not dead';
 const config: Configuration = {
     mode: IS_DEV ? 'development' : 'production',
     devtool: IS_DEV ? 'inline-source-map' : false,
-    entry: ['./src/client/main'],
+    entry: {
+        main: './src/client/main',
+        admin: './src/client/admin',
+    },
     plugins: [
         new webpack.ProgressPlugin(),
         new CleanWebpackPlugin(),
