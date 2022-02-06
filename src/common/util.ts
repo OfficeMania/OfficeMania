@@ -142,3 +142,14 @@ export function ensureDisplayName(value?: string): string {
 export function ensureCharacter(value?: string): string {
     return value || "Adam_48x48.png"; //TODO This needs to be done from the server, because characters could change
 }
+
+export function sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export async function waitFor<T>(supplier: () => T | undefined, ms = 100): Promise<T> {
+    while (supplier() === undefined) {
+        await sleep(ms);
+    }
+    return supplier();
+}
