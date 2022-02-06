@@ -6,7 +6,7 @@ export class ConfigEntry extends BaseEntity {
     key: string;
 
     @Column({ type: "varchar", length: 1024, nullable: true })
-    value: string;
+    value?: string;
 
     @CreateDateColumn({ name: "created_at" })
     createdAt: Date;
