@@ -21,6 +21,7 @@ export var PLAYER_COLORS = ["red", "blue", "green", "yellow", "black"];
  */
 export interface Player {
     userId: string; // user id logged in with
+    userRole?: number; // user role logged in with
     roomId: string; //players id in the room
     username: string; //players username
     displayName: string; //players display name

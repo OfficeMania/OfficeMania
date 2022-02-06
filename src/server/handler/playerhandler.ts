@@ -6,13 +6,16 @@ import {
     Direction,
     ensureCharacter,
     ensureDisplayName,
+    ensureRole,
     ensureUserId,
     literallyUndefined,
     MessageType,
     PlayerState,
+    sanitizeDisplayName,
+    sanitizeUsername,
     State,
 } from "../../common";
-import { findUserById } from "../database/entities/user";
+import { User } from "../database/entity/user";
 
 export interface AuthData {
     userSettings?: UserSettings;
@@ -20,6 +23,7 @@ export interface AuthData {
 
 export interface UserSettings {
     id: string;
+    role: string;
     username: string;
     displayName?: string;
     character?: string;
@@ -60,6 +64,7 @@ export class PlayerHandler implements Handler {
         const userSettings: UserSettings | undefined = authData.userSettings;
         const playerState: PlayerState = new PlayerState();
         playerState.userId = ensureUserId(userSettings?.id);
+        playerState.userRole = ensureRole(userSettings?.role);
         playerState.username = ensureDisplayName(userSettings?.username);
         playerState.displayName = ensureDisplayName(userSettings?.displayName);
         playerState.character = ensureCharacter(userSettings?.character);
@@ -120,36 +125,47 @@ export class PlayerHandler implements Handler {
 
     private onUsernameUpdate(client: Client, username: string): Promise<void> {
         //console.debug(`Incoming Username Update: ${username}`);
-        username = checkUsername(username);
+        if (!checkUsername(username)) {
+            //TODO Somehow notify the Player about the wrong username?
+            this.updateUsername(client, this.getPlayerData(client).username);
+            return;
+        }
+        username = sanitizeUsername(username);
         const playerState: PlayerState = this.getPlayerData(client);
         if (literallyUndefined(playerState.userId)) {
             this.updateUsername(client, username);
             return;
         }
-        return findUserById(playerState.userId)
-            .then(user =>
-                user
-                    .update({ username }, { where: { id: user.getId() } })
-                    .then(() => this.updateUsername(client, username))
-            )
+        return User.findOne(playerState.userId)
+            .then(user => {
+                user.username = username;
+                return user.save().then(() => this.updateUsername(client, username));
+            })
             .catch(console.error);
     }
 
     private onDisplayNameUpdate(client: Client, displayName?: string): Promise<void> {
         //console.debug(`Incoming Display Name Update: ${displayName}`);
         const remove: boolean = !displayName;
-        displayName = checkDisplayName(displayName);
+        if (!checkDisplayName(displayName)) {
+            //TODO Somehow notify the Player about the wrong display name?
+            this.updateDisplayName(client, this.getPlayerData(client).displayName);
+            return;
+        }
+        displayName = sanitizeDisplayName(displayName);
         const playerState: PlayerState = this.getPlayerData(client);
         if (literallyUndefined(playerState.userId)) {
+            if (remove) {
+                return;
+            }
             this.updateDisplayName(client, ensureDisplayName(displayName));
             return;
         }
-        return findUserById(playerState.userId)
-            .then(user =>
-                user
-                    .update({ displayName }, { where: { id: user.getId() } })
-                    .then(() => this.updateDisplayName(client, remove ? user.getUsername() : displayName))
-            )
+        return User.findOne(playerState.userId)
+            .then(user => {
+                user.displayName = displayName;
+                return user.save().then(() => this.updateDisplayName(client, remove ? user.username : displayName));
+            })
             .catch(console.error);
     }
 
@@ -161,12 +177,11 @@ export class PlayerHandler implements Handler {
             this.updateCharacter(client, character);
             return;
         }
-        return findUserById(playerState.userId)
-            .then(user =>
-                user
-                    .update({ character }, { where: { id: user.getId() } })
-                    .then(() => this.updateCharacter(client, character))
-            )
+        return User.findOne(playerState.userId)
+            .then(user => {
+                user.character = character;
+                return user.save().then(() => this.updateCharacter(client, character));
+            })
             .catch(console.error);
     }
 

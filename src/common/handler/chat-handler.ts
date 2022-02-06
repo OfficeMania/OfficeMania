@@ -5,6 +5,7 @@ export interface ChatMessage {
     name?: string;
     chatId: string;
     message: string;
+    userId?: string;
 }
 
 export interface ChatDTO {

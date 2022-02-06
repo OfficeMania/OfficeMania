@@ -13,10 +13,11 @@ import {
     textchatDropdownUsersButton,
     textchatSendButton,
 } from "./static";
-import { getOurPlayer, getRoom } from "./util";
+import { getOurPlayer, getRoom, sendNotification } from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chat-handler";
 import { PlayerState } from "../common/states/player-state";
-import { getUser } from "./conference/conference";
+import { getUser, setShowParticipantsTab } from "./conference/conference";
+import { setShowLoadingscreen } from "./loadingscreen";
 
 //tracks if button/shortcut have been pressed
 let _showTextchat = false;
@@ -64,6 +65,7 @@ function toggleTextchatBar() {
     if (getShowTextchatBar()) setShowTextchatBar(false);
     else setShowTextchatBar(true);
     checkInputMode();
+    setShowParticipantsTab(false);
 }
 
 //getter of _showTextchat
@@ -72,7 +74,7 @@ function getShowTextchatBar(): boolean {
 }
 
 //setter of _showTextchat
-function setShowTextchatBar(set: boolean) {
+export function setShowTextchatBar(set: boolean) {
     if (set) {
         textchatContainer.classList.add("hover");
     } else {
@@ -139,13 +141,15 @@ export function initChatListener() {
     getRoom().onMessage(MessageType.CHAT_LOG, (message: string) => onMessageLogs(JSON.parse(message)));
     getRoom().send(MessageType.CHAT_UPDATE);
     getRoom().send(MessageType.CHAT_LOG);
-    getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => onMessage(message));
+    getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => {
+        onMessage(message);
+        sendChatNotification(message);
+    });
 }
 
 export function textchatPlayerOnChange(playerState: PlayerState) {
     if (playerState) {
         let uid: string = "";
-
         playerState.onChange = (changes => {
             changes.forEach(change => {
                 if (change.field === "displayName") {
@@ -202,8 +206,8 @@ function onMessageLogs(chatMessages: ChatMessage[]): void {
             clearTextchatBar();
         }
     });
-    chatMessages.forEach(mesage => {
-        onMessage(mesage)
+    chatMessages.forEach(message => {
+        onMessage(message)
     });
 }
 
@@ -240,11 +244,30 @@ function sendMessage(message: string, chatId: string) {
 
 //add message as "p" into textchatbar
 function addMessageToBar(chatMessage: ChatMessage) {
+    const messageDiv = document.createElement("div");
     const messageLine = document.createElement("p");
-    messageLine.innerText = `[${chatMessage.timestamp}] ${chatMessage.name}: ${chatMessage.message}`;
-    textchatBar.prepend(messageLine);
+    const messageTime = document.createElement("p");
+    messageTime.id = "message-time";
+    messageLine.id = "message-line";
+    messageTime.innerText = `${chatMessage.timestamp}  `;
+    messageLine.innerText = `${chatMessage.name}: ${chatMessage.message}`;
+    messageDiv.append(messageTime);
+    messageDiv.append(messageLine);
+    if (checkIfOwnMessage(chatMessage)) {
+        messageDiv.classList.add("sent-message");
+    } else {
+        messageDiv.classList.add("received-message");
+    }
+    textchatBar.prepend(messageDiv);
 }
 
+function checkIfOwnMessage(message: ChatMessage) {
+    if (message.userId === getOurPlayer().roomId) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 //for sending the adding/removing command to server
 function modifyChat(whoToAdd: string[], chatId: string = "new") {
@@ -456,5 +479,17 @@ function updateChatName(chat: Chat) {
     });
     if (chat.name === "") {
         chat.name = "Empty chat";
+    }
+}
+
+function sendChatNotification(message: ChatMessage) {
+    if (message.userId && message.userId !== getOurPlayer().roomId) {
+        let chatSuffix: string = "";
+        if (chats[0].id === message.chatId) {
+            chatSuffix = " in Global";
+        } else if (chats[1].id === message.chatId) {
+            chatSuffix = " in Nearby";
+        }
+        sendNotification(`${message.name}${chatSuffix} says: ${message.message}`);
     }
 }

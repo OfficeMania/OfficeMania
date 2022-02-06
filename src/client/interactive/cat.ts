@@ -30,6 +30,9 @@ export class Cat extends Interactive {
             createCloseInteractionButton(() => this.leave());
             checkInputMode();
             document.getElementById("interactive-bar").prepend(this.iframe);
+            document.getElementById("computer-iframe").addEventListener("load", () => {
+                this.canvas.style.visibility = "hidden";
+            });
         }
         else this.leave();
     }

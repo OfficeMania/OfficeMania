@@ -20,6 +20,7 @@ import AnimationData, { createAnimationData } from "./graphic/animation-data";
 import { PlayerState } from "../common/states/player-state";
 import { textchatPlayerOnChange } from "./textchat";
 import { updateUsers } from "./conference/conference";
+import { convertCompilerOptionsFromJson } from "typescript";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -100,6 +101,11 @@ export function areWeLoggedIn(): boolean {
     return !literallyUndefined(ourPlayer.userId);
 }
 
+export function areWeAdmin(): boolean {
+    const ourPlayer: Player = getOurPlayer();
+    return ourPlayer.userRole === 1;
+}
+
 /*
  * This function returns a promise that is resolve when the image is loaded
  * from the url. Note that this function currently does no error handling.
@@ -139,6 +145,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
 
                 let player: Player = {
                     userId: playerState.userId,
+                    userRole: playerState.userRole,
                     roomId: sessionId,
                     username: playerState.username,
                     displayName: playerState.displayName,
@@ -368,18 +375,6 @@ export function loadUser(): void {
     const username = getUsername();
     if (username && username !== "") {
         setUsername(username);
-    } else {
-        document.getElementById("name-form").addEventListener(
-            "submit",
-            function (e) {
-                setUsername(usernameInputWelcome.value);
-                e.preventDefault();
-                bsWelcomeModal.hide();
-                welcomeModal.style.display = "none";
-                checkInputMode();
-            },
-            false
-        );
     }
     if (!areWeLoggedIn()) {
         //load displayName
@@ -562,4 +557,31 @@ function playerOnChangeFunctions(playerState: PlayerState) {
     textchatPlayerOnChange(playerState);
     //for user online list
     updateUsers();
+}
+
+
+export function sendNotification(message: string) {
+    if (!("Notification" in window)) {
+        console.warn("This browser does not support desktop notifications.");
+    } else if (window.Notification.permission === "granted") {
+        makeNotification(message);
+    } else if (window.Notification.permission !== "denied") {
+        //we send even though the person doesnt want to get notifications
+        window.Notification.requestPermission(function (permission) {
+            if (permission === "granted") {
+                makeNotification(message);
+            }
+        });
+    }
+}
+
+function makeNotification(message: string) {
+    let notification = new window.Notification("OfficeMania", {
+        body: message,
+        icon: "../../assets/img/favicon.ico"
+    });
+    notification.onclick = function () {
+        window.focus();
+    }
+    return notification;
 }

@@ -42,9 +42,16 @@
                            autocomplete="new-password" required oninput="validateForm()" />
                     <small id="error-mismatch" style="color: red; visibility: hidden;">Passwords do not match</small>
                 </div>
+                <% if (requireInviteCode) { %>
+                    <div>
+                        <label for="invite-code"><strong>Invite Code</strong></label>
+                        <input id="invite-code" type="text" placeholder="Invite Code" name="invite-code"
+                               autocomplete="invite-code" required oninput="validateForm()" />
+                    </div>
+                <% } %>
                 <div>
                     <input type="submit" value="Sign Up" />
-                    <button onclick="window.location='/auth/login';">Login</button>
+                    <button onclick="window.location='/auth/login';">Or Login instead</button>
                 </div>
             </div>
         </form>

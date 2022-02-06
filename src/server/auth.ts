@@ -1,11 +1,25 @@
 import express, { Express, Router } from "express";
 import passport from "passport";
-import { DISABLE_SIGNUP, FORCE_LOGIN, IS_DEV, LDAP_OPTIONS, SESSION_SECRET } from "./config";
+import {
+    IS_DEV,
+    isInviteCodeRequired,
+    isLoginRequired,
+    isSignupDisabled,
+    LDAP_OPTIONS,
+    REDIS_HOST,
+    REDIS_PASSWORD,
+    REDIS_PORT,
+    SESSION_SECRET,
+} from "./config";
 import path from "path";
-import connectionEnsureLogin, { LoggedInOptions } from "connect-ensure-login";
-import User, { createUser, findUserById, findUserByUsername, getUsername } from "./database/entities/user";
+import { LoggedInOptions } from "connect-ensure-login";
+import { createUser, User } from "./database/entity/user";
 import session from "express-session";
-import { getId } from "./database/database";
+import { InviteCode } from "./database/entity/invite-code";
+import Redis from "ioredis";
+import connect_redis from "connect-redis";
+
+const RedisStore = connect_redis(session);
 
 const LocalStrategy = require("passport-local").Strategy;
 const LdapStrategy = require("passport-ldapauth").Strategy;
@@ -27,10 +41,14 @@ enum AuthError {
     USER_CREATION_FAILED,
     PASSWORDS_MISMATCH,
     INVALID_CREDENTIALS,
+    INVITE_CODE_REQUIRED,
+    INVALID_INVITE_CODE,
+    INVITE_CODE_EXPIRED,
 }
 
 function authErrorToString(error: AuthError): string {
     switch (error) {
+        default:
         case AuthError.UNKNOWN:
             return "Unknown Error";
         case AuthError.NO_ERROR:
@@ -41,16 +59,17 @@ function authErrorToString(error: AuthError): string {
             return "Passwords do not match";
         case AuthError.INVALID_CREDENTIALS:
             return "Invalid Credentials";
+        case AuthError.INVITE_CODE_REQUIRED:
+            return "Invite Code required";
+        case AuthError.INVALID_INVITE_CODE:
+            return "Invalid Invite Code";
+        case AuthError.INVITE_CODE_EXPIRED:
+            return "Invite Code expired";
     }
 }
 
 const router: Router = Router();
-const sessionHandler: express.RequestHandler = session({
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
-});
+let sessionHandler: express.RequestHandler = undefined;
 
 setupRouter();
 
@@ -62,37 +81,107 @@ export function getSessionHandler(): express.RequestHandler {
     return sessionHandler;
 }
 
+function createDefaultSessionHandler(): express.RequestHandler {
+    return session({
+        secret: SESSION_SECRET,
+        resave: false,
+        saveUninitialized: true,
+        cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
+    });
+}
+
+function createRedisSessionHandler(): express.RequestHandler {
+    const redisClient = new Redis({
+        host: REDIS_HOST,
+        port: REDIS_PORT || 6379,
+        password: REDIS_PASSWORD,
+    });
+    redisClient.on("error", console.error);
+    return session({
+        store: new RedisStore({ client: redisClient }),
+        secret: SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: { secure: !IS_DEV, maxAge: 60 * 60 * 1000 }, // 1 hour
+    });
+}
+
+function setupSessionHandler(): void {
+    if (REDIS_HOST) {
+        console.debug("Setup Redis Session Store");
+        sessionHandler = createRedisSessionHandler();
+    } else {
+        console.debug("Setup In-Memory Session Store");
+        sessionHandler = createDefaultSessionHandler();
+    }
+}
+
 function setupSignup(): void {
-    router.post("/signup", connectionEnsureLogin.ensureLoggedOut(), (req, res, next) => {
+    router.post("/signup", async (req, res) => {
+        if (await isSignupDisabled()) {
+            return res.sendStatus(404);
+        }
         const username: string = req.body.username;
         const password: string[] = req.body.password;
+        const inviteCodeString: string | undefined = req.body["invite-code"];
         if (password.length !== 2 || password[0] !== password[1]) {
             req.session.signupError = AuthError.PASSWORDS_MISMATCH;
             return res.redirect("/auth/signup");
         }
-        findUserByUsername(username)
+        if ((await isInviteCodeRequired()) && !inviteCodeString) {
+            req.session.signupError = AuthError.INVITE_CODE_REQUIRED;
+            return res.redirect("/auth/signup");
+        } else if (inviteCodeString) {
+            const inviteCode: InviteCode | undefined = await InviteCode.findOne({ where: { code: inviteCodeString } });
+            if (!inviteCode) {
+                req.session.signupError = AuthError.INVALID_INVITE_CODE;
+                return res.redirect("/auth/signup");
+            }
+            if (inviteCode.usagesLeft === 0) {
+                req.session.signupError = AuthError.INVITE_CODE_EXPIRED;
+                return res.redirect("/auth/signup");
+            }
+            inviteCode.usages++;
+            if (inviteCode.usagesLeft > 0) {
+                inviteCode.usagesLeft--;
+            }
+            await inviteCode.save();
+        }
+        User.findOne({ where: { username } })
             .then(user => {
                 req.session.signupError = AuthError.NO_ERROR;
                 if (user) {
                     req.session.signupError = AuthError.USERNAME_TAKEN;
-                    return res.redirect("/auth/signup");
+                    return;
                 }
-                return createUser(username, password[0]).catch(() => {
+                return createUser(username, password[0]).catch(reason => {
+                    console.error(reason);
                     req.session.signupError = AuthError.USER_CREATION_FAILED;
-                    res.redirect("/auth/signup");
                 });
             })
-            .then(() => res.redirect("/auth/login"))
-            .catch(() => {
+            .then((user: User) => {
+                if (user) {
+                    req.session.loginError = AuthError.NO_ERROR;
+                    res.redirect("/auth/login");
+                } else {
+                    res.redirect("/auth/signup");
+                }
+            })
+            .catch(reason => {
+                console.error(reason);
                 req.session.signupError = AuthError.UNKNOWN;
                 res.redirect("/auth/signup");
             });
     });
-    router.get("/signup", (req, res) =>
+    router.get("/signup", async (req, res) => {
+        if (await isSignupDisabled()) {
+            return res.redirect("/auth/login");
+        }
         res.render("pages/signup", {
             error: authErrorToString(req.session.signupError),
-        })
-    );
+            requireInviteCode: await isInviteCodeRequired(),
+        });
+    });
 }
 
 function setupLogin(): void {
@@ -116,10 +205,10 @@ function setupLogin(): void {
             });
         })(req, res, next);
     });
-    router.get("/login", (req, res) =>
+    router.get("/login", async (req, res) =>
         res.render("pages/login", {
             error: authErrorToString(req.session.loginError),
-            disableSignup: DISABLE_SIGNUP,
+            disableSignup: await isSignupDisabled(),
         })
     );
 }
@@ -127,15 +216,13 @@ function setupLogin(): void {
 function setupLogout(): void {
     router.get("/logout", (req, res) => {
         req.logout();
-        res.redirect("/");
+        req.session.destroy(() => res.redirect("/"));
     });
 }
 
 function setupRouter(): void {
     router.get("/auth.css", (req, res) => res.sendFile(path.join(process.cwd(), "public", "auth.css")));
-    if (!DISABLE_SIGNUP) {
-        setupSignup();
-    }
+    setupSignup();
     setupLogin();
     setupLogout();
 }
@@ -160,7 +247,7 @@ function setupLocalStrategy(): void {
     console.debug("Setup Passport with LocalStrategy");
     passport.use(
         new LocalStrategy(function (username, password, done) {
-            findUserByUsername(username)
+            User.findOne({ where: { username } })
                 .then(user => {
                     if (!user || !user.checkPassword(password)) {
                         if (!user) {
@@ -168,21 +255,41 @@ function setupLocalStrategy(): void {
                         }
                         return done(null, false, { message: "Username or Password incorrect." });
                     }
-                    return done(null, { id: getId(user), username: getUsername(user) });
+                    return done(null, { id: user.id, username: user.username });
                 })
                 .catch(error => done(error, null));
         })
     );
-    passport.serializeUser((user: User, done) => done(null, getId(user)));
+    passport.serializeUser((user: User, done) => done(null, user.id));
     passport.deserializeUser((id: string, done) =>
-        findUserById(id)
+        User.findOne(id)
             .then(user => done(null, user))
             .catch(error => done(error, null))
     );
 }
 
-export function setupAuth(app: Express): void {
+const ensureSession: express.RequestHandler = (req, res, next) => {
+    let tries = 3;
+    function lookupSession(error?: any): void {
+        if (error) {
+            return next(error);
+        }
+        tries--;
+        if (req.session) {
+            return next();
+        }
+        if (tries < 0) {
+            return next(new Error("Session is missing"));
+        }
+        sessionHandler(req, res, lookupSession);
+    }
+    lookupSession();
+};
+
+export async function setupAuth(app: Express): Promise<void> {
+    setupSessionHandler();
     app.use(sessionHandler);
+    app.use(ensureSession);
     if (LDAP_OPTIONS) {
         setupLDAPStrategy();
     } else {
@@ -190,10 +297,10 @@ export function setupAuth(app: Express): void {
     }
     app.use(passport.initialize());
     app.use(passport.session());
-    if (IS_DEV && !FORCE_LOGIN) {
-        app.use((req, res, next) => {
+    app.use(async (req, res, next) => {
+        if (!(await isLoginRequired())) {
             req.isAuthenticated = () => true;
-            next();
-        });
-    }
+        }
+        next();
+    });
 }

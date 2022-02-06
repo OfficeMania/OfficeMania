@@ -68,10 +68,10 @@ export class ChatHandler implements Handler {
         if (chatIds.includes(messageIdArray[0])) {
             const chatId = messageIdArray[0];
             console.log(chatId);
-            const serverMessage: ChatMessage = makeMessage(this.room, client, { chatId: chatId, message: chatMessage.message });
+            const userId: string = getUserId(client, this.room);
+            const serverMessage: ChatMessage = makeMessage(this.room, client, { chatId: chatId, message: chatMessage.message, userId });
 
             const chat: Chat = this.byChatId(chatId);
-            const userId: string = getUserId(client, this.room);
             if (!chat.users.includes(userId)) {
                 chat.users.push(userId);
             }
@@ -88,6 +88,7 @@ export class ChatHandler implements Handler {
             const serverMessage: ChatMessage = makeMessage(this.room, client, {
                 message: chatMessage.message,
                 chatId: this.chats[1].id,
+                userId: client.sessionId,
             });
             let users: string[] = messageIdArray;
             this.room.clients
@@ -319,6 +320,7 @@ function makeMessage(room: Room, client: Client, chatMessage: ChatMessage): Chat
         name: room.state.players[client.sessionId].displayName,
         chatId: chatMessage.chatId,
         message: chatMessage.message,
+        userId: chatMessage.userId,
     };
 }
 

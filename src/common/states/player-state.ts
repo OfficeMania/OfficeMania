@@ -7,6 +7,9 @@ export class PlayerState extends Schema {
     @type("string")
     userId: string;
 
+    @type("number")
+    userRole: number;
+
     @type("string")
     username: string;
 
