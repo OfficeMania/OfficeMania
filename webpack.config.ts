@@ -1,7 +1,8 @@
 import * as path from 'path';
 import {CleanWebpackPlugin} from 'clean-webpack-plugin';
 import {Configuration} from 'webpack';
-import {IS_DEV, SERVER_PORT, WEBPACK_PORT} from './src/server/config';
+
+const IS_DEV = process.env.NODE_ENV !== "production";
 
 const webpack = require('webpack');
 
