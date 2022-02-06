@@ -233,10 +233,10 @@ export async function setupAuth(app: Express): Promise<void> {
     }
     app.use(passport.initialize());
     app.use(passport.session());
-    if (!(await isLoginRequired())) {
-        app.use((req, res, next) => {
+    app.use(async (req, res, next) => {
+        if (!(await isLoginRequired())) {
             req.isAuthenticated = () => true;
-            next();
-        });
-    }
+        }
+        next();
+    });
 }
