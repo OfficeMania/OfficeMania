@@ -101,6 +101,7 @@ export class User extends BaseEntity {
 
 export function ensureHasRole(...roles): RequestHandler {
     return (req, res, next) => {
+        // @ts-ignore
         const user: User = req.user as User;
         if (!user) {
             return res.sendStatus(401);
