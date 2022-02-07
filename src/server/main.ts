@@ -14,6 +14,7 @@ import connectionEnsureLogin from "connect-ensure-login";
 import { ensureHasRole, findOrCreateUserByUsername, PasswordVersion, Role } from "./database/entity/user";
 import { connectDatabase } from "./database/database";
 import { getApiRouter } from "./api";
+import { monitor } from "@colyseus/monitor";
 
 async function initDatabase(): Promise<void> {
     // TODO Remove this and use proper user creation etc.
@@ -165,7 +166,7 @@ function setupGameServer(app: Express): Server {
      *
      * See: https://docs.colyseus.io/tools/monitor/
      */
-    //app.use("/colyseus", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), ensureHasRole(Role.ADMIN), monitor()); //TODO Enable this and secure it via authentication/authorization
+    app.use("/colyseus", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), ensureHasRole(Role.ADMIN), monitor());
 
     return gameServer;
 }
