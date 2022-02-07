@@ -11,9 +11,12 @@ const enableSignup: HTMLInputElement = $("config-enable-signup");
 const requireInviteCodeForSignup: HTMLInputElement = $("config-require-invite-code-for-signup");
 const needsLogin: HTMLInputElement[] = Array.from(document.getElementsByClassName("group-needs-login")) as HTMLInputElement[];
 const needsSignup: HTMLInputElement[] = Array.from(document.getElementsByClassName("group-needs-signup")) as HTMLInputElement[];
+const inputElements: HTMLInputElement[] = Array.from(document.getElementsByTagName("input")) as HTMLInputElement[];
 
 const buttonConfigApply: HTMLButtonElement = $("button-config-apply");
 const buttonConfigReset: HTMLButtonElement = $("button-config-reset");
+
+const noteUnsavedChanges: HTMLSpanElement = $("note-unsaved-changes");
 
 function updateGroupLogin() {
     for (const element of needsLogin) {
@@ -37,6 +40,8 @@ enableSignup.addEventListener("input", () => updateGroupSignup());
 
 buttonConfigApply.addEventListener("click", () => apply());
 buttonConfigReset.addEventListener("click", () => load());
+
+inputElements.forEach(inputElement => inputElement.addEventListener("input", () => updateCacheState()));
 
 const apiEndpoint = "/api";
 const configEndpoint = apiEndpoint + "/config";
@@ -72,6 +77,7 @@ async function loadRequireInviteCodeForSignup(): Promise<void> {
 
 async function load(): Promise<void> {
     cache = {};
+    updateCacheState();
     await Promise.all([loadEnableLogin(), loadRequireLogin(), loadAllowLoginViaInviteCode(), loadEnableSignup(), loadRequireInviteCodeForSignup()]);
     updateGroups();
 }
@@ -106,6 +112,23 @@ async function applyRequireInviteCodeForSignup(): Promise<void> {
 
 async function apply(): Promise<void> {
     await Promise.all([applyEnableLogin(), applyRequireLogin(), applyAllowLoginViaInviteCode(), applyEnableSignup(), applyRequireInviteCodeForSignup()]);
+    updateCacheState();
+}
+
+function areChangesUnsaved(): boolean {
+    if (Object.keys(cache).length === 0) {
+        return false;
+    }
+    return cache["ENABLE_LOGIN"] !== String(enableLogin.checked)
+        || cache["REQUIRE_LOGIN"] !== String(requireLogin.checked)
+        || cache["ALLOW_LOGIN_VIA_INVITE_CODE"] !== String(allowLoginViaInviteCode.checked)
+        || cache["DISABLE_SIGNUP"] !== String(!enableSignup.checked)
+        || cache["REQUIRE_INVITE_CODE_FOR_SIGNUP"] !== String(requireInviteCodeForSignup.checked);
+}
+
+function updateCacheState(): void {
+    const changesUnsaved: boolean = areChangesUnsaved();
+    noteUnsavedChanges.hidden = !changesUnsaved;
 }
 
 load().catch(reason => console.error(reason));
