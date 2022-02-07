@@ -22,7 +22,7 @@ async function initDatabase(): Promise<void> {
         const name = `test${i}`;
         await findOrCreateUserByUsername(name, name, PasswordVersion.PLAIN);
     }
-    await findOrCreateUserByUsername("admin", "admin", PasswordVersion.PLAIN);
+    await findOrCreateUserByUsername("admin", "admin", PasswordVersion.PLAIN, Role.ADMIN);
     return findOrCreateUserByUsername("officemania", "sec-sep21-project").then(user => {
         if (!user) {
             console.error("Something went wrong when creating the default user");
