@@ -3,6 +3,7 @@ import { ensureHasRole, Role, User } from "./database/entity/user";
 import { createOrUpdate } from "./database/database";
 import { ConfigEntry } from "./database/entity/config-entry";
 import { getManager } from "typeorm";
+import { convertOrNull } from "../common";
 
 const router: Router = Router();
 
@@ -45,7 +46,7 @@ function setupRouter(): void {
         if (!type) {
             return res.status(500).send("Missing query parameter 'type'");
         }
-        const value: string | null = req.query.value ? String(req.query.value) : null;
+        const value: string | null = convertOrNull(req.query.value, String);
         console.debug(`PUT    "${key}" => "${value}"`);
         createOrUpdate(getManager(), ConfigEntry, { key, type, value })
             .then(configEntry => res.send(configEntry))
@@ -57,7 +58,7 @@ function setupRouter(): void {
             return res.status(500).send("Missing query parameter 'key'");
         }
         const type: number | undefined = req.query.type ? Number(req.query.type) : undefined;
-        const value: string | null = req.query.value ? String(req.query.value) : null;
+        const value: string | null = convertOrNull(req.query.value, String);
         console.debug(`PATCH  "${key}" => "${value}"`);
         createOrUpdate(getManager(), ConfigEntry, { key, type, value })
             .then(configEntry => res.send(configEntry))
