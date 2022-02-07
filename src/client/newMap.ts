@@ -648,7 +648,7 @@ function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
                             let width = Number(String(mapJsonLayer.name).replace("<animated", "")[0]);
                             let height = Number(String(mapJsonLayer.name).replace("<animated", "")[2]);
 
-                            map._animationList.push(new Animation(path, width, height, x + chunk.posX, y + chunk.posY, LAYER_INDEX, 5));
+                            map._animationList.push(new Animation(path, width, height, x + chunk.posX, y + chunk.posY, LAYER_INDEX, 15));
                         }
 
                         let index = map._tileList.addTile(path, data - id);
