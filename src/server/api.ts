@@ -4,6 +4,7 @@ import { createOrUpdate } from "./database/database";
 import { ConfigEntry } from "./database/entity/config-entry";
 import { getManager } from "typeorm";
 import { convertOrNull } from "../common";
+import { getValue } from "./config";
 
 const router: Router = Router();
 
@@ -26,16 +27,18 @@ function setupRouter(): void {
             })
             .catch(() => res.sendStatus(500));
     });
-    router.get("/config", ensureHasRole(Role.ADMIN), (req, res) => {
+    router.get("/config", ensureHasRole(Role.ADMIN), async (req, res) => {
         const key = req.query.key;
         if (!key) {
             return ConfigEntry.find()
                 .then(configEntries => res.send(configEntries))
                 .catch(reason => res.status(500).send(reason));
         }
-        ConfigEntry.findOne(String(key))
-            .then(configEntry => (configEntry ? res.send(configEntry) : res.sendStatus(404)))
-            .catch(reason => res.status(500).send(reason));
+        const value: string | undefined | null = await getValue(String(key));
+        if (value === undefined) {
+            return res.sendStatus(404);
+        }
+        return res.send({ key, value });
     });
     router.put("/config", ensureHasRole(Role.ADMIN), (req, res) => {
         const key: string | undefined = req.query.key ? String(req.query.key) : undefined;
@@ -72,7 +75,7 @@ function setupRouter(): void {
         console.debug(`DELETE "${key}"`);
         ConfigEntry.findOne(String(key))
             .then(configEntry =>
-                configEntry ? configEntry.remove().then(value => res.send(value)) : res.sendStatus(404)
+                configEntry ? configEntry.remove().then(value => res.send(value)) : res.sendStatus(404),
             )
             .catch(reason => res.status(500).send(reason));
     });
