@@ -79,6 +79,13 @@ async function setupApp(): Promise<Express> {
         express.static("admin")
     );
 
+    app.use(
+        "/admin/config",
+        connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
+        ensureHasRole(Role.ADMIN),
+        express.static("admin/config.html")
+    );
+
     // "Mount" the public folder as the root of the website
     //app.use('/', serveIndex(path.join(process.cwd(), "public"), {'icons': true}));
     //app.use('/', express.static(path.join(process.cwd(), "public")));
