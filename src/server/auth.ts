@@ -3,6 +3,7 @@ import passport from "passport";
 import {
     IS_DEV,
     isInviteCodeRequiredForSignup,
+    isLoginEnabled,
     isLoginRequired,
     isSignupDisabled,
     LDAP_OPTIONS,
@@ -185,7 +186,10 @@ function setupSignup(): void {
 }
 
 function setupLogin(): void {
-    router.post("/login", (req, res, next) => {
+    router.post("/login", async (req, res, next) => {
+        if (!(await isLoginEnabled())) {
+            return res.sendStatus(404);
+        }
         passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", (error, user, info) => {
             if (error) {
                 req.session.loginError = AuthError.UNKNOWN;
@@ -205,11 +209,15 @@ function setupLogin(): void {
             });
         })(req, res, next);
     });
-    router.get("/login", async (req, res) =>
-        res.render("pages/login", {
-            error: authErrorToString(req.session.loginError),
-            disableSignup: await isSignupDisabled(),
-        })
+    router.get("/login", async (req, res) => {
+            if (!(await isLoginEnabled())) {
+                return res.redirect("/");
+            }
+            res.render("pages/login", {
+                error: authErrorToString(req.session.loginError),
+                disableSignup: await isSignupDisabled(),
+            });
+        },
     );
 }
 
