@@ -258,7 +258,7 @@ function createInteractionHelp(): [HTMLDivElement, HTMLSpanElement] {
     const interactionHelpKey: HTMLImageElement = document.createElement("img");
     interactionHelpKey.src = "../assets/img/transparent_32x32.png";
     interactionHelpKey.classList.add("key", "key-small");
-    interactionHelpKey.style.backgroundPosition = "calc(6 * -32px) calc(-32px)";
+    interactionHelpKey.style.backgroundPosition = "calc(6 * -32px) calc(-33px)";
     divElement.append(interactionHelpKey);
     const interactionHelpText = document.createElement("span");
     interactionHelpText.innerText = "to interact with ";
