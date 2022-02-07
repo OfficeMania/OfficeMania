@@ -199,7 +199,7 @@ function setupLogin(): void {
                 req.session.loginError = AuthError.INVALID_CREDENTIALS;
                 return res.redirect("/auth/login");
             }
-            req.logIn(user, function (error) {
+            req.logIn(user, function(error) {
                 if (error) {
                     req.session.loginError = AuthError.UNKNOWN;
                     return res.redirect("/auth/login");
@@ -241,7 +241,7 @@ function setupLDAPStrategy(): void {
     passport.use(
         new LdapStrategy(LDAP_OPTIONS, (user, done) => {
             done(null, user);
-        })
+        }),
     );
     passport.serializeUser((user, done) => {
         done(null, user);
@@ -254,7 +254,7 @@ function setupLDAPStrategy(): void {
 function setupLocalStrategy(): void {
     console.debug("Setup Passport with LocalStrategy");
     passport.use(
-        new LocalStrategy(function (username, password, done) {
+        new LocalStrategy(function(username, password, done) {
             User.findOne({ where: { username } })
                 .then(user => {
                     if (!user || !user.checkPassword(password)) {
@@ -266,18 +266,19 @@ function setupLocalStrategy(): void {
                     return done(null, { id: user.id, username: user.username });
                 })
                 .catch(error => done(error, null));
-        })
+        }),
     );
     passport.serializeUser((user: User, done) => done(null, user.id));
     passport.deserializeUser((id: string, done) =>
         User.findOne(id)
             .then(user => done(null, user))
-            .catch(error => done(error, null))
+            .catch(error => done(error, null)),
     );
 }
 
 const ensureSession: express.RequestHandler = (req, res, next) => {
     let tries = 3;
+
     function lookupSession(error?: any): void {
         if (error) {
             return next(error);
@@ -291,6 +292,7 @@ const ensureSession: express.RequestHandler = (req, res, next) => {
         }
         sessionHandler(req, res, lookupSession);
     }
+
     lookupSession();
 };
 
