@@ -17,54 +17,61 @@
     </head>
     <body>
         <div id="configuration-container">
-            <h1>Configuration</h1>
-            <section>
-                <h2>Login Configuration</h2>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" value="" id="config-enable-login">
-                    <label class="form-check-label" for="config-enable-login">
-                        Enable Login
-                    </label>
-                </div>
-                <div class="form-check form-switch">
-                    <input class="form-check-input group-needs-login" type="checkbox" value="" id="config-require-login"
-                           disabled>
-                    <label class="form-check-label" for="config-require-login">
-                        Require Login
-                    </label>
-                </div>
-                <div class="form-check form-switch">
-                    <input class="form-check-input group-needs-login" type="checkbox" value=""
-                           id="config-allow-login-via-invite-code" disabled>
-                    <label class="form-check-label" for="config-allow-login-via-invite-code">
-                        Allow Login via Invite Code
-                    </label>
-                </div>
-            </section>
-            <section>
-                <h2>Sign Up Configuration</h2>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" value="" id="config-enable-signup">
-                    <label class="form-check-label" for="config-enable-signup">
-                        Enable Signup
-                    </label>
-                </div>
-                <div class="form-check form-switch">
-                    <input class="form-check-input group-needs-signup" type="checkbox" value=""
-                           id="config-require-invite-for-signup" disabled>
-                    <label class="form-check-label" for="config-require-invite-for-signup">
-                        Require Invite Code for Sign Up
-                    </label>
+            <section class="card">
+                <div class="card-header"><h2>Login Configuration</h2></div>
+                <div class="card-body">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" value="" id="config-enable-login">
+                        <label class="form-check-label" for="config-enable-login">
+                            Enable Login
+                        </label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input group-needs-login" type="checkbox" value=""
+                               id="config-require-login" disabled>
+                        <label class="form-check-label" for="config-require-login">
+                            Require Login
+                        </label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input group-needs-login" type="checkbox" value=""
+                               id="config-allow-login-via-invite-code" disabled>
+                        <label class="form-check-label" for="config-allow-login-via-invite-code">
+                            Allow Login via Invite Code
+                        </label>
+                    </div>
                 </div>
             </section>
-            <section>
-                <h2>Player Configuration</h2>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" value="" id="config-allow-display-name" checked
-                           disabled>
-                    <label class="form-check-label" for="config-allow-display-name">
-                        Allow Players to change their Display Name
-                    </label>
+            <br>
+            <section class="card">
+                <div class="card-header"><h2>Sign Up Configuration</h2></div>
+                <div class="card-body">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" value="" id="config-enable-signup">
+                        <label class="form-check-label" for="config-enable-signup">
+                            Enable Signup
+                        </label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input group-needs-signup" type="checkbox" value=""
+                               id="config-require-invite-for-signup" disabled>
+                        <label class="form-check-label" for="config-require-invite-for-signup">
+                            Require Invite Code for Sign Up
+                        </label>
+                    </div>
+                </div>
+            </section>
+            <br>
+            <section class="card">
+                <div class="card-header"><h2>Player Configuration</h2></div>
+                <div class="card-body">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" value="" id="config-allow-display-name" checked
+                               disabled>
+                        <label class="form-check-label" for="config-allow-display-name">
+                            Allow Players to change their Display Name
+                        </label>
+                    </div>
                 </div>
             </section>
         </div>
