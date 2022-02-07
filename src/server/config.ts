@@ -44,7 +44,7 @@ export const REDIS_PASSWORD: string | undefined = process.env.REDIS_PASSWORD;
 
 const REQUIRE_LOGIN: boolean | undefined = toBoolean(process.env.FORCE_LOGIN);
 const DISABLE_SIGNUP: boolean | undefined = toBoolean(process.env.DISABLE_SIGNUP);
-const REQUIRE_INVITE_CODE: boolean | undefined = toBoolean(process.env.REQUIRE_INVITE_CODE);
+const REQUIRE_INVITE_CODE_FOR_SIGNUP: boolean | undefined = toBoolean(process.env.REQUIRE_INVITE_CODE_FOR_SIGNUP);
 
 export const LDAP_OPTIONS = null;
 
@@ -92,6 +92,6 @@ export function isSignupDisabled(defaultValue = true): Promise<boolean> {
     return getBooleanOrElse("DISABLE_SIGNUP", DISABLE_SIGNUP, defaultValue);
 }
 
-export function isInviteCodeRequired(defaultValue = false): Promise<boolean> {
-    return getBooleanOrElse("REQUIRE_INVITE_CODE", REQUIRE_INVITE_CODE, defaultValue);
+export function isInviteCodeRequiredForSignup(defaultValue = false): Promise<boolean> {
+    return getBooleanOrElse("REQUIRE_INVITE_CODE_FOR_SIGNUP", REQUIRE_INVITE_CODE_FOR_SIGNUP, defaultValue);
 }

@@ -2,7 +2,7 @@ import express, { Express, Router } from "express";
 import passport from "passport";
 import {
     IS_DEV,
-    isInviteCodeRequired,
+    isInviteCodeRequiredForSignup,
     isLoginRequired,
     isSignupDisabled,
     LDAP_OPTIONS,
@@ -128,7 +128,7 @@ function setupSignup(): void {
             req.session.signupError = AuthError.PASSWORDS_MISMATCH;
             return res.redirect("/auth/signup");
         }
-        if ((await isInviteCodeRequired()) && !inviteCodeString) {
+        if ((await isInviteCodeRequiredForSignup()) && !inviteCodeString) {
             req.session.signupError = AuthError.INVITE_CODE_REQUIRED;
             return res.redirect("/auth/signup");
         } else if (inviteCodeString) {
@@ -179,7 +179,7 @@ function setupSignup(): void {
         }
         res.render("pages/signup", {
             error: authErrorToString(req.session.signupError),
-            requireInviteCode: await isInviteCodeRequired(),
+            requireInviteCode: await isInviteCodeRequiredForSignup(),
         });
     });
 }
