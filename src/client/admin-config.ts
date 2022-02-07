@@ -35,13 +35,19 @@ function updateGroups() {
 enableLogin.addEventListener("input", () => updateGroupLogin());
 enableSignup.addEventListener("input", () => updateGroupSignup());
 
+buttonConfigApply.addEventListener("click", () => apply());
 buttonConfigReset.addEventListener("click", () => load());
 
 const apiEndpoint = "/api";
 const configEndpoint = apiEndpoint + "/config";
 
+let cache: Record<string, string> = {};
+
 function loadValue(key: string): Promise<string | undefined> {
-    return fetch(`${configEndpoint}?key=${key}`).then(response => response.json()).then(response => response.value).catch(reason => console.warn(reason));
+    return fetch(`${configEndpoint}?key=${key}`).then(response => response.json()).then(response => {
+        cache[key] = response.value;
+        return response.value;
+    }).catch(reason => console.warn(reason));
 }
 
 async function loadEnableLogin(): Promise<void> {
@@ -65,12 +71,41 @@ async function loadRequireInviteCodeForSignup(): Promise<void> {
 }
 
 async function load(): Promise<void> {
-    await Promise.all([loadEnableLogin(), loadRequireLogin(), loadAllowLoginViaInviteCode(), loadEnableSignup(), loadRequireInviteCodeForSignup()])
+    cache = {};
+    await Promise.all([loadEnableLogin(), loadRequireLogin(), loadAllowLoginViaInviteCode(), loadEnableSignup(), loadRequireInviteCodeForSignup()]);
     updateGroups();
 }
 
-function apply(): void {
-    //TODO Apply Settings
+function applyValue(key: string, value: string, force = false): Promise<Response | void> {
+    if (!force && cache[key] === value) {
+        return;
+    }
+    cache[key] = value;
+    return fetch(`${configEndpoint}?key=${key}&value=${value}`, { method: "PATCH" }).catch(reason => console.warn(reason));
+}
+
+async function applyEnableLogin(): Promise<void> {
+    await applyValue("ENABLE_LOGIN", String(enableLogin.checked));
+}
+
+async function applyRequireLogin(): Promise<void> {
+    await applyValue("REQUIRE_LOGIN", String(requireLogin.checked));
+}
+
+async function applyAllowLoginViaInviteCode(): Promise<void> {
+    await applyValue("ALLOW_LOGIN_VIA_INVITE_CODE", String(allowLoginViaInviteCode.checked));
+}
+
+async function applyEnableSignup(): Promise<void> {
+    await applyValue("DISABLE_SIGNUP", String(!enableSignup.checked));
+}
+
+async function applyRequireInviteCodeForSignup(): Promise<void> {
+    await applyValue("REQUIRE_INVITE_CODE_FOR_SIGNUP", String(requireInviteCodeForSignup.checked));
+}
+
+async function apply(): Promise<void> {
+    await Promise.all([applyEnableLogin(), applyRequireLogin(), applyAllowLoginViaInviteCode(), applyEnableSignup(), applyRequireInviteCodeForSignup()]);
 }
 
 load().catch(reason => console.error(reason));
