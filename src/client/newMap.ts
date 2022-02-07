@@ -4,6 +4,20 @@ import {Interactive} from "./interactive/interactive"
 import { helpExitButton } from "./static";
 import { lowestX, lowestY } from "./main";
 import { classicNameResolver } from "typescript";
+import { Door, DoorDirection } from "./interactive/door";
+import { PingPongTable } from "./interactive/pingpongtable";
+import { Whiteboard } from "./interactive/whiteboard";
+import { Todo } from "./interactive/todo";
+import { CoffeeMachine } from "./interactive/machines/coffeeMachine";
+import { Donuts } from "./interactive/donuts";
+import { VendingMachine } from "./interactive/machines/vendingMachine";
+import { State } from "../common";
+import { Cat } from "./interactive/cat";
+import { ChessBoard } from "./interactive/chessboard";
+import { Computer } from "./interactive/computer";
+import { WaterCooler } from "./interactive/machines/waterCooler";
+import { Notes } from "./interactive/notes";
+import { MapInfo } from "./map";
 export class Chunk {
 
     private readonly _posX: number;
@@ -14,7 +28,7 @@ export class Chunk {
     public get posY(): number { return this._posY; };
     public get data(): dataFromPos[][] { return this._data; };
 
-    constructor(posX: number, posY: number) {
+    constructor(posX: number, posY: number, layerSize: number) {
         this._posX = posX;
         this._posY = posY;
         this._data = [];
@@ -23,54 +37,13 @@ export class Chunk {
         }
         for (let y = 0; y < 16; y++) {
             for (let x = 0; x < 16; x++) {
-                this._data[x][y] = new dataFromPos();
+                this._data[x][y] = new dataFromPos(layerSize);
             }
         }
     }
-
-    public setTileNumber(posX: number, posY: number, tileNumb:number, groundType: GroundType) {
-
-        switch (groundType) {
-            case GroundType.BackGround:
-                this._data[posX][posY]._textureIdB = tileNumb;
-                break;
-
-            case GroundType.BackGround1:
-                this._data[posX][posY]._textureIdB1 = tileNumb;
-                break;
-
-            case GroundType.BackGround2:
-                this._data[posX][posY]._textureIdB2 = tileNumb;
-                break;
-            
-            case GroundType.BackGround3:
-                this._data[posX][posY]._textureIdB3 = tileNumb;
-                break;
-
-            case GroundType.BackGround4:
-                this._data[posX][posY]._textureIdB4 = tileNumb;
-                break;
-    
-            case GroundType.BackGround5:
-                this._data[posX][posY]._textureIdB5 = tileNumb;
-                break;
-             
-            case GroundType.BackGround6:
-                this._data[posX][posY]._textureIdB6 = tileNumb;
-                break;
-    
-            case GroundType.BackGround7:
-                this._data[posX][posY]._textureIdB7 = tileNumb;
-                break;
-
-            case GroundType.ForeGround:
-                this._data[posX][posY]._textureIdF = tileNumb;
-                break;
-        }
-    };
 }
 
-class Animation {
+export class Animation {
 
     private _path: string; //Path from the animation
     private _animationState: number; //The current state of the snimation
@@ -239,32 +212,30 @@ export class TileList {
 
 class dataFromPos {
 
-    _textureIdB: number; //For Background
-    _textureIdB1: number; //For Backgound1
-    _textureIdB2: number; //For Background2
-    _textureIdB3: number; //For Background3
-    _textureIdB4: number; //For Background4
-    _textureIdB5: number; //For Background5
-    _textureIdB6: number; //For Background6
-    _textureIdB7: number; //For Background7
-    _textureIdF: number; // For Foregound
-    _dataPackage: dataPackage[][];
+    public _textureIdF: number[]; // For Foregound
+    public _textureIdB: number[]; // For Background
+    public _solidInfo: boolean[][];
+    public _interactive: Interactive;
+    public _isConferencRoom: boolean;
+    public _roomId: number;
 
-    constructor() {
+    constructor(layerSize: number) {
 
-        this._textureIdB = -1;
-        this._textureIdB1 = -1;
-        this._textureIdB2 = -1;
-        this._textureIdB3 = -1;
-        this._textureIdB4 = -1;
-        this._textureIdB5 = -1;
-        this._textureIdB6 = -1;
-        this._textureIdB7 = -1;
-        this._textureIdF = -1;
+        this._textureIdB = [];
+        for (let i = 0; i < layerSize; i++) {
+            this._textureIdB[i] = -1;
+        }
+        this._interactive = null;
+        this._isConferencRoom = false;
+        this._roomId = 0;
 
-        this._dataPackage = [];
-        this._dataPackage[0] = [];
-        this._dataPackage[1] = [];
+        this._solidInfo = [];
+        this._solidInfo[0] = [];
+        this._solidInfo[1] = [];
+        this._solidInfo[0][0] = false;
+        this._solidInfo[0][1] = false;
+        this._solidInfo[1][0] = false;
+        this._solidInfo[1][1] = false;
     }
 
     /* TODO einheitliches Koordinaten-System
@@ -278,26 +249,14 @@ class dataFromPos {
 class dataPackage {
 
     _isSolid: boolean;
-    _interactive: Interactive;
-    _roomId: number;
-    _isConferenceRoom: boolean;
 
     constructor() {
         this._isSolid = false
-        this._interactive = null;
-        this._roomId = 0;
-        this._isConferenceRoom = false;
     }
 
     get isSolid() {return this._isSolid}
-    get interactive() {return this._interactive}
-    get roomId() {return this._roomId}
-    get isConferenceRoom() {return this._isConferenceRoom}
 
     set isSolid(isSolid: boolean) {this._isSolid = isSolid}
-    set interactive(interactive: Interactive) {this._interactive = interactive}
-    set roomId(roomId: number) {this._roomId = roomId}
-    set isConferenceRoom(isConferenceRoom: boolean) {this._isConferenceRoom = isConferenceRoom}
 }
 
 export class MapData {
@@ -310,12 +269,14 @@ export class MapData {
     public _lowestPosy: number;
     public _highestPosx: number;
     public _highestPosy: number;
+    public _layerList: string[];
 
     constructor(paths: TexturePaths) {
         this._map = new Map<string, Chunk>();
         this._tileList = new TileList();
         this._animationList = [];
         this._texturePaths = paths;
+        this._layerList = [];
     }
 
     public setBoundaries(lowestX: number, lowestY: number, highestX: number, highestY: number) {
@@ -325,67 +286,14 @@ export class MapData {
         this._highestPosy = highestY;
     }
 
-    private mergeChunks(chunk: Chunk, groundType: GroundType) {
+    private mergeChunks(chunk: Chunk, layerId: number) {
 
         let mergedChunk = <Chunk> this.getChunk(chunk.posX + "." + chunk.posY);
         for (let y = 0; y < 16; y++) {
             for (let x = 0; x < 16; x++) {
 
-                switch (groundType) {
-
-                    case GroundType.BackGround:
-                        if (mergedChunk.data[x][y]._textureIdB == -1) {
-                            mergedChunk.data[x][y]._textureIdB = chunk.data[x][y]._textureIdB;
-                        }
-                        break;
-
-                    case GroundType.BackGround1:
-                        if (mergedChunk.data[x][y]._textureIdB1 == -1) {
-                            mergedChunk.data[x][y]._textureIdB1 = chunk.data[x][y]._textureIdB1;
-                        }
-                        break;
-
-                    case GroundType.BackGround2:
-                        if (mergedChunk.data[x][y]._textureIdB2 == -1) {
-                            mergedChunk.data[x][y]._textureIdB2 = chunk.data[x][y]._textureIdB2;
-                        }
-                        break;
-
-                    case GroundType.BackGround3:
-                        if (mergedChunk.data[x][y]._textureIdB3 == -1) {
-                            mergedChunk.data[x][y]._textureIdB3 = chunk.data[x][y]._textureIdB3;
-                        }
-                        break;
-                    
-                    case GroundType.BackGround4:
-                        if (mergedChunk.data[x][y]._textureIdB4 == -1) {
-                            mergedChunk.data[x][y]._textureIdB4 = chunk.data[x][y]._textureIdB4;
-                        }
-                        break;    
-
-                    case GroundType.BackGround5:
-                        if (mergedChunk.data[x][y]._textureIdB5 == -1) {
-                            mergedChunk.data[x][y]._textureIdB5 = chunk.data[x][y]._textureIdB5;
-                        }
-                        break;
-    
-                    case GroundType.BackGround6:
-                        if (mergedChunk.data[x][y]._textureIdB6 == -1) {
-                            mergedChunk.data[x][y]._textureIdB6 = chunk.data[x][y]._textureIdB6;
-                        }
-                        break;
-                        
-                    case GroundType.BackGround7:
-                        if (mergedChunk.data[x][y]._textureIdB7 == -1) {
-                            mergedChunk.data[x][y]._textureIdB7 = chunk.data[x][y]._textureIdB7;
-                        }
-                        break;  
-
-                    case GroundType.ForeGround:
-                        if (mergedChunk.data[x][y]._textureIdF == -1) {
-                            mergedChunk.data[x][y]._textureIdF = chunk.data[x][y]._textureIdF;
-                        }
-                        break;
+                if (mergedChunk.data[x][y]._textureIdB[layerId] == -1) {
+                    mergedChunk.data[x][y]._textureIdB[layerId] = chunk.data[x][y]._textureIdB[layerId];
                 }
             }
         }
@@ -400,18 +308,36 @@ export class MapData {
         }
     }
 
-    public addChunk(chunk: Chunk, groundType: GroundType) {
+    public addChunk(chunk: Chunk, layerIndex: number) {
         let groundChunk = this._map.get(chunk.posX + "." + chunk.posY);
         if (groundChunk == null) {
             this._map.set(chunk.posX + "." + chunk.posY, chunk);
         } else {
-            this.mergeChunks(chunk, groundType);
+            this.mergeChunks(chunk, layerIndex);
         }
     }
 
     public async updateAnimationCounter() {
         for (const Animation of this._animationList) {
             await Animation.setState(this._texturePaths);
+        }
+    }
+
+    public addLayer(name: string) {
+        for (const LAYER of this._layerList) {
+            if (name == LAYER) {
+                break;
+            }
+        }
+        this._layerList.push(name);
+        return this._layerList.length - 1;
+    }
+
+    public getIndex(name: string) {
+        for (let i = 0; i < this._layerList.length; i++) {
+            if (name == this._layerList[i]) {
+                return i;
+            }
         }
     }
 
@@ -481,7 +407,7 @@ async function createSpriteSheet(map: MapData, canvas: HTMLCanvasElement) {
     return canvas;
 }
 
-export function drawMap(map: MapData, spriteSheet: HTMLCanvasElement, canvas: HTMLCanvasElement, startx: number, starty: number, endx:number, endy: number, groundType: GroundType) {
+export function drawMap(map: MapData, spriteSheet: HTMLCanvasElement, canvas: HTMLCanvasElement, startx: number, starty: number, endx:number, endy: number, layerIndex: number) {
 
     let ctx = canvas.getContext("2d");
     let mapChunks: Map<string, Chunk>;
@@ -525,7 +451,7 @@ export function drawMap(map: MapData, spriteSheet: HTMLCanvasElement, canvas: HT
             const dy = (y + Math.abs(map._lowestPosy)) * 48;
 
             for (const ANIMATION of map._animationList) {
-                if ((ChunkX + correctX - ANIMATION.posx) < ANIMATION.width && (ChunkX + correctX - ANIMATION.posx) >= 0 && (ChunkY + correctY - ANIMATION.posy) < ANIMATION.height && (ChunkY + correctY - ANIMATION.posy) >= 0) {
+                if ((ChunkX + correctX - ANIMATION.posx) < ANIMATION.width && (ChunkX + correctX - ANIMATION.posx) >= 0 && (ChunkY + correctY - ANIMATION.posy) < ANIMATION.height && (ChunkY + correctY - ANIMATION.posy) >= 0 && ANIMATION.groundType == layerIndex) {
                     willAnimate = true;
                     animationToDraw = ANIMATION;
                     animationX = ChunkX + correctX - ANIMATION.posx;
@@ -537,108 +463,79 @@ export function drawMap(map: MapData, spriteSheet: HTMLCanvasElement, canvas: HT
                 continue;
             }
 
-            switch (groundType) {
-
-                case GroundType.BackGround:
-                    if (willAnimate == true) {
-                        animationToDraw.drawAnimation(ctx, dx, dy, animationX, animationY);
-                    }
-                    if (chunk.data[correctX][correctY]._textureIdB == -1) {
-                        continue;
-                    }
-                    ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdB % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdB / size) * 48, 48, 48, dx, dy, 48, 48);
-                    break;
-
-                case GroundType.BackGround1:
-                    if (willAnimate == true) {
-                        animationToDraw.drawAnimation(ctx, dx, dy, animationX, animationY);
-                    }
-                    if (chunk.data[correctX][correctY]._textureIdB1 == -1) {
-                        continue;
-                    }
-                    ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdB1 % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdB1 / size) * 48, 48, 48, dx, dy, 48, 48);
-                    break;
-
-                case GroundType.BackGround2:
-                    if (willAnimate == true) {
-                        animationToDraw.drawAnimation(ctx, dx, dy, animationX, animationY);
-                    }
-                    if (chunk.data[correctX][correctY]._textureIdB2 == -1) {
-                        continue;
-                    }
-                    ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdB2 % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdB2 / size) * 48, 48, 48, dx, dy, 48, 48);
-                    break;
-
-                case GroundType.BackGround3:
-                    if (willAnimate == true) {
-                        animationToDraw.drawAnimation(ctx, dx, dy, animationX, animationY);
-                    }
-                    if (chunk.data[correctX][correctY]._textureIdB3 == -1) {
-                        continue;
-                    }
-                    ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdB3 % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdB3 / size) * 48, 48, 48, dx, dy, 48, 48);                        
-                    break;
-
-                case GroundType.BackGround4:
-                    if (willAnimate == true) {
-                        animationToDraw.drawAnimation(ctx, dx, dy, animationX, animationY);
-                    }
-                    if (chunk.data[correctX][correctY]._textureIdB4 == -1) {
-                        continue;
-                    }
-                    ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdB4 % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdB4 / size) * 48, 48, 48, dx, dy, 48, 48);                        
-                    break;
-
-                case GroundType.BackGround5:
-                    if (willAnimate == true) {
-                        animationToDraw.drawAnimation(ctx, dx, dy, animationX, animationY);
-                    }
-                    if (chunk.data[correctX][correctY]._textureIdB5 == -1) {
-                        continue;
-                    }
-                    ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdB5 % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdB5 / size) * 48, 48, 48, dx, dy, 48, 48);
-                    break;
-    
-                case GroundType.BackGround6:
-                    if (willAnimate == true) {
-                        animationToDraw.drawAnimation(ctx, dx, dy, animationX, animationY);
-                    }
-                    if (chunk.data[correctX][correctY]._textureIdB6 == -1) {
-                        continue;
-                    }
-                    ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdB6 % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdB6 / size) * 48, 48, 48, dx, dy, 48, 48);                        
-                    break;
-    
-                case GroundType.BackGround7:
-                    if (willAnimate == true) {
-                        animationToDraw.drawAnimation(ctx, dx, dy, animationX, animationY);
-                    }
-                    if (chunk.data[correctX][correctY]._textureIdB4 == -1) {
-                        continue;
-                    }
-                    ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdB7 % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdB7 / size) * 48, 48, 48, dx, dy, 48, 48);                        
-                    break;
-                
-                case GroundType.ForeGround:
-                    if (willAnimate == true) {
-                        animationToDraw.drawAnimation(ctx, dx, dy, animationX, animationY);
-                    }
-                    if (chunk.data[correctX][correctY]._textureIdF == -1) {
-                        continue;
-                    }
-                    ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdF % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdF / size) * 48, 48, 48, dx, dy, 48, 48);
-                    break;
+            if (willAnimate == true) {
+                animationToDraw.drawAnimation(ctx, dx, dy, animationX, animationY);
+                continue;
             }
+            if (chunk.data[correctX][correctY]._textureIdB[layerIndex] == -1) {
+                continue;
+            }
+            ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdB[layerIndex] % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdB[layerIndex] / size) * 48, 48, 48, dx, dy, 48, 48);
         }
     }
 }
 
-function createInfoMap(mapJson: {[key: string]: any}, room: Room) {
-    // fillSolidInfoMap and add animations to the animation layer of the map
-
-
-
-
+function getInteractive(value: number, basePosX: number, basePosY: number, path: string) {
+    switch (value) {
+        //doors
+        case 1: {
+            return new Door(DoorDirection.NORTH, basePosX, basePosY, path, new Animation(path, 1, 2, basePosX, basePosY, GroundType.BackGround7, 20));
+        }
+        case 2: {
+            return new Door(DoorDirection.EAST, basePosX, basePosY, path, new Animation(path, 1, 2, basePosX, basePosY, GroundType.BackGround7, 20));
+        }
+        case 3: {
+            return new Door(DoorDirection.SOUTH, basePosX, basePosY, path, new Animation(path, 1, 2, basePosX, basePosY, GroundType.BackGround7, 20));
+        }
+        case 4: {
+            return new Door(DoorDirection.WEST, basePosX, basePosY, path, new Animation(path, 1, 2, basePosX, basePosY, GroundType.BackGround7, 20));
+        }
+        case 5: {
+            return new Door(DoorDirection.ALWAYS_OPEN, basePosX, basePosY, path, new Animation(path, 1, 2, basePosX, basePosY, GroundType.BackGround7, 20));
+        }
+        //pongtable
+        case 6: {
+            return new PingPongTable();
+        }
+        //whiteboard
+        case 7: {
+            return new Whiteboard();
+        }
+        //Post-its
+        case 8: {
+            return new Todo();
+        }
+        //coffee machine
+        case 9: {
+            return new CoffeeMachine();
+        }
+        //Donuts
+        case 10: {
+            return new Donuts();
+        }
+        //vending machine
+        case 11: {
+            return new VendingMachine();
+        }
+        //computer
+        case 12: {
+            return new Computer();
+        }
+        //chess table
+        case 15: {
+            return new ChessBoard();
+        }
+        case 16: {
+            return new WaterCooler();
+        }
+        case 17: {
+            return new Notes();
+        }
+        case 18: {
+            return new Cat();
+        }
+    }
+    return null;
 }
 
 function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
@@ -646,7 +543,6 @@ function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
     let paths = createTexturePaths(room);
     let map = new MapData(paths);
     let usedPngFiles: usedPngFile[] = [];
-    let groundType: GroundType;
     let lowestX: number;
     let lowestY: number;
     let highestY: number;
@@ -659,15 +555,19 @@ function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
     }
 
     for (const mapJsonLayer of mapJson.layers) {
+        map.addLayer(mapJsonLayer.name);
+    }
 
-        if (mapJsonLayer.name === "Interactives" || mapJsonLayer.name == "Content" || mapJsonLayer.name == "Solid" || mapJsonLayer.name == "Rooms" || mapJsonLayer.name == "Conference rooms") {
-            
-            //TODO Infos in eine Info Datei speichern, siehe SolidInfoMap
+    for (const mapJsonLayer of mapJson.layers) {
+
+        const LAYER_INDEX = map.getIndex(mapJsonLayer.name);
+
+        if (mapJsonLayer.chunks == undefined) {
             continue;
         }
 
         for (const mapJsonChunk of mapJsonLayer.chunks) {
-            const chunk: Chunk = new Chunk(mapJsonChunk.x, mapJsonChunk.y)
+            const chunk: Chunk = new Chunk(mapJsonChunk.x, mapJsonChunk.y, map._layerList.length);
 
             if (lowestX == undefined || mapJsonChunk.x < lowestX) {
                 lowestX = mapJsonChunk.x;
@@ -684,7 +584,7 @@ function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
 
             //Finds the correct png file for every data-entry
             for (let y = 0; y < 16; y++) {
-                for ( let x = 0; x < 16; x++) {
+                for (let x = 0; x < 16; x++) {
                     const data = mapJsonChunk.data[x + 16*y];
                     if (data == 0) {
                         continue;
@@ -703,126 +603,57 @@ function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
                         if (!(newFirstGridId < tileSet.firstgid || tileSet === lastTileSet)) {
                             continue;
                         }
+
                         path = path.replace(".tsx", ".png");
                         path = path.replace("Map/", "")
+
+                        if (mapJsonLayer.name == "Content" || mapJsonLayer.name == "Solid" || mapJsonLayer.name == "Rooms" || mapJsonLayer.name == "Conference rooms") {
+            
+                            const value: number = data - id + 1;
+                            if (mapJsonLayer.name == "Solid" && value !== 0 && value < 16) {
+                                let numbBin: string = value.toString(2);
+                                let fillerString: string = "";
+                                const length = numbBin.length;
+                                if (length < 4) {
+                                    for (let j = 0; j < 4 - length; j++) {
+                                        fillerString += "0";
+                                    }
+                                    numbBin = fillerString + numbBin;
+                                }
+                                //makes different quarters of a block solid
+                                if (numbBin.charAt(0) === "1") {
+                                    chunk.data[x][y]._solidInfo[0][0] = true;
+                                }
+                                if (numbBin.charAt(1) === "1") {
+                                    chunk.data[x][y]._solidInfo[0][1]= true;
+                                }
+                                if (numbBin.charAt(2) === "1") {
+                                    chunk.data[x][y]._solidInfo[1][0] = true;
+                                }
+                                if (numbBin.charAt(3) === "1") {
+                                    chunk.data[x][y]._solidInfo[1][1] = true;
+                                }
+                            } else if (mapJsonLayer.name == "Content" && value !== 0) {
+                                const interactive: Interactive = getInteractive(value, chunk.posX + x, chunk.posY + y, path);
+                                chunk.data[x][y]._interactive = interactive;
+                            } else if (mapJsonLayer.name == "Conference rooms" && value === 1) {
+                                chunk.data[x][y]._isConferencRoom = true;
+                            } else if (mapJsonLayer.name == "Rooms") {
+                                chunk.data[x][y]._roomId = value;
+                            }
+                            break;
+                        }
 
                         if (String(mapJsonLayer.name).includes("animated")) {
                             let width = Number(String(mapJsonLayer.name).replace("<animated", "")[0]);
                             let height = Number(String(mapJsonLayer.name).replace("<animated", "")[2]);
 
-                            switch (mapJsonLayer.name) {
-
-                                case("<animated1x2>Plant"):
-                                    map._animationList.push(new Animation(path, width, height, x + chunk.posX, y + chunk.posY, GroundType.BackGround7, 30));
-                                    break;
-
-                                case("<animated2x2>Fishtank"):
-                                    map._animationList.push(new Animation(path, width, height, x + chunk.posX, y + chunk.posY, GroundType.BackGround7, 10));
-                                    break;
-
-                                case("<animated3x2>Cat"):
-                                    map._animationList.push(new Animation(path, width, height, x + chunk.posX, y + chunk.posY, GroundType.BackGround5, 15));
-                                    break;
-                                
-                            }
-                            break;
+                            map._animationList.push(new Animation(path, width, height, x + chunk.posX, y + chunk.posY, LAYER_INDEX, 25));
                         }
 
                         let index = map._tileList.addTile(path, data - id);
-
-                        switch(mapJsonLayer.name) {
-
-                            case("Floor"):
-                                groundType = GroundType.BackGround;
-                                break;
-                
-                            case("Floor kitchen"):
-                                groundType = GroundType.BackGround;
-                                break;
-                
-                            case("Floor bathroom"):
-                                groundType = GroundType.BackGround;
-                                break;
-                
-                            case("Walls"):
-                                groundType = GroundType.BackGround1;
-                                break;
-
-                            case("Post its"):
-                                groundType = GroundType.BackGround7;
-                                break;
-
-                            case("Whiteboards"):
-                                groundType = GroundType.BackGround7;
-                                break;
-
-                            case("Deko above Deko"):
-                                groundType = GroundType.BackGround7;
-                                break;
-
-                            case("Automat"):
-                                groundType = GroundType.BackGround2;
-                                break;
-
-                            case("Deko"):
-                                groundType = GroundType.BackGround6;
-                                break;
-
-                            case("Toilette"):
-                                groundType = GroundType.BackGround2;
-                                break;
-
-                            case("Coffee machine"):
-                                groundType = GroundType.BackGround5;
-                                break;
-
-                            case("Donuts"):
-                                groundType = GroundType.BackGround4;
-                                break;
-
-                            case("kitchen utensils"):
-                                groundType = GroundType.BackGround3;
-                                break;
-
-                            case("kitchen"):
-                                groundType = GroundType.BackGround2;
-                                break;
-
-                            case("chairs above tables"):
-                                groundType = GroundType.BackGround6;
-                                break;
-
-                            case("Computer front"):
-                                groundType = GroundType.BackGround5;
-                                break;
-
-                            case("Computer back"):
-                                groundType = GroundType.BackGround4;
-                                break;
-
-                            case("Tables"):
-                                groundType = GroundType.BackGround3;
-                                break;
-
-                            case("chairs behind tables"):
-                                groundType = GroundType.BackGround2;
-                                break;
-
-                            case("Deko under deko"):
-                                groundType = GroundType.BackGround1;
-                                break;
-
-                            case("Stairs"):
-                                groundType = GroundType.BackGround2;
-                                break;
-
-                            case("Windows"):
-                                groundType = GroundType.BackGround1;
-                                break;
-                        }
-
-                        chunk.setTileNumber(x, y, index, groundType); //Adds the index of the texture in the TileList. New textures will be saved first in the list
-                        map.addChunk(chunk, groundType)
+                        chunk.data[x][y]._textureIdB[LAYER_INDEX] = index; //Adds the index of the texture in the TileList. New textures will be saved first in the list
+                        map.addChunk(chunk, LAYER_INDEX);
                         break;
                     }
                 }
@@ -830,5 +661,6 @@ function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
         }
     }
     map.setBoundaries(lowestX, lowestY, highestX, highestY);
+    console.log(map);
     return map;
 }

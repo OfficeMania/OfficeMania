@@ -18,6 +18,7 @@ import { doors, interactiveCanvas } from "../static";
 import { Player } from "../player";
 import { checkInputMode } from "../main";
 import { setInputMode } from "../input";
+import { Animation, drawMap, GroundType, MapData } from "../newMap";
 
 export enum DoorDirection {
     UNKNOWN,
@@ -45,7 +46,8 @@ export class Door extends Interactive {
     ctx: CanvasRenderingContext2D;
     chunk: Chunk;
     animationCounter: number;
-    inAnimation: boolean;
+    inOpenAnimation: boolean;
+    inCloseAnimation: boolean
     firstTimeDrawn: boolean;
     syncIndex: boolean;
     asyncIsClosed: boolean;
@@ -55,28 +57,33 @@ export class Door extends Interactive {
     groundChunk: Chunk;
     lastIsClosed: boolean;
     syncDelay: number;
+    path: string;
+    animation: Animation;
+    newMap: MapData;
 
-    constructor(direction: DoorDirection, posX: number, posY: number, map: MapInfo) {
+    constructor(direction: DoorDirection, posX: number, posY: number, path: string, animation: Animation) {
         super("Door", true, 1);
         this.isClosed = false;
         this.lastIsClosed = false;
         this.direction = direction;
         this.posX = posX;
         this.posY = posY;
-        this.map = map;
+        this.path = path;
         this.room = getRoom();
         let id = posX + "" + posY;
         this.room.send(MessageType.DOOR_NEW, id);
-        this.setTexture();
+        //this.setTexture();
         Door.doors.push(this);
         this.ctx = doors.getContext("2d");
         this.animationCounter = 0;
-        this.inAnimation = false;
+        this.inOpenAnimation = false;
+        this.inCloseAnimation = false;
         this.firstTimeDrawn = false;
         this.syncIndex = false;
         this.asyncIsClosed = false;
         this.delay = 4;
         this.syncDelay = 0;
+        this.animation = animation;
     }
 
     onInteraction(): void {
@@ -162,6 +169,9 @@ export class Door extends Interactive {
             this.isClosed = true;
             let message = [this.posX + "" + this.posY, this.playerId];
             this.room.send(MessageType.DOOR_LOCK, message);
+            this.inCloseAnimation = true;
+            console.log(this.inCloseAnimation);
+            console.log(this);
         }
     }
 
@@ -199,6 +209,7 @@ export class Door extends Interactive {
     unlockDoor() {
         this.isClosed = false;
         this.room.send(MessageType.DOOR_UNLOCK, this.posX + "" + this.posY);
+        this.inOpenAnimation = true;
     }
 
     //id descripes who knocks
@@ -280,27 +291,53 @@ export class Door extends Interactive {
     }
 
     update() {
+
+        const doorState = this.room.state.doorStates[this.posX + "" + this.posY];
+        this.isClosed = doorState?.isClosed;
+
         if (this.syncDelay > 0) {
             this.syncDelay++;
         }
-        const doorState = this.room.state.doorStates[this.posX + "" + this.posY];
         if (this.lastIsClosed !== this.isClosed) {
-            if (doorState?.isClosed && !this.inAnimation) {
+            if (doorState?.isClosed && !this.inOpenAnimation) {
                 this.animationCounter = 4;
-                this.inAnimation = true;
+                this.inOpenAnimation = true;
                 this.syncDelay = 1;
                 this.syncIndex = false;
-            } else if (!doorState?.isClosed && !this.inAnimation) {
+            } else if (!doorState?.isClosed && !this.inOpenAnimation) {
                 this.animationCounter = 0;
-                this.inAnimation = true;
+                this.inOpenAnimation = true;
                 this.syncDelay = 1;
                 this.syncIndex = false;
             }
         }
-        this.isClosed = doorState?.isClosed;
         if (this.syncDelay === 20) {
             this.syncIndex = true;
             this.syncDelay = 0;
+        }
+    }
+
+    drawNewDoor(spriteSheet: HTMLCanvasElement, background: HTMLCanvasElement, map: MapData, tileSize: number) {
+        let ctx = background.getContext("2d");
+        if(this.inCloseAnimation) {
+            ctx.clearRect(
+                (this.animation.posx + Math.abs(map._lowestPosx)) * tileSize, 
+                (this.animation.posy + Math.abs(map._lowestPosy)) * tileSize, 
+                this.animation.width * tileSize, this.animation.height * tileSize);
+
+            console.log("HI");
+
+            for (let i = 0; i < map._layerList.length; i++) {
+                drawMap(
+                    map, 
+                    spriteSheet, 
+                    background, 
+                    this.animation.posx, 
+                    this.animation.posy, 
+                    this.animation.posx + this.animation.width - 1, 
+                    this.animation.posy + this.animation.height - 1, 
+                        i);
+            }
         }
     }
 
@@ -474,11 +511,13 @@ export class Door extends Interactive {
     }
 }
 
-export function updateDoors() {
+export function updateDoors(spriteSheet: HTMLCanvasElement, background: HTMLCanvasElement, map: MapData, tileSize: number) {
     Door.doors.forEach(value => {
-        value.sync();
-        value.update();
-        value.drawDoor();
+        if (value.posX <= map._highestPosx && value.posY <= map._highestPosy) {
+            value.sync();
+            value.update();
+            value.drawNewDoor(spriteSheet, background, map, tileSize);
+        }
     });
 }
 

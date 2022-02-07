@@ -411,15 +411,9 @@ async function main() {
 
     await newMap.updateAnimationCounter();
 
-    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround);
-    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround1);
-    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround2);
-    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround3);
-    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround4);
-    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround5);
-    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround6);
-    drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.BackGround7);
-    drawMap(newMap, spriteSheet, foreground, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, GroundType.ForeGround);
+    for (let i = 0; i < newMap._layerList.length; i++) {
+        drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, i);
+    }
 
     //For getting the SpriteSheet as png
     //let img = background.toDataURL("image/png");
@@ -573,7 +567,7 @@ async function main() {
                     (starty + Math.abs(newMap._lowestPosy)) * TILE_SIZE, 
                     ANIMATION.width * TILE_SIZE, ANIMATION.height * TILE_SIZE);
 
-                for (let i = GroundType.BackGround; i < GroundType.ForeGround; i++) {
+                for (let i = 0; i < newMap._layerList.length; i++) {
                     drawMap(
                         newMap, 
                         spriteSheet, 
@@ -599,7 +593,7 @@ async function main() {
             height);
 
         //check if a doorState changed
-        //updateDoors();
+        updateDoors(spriteSheet, background, newMap, 48);
 
         ctx.save();
 
