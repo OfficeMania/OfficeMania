@@ -95,6 +95,7 @@ export function isLoginRequired(defaultValue = false): Promise<boolean> {
 }
 
 export function isLoginViaInviteCodeAllowed(defaultValue = false): Promise<boolean> {
+    //TODO Implement this
     return getBooleanOrElse("ALLOW_LOGIN_VIA_INVITE_CODE", ALLOW_LOGIN_VIA_INVITE_CODE, defaultValue);
 }
 
