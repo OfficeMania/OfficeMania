@@ -42,7 +42,9 @@ export const REDIS_HOST: string | undefined = process.env.REDIS_HOST;
 export const REDIS_PORT: number | undefined = toNumber(process.env.REDIS_PORT, 10);
 export const REDIS_PASSWORD: string | undefined = process.env.REDIS_PASSWORD;
 
+const ENABLE_LOGIN: boolean | undefined = toBoolean(process.env.ENABLE_LOGIN);
 const REQUIRE_LOGIN: boolean | undefined = toBoolean(process.env.FORCE_LOGIN);
+const ALLOW_LOGIN_VIA_INVITE_CODE: boolean | undefined = toBoolean(process.env.ALLOW_LOGIN_VIA_INVITE_CODE);
 const DISABLE_SIGNUP: boolean | undefined = toBoolean(process.env.DISABLE_SIGNUP);
 const REQUIRE_INVITE_CODE_FOR_SIGNUP: boolean | undefined = toBoolean(process.env.REQUIRE_INVITE_CODE_FOR_SIGNUP);
 
@@ -84,8 +86,16 @@ async function getBooleanOrElse(
     return toBoolean(configEntry.value) ?? defaultValue;
 }
 
+export function isLoginEnabled(defaultValue = false): Promise<boolean> {
+    return getBooleanOrElse("ENABLE_LOGIN", ENABLE_LOGIN, defaultValue);
+}
+
 export function isLoginRequired(defaultValue = false): Promise<boolean> {
     return getBooleanOrElse("REQUIRE_LOGIN", REQUIRE_LOGIN, defaultValue);
+}
+
+export function isLoginViaInviteCodeAllowed(defaultValue = false): Promise<boolean> {
+    return getBooleanOrElse("ALLOW_LOGIN_VIA_INVITE_CODE", ALLOW_LOGIN_VIA_INVITE_CODE, defaultValue);
 }
 
 export function isSignupDisabled(defaultValue = true): Promise<boolean> {
