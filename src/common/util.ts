@@ -157,3 +157,10 @@ export async function waitFor<T>(supplier: () => T | undefined, ms = 100): Promi
     }
     return supplier();
 }
+
+export function convertOrNull<T>(input: any, converter?: (input: any) => T): T | null {
+    if (input === undefined || input === null) {
+        return null;
+    }
+    return converter(input);
+}

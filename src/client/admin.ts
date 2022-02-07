@@ -197,6 +197,7 @@ function processConfigEntriesResponse(configEntries: any[]): ConfigEntry<any>[] 
     return configEntries.map(entry => {
         const type: number = entry.type;
         const value: string | undefined = entry.value;
+        const description: string | undefined = entry.description;
         let settingType: SettingType;
         let valueProcessed: any;
         switch (type) {
@@ -223,6 +224,7 @@ function processConfigEntriesResponse(configEntries: any[]): ConfigEntry<any>[] 
             key: entry.key,
             settingType,
             value: valueProcessed,
+            description,
             createdAt: new Date(entry.createdAt),
             updatedAt: new Date(entry.updatedAt),
         };
@@ -237,7 +239,7 @@ function test(): void {
         .then((configEntries: ConfigEntry<any>[]) => {
             console.debug(configEntries);
             configEntries.forEach(configEntry =>
-                settings.push(createSetting(configEntry.key, configEntry.key, "checkbox", configEntry.value))
+                settings.push(createSetting(configEntry.key, configEntry.key, "checkbox", configEntry.value, configEntry.description)),
             );
             appendSettings(settings);
         });
@@ -250,6 +252,7 @@ interface ConfigEntry<T> {
     key: string;
     settingType: SettingType,
     value?: T;
+    description?: string;
     createdAt: Date;
     updatedAt: Date;
 }

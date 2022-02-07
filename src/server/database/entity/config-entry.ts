@@ -18,6 +18,9 @@ export class ConfigEntry extends BaseEntity {
     @Column({ type: "varchar", length: 1024, nullable: true })
     value?: string;
 
+    @Column({ type: "varchar", length: 1024, nullable: true })
+    description?: string;
+
     @CreateDateColumn({ name: "created_at" })
     createdAt: Date;
 
