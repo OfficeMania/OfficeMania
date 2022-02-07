@@ -169,8 +169,8 @@ body {
     content: '  Send';
 }
 
-#button-admin:hover span:after {
-    content: '  Admin';
+#button-admin-config:hover span:after {
+    content: '  Configuration';
 }
 
 #button-send {

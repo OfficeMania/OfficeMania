@@ -56,7 +56,7 @@ import {
 } from "./input";
 import { drawPlayers } from "./draw-player";
 import {
-    adminButton,
+    adminConfigButton,
     background,
     backpackCanvas,
     bsWelcomeModal,
@@ -127,7 +127,7 @@ function toggleMute(type: string) {
 
 // Settings
 
-adminButton.addEventListener("click", () => admin());
+adminConfigButton.addEventListener("click", () => adminConfig());
 loginButton.addEventListener("click", () => login());
 logoutButton.addEventListener("click", () => logout());
 
@@ -161,8 +161,8 @@ export function checkInputMode() {
     //console.log(getInputMode());
 }
 
-function admin() {
-    window.location.href = "/admin";
+function adminConfig() {
+    window.location.href = "/admin/config";
 }
 
 function login() {
@@ -392,13 +392,13 @@ async function main() {
     loginButton.hidden = loggedIn;
     logoutButton.hidden = !loggedIn;
     const admin: boolean = areWeAdmin();
-    adminButton.hidden = !admin;
+    adminConfigButton.hidden = !admin;
 
     /*
      * Then, we wait for our map to load
      */
 
-    
+
 
     let newMap = await createMapJson(room, spriteSheet);
     newMap.mergeAnimation();
@@ -563,33 +563,33 @@ async function main() {
                 let startx = ANIMATION.posx;
                 let starty = ANIMATION.posy;
                 ctxB.clearRect(
-                    (startx + Math.abs(newMap._lowestPosx)) * TILE_SIZE, 
-                    (starty + Math.abs(newMap._lowestPosy)) * TILE_SIZE, 
+                    (startx + Math.abs(newMap._lowestPosx)) * TILE_SIZE,
+                    (starty + Math.abs(newMap._lowestPosy)) * TILE_SIZE,
                     ANIMATION.width * TILE_SIZE, ANIMATION.height * TILE_SIZE);
 
                 for (let i = 0; i < newMap._layerList.length; i++) {
                     drawMap(
-                        newMap, 
-                        spriteSheet, 
-                        background, 
-                        startx, 
-                        starty, 
-                        startx + ANIMATION.width - 1, 
-                        starty + ANIMATION.height - 1, 
+                        newMap,
+                        spriteSheet,
+                        background,
+                        startx,
+                        starty,
+                        startx + ANIMATION.width - 1,
+                        starty + ANIMATION.height - 1,
                         i);
                 }
             }
         }
 
         ctx.drawImage(
-            background, 
-            posX - Math.floor(width / 2), 
-            posY - Math.floor(height / 2), 
-            width, 
-            height, 
-            0, 
-            0, 
-            width, 
+            background,
+            posX - Math.floor(width / 2),
+            posY - Math.floor(height / 2),
+            width,
+            height,
+            0,
+            0,
+            width,
             height);
 
         //check if a doorState changed

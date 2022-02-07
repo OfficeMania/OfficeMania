@@ -98,6 +98,7 @@ export class ChatHandler implements Handler {
     }
 
     onLog(client: Client, chatId?: string) {
+        console.log("chatlog call ", client.id)
         if (chatId) {
             console.log("Request log for Chat:", chatId);
             const chat: Chat = this.byChatId(chatId);
@@ -143,6 +144,7 @@ export class ChatHandler implements Handler {
     }
 
     onChatLeave(client: Client, chatMessage: ChatMessage) {
+        console.log(`client ${client.id} leavin chat ${chatMessage.chatId}`);
         const chatId: string = chatMessage.chatId;
         const sendMessage: boolean = chatId !== this.globalChat.id && chatId !== this.nearbyChat.id;
         const userId: string = getUserId(client, this.room);
@@ -197,7 +199,7 @@ export class ChatHandler implements Handler {
             return;
         }
         const ids: string[] = chatMessage.message.split(",");
-        console.log(ids);
+        console.log("adding new chat with ",ids, client.id);
 
         let ourPlayer: { data: PlayerState; id: string };
         const otherPlayers: { data: PlayerState; id: string }[] = [];
@@ -279,7 +281,7 @@ export class ChatHandler implements Handler {
     }
 
     onUpdateUsername(client: Client, name: string) {
-        console.log("hello there name has changed", client.sessionId, name);
+        console.log("updatreusernamecall", client.sessionId, name);
         this.chats.forEach(chat => {
             if (chat.users.includes(getUserId(client, this.room)) && chat.id !== this.globalChat.id && chat.id !== this.nearbyChat.id) {
                 updateChatName(chat, this.room);

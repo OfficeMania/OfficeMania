@@ -42,16 +42,18 @@ export const REDIS_HOST: string | undefined = process.env.REDIS_HOST;
 export const REDIS_PORT: number | undefined = toNumber(process.env.REDIS_PORT, 10);
 export const REDIS_PASSWORD: string | undefined = process.env.REDIS_PASSWORD;
 
+const ENABLE_LOGIN: boolean | undefined = toBoolean(process.env.ENABLE_LOGIN);
 const REQUIRE_LOGIN: boolean | undefined = toBoolean(process.env.FORCE_LOGIN);
+const ALLOW_LOGIN_VIA_INVITE_CODE: boolean | undefined = toBoolean(process.env.ALLOW_LOGIN_VIA_INVITE_CODE);
 const DISABLE_SIGNUP: boolean | undefined = toBoolean(process.env.DISABLE_SIGNUP);
-const REQUIRE_INVITE_CODE: boolean | undefined = toBoolean(process.env.REQUIRE_INVITE_CODE);
+const REQUIRE_INVITE_CODE_FOR_SIGNUP: boolean | undefined = toBoolean(process.env.REQUIRE_INVITE_CODE_FOR_SIGNUP);
 
 export const LDAP_OPTIONS = null;
 
 async function getStringOrElse(
     key: string,
     envValue: string | undefined,
-    defaultValue: string
+    defaultValue: string,
 ): Promise<string> {
     const configEntry: ConfigEntry | undefined = await ConfigEntry.findOne(key);
     if (!configEntry) {
@@ -63,7 +65,7 @@ async function getStringOrElse(
 async function getNumberOrElse(
     key: string,
     envValue: number | undefined,
-    defaultValue: number
+    defaultValue: number,
 ): Promise<number> {
     const configEntry: ConfigEntry | undefined = await ConfigEntry.findOne(key);
     if (!configEntry) {
@@ -75,7 +77,7 @@ async function getNumberOrElse(
 async function getBooleanOrElse(
     key: string,
     envValue: boolean | undefined,
-    defaultValue: boolean
+    defaultValue: boolean,
 ): Promise<boolean> {
     const configEntry: ConfigEntry | undefined = await ConfigEntry.findOne(key);
     if (!configEntry) {
@@ -84,14 +86,43 @@ async function getBooleanOrElse(
     return toBoolean(configEntry.value) ?? defaultValue;
 }
 
+export function isLoginEnabled(defaultValue = false): Promise<boolean> {
+    return getBooleanOrElse("ENABLE_LOGIN", ENABLE_LOGIN, defaultValue);
+}
+
 export function isLoginRequired(defaultValue = false): Promise<boolean> {
     return getBooleanOrElse("REQUIRE_LOGIN", REQUIRE_LOGIN, defaultValue);
+}
+
+export function isLoginViaInviteCodeAllowed(defaultValue = false): Promise<boolean> {
+    //TODO Implement this
+    return getBooleanOrElse("ALLOW_LOGIN_VIA_INVITE_CODE", ALLOW_LOGIN_VIA_INVITE_CODE, defaultValue);
 }
 
 export function isSignupDisabled(defaultValue = true): Promise<boolean> {
     return getBooleanOrElse("DISABLE_SIGNUP", DISABLE_SIGNUP, defaultValue);
 }
 
-export function isInviteCodeRequired(defaultValue = false): Promise<boolean> {
-    return getBooleanOrElse("REQUIRE_INVITE_CODE", REQUIRE_INVITE_CODE, defaultValue);
+export function isInviteCodeRequiredForSignup(defaultValue = false): Promise<boolean> {
+    return getBooleanOrElse("REQUIRE_INVITE_CODE_FOR_SIGNUP", REQUIRE_INVITE_CODE_FOR_SIGNUP, defaultValue);
+}
+
+export const CONFIG_KEYS: string[] = ["ENABLE_LOGIN", "REQUIRE_LOGIN", "ALLOW_LOGIN_VIA_INVITE_CODE", "DISABLE_SIGNUP", "REQUIRE_INVITE_CODE_FOR_SIGNUP"];
+
+export function getEnvValue(key: string): string | undefined | null {
+    if (!CONFIG_KEYS.includes(key)) {
+        return undefined;
+    }
+    return process.env[key] ?? null;
+}
+
+export async function getValue(key: string): Promise<string | undefined | null> {
+    if (!CONFIG_KEYS.includes(key)) {
+        return undefined;
+    }
+    const configEntry: ConfigEntry | undefined = await ConfigEntry.findOne(key);
+    if (!configEntry) {
+        return getEnvValue(key);
+    }
+    return configEntry.value;
 }

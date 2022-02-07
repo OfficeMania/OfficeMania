@@ -3,6 +3,8 @@ import { ensureHasRole, Role, User } from "./database/entity/user";
 import { createOrUpdate } from "./database/database";
 import { ConfigEntry } from "./database/entity/config-entry";
 import { getManager } from "typeorm";
+import { convertOrNull } from "../common";
+import { getValue } from "./config";
 
 const router: Router = Router();
 
@@ -25,16 +27,18 @@ function setupRouter(): void {
             })
             .catch(() => res.sendStatus(500));
     });
-    router.get("/config", ensureHasRole(Role.ADMIN), (req, res) => {
+    router.get("/config", ensureHasRole(Role.ADMIN), async (req, res) => {
         const key = req.query.key;
         if (!key) {
             return ConfigEntry.find()
                 .then(configEntries => res.send(configEntries))
                 .catch(reason => res.status(500).send(reason));
         }
-        ConfigEntry.findOne(String(key))
-            .then(configEntry => (configEntry ? res.send(configEntry) : res.sendStatus(404)))
-            .catch(reason => res.status(500).send(reason));
+        const value: string | undefined | null = await getValue(String(key));
+        if (value === undefined) {
+            return res.sendStatus(404);
+        }
+        return res.send({ key, value });
     });
     router.put("/config", ensureHasRole(Role.ADMIN), (req, res) => {
         const key: string | undefined = req.query.key ? String(req.query.key) : undefined;
@@ -45,7 +49,8 @@ function setupRouter(): void {
         if (!type) {
             return res.status(500).send("Missing query parameter 'type'");
         }
-        const value: string | null = req.query.value ? String(req.query.value) : null;
+        const value: string | null = convertOrNull(req.query.value, String);
+        console.debug(`PUT    "${key}" => "${value}"`);
         createOrUpdate(getManager(), ConfigEntry, { key, type, value })
             .then(configEntry => res.send(configEntry))
             .catch(reason => res.status(500).send(reason));
@@ -56,7 +61,8 @@ function setupRouter(): void {
             return res.status(500).send("Missing query parameter 'key'");
         }
         const type: number | undefined = req.query.type ? Number(req.query.type) : undefined;
-        const value: string | null = req.query.value ? String(req.query.value) : null;
+        const value: string | null = convertOrNull(req.query.value, String);
+        console.debug(`PATCH  "${key}" => "${value}"`);
         createOrUpdate(getManager(), ConfigEntry, { key, type, value })
             .then(configEntry => res.send(configEntry))
             .catch(reason => res.status(500).send(reason));
@@ -66,9 +72,10 @@ function setupRouter(): void {
         if (!key) {
             return res.status(500).send("Missing query parameter 'key'");
         }
+        console.debug(`DELETE "${key}"`);
         ConfigEntry.findOne(String(key))
             .then(configEntry =>
-                configEntry ? configEntry.remove().then(value => res.send(value)) : res.sendStatus(404)
+                configEntry ? configEntry.remove().then(value => res.send(value)) : res.sendStatus(404),
             )
             .catch(reason => res.status(500).send(reason));
     });

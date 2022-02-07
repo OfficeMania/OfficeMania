@@ -2,7 +2,8 @@ import express, { Express, Router } from "express";
 import passport from "passport";
 import {
     IS_DEV,
-    isInviteCodeRequired,
+    isInviteCodeRequiredForSignup,
+    isLoginEnabled,
     isLoginRequired,
     isSignupDisabled,
     LDAP_OPTIONS,
@@ -128,7 +129,7 @@ function setupSignup(): void {
             req.session.signupError = AuthError.PASSWORDS_MISMATCH;
             return res.redirect("/auth/signup");
         }
-        if ((await isInviteCodeRequired()) && !inviteCodeString) {
+        if ((await isInviteCodeRequiredForSignup()) && !inviteCodeString) {
             req.session.signupError = AuthError.INVITE_CODE_REQUIRED;
             return res.redirect("/auth/signup");
         } else if (inviteCodeString) {
@@ -179,13 +180,16 @@ function setupSignup(): void {
         }
         res.render("pages/signup", {
             error: authErrorToString(req.session.signupError),
-            requireInviteCode: await isInviteCodeRequired(),
+            requireInviteCode: await isInviteCodeRequiredForSignup(),
         });
     });
 }
 
 function setupLogin(): void {
-    router.post("/login", (req, res, next) => {
+    router.post("/login", async (req, res, next) => {
+        if (!(await isLoginEnabled())) {
+            return res.sendStatus(404);
+        }
         passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", (error, user, info) => {
             if (error) {
                 req.session.loginError = AuthError.UNKNOWN;
@@ -195,7 +199,7 @@ function setupLogin(): void {
                 req.session.loginError = AuthError.INVALID_CREDENTIALS;
                 return res.redirect("/auth/login");
             }
-            req.logIn(user, function (error) {
+            req.logIn(user, function(error) {
                 if (error) {
                     req.session.loginError = AuthError.UNKNOWN;
                     return res.redirect("/auth/login");
@@ -205,11 +209,15 @@ function setupLogin(): void {
             });
         })(req, res, next);
     });
-    router.get("/login", async (req, res) =>
-        res.render("pages/login", {
-            error: authErrorToString(req.session.loginError),
-            disableSignup: await isSignupDisabled(),
-        })
+    router.get("/login", async (req, res) => {
+            if (!(await isLoginEnabled())) {
+                return res.redirect("/");
+            }
+            res.render("pages/login", {
+                error: authErrorToString(req.session.loginError),
+                disableSignup: await isSignupDisabled(),
+            });
+        },
     );
 }
 
@@ -233,7 +241,7 @@ function setupLDAPStrategy(): void {
     passport.use(
         new LdapStrategy(LDAP_OPTIONS, (user, done) => {
             done(null, user);
-        })
+        }),
     );
     passport.serializeUser((user, done) => {
         done(null, user);
@@ -246,7 +254,7 @@ function setupLDAPStrategy(): void {
 function setupLocalStrategy(): void {
     console.debug("Setup Passport with LocalStrategy");
     passport.use(
-        new LocalStrategy(function (username, password, done) {
+        new LocalStrategy(function(username, password, done) {
             User.findOne({ where: { username } })
                 .then(user => {
                     if (!user || !user.checkPassword(password)) {
@@ -258,18 +266,19 @@ function setupLocalStrategy(): void {
                     return done(null, { id: user.id, username: user.username });
                 })
                 .catch(error => done(error, null));
-        })
+        }),
     );
     passport.serializeUser((user: User, done) => done(null, user.id));
     passport.deserializeUser((id: string, done) =>
         User.findOne(id)
             .then(user => done(null, user))
-            .catch(error => done(error, null))
+            .catch(error => done(error, null)),
     );
 }
 
 const ensureSession: express.RequestHandler = (req, res, next) => {
     let tries = 3;
+
     function lookupSession(error?: any): void {
         if (error) {
             return next(error);
@@ -283,6 +292,7 @@ const ensureSession: express.RequestHandler = (req, res, next) => {
         }
         sessionHandler(req, res, lookupSession);
     }
+
     lookupSession();
 };
 

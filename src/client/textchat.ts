@@ -17,7 +17,6 @@ import { getOurPlayer, getRoom, sendNotification } from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chat-handler";
 import { PlayerState } from "../common/states/player-state";
 import { getUser, setShowParticipantsTab } from "./conference/conference";
-import { setShowLoadingscreen } from "./loadingscreen";
 
 //tracks if button/shortcut have been pressed
 let _showTextchat = false;
@@ -142,6 +141,7 @@ export function initChatListener() {
     getRoom().send(MessageType.CHAT_UPDATE);
     getRoom().send(MessageType.CHAT_LOG);
     getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => {
+        console.debug("onmessage call")
         onMessage(message);
         sendChatNotification(message);
     });
@@ -171,7 +171,7 @@ export function textchatPlayerOnChange(playerState: PlayerState) {
 
 //rewrites all the of the clients chats from scratch
 function onChatUpdate(chatDTOs: ChatDTO[]): void {
-    //console.debug("chatDTOs:", chatDTOs);
+    console.debug("onchatupdate call");
     //chats.forEach(() => {chats.pop()});
     //console.log(chats, "chats:");
     let ids: string[] = [];
@@ -191,7 +191,7 @@ function onChatUpdate(chatDTOs: ChatDTO[]): void {
 
 //
 function onMessageLogs(chatMessages: ChatMessage[]): void {
-    //console.debug("chatMessages:", chatMessages);
+    console.debug("onmessagelogs call");
     let chatIds: string[] = [];
     chatMessages.forEach(message => {
         if (!chatIds.includes(message.chatId)) {
@@ -365,7 +365,7 @@ function addChatListOption(chat: Chat) {
     const i = document.createElement("a");
     i.innerText = chat.name;
     a.appendChild(i);
-
+    let chatId = chat.id;
     if (chats[0].id !== chat.id && chats[1].id !== chat.id) {
         const bin = document.createElement("i");
         bin.classList.add("fas");
@@ -373,7 +373,7 @@ function addChatListOption(chat: Chat) {
         //bin.setAttribute()
         bin.addEventListener("click", (event) => {
             event.stopPropagation();
-            leaveChat(chat.id);
+            leaveChat(chatId);
             updateChatListButton(chats[0].id);
             clearTextchatBar();
             getChatById(chats[0].id).messages.forEach(addMessageToBar);

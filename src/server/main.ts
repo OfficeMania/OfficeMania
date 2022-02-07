@@ -14,6 +14,7 @@ import connectionEnsureLogin from "connect-ensure-login";
 import { ensureHasRole, findOrCreateUserByUsername, PasswordVersion, Role } from "./database/entity/user";
 import { connectDatabase } from "./database/database";
 import { getApiRouter } from "./api";
+import { monitor } from "@colyseus/monitor";
 
 async function initDatabase(): Promise<void> {
     // TODO Remove this and use proper user creation etc.
@@ -21,6 +22,7 @@ async function initDatabase(): Promise<void> {
         const name = `test${i}`;
         await findOrCreateUserByUsername(name, name, PasswordVersion.PLAIN);
     }
+    await findOrCreateUserByUsername("admin", "admin", PasswordVersion.PLAIN, Role.ADMIN);
     return findOrCreateUserByUsername("officemania", "sec-sep21-project").then(user => {
         if (!user) {
             console.error("Something went wrong when creating the default user");
@@ -76,6 +78,13 @@ async function setupApp(): Promise<Express> {
         connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
         ensureHasRole(Role.ADMIN),
         express.static("admin")
+    );
+
+    app.use(
+        "/admin/config",
+        connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
+        ensureHasRole(Role.ADMIN),
+        express.static("admin/config.html")
     );
 
     // "Mount" the public folder as the root of the website
@@ -165,7 +174,7 @@ function setupGameServer(app: Express): Server {
      *
      * See: https://docs.colyseus.io/tools/monitor/
      */
-    //app.use("/colyseus", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), ensureHasRole(Role.ADMIN), monitor()); //TODO Enable this and secure it via authentication/authorization
+    app.use("/colyseus", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), ensureHasRole(Role.ADMIN), monitor());
 
     return gameServer;
 }
