@@ -148,7 +148,8 @@ export function createUser(
 export async function findOrCreateUserByUsername(
     username: string,
     password: string = undefined,
-    passwordVersion: PasswordVersion = PasswordVersion.LATEST
+    passwordVersion: PasswordVersion = PasswordVersion.LATEST,
+    role: Role = Role.USER
 ): Promise<User> {
     const user: User | undefined = await User.findOne({ where: { username } });
     if (user) {
@@ -158,5 +159,6 @@ export async function findOrCreateUserByUsername(
         username,
         password: serializePassword(password, passwordVersion),
         passwordVersion,
+        role
     }).save();
 }
