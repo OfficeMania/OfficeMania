@@ -136,8 +136,6 @@ function areChangesUnsaved(): boolean {
 
 function updateCacheState(): void {
     const changesUnsaved: boolean = areChangesUnsaved();
-    console.debug("changesUnsaved:", changesUnsaved);
-    console.debug("cache:", cache);
     noteUnsavedChanges.hidden = !changesUnsaved;
 }
 
