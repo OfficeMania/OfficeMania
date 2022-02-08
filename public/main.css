@@ -368,8 +368,10 @@ body {
     position: absolute;
 }
 
-
-#interactive{
+#interactive,
+#interactive-whiteboard-canvas,
+#interactive-chess-canvas,
+#interactive-pong-canvas {
     position:absolute;
     z-index: 1;
     width: 60%;

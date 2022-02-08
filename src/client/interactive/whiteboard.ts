@@ -22,7 +22,8 @@ import {
     size10Button,
     size5Button,
     whiteboardPanel,
-    yellowButton
+    yellowButton,
+    interactiveWhiteboardCanvas
 } from "../static";
 import { ArraySchema } from "@colyseus/schema";
 import { Interactive } from "./interactive";
@@ -106,7 +107,7 @@ export class Whiteboard extends Interactive{
 
     constructor() {
 
-        super("whiteboard", false, 1)
+        super("whiteboard", false, 1, interactiveWhiteboardCanvas)
 
         this.wID = Whiteboard.whiteboardCount;
         Whiteboard.whiteboardCount++;

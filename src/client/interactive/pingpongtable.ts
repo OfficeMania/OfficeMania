@@ -10,6 +10,7 @@ import {
     PlayerRecord,
     removeCloseInteractionButton,
 } from "../util";
+import { interactivePongCanvas } from "../static";
 import { Interactive } from "./interactive";
 import { Pong, PongPlayer } from "./pong";
 
@@ -24,7 +25,7 @@ export class PingPongTable extends Interactive {
     leavable: boolean;
 
     constructor() {
-        super("Pong table", false, 2);
+        super("Pong table", false, 2, interactivePongCanvas);
         this.room = getRoom();
         this.players = getPlayers();
         this.input = [null];

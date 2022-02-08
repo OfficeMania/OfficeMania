@@ -68,6 +68,9 @@ import {
     doors,
     foreground,
     interactiveCanvas,
+    interactiveChessCanvas,
+    interactivePongCanvas,
+    interactiveWhiteboardCanvas,
     loadingScreen,
     loginButton,
     logoutButton,
@@ -150,6 +153,12 @@ export function checkInputMode() {
     } else if (welcomeModal.style.display && !welcomeModal.style.display.match(/none/)) {
         setInputMode(InputMode.IGNORE);
     } else if (!interactiveCanvas.style.visibility.match(/hidden/)) {
+        setInputMode(InputMode.INTERACTION);
+    } else if (!interactiveChessCanvas.style.visibility.match(/hidden/)) {
+        setInputMode(InputMode.INTERACTION);
+    } else if (!interactivePongCanvas.style.visibility.match(/hidden/)) {
+        setInputMode(InputMode.INTERACTION);
+    } else if (!interactiveWhiteboardCanvas.style.visibility.match(/hidden/)) {
         setInputMode(InputMode.INTERACTION);
     } else if (!backpackCanvas.style.visibility.match(/hidden/)) {
         setInputMode(InputMode.BACKPACK);
@@ -273,6 +282,9 @@ function onSettingsOpen() {
     if (currentInteraction === null) {
         interactiveCanvas.style.visibility = "hidden";
         backpackCanvas.style.visibility = "hidden";
+        interactiveChessCanvas.style.visibility = "hidden";
+        interactivePongCanvas.style.visibility = "hidden";
+        interactiveWhiteboardCanvas.style.visibility = "hidden";
     }
     currentInteraction?.hide();
     loadSettings();
@@ -614,6 +626,9 @@ async function main() {
     //loadingScreen.style.display = "none";
     setShowLoadingscreen(false);
     interactiveCanvas.style.visibility = "hidden";
+    interactiveWhiteboardCanvas.style.visibility = "hidden";
+    interactiveChessCanvas.style.visibility = "hidden";
+    interactivePongCanvas.style.visibility = "hidden";
     backpackCanvas.style.visibility = "hidden";
     checkInputMode();
     // Start game loop
