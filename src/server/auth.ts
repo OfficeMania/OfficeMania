@@ -178,10 +178,7 @@ function setupSignup(): void {
         if (await isSignupDisabled()) {
             return res.redirect("/auth/login");
         }
-        res.render("pages/signup", {
-            error: authErrorToString(req.session.signupError),
-            requireInviteCode: await isInviteCodeRequiredForSignup(),
-        });
+        res.sendFile(path.join(process.cwd(), "public", "signup.html"));
     });
 }
 
@@ -209,10 +206,7 @@ function setupLogin(): void {
             if (!(await isLoginEnabled())) {
                 return res.redirect("/");
             }
-            res.render("pages/login", {
-                error: authErrorToString(req.session.loginError),
-                disableSignup: await isSignupDisabled(),
-            });
+            res.sendFile(path.join(process.cwd(), "public", "login.html"));
         },
     );
 }
