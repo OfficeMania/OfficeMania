@@ -29,12 +29,20 @@
                             <div class="input-group mb-3">
                                 <span class="input-group-text"><i class="fa fa-lock"></i></span>
                                 <input type="password" class="form-control" placeholder="Create Password" name="password"
-                                       autocomplete="new-password" aria-label="Create Password" required>
+                                       autocomplete="new-password" aria-label="Create Password" required id="input-password-create">
+                                <span class="input-group-text" onclick="toggleCreatePasswordVisibility();">
+                                    <i class="fas fa-eye d-none" id="eye-show-create"></i>
+                                    <i class="fas fa-eye-slash" id="eye-hide-create"></i>
+                                </span>
                             </div>
                             <div class="input-group mb-3">
                                 <span class="input-group-text"><i class="fa fa-key"></i></span>
                                 <input type="password" class="form-control" placeholder="Confirm Password" name="password"
-                                       autocomplete="new-password" aria-label="Confirm Password" required>
+                                       autocomplete="new-password" aria-label="Confirm Password" required id="input-password-confirm">
+                                <span class="input-group-text" onclick="toggleConfirmPasswordVisibility();">
+                                    <i class="fas fa-eye d-none" id="eye-show-confirm"></i>
+                                    <i class="fas fa-eye-slash" id="eye-hide-confirm"></i>
+                                </span>
                             </div>
                             <button type="submit" class="col-12 btn btn-primary btn-block">Signup</button>
                         </form>
@@ -46,6 +54,34 @@
                 integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
                 crossorigin="anonymous"></script>
         <script>
+            function toggleCreatePasswordVisibility() {
+                const inputPassword = document.getElementById("input-password-create");
+                const eyeShow = document.getElementById("eye-show-create");
+                const eyeHide = document.getElementById("eye-hide-create");
+                if (inputPassword.type === "password") {
+                    inputPassword.type = "text";
+                    eyeShow.classList.remove("d-none");
+                    eyeHide.classList.add("d-none");
+                } else {
+                    inputPassword.type = "password";
+                    eyeShow.classList.add("d-none");
+                    eyeHide.classList.remove("d-none");
+                }
+            }
+            function toggleConfirmPasswordVisibility() {
+                const inputPassword = document.getElementById("input-password-confirm");
+                const eyeShow = document.getElementById("eye-show-confirm");
+                const eyeHide = document.getElementById("eye-hide-confirm");
+                if (inputPassword.type === "password") {
+                    inputPassword.type = "text";
+                    eyeShow.classList.remove("d-none");
+                    eyeHide.classList.add("d-none");
+                } else {
+                    inputPassword.type = "password";
+                    eyeShow.classList.add("d-none");
+                    eyeHide.classList.remove("d-none");
+                }
+            }
             const errorMessage = document.getElementById("error-message");
             document.forms["form-signup"].addEventListener("submit", (event) => {
                 event.preventDefault();
