@@ -417,6 +417,25 @@ body {
     color: black;
 }
 
+#whiteboard-size-icon {
+    visibility: hidden;
+    margin: 17px;
+    position: absolute;
+    margin-top: -32px;
+}
+
+#whiteboard-size-selector {
+    visibility: hidden;
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    border-radius: 10px;
+    border-style: solid;
+    border-color: rgb(19, 37, 74);
+    background-color: white;
+    color: white;
+}
+
 #interactive-bar-whiteboard {
     display: inline-grid;
     position: relative;

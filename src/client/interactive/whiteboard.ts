@@ -14,10 +14,10 @@ import {
     penButton,
     colorSelector,
     saveButton,
-    size10Button,
-    size5Button,
+    sizeSelector,
     whiteboardPanel,
-    interactiveWhiteboardCanvas
+    interactiveWhiteboardCanvas,
+    whiteboardSizeIcon
 } from "../static";
 import { ArraySchema } from "@colyseus/schema";
 import { Interactive } from "./interactive";
@@ -47,7 +47,7 @@ export class Whiteboard extends Interactive{
     private currentlyDrawing: boolean = false;
 
     changeSize = (size) => {
-        this.size = size;
+        this.size = Number(size);
     }
 
     mousemove = (e) => this.useTool(e, this)
@@ -150,9 +150,8 @@ export class Whiteboard extends Interactive{
         saveButton.removeEventListener("click", this.savePressed);
         eraserButton.removeEventListener("click", this.erasePressed);
         penButton.removeEventListener("click", this.drawPressed);
-        size5Button.removeEventListener("click", (e) => {this.changeSize(5);});
-        size10Button.removeEventListener("click", (e) => {this.changeSize(10);});
 
+        sizeSelector.removeEventListener("change", (e) => {this.changeSize(sizeSelector.value);});
         colorSelector.removeEventListener("change", (e) => {this.changeColor(colorSelector.value);});
 
 
@@ -171,20 +170,15 @@ export class Whiteboard extends Interactive{
         penButton.style.visibility = "hidden";
         penButton.setAttribute("aria-label", "");
         penButton.innerHTML ="";
-        size5Button.style.visibility = "hidden";
-        size5Button.setAttribute("aria-label", "");
-        size5Button.innerHTML ="";
-        size10Button.style.visibility = "hidden";
-        size10Button.setAttribute("aria-label", "");
-        size10Button.innerHTML ="";
+
+        sizeSelector.style.visibility = "hidden";
+        colorSelector.style.visibility = "hidden";
+
         saveButton.style.visibility = "hidden";
         saveButton.setAttribute("aria-label", "");
         saveButton.innerHTML ="";
-        colorSelector.style.visibility = "hidden";
-        /*pinkButton.style.visibility = "hidden";
-        pinkButton.setAttribute("aria-label", "");
-        pinkButton.innerHTML ="";*/
         whiteboardPanel.style.visibility = "hidden";
+        whiteboardSizeIcon.style.visibility = "hidden";
 
         checkInputMode()
 
@@ -210,9 +204,8 @@ export class Whiteboard extends Interactive{
         saveButton.addEventListener("click", this.savePressed);
         eraserButton.addEventListener("click", this.erasePressed);
         penButton.addEventListener("click", this.drawPressed);
-        size5Button.addEventListener("click", (e) => {this.changeSize(5);});
-        size10Button.addEventListener("click", (e) => {this.changeSize(10);});
 
+        sizeSelector.addEventListener("change", (e) => {this.changeSize(sizeSelector.value);});
         colorSelector.addEventListener("change", (e) => {this.changeColor(colorSelector.value);});
 
 
@@ -229,14 +222,6 @@ export class Whiteboard extends Interactive{
         penButton.innerHTML = "<em class=\"fa fa-pen\"></em>"
         penButton.style.visibility = "visible";
 
-        size5Button.setAttribute("aria-label", "Size");
-        size5Button.innerHTML = "<em class=\"fas fa-circle\"></em>";
-        size5Button.style.visibility = "visible";
-
-        size10Button.setAttribute("aria-label", "Size");
-        size10Button.innerHTML = "<em class=\"fas fa-circle fa-lg\"></em>";
-        size10Button.style.visibility = "visible";
-
         eraserButton.setAttribute("aria-label", "Erase");
         eraserButton.innerHTML = "<em class=\"fa fa-eraser\"></em>"
         eraserButton.style.visibility = "visible";
@@ -245,15 +230,10 @@ export class Whiteboard extends Interactive{
         saveButton.innerHTML = "<em class=\"fa fa-save\"></em>"
         saveButton.style.visibility = "visible";
 
-        //colorSelector.innerHTML += "<em class=\"fa fa-pen\"></em>"
+        sizeSelector.style.visibility = "visible";
         colorSelector.style.visibility = "visible";
-        //colorSelector.style.backgroundColor = "red";
+        whiteboardSizeIcon.style.visibility = "visible";
 
-        /*pinkButton.setAttribute("aria-label", "Draw");
-        pinkButton.innerHTML = "<em></em>"
-        pinkButton.style.visibility = "visible";
-        pinkButton.style.backgroundColor = "magenta";
-*/
 
         whiteboardPanel.style.visibility = "vsible";
 

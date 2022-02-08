@@ -245,9 +245,15 @@
                         <button id="button-whiteboard-clear"><em class="fa fa-trash"></em><span></span></button>
                         <button id="button-whiteboard-pen"><em class="fas fa-pen"></em><span></span></button>
                         <button id="button-whiteboard-eraser"><em class="fa fa-eraser"></em><span></span></button>
-                        <button id="button-whiteboard-size5"><em class="fa fa-circle"></em><span></span></button>
-                        <button id="button-whiteboard-size10"><em class="fa fa-circle fa-2x"></em><span></span></button>
-                        <select id="whiteboard-color-selector"><em class="fas fa-pen"></em><span></span>
+                        <div>    
+                            <select id="whiteboard-size-selector">
+                                <option value="5">small</option>
+                                <option value="10">medium</option>
+                                <option value="15">large</option>
+                            </select>
+                            <div><em class="fa fa-circle" id="whiteboard-size-icon"></em><span></span></div>
+                        </div>
+                        <select id="whiteboard-color-selector">
                             <option value="1">black</option> 
                             <option value="2">red</option>
                             <option value="3">pink</option>
