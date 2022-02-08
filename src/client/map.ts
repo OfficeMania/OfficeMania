@@ -3,7 +3,7 @@ import {Room} from "colyseus.js";
 import {Interactive} from "./interactive/interactive"
 import {Door, DoorDirection} from "./interactive/door";
 import {PingPongTable} from "./interactive/pingpongtable";
-import {State} from "../common";
+import {Direction, State} from "../common";
 import {Whiteboard} from "./interactive/whiteboard";
 import {Todo} from "./interactive/todo";
 import {CoffeeMachine} from "./interactive/machines/coffeeMachine";
@@ -14,6 +14,7 @@ import {Computer} from "./interactive/computer";
 import {Notes} from "./interactive/notes";
 import { Donuts } from "./interactive/donuts";
 import { Cat } from "./interactive/cat";
+import { Chair } from "./interactive/chairs";
 
 export {convertMapData, MapInfo, drawMap, fillSolidInfos, solidInfo}
 
@@ -361,6 +362,19 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
         }
         case 18: {
             return new Cat();
+        }
+        //chairs
+        case 19: {
+            return new Chair(Direction.UP, basePosX, basePosY);
+        }
+        case 20: {
+            return new Chair(Direction.DOWN, basePosX, basePosY);
+        }
+        case 21: {
+            return new Chair(Direction.LEFT, basePosX, basePosY);
+        }
+        case 22: {
+            return new Chair(Direction.RIGHT, basePosX, basePosY);
         }
     }
     return null;

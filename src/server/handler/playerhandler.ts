@@ -14,6 +14,7 @@ import {
     sanitizeDisplayName,
     sanitizeUsername,
     State,
+    STEP_SIZE,
 } from "../../common";
 import { User } from "../database/entity/user";
 
@@ -57,6 +58,8 @@ export class PlayerHandler implements Handler {
         this.room.onMessage(MessageType.UPDATE_PARTICIPANT_ID, (client: Client, message: string) =>
             this.updateParticipantId(client, message)
         );
+
+        this.room.onMessage(MessageType.SIT, (client: Client, message: number[]) => this.onSit(client, message))
     }
 
     onJoin(client: Client): void {
@@ -97,6 +100,8 @@ export class PlayerHandler implements Handler {
 
     private onMove(client: Client, direction: Direction): void {
         const playerState: PlayerState = this.getPlayerData(client);
+        playerState.isSitting = false;
+        //correct coordinates if sitting was true TODO
         switch (direction) {
             case Direction.DOWN: {
                 playerState.y++;
@@ -207,5 +212,13 @@ export class PlayerHandler implements Handler {
         const playerState: PlayerState = this.getPlayerData(client);
         playerState.character = value;
         client.send(MessageType.UPDATE_CHARACTER, value);
+    }
+    
+    private onSit(client:Client, message: number[]): void {
+        const playerState: PlayerState = this.getPlayerData(client);
+        playerState.isSitting = true;
+        //correct coordinates
+        playerState.x = message[0];
+        playerState.y = message[1];
     }
 }

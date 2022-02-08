@@ -30,4 +30,7 @@ export class PlayerState extends Schema {
 
     @type("string")
     participantId: string;
+    
+    @type("boolean")
+    isSitting: boolean;
 }

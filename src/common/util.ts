@@ -8,6 +8,9 @@ export const KEY_SPEAKER_DEVICE_ID = "speakerDeviceId";
 export const KEY_CAMERA_DEVICE_ID = "cameraDeviceId";
 export const KEY_CURRENT_VERSION = "currentVersion";
 
+export var TILE_SIZE = 48;
+export var STEP_SIZE = TILE_SIZE / 2;
+
 export enum Direction {
     LEFT = "left",
     RIGHT = "right",
@@ -37,6 +40,7 @@ export enum MessageType {
     UPDATE_USERNAME = "updateUsername",
     UPDATE_DISPLAY_NAME = "updateDisplayName",
     UPDATE_PARTICIPANT_ID = "updateParticipantId",
+    SIT = "sit",
     // PongHandler
     PONG_MOVE = "pongMove",
     PONG_INTERACTION = "pongInteraction",
