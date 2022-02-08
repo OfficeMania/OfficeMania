@@ -9,20 +9,14 @@ import {
     removeCloseInteractionButton
 } from "../util";
 import {
-    blackButton,
-    blueButton,
     clearButton,
     eraserButton,
-    greenButton,
-    orangeButton,
     penButton,
-    pinkButton,
-    redButton,
+    colorSelector,
     saveButton,
     size10Button,
     size5Button,
     whiteboardPanel,
-    yellowButton,
     interactiveWhiteboardCanvas
 } from "../static";
 import { ArraySchema } from "@colyseus/schema";
@@ -73,33 +67,41 @@ export class Whiteboard extends Interactive{
         this.room.send(MessageType.WHITEBOARD_SAVE, this.wID);
         this.save(this, this.wID);
     }
-    redPressed = () => {
+
+    changeColor = (number) => {
+        console.log(number);
         this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
-        this.draw(2);
-    }
-    pinkPressed = () => {
-        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
-        this.draw(3);
-    }
-    orangePressed = () => {
-        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
-        this.draw(4);
-    }
-    yellowPressed = () => {
-        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
-        this.draw(5);
-    }
-    greenPressed = () => {
-        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
-        this.draw(6);
-    }
-    bluePressed = () => {
-        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
-        this.draw(7);
-    }
-    blackPressed = () => {
-        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
-        this.draw(0);
+        this.draw(Number(number));
+        switch (this.currentColor) {
+            case 2:
+                colorSelector.style.backgroundColor = "red";
+                colorSelector.style.color = "red";
+                break;
+            case 3:
+                colorSelector.style.backgroundColor = "magenta";
+                colorSelector.style.color = "magenta";
+                break;
+            case 4:
+                colorSelector.style.backgroundColor = "orange";
+                colorSelector.style.color = "orange";
+                break;
+            case 5:
+                colorSelector.style.backgroundColor = "yellow";
+                colorSelector.style.color = "yellow";
+                break;
+            case 6:
+                colorSelector.style.backgroundColor = "green";
+                colorSelector.style.color = "green";
+                break;
+            case 7:
+                colorSelector.style.backgroundColor = "blue";
+                colorSelector.style.color = "blue";
+                break;
+            default: //case 0
+                colorSelector.style.backgroundColor = "black";
+                colorSelector.style.color = "black";
+                break;
+        }
     }
 
 
@@ -150,13 +152,8 @@ export class Whiteboard extends Interactive{
         penButton.removeEventListener("click", this.drawPressed);
         size5Button.removeEventListener("click", (e) => {this.changeSize(5);});
         size10Button.removeEventListener("click", (e) => {this.changeSize(10);});
-        redButton.removeEventListener("click", this.redPressed);
-        pinkButton.removeEventListener("click", this.pinkPressed);
-        orangeButton.removeEventListener("click", this.orangePressed);
-        yellowButton.removeEventListener("click", this.yellowPressed);
-        greenButton.removeEventListener("click", this.greenPressed);
-        blueButton.removeEventListener("click", this.bluePressed);
-        blackButton.removeEventListener("click", this.blackPressed);
+
+        colorSelector.removeEventListener("change", (e) => {this.changeColor(colorSelector.value);});
 
 
         window.removeEventListener('resize', this.resized);
@@ -183,27 +180,10 @@ export class Whiteboard extends Interactive{
         saveButton.style.visibility = "hidden";
         saveButton.setAttribute("aria-label", "");
         saveButton.innerHTML ="";
-        redButton.style.visibility = "hidden";
-        redButton.setAttribute("aria-label", "");
-        redButton.innerHTML ="";
-        pinkButton.style.visibility = "hidden";
+        colorSelector.style.visibility = "hidden";
+        /*pinkButton.style.visibility = "hidden";
         pinkButton.setAttribute("aria-label", "");
-        pinkButton.innerHTML ="";
-        orangeButton.style.visibility = "hidden";
-        orangeButton.setAttribute("aria-label", "");
-        orangeButton.innerHTML ="";
-        yellowButton.style.visibility = "hidden";
-        yellowButton.setAttribute("aria-label", "");
-        yellowButton.innerHTML ="";
-        greenButton.style.visibility = "hidden";
-        greenButton.setAttribute("aria-label", "");
-        greenButton.innerHTML ="";
-        blueButton.style.visibility = "hidden";
-        blueButton.setAttribute("aria-label", "");
-        blueButton.innerHTML ="";
-        blackButton.style.visibility = "hidden";
-        blackButton.setAttribute("aria-label", "");
-        blackButton.innerHTML ="";
+        pinkButton.innerHTML ="";*/
         whiteboardPanel.style.visibility = "hidden";
 
         checkInputMode()
@@ -223,19 +203,17 @@ export class Whiteboard extends Interactive{
         this.canvas.addEventListener('mousedown',this.mousedown);
         this.canvas.addEventListener('mouseup',this.mouseup);
         this.canvas.addEventListener('mouseenter',this.mouseenter);
+
+
+
         clearButton.addEventListener("click", this.clearCommand);
         saveButton.addEventListener("click", this.savePressed);
         eraserButton.addEventListener("click", this.erasePressed);
         penButton.addEventListener("click", this.drawPressed);
         size5Button.addEventListener("click", (e) => {this.changeSize(5);});
         size10Button.addEventListener("click", (e) => {this.changeSize(10);});
-        redButton.addEventListener("click", this.redPressed);
-        pinkButton.addEventListener("click", this.pinkPressed);
-        orangeButton.addEventListener("click", this.orangePressed);
-        yellowButton.addEventListener("click", this.yellowPressed);
-        greenButton.addEventListener("click", this.greenPressed);
-        blueButton.addEventListener("click", this.bluePressed);
-        blackButton.addEventListener("click", this.blackPressed);
+
+        colorSelector.addEventListener("change", (e) => {this.changeColor(colorSelector.value);});
 
 
         //size changed
@@ -267,40 +245,15 @@ export class Whiteboard extends Interactive{
         saveButton.innerHTML = "<em class=\"fa fa-save\"></em>"
         saveButton.style.visibility = "visible";
 
-        redButton.setAttribute("aria-label", "Draw");
-        redButton.innerHTML = "<em></em>"
-        redButton.style.visibility = "visible";
-        redButton.style.backgroundColor = "red";
+        //colorSelector.innerHTML += "<em class=\"fa fa-pen\"></em>"
+        colorSelector.style.visibility = "visible";
+        //colorSelector.style.backgroundColor = "red";
 
-        pinkButton.setAttribute("aria-label", "Draw");
+        /*pinkButton.setAttribute("aria-label", "Draw");
         pinkButton.innerHTML = "<em></em>"
         pinkButton.style.visibility = "visible";
         pinkButton.style.backgroundColor = "magenta";
-
-        orangeButton.setAttribute("aria-label", "Draw");
-        orangeButton.innerHTML = "<em></em>"
-        orangeButton.style.visibility = "visible";
-        orangeButton.style.backgroundColor = "orange";
-
-        yellowButton.setAttribute("aria-label", "Draw");
-        yellowButton.innerHTML = "<em></em>"
-        yellowButton.style.visibility = "visible";
-        yellowButton.style.backgroundColor = "yellow";
-
-        greenButton.setAttribute("aria-label", "Draw");
-        greenButton.innerHTML = "<em></em>"
-        greenButton.style.visibility = "visible";
-        greenButton.style.backgroundColor = "green";
-
-        blueButton.setAttribute("aria-label", "Draw");
-        blueButton.innerHTML = "<em></em>"
-        blueButton.style.visibility = "visible";
-        blueButton.style.backgroundColor = "blue";
-
-        blackButton.setAttribute("aria-label", "Draw");
-        blackButton.innerHTML = "<em></em>"
-        blackButton.style.visibility = "visible";
-        blackButton.style.backgroundColor = "black";
+*/
 
         whiteboardPanel.style.visibility = "vsible";
 
