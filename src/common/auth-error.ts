@@ -8,6 +8,10 @@ export enum AuthError {
     INVITE_CODE_REQUIRED,
     INVALID_INVITE_CODE,
     INVITE_CODE_EXPIRED,
+    LOGIN_IS_DISABLED,
+    LOGIN_VIA_CREDENTIALS_IS_DISABLED,
+    LOGIN_VIA_INVITE_CODE_IS_DISABLED,
+    UNKNOWN_LOGIN_METHOD,
 }
 
 export function authErrorToString(error: AuthError): string {
@@ -31,5 +35,13 @@ export function authErrorToString(error: AuthError): string {
             return "Invalid Invite Code";
         case AuthError.INVITE_CODE_EXPIRED:
             return "Invite Code expired";
+        case AuthError.LOGIN_IS_DISABLED:
+            return "Login is disabled";
+        case AuthError.LOGIN_VIA_CREDENTIALS_IS_DISABLED:
+            return "Login via Credentials is disabled";
+        case AuthError.LOGIN_VIA_INVITE_CODE_IS_DISABLED:
+            return "Login via Invite Code is disabled";
+        case AuthError.UNKNOWN_LOGIN_METHOD:
+            return "Unknown Login Method";
     }
 }
