@@ -175,6 +175,9 @@ function setupSignup(): void {
             });
     });
     router.get("/signup", async (req, res) => {
+        if (req.isAuthenticated && req.isAuthenticated()) {
+            return res.redirect("/");
+        }
         if (await isSignupDisabled()) {
             return res.redirect("/auth/login");
         }
@@ -203,6 +206,9 @@ function setupLogin(): void {
         })(req, res, next);
     });
     router.get("/login", async (req, res) => {
+            if (req.isAuthenticated && req.isAuthenticated()) {
+                return res.redirect("/");
+            }
             if (!(await isLoginEnabled())) {
                 return res.redirect("/");
             }
