@@ -3,6 +3,7 @@ import { getAuthRouter, setupAuth } from "./routes/auth";
 import { getApiRouter } from "./routes/api";
 import { ensureHasRole, Role } from "./database/entity/user";
 import { getAdminRouter } from "./routes/admin";
+import { getCacheRouter } from "./routes/cache";
 
 export async function setupRoutes(app: Express): Promise<void> {
     await setupAuth(app);
@@ -18,6 +19,7 @@ export async function setupRoutes(app: Express): Promise<void> {
         getApiRouter(),
     );
     app.use("/auth", getAuthRouter());
+    app.use("/cache", getCacheRouter());
 }
 
 export function ensureLoggedIn(setReturnTo = true): express.RequestHandler {

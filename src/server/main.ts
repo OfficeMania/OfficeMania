@@ -85,8 +85,7 @@ async function setupApp(): Promise<Express> {
     /*
      * "Mount" the assets/templates directory under "[host]/templates"
      */
-    app.use("/templates", ensureLoggedInOr404(), express.static(path.join(process.cwd(), "assets", "templates"), { maxAge: 31536000000 }),
-    );
+    app.use("/templates", ensureLoggedInOr404(), express.static(path.join(process.cwd(), "assets", "templates"), { maxAge: 31536000000 }));
 
     /*
      * "Mount" the assets directory under "[host]/assets"
