@@ -174,3 +174,9 @@ export interface LoginInfo {
 export interface SignupInfo {
     isInviteCodeRequiredForSignup?: boolean,
 }
+
+export interface InviteCodeToken {
+    token: string;
+    created: Date;
+    lastUsed?: Date;
+}
