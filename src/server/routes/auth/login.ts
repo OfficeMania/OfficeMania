@@ -42,9 +42,6 @@ function setupRouter(): void {
         })(req, res, next);
     });
     router.get("/", async (req, res) => {
-            if (req.isAuthenticated && req.isAuthenticated()) {
-                return res.redirect("/");
-            }
             if (!(await isLoginEnabled())) {
                 return res.redirect("/");
             }

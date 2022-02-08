@@ -91,9 +91,6 @@ function setupRouter(): void {
             });
     });
     router.get("/", async (req, res) => {
-        if (req.isAuthenticated && req.isAuthenticated()) {
-            return res.redirect("/");
-        }
         if (await isSignupDisabled()) {
             return res.redirect("/auth/login");
         }
