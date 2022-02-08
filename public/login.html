@@ -39,8 +39,8 @@
                             <p class="text-center"><a href="/auth/forgot-password" class="btn text-primary disabled">Forgot
                                 password?</a></p>
                         </form>
+                        <hr id="form-separator" hidden>
                         <form id="form-login-invite-code" action="/auth/login" method="post" hidden>
-                            <hr>
                             <div class="input-group mb-3">
                                 <span class="input-group-text"><i class="fa fa-ticket-alt"></i></span>
                                 <input type="text" class="form-control" placeholder="Invite Code" name="invite-code"
@@ -57,16 +57,27 @@
                 crossorigin="anonymous"></script>
         <script>
             const signupButton = document.getElementById("button-signup");
+            const formLogin = document.getElementById("form-login");
+            const hr = document.getElementById("form-separator");
             const formLoginInviteCode = document.getElementById("form-login-invite-code");
             fetch("/auth/login/info").then(response => response.json()).then(loginInfo => {
                 if (loginInfo?.isSignupDisabled) {
                     signupButton.classList.add("disabled");
                     signupButton.remove();
                 }
+                if (!loginInfo?.isLoginViaCredentialsAllowed) {
+                    formLogin.hidden = true;
+                    formLogin.remove();
+                    hr.remove();
+                } else {
+                    hr.hidden = false;
+                }
                 if (loginInfo?.isLoginViaInviteCodeAllowed) {
                     formLoginInviteCode.hidden = false;
+                    hr.hidden = false;
                 } else {
                     formLoginInviteCode.remove();
+                    hr.remove();
                 }
             });
             const params = new Proxy(new URLSearchParams(window.location.search), {
