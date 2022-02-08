@@ -99,7 +99,7 @@ const cacheLoginRequired: {
 
 export async function isLoginRequired(defaultValue = false): Promise<boolean> {
     const now: Date = new Date();
-    if (cacheLoginRequired.timestamp && (now.getTime() - cacheLoginRequired.timestamp.getTime()) < 1000) {
+    if (cacheLoginRequired.value !== undefined && cacheLoginRequired.timestamp && (now.getTime() - cacheLoginRequired.timestamp.getTime()) < 1000) {
         return cacheLoginRequired.value;
     }
     const value: boolean = await getBooleanOrElse("REQUIRE_LOGIN", REQUIRE_LOGIN, defaultValue);
