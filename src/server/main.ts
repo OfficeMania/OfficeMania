@@ -30,7 +30,7 @@ export function ensureLoggedIn(setReturnTo = true): express.RequestHandler {
             return res.redirect(`${pathname}?${urlParameters}`);
         }
         next();
-    }
+    };
 }
 
 async function initDatabase(): Promise<void> {
@@ -83,14 +83,14 @@ async function setupApp(): Promise<Express> {
             }
             next();
         },
-        getApiRouter()
+        getApiRouter(),
     );
 
     app.use(
         "/admin/config",
         ensureLoggedIn(),
         ensureHasRole(Role.ADMIN),
-        express.static("admin/config.html")
+        express.static("admin/config.html"),
     );
 
     // Expose admin directory
@@ -98,7 +98,7 @@ async function setupApp(): Promise<Express> {
         "/admin",
         ensureLoggedIn(),
         ensureHasRole(Role.ADMIN),
-        express.static("admin")
+        express.static("admin"),
     );
 
     // Expose public directory
@@ -117,7 +117,7 @@ async function setupApp(): Promise<Express> {
     app.use(
         "/img",
         connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-        express.static(path.join(process.cwd(), "assets", "img"), { maxAge: 31536000000 })
+        express.static(path.join(process.cwd(), "assets", "img"), { maxAge: 31536000000 }),
     );
 
     /*
@@ -131,7 +131,7 @@ async function setupApp(): Promise<Express> {
     app.use(
         "/lib",
         connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-        express.static(path.join(process.cwd(), "assets", "lib"), { maxAge: 86400000 })
+        express.static(path.join(process.cwd(), "assets", "lib"), { maxAge: 86400000 }),
     );
 
     /*
@@ -140,7 +140,7 @@ async function setupApp(): Promise<Express> {
     app.use(
         "/templates",
         connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-        express.static(path.join(process.cwd(), "assets", "templates"), { maxAge: 31536000000 })
+        express.static(path.join(process.cwd(), "assets", "templates"), { maxAge: 31536000000 }),
     );
 
     /*
@@ -149,7 +149,7 @@ async function setupApp(): Promise<Express> {
     app.use(
         "/assets",
         connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-        express.static(path.join(process.cwd(), "assets"))
+        express.static(path.join(process.cwd(), "assets")),
     );
 
     /*
@@ -162,7 +162,7 @@ async function setupApp(): Promise<Express> {
     app.use(
         "/js",
         connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-        express.static(path.join(process.cwd(), "js", "client"))
+        express.static(path.join(process.cwd(), "js", "client")),
     );
 
     return app;
