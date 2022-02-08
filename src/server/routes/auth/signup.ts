@@ -46,6 +46,12 @@ function setupRouter(): void {
                     errorMessage: authErrorToString(AuthError.INVITE_CODE_EXPIRED),
                 });
             }
+            if (inviteCode.expiration && (inviteCode.expiration.getTime() < new Date().getTime())) {
+                return res.status(500).send({
+                    error: AuthError.INVITE_CODE_EXPIRED,
+                    errorMessage: authErrorToString(AuthError.INVITE_CODE_EXPIRED),
+                });
+            }
             inviteCode.usages++;
             if (inviteCode.usagesLeft > 0) {
                 inviteCode.usagesLeft--;
