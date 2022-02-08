@@ -86,23 +86,23 @@ async function setupApp(): Promise<Express> {
         getApiRouter()
     );
 
-    // Expose public directory
-    app.use("/", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), express.static("public"));
+    app.use(
+        "/admin/config",
+        ensureLoggedIn(),
+        ensureHasRole(Role.ADMIN),
+        express.static("admin/config.html")
+    );
 
     // Expose admin directory
     app.use(
         "/admin",
-        connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
+        ensureLoggedIn(),
         ensureHasRole(Role.ADMIN),
         express.static("admin")
     );
 
-    app.use(
-        "/admin/config",
-        connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-        ensureHasRole(Role.ADMIN),
-        express.static("admin/config.html")
-    );
+    // Expose public directory
+    app.use("/", ensureLoggedIn(), express.static("public"));
 
     // "Mount" the public folder as the root of the website
     //app.use('/', serveIndex(path.join(process.cwd(), "public"), {'icons': true}));
