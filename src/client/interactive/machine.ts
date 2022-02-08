@@ -47,9 +47,9 @@ export class Machine extends Interactive {
         this.room.onMessage(this.type, (message) => {
             this.ctx.textAlign = "left";
             this.ctx.fillStyle = "black";
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.fillStyle = "rgb(0, 4, 120)";
-            this.ctx.fillRect(5, 5, this.canvas.width - 10, this.canvas.height - 10);
+            this.ctx.fillRect(200, 200, this.canvas.width - 400, this.canvas.height - 400);
+            this.ctx.fillStyle = "rgb(75, 71, 152)";
+            this.ctx.fillRect(210, 210, this.canvas.width - 420, this.canvas.height - 420);
 
             this.ctx.fillStyle = "white";
             this.ctx.font = "50px MobileFont";
@@ -59,13 +59,13 @@ export class Machine extends Interactive {
             let i = 0;
             let j = 0;
             while(i < subs.length) {
-                let times = Math.floor(subs[i]?.length / 40);
+                let times = Math.floor(subs[i]?.length / 30);
                 for(let k = 0; k <= times; k++) {
                     if(k === times){
-                        this.ctx.fillText(subs[i]?.slice(40 * k, subs[i]?.length), 100, 100 + (50 * j));
+                        this.ctx.fillText(subs[i]?.slice(30 * k, subs[i]?.length), 250, 300 + (50 * j));
                         j++;
                     } else {
-                        this.ctx.fillText(subs[i]?.slice(40 * k, (40 * k) + 40), 100, 100 + (50 * j));
+                        this.ctx.fillText(subs[i]?.slice(30 * k, (30 * k) + 30), 250, 300 + (50 * j));
                         j++;
                     }
                 }
