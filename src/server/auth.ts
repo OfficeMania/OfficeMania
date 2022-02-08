@@ -56,6 +56,8 @@ function authErrorToString(error: AuthError): string {
             return undefined;
         case AuthError.USERNAME_TAKEN:
             return "The Username is already taken";
+        case AuthError.USER_CREATION_FAILED:
+            return "User creation failed";
         case AuthError.PASSWORDS_MISMATCH:
             return "Passwords do not match";
         case AuthError.INVALID_CREDENTIALS:
