@@ -9,7 +9,7 @@ import { Server } from "colyseus";
 
 import { TURoom } from "./rooms/turoom";
 import { DEBUG, IS_DEV, SERVER_PORT } from "./config";
-import { getAuthRouter, getSessionHandler, loggedInOptions, setupAuth } from "./auth";
+import { getAuthRouter, getSessionHandler, loggedInOptions, setupAuth } from "./routes/auth";
 import connectionEnsureLogin from "connect-ensure-login";
 import { ensureHasRole, findOrCreateUserByUsername, PasswordVersion, Role } from "./database/entity/user";
 import { connectDatabase } from "./database/database";
