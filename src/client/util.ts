@@ -98,7 +98,7 @@ export function getChatEnabled(): boolean {
 
 export function areWeLoggedIn(): boolean {
     const ourPlayer: Player = getOurPlayer();
-    return !literallyUndefined(ourPlayer.userId);
+    return ourPlayer.loggedIn;
 }
 
 export function areWeAdmin(): boolean {
