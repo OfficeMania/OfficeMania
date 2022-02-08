@@ -50,9 +50,14 @@ let cache: Record<string, string> = {};
 
 function loadValue(key: string): Promise<string | undefined> {
     return fetch(`${configEndpoint}?key=${key}`).then(response => response.json()).then(response => {
-        cache[key] = response.value;
-        return response.value;
-    }).catch(reason => console.warn(reason));
+        const value: string | undefined = response.value ? String(response.value) : undefined;
+        cache[key] = value;
+        return value;
+    }).catch(reason => {
+        cache[key] = undefined;
+        console.warn(reason);
+        return undefined;
+    });
 }
 
 async function loadEnableLogin(): Promise<void> {
