@@ -128,17 +128,29 @@ function setupSignup(): void {
         const password: string[] = req.body.password;
         const inviteCodeString: string | undefined = req.body["invite-code"];
         if (password.length !== 2 || password[0] !== password[1]) {
-            return res.status(500).send({ error: AuthError.PASSWORDS_MISMATCH, errorMessage: authErrorToString(AuthError.PASSWORDS_MISMATCH) });
+            return res.status(500).send({
+                error: AuthError.PASSWORDS_MISMATCH,
+                errorMessage: authErrorToString(AuthError.PASSWORDS_MISMATCH),
+            });
         }
         if ((await isInviteCodeRequiredForSignup()) && !inviteCodeString) {
-            return res.status(500).send({ error: AuthError.INVITE_CODE_REQUIRED, errorMessage: authErrorToString(AuthError.INVITE_CODE_REQUIRED) });
+            return res.status(500).send({
+                error: AuthError.INVITE_CODE_REQUIRED,
+                errorMessage: authErrorToString(AuthError.INVITE_CODE_REQUIRED),
+            });
         } else if (inviteCodeString) {
             const inviteCode: InviteCode | undefined = await InviteCode.findOne({ where: { code: inviteCodeString } });
             if (!inviteCode) {
-                return res.status(500).send({ error: AuthError.INVALID_INVITE_CODE, errorMessage: authErrorToString(AuthError.INVALID_INVITE_CODE) });
+                return res.status(500).send({
+                    error: AuthError.INVALID_INVITE_CODE,
+                    errorMessage: authErrorToString(AuthError.INVALID_INVITE_CODE),
+                });
             }
             if (inviteCode.usagesLeft === 0) {
-                return res.status(500).send({ error: AuthError.INVITE_CODE_EXPIRED, errorMessage: authErrorToString(AuthError.INVITE_CODE_EXPIRED) });
+                return res.status(500).send({
+                    error: AuthError.INVITE_CODE_EXPIRED,
+                    errorMessage: authErrorToString(AuthError.INVITE_CODE_EXPIRED),
+                });
             }
             inviteCode.usages++;
             if (inviteCode.usagesLeft > 0) {
@@ -153,7 +165,11 @@ function setupSignup(): void {
                 }
                 return createUser(username, password[0]).then(user => ({ user })).catch(reason => {
                     console.error(reason);
-                    return { user: undefined, error: AuthError.USER_CREATION_FAILED, errorMessage: IS_DEV ? JSON.stringify(reason) : authErrorToString(AuthError.USER_CREATION_FAILED) };
+                    return {
+                        user: undefined,
+                        error: AuthError.USER_CREATION_FAILED,
+                        errorMessage: IS_DEV ? JSON.stringify(reason) : authErrorToString(AuthError.USER_CREATION_FAILED),
+                    };
                 });
             })
             .then((wrapper: { user?: User, error?: AuthError, errorMessage?: string }) => {
@@ -166,12 +182,18 @@ function setupSignup(): void {
                 if (user) {
                     return res.send({ user });
                 } else {
-                    res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: authErrorToString(AuthError.UNKNOWN) });
+                    res.status(500).send({
+                        error: AuthError.UNKNOWN,
+                        errorMessage: authErrorToString(AuthError.UNKNOWN),
+                    });
                 }
             })
             .catch(reason => {
                 console.error(reason);
-                res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: IS_DEV ? JSON.stringify(reason) : authErrorToString(AuthError.UNKNOWN) });
+                res.status(500).send({
+                    error: AuthError.UNKNOWN,
+                    errorMessage: IS_DEV ? JSON.stringify(reason) : authErrorToString(AuthError.UNKNOWN),
+                });
             });
     });
     router.get("/signup", async (req, res) => {
@@ -192,14 +214,23 @@ function setupLogin(): void {
         }
         passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", (error, user, info) => {
             if (error) {
-                return res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: IS_DEV ? JSON.stringify(error) : authErrorToString(AuthError.UNKNOWN) });
+                return res.status(500).send({
+                    error: AuthError.UNKNOWN,
+                    errorMessage: IS_DEV ? JSON.stringify(error) : authErrorToString(AuthError.UNKNOWN),
+                });
             }
             if (!user) {
-                return res.status(500).send({ error: AuthError.INVALID_CREDENTIALS, errorMessage: authErrorToString(AuthError.INVALID_CREDENTIALS) });
+                return res.status(500).send({
+                    error: AuthError.INVALID_CREDENTIALS,
+                    errorMessage: authErrorToString(AuthError.INVALID_CREDENTIALS),
+                });
             }
             req.logIn(user, function(error) {
                 if (error) {
-                    return res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: IS_DEV ? JSON.stringify(error) : authErrorToString(AuthError.UNKNOWN) });
+                    return res.status(500).send({
+                        error: AuthError.UNKNOWN,
+                        errorMessage: IS_DEV ? JSON.stringify(error) : authErrorToString(AuthError.UNKNOWN),
+                    });
                 }
                 return res.send({ user });
             });
