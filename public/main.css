@@ -59,6 +59,10 @@ body {
     justify-content: center;
 }
 
+#button-close-interaction {
+    background-color: #ff5d5d !important; 
+}
+
 #panel-buttons #group-right {
     display: flex;
     flex-direction: row;
@@ -169,8 +173,8 @@ body {
     content: '  Send';
 }
 
-#button-admin-config:hover span:after {
-    content: '  Configuration';
+#button-close-interaction span:after {
+    content: '  Exit';
 }
 
 #button-send {
