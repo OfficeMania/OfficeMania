@@ -22,7 +22,6 @@ function updateGroupLogin() {
     for (const element of needsLogin) {
         element.disabled = !enableLogin.checked;
     }
-    allowLoginViaInviteCode.disabled = true; //TODO Remove this after ALLOW_LOGIN_VIA_INVITE_CODE is implemented
 }
 
 function updateGroupSignup() {
