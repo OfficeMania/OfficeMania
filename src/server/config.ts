@@ -1,5 +1,5 @@
 import { ConfigEntry } from "./database/entity/config-entry";
-import { LoginInfo } from "../common";
+import { LoginInfo, SignupInfo } from "../common";
 
 function toNumber(input?: string, radix = 10): number | undefined {
     if (input === undefined || input === null) {
@@ -155,4 +155,8 @@ export async function getLoginInfo(): Promise<LoginInfo> {
         isSignupDisabled: await isSignupDisabled(),
         isLoginViaInviteCodeAllowed: await isLoginViaInviteCodeAllowed(),
     };
+}
+
+export async function getSignupInfo(): Promise<SignupInfo> {
+    return { isInviteCodeRequiredForSignup: await isInviteCodeRequiredForSignup() };
 }
