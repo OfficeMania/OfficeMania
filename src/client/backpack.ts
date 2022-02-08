@@ -17,7 +17,7 @@ export class Backpack {
         //TODO png has resolution=48
         var resolution = getMapInfo().resolution;
         this.items.set("strawberry donut",new Donut("Strawberry donut", "A delicious strawberry donut", "/12_Kitchen_48x48.png", 3 * resolution, 39 * resolution));
-        this.items.set("sprincle donut", new Donut("Sprincle donut", "A delicious stprincle donut", "/12_Kitchen_48x48.png", 3 * resolution, 38 * resolution));
+        this.items.set("sprincle donut", new Donut("Sprincle donut", "A delicious sprincle donut", "/12_Kitchen_48x48.png", 3 * resolution, 38 * resolution));
         this.items.set("chocloate donut" ,new Donut("Chocolate donut", "A delicious chocolate donut", "/12_Kitchen_48x48.png", 2 * resolution, 38 * resolution));
         this.items.set("vanile donut", new Donut("Vanille donut", "A delicious vanille donut", "/12_Kitchen_48x48.png", 2 * resolution, 38 * resolution));
     }
@@ -38,9 +38,9 @@ export class Backpack {
         this.items.forEach((value) => {
             if(value.amount >= 1) {
                 this.ctx.drawImage(value.image, value.tileX, value.tileY, getMapInfo().resolution, getMapInfo().resolution, 20, 20 * i, getMapInfo().resolution, getMapInfo().resolution);
-                var text = value.name + ": " + value.description;
+                var text = value.name + ": " + value.description + " x" + value.amount;
                 if (value.isNew) {
-                    text = "*New* "+ value.name + ": " + value.description + " x" + value.amount ;
+                    text = "*New* "+ value.name + ": " + value.description + " x" + value.amount;
                 }
                 i += 2;
                 this.ctx.fillStyle = "black";
