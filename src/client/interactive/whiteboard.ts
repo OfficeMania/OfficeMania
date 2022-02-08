@@ -213,6 +213,7 @@ export class Whiteboard extends Interactive{
     }
 
     leave() {
+        this.canvas.getContext("2d").clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.hide();
     }
 
