@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { ConfigEntry } from "../../database/entity/config-entry";
-import { getValue } from "../../config";
+import { getValueOrDefault } from "../../config";
 import { convertOrNull } from "../../../common";
 import { createOrUpdate } from "../../database/database";
 import { getManager } from "typeorm";
@@ -21,7 +21,7 @@ function setupRouter(): void {
                 .then(configEntries => res.send(configEntries))
                 .catch(reason => res.status(500).send(reason));
         }
-        const value: string | undefined | null = await getValue(String(key));
+        const value: string | undefined = await getValueOrDefault(String(key));
         if (value === undefined) {
             return res.sendStatus(404);
         }

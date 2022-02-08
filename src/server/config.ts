@@ -108,6 +108,7 @@ export function isInviteCodeRequiredForSignup(defaultValue = false): Promise<boo
 }
 
 export const CONFIG_KEYS: string[] = ["ENABLE_LOGIN", "REQUIRE_LOGIN", "ALLOW_LOGIN_VIA_INVITE_CODE", "DISABLE_SIGNUP", "REQUIRE_INVITE_CODE_FOR_SIGNUP"];
+export const CONFIG_DEFAULT_VALUES: any[] = [false, false, false, true, false];
 
 export function getEnvValue(key: string): string | undefined | null {
     if (!CONFIG_KEYS.includes(key)) {
@@ -125,4 +126,13 @@ export async function getValue(key: string): Promise<string | undefined | null> 
         return getEnvValue(key);
     }
     return configEntry.value;
+}
+
+export async function getValueOrDefault(key: string): Promise<string | undefined> {
+    const index: number = CONFIG_KEYS.indexOf(key);
+    if (index < 0) {
+        return undefined;
+    }
+    const defaultValue: any = CONFIG_DEFAULT_VALUES[index];
+    return await getValue(key) ?? defaultValue;
 }
