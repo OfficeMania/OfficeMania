@@ -65,7 +65,7 @@
                     signupButton.classList.add("disabled");
                     signupButton.remove();
                 }
-                if (!loginInfo?.isLoginViaCredentialsAllowed) {
+                if (loginInfo?.isLoginViaCredentialsAllowed !== undefined && !loginInfo?.isLoginViaCredentialsAllowed) {
                     formLogin.hidden = true;
                     formLogin.remove();
                     hr.remove();
