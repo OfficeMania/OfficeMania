@@ -128,21 +128,17 @@ function setupSignup(): void {
         const password: string[] = req.body.password;
         const inviteCodeString: string | undefined = req.body["invite-code"];
         if (password.length !== 2 || password[0] !== password[1]) {
-            req.session.signupError = AuthError.PASSWORDS_MISMATCH;
-            return res.redirect("/auth/signup");
+            return res.status(500).send({ error: AuthError.PASSWORDS_MISMATCH, errorMessage: authErrorToString(AuthError.PASSWORDS_MISMATCH) });
         }
         if ((await isInviteCodeRequiredForSignup()) && !inviteCodeString) {
-            req.session.signupError = AuthError.INVITE_CODE_REQUIRED;
-            return res.redirect("/auth/signup");
+            return res.status(500).send({ error: AuthError.INVITE_CODE_REQUIRED, errorMessage: authErrorToString(AuthError.INVITE_CODE_REQUIRED) });
         } else if (inviteCodeString) {
             const inviteCode: InviteCode | undefined = await InviteCode.findOne({ where: { code: inviteCodeString } });
             if (!inviteCode) {
-                req.session.signupError = AuthError.INVALID_INVITE_CODE;
-                return res.redirect("/auth/signup");
+                return res.status(500).send({ error: AuthError.INVALID_INVITE_CODE, errorMessage: authErrorToString(AuthError.INVALID_INVITE_CODE) });
             }
             if (inviteCode.usagesLeft === 0) {
-                req.session.signupError = AuthError.INVITE_CODE_EXPIRED;
-                return res.redirect("/auth/signup");
+                return res.status(500).send({ error: AuthError.INVITE_CODE_EXPIRED, errorMessage: authErrorToString(AuthError.INVITE_CODE_EXPIRED) });
             }
             inviteCode.usages++;
             if (inviteCode.usagesLeft > 0) {
@@ -152,28 +148,29 @@ function setupSignup(): void {
         }
         User.findOne({ where: { username } })
             .then(user => {
-                req.session.signupError = AuthError.NO_ERROR;
                 if (user) {
-                    req.session.signupError = AuthError.USERNAME_TAKEN;
-                    return;
+                    return { error: AuthError.USERNAME_TAKEN };
                 }
-                return createUser(username, password[0]).catch(reason => {
+                return createUser(username, password[0]).then(user => ({ user })).catch(reason => {
                     console.error(reason);
-                    req.session.signupError = AuthError.USER_CREATION_FAILED;
+                    return { error: AuthError.USER_CREATION_FAILED };
                 });
             })
-            .then((user: User) => {
+            .then((wrapper: { user?: User, error?: AuthError }) => {
+                const user: User = wrapper.user;
+                const error: AuthError = wrapper.error;
+                if (error) {
+                    return res.status(500).send({ error, errorMessage: authErrorToString(error) });
+                }
                 if (user) {
-                    req.session.loginError = AuthError.NO_ERROR;
-                    res.redirect("/auth/login");
+                    return res.send({ user });
                 } else {
-                    res.redirect("/auth/signup");
+                    res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: authErrorToString(AuthError.UNKNOWN) });
                 }
             })
             .catch(reason => {
                 console.error(reason);
-                req.session.signupError = AuthError.UNKNOWN;
-                res.redirect("/auth/signup");
+                res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: authErrorToString(AuthError.UNKNOWN) });
             });
     });
     router.get("/signup", async (req, res) => {
