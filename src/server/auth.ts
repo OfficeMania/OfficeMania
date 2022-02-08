@@ -153,7 +153,7 @@ function setupSignup(): void {
                 }
                 return createUser(username, password[0]).then(user => ({ user })).catch(reason => {
                     console.error(reason);
-                    return { user: undefined, error: AuthError.USER_CREATION_FAILED, errorMessage: IS_DEV ? JSON.stringify(reason) : authErrorToString(AuthError.UNKNOWN) };
+                    return { user: undefined, error: AuthError.USER_CREATION_FAILED, errorMessage: IS_DEV ? JSON.stringify(reason) : authErrorToString(AuthError.USER_CREATION_FAILED) };
                 });
             })
             .then((wrapper: { user?: User, error?: AuthError, errorMessage?: string }) => {
