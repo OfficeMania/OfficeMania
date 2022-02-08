@@ -177,6 +177,10 @@ body {
     content: '  Exit';
 }
 
+#button-admin-config span:after {
+    content: '  Configuration';
+}
+
 #button-send {
     position: relative;
     padding-right: 5px;
