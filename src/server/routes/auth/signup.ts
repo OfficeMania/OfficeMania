@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { IS_DEV, isInviteCodeRequiredForSignup, isSignupDisabled } from "../../config";
+import { getSignupInfo, IS_DEV, isInviteCodeRequiredForSignup, isSignupDisabled } from "../../config";
 import { InviteCode } from "../../database/entity/invite-code";
 import { createUser, User } from "../../database/entity/user";
 import path from "path";
@@ -96,4 +96,5 @@ function setupRouter(): void {
         }
         res.sendFile(path.join(process.cwd(), "public", "signup.html"));
     });
+    router.get("/info", async (req, res) => res.send(await getSignupInfo()));
 }
