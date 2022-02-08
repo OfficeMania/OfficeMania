@@ -251,7 +251,17 @@ function setupLogin(): void {
 function setupLogout(): void {
     router.get("/logout", (req, res) => {
         req.logout();
-        req.session.destroy(() => res.redirect("/"));
+        req.session.destroy(() => {
+            if (!req.query.returnTo) {
+                return res.redirect("/");
+            }
+            const pathname = "/auth/login";
+            // @ts-ignore
+            const urlParameters = new URLSearchParams({
+                returnTo: req.query.returnTo,
+            });
+            res.redirect(`${pathname}?${urlParameters}`);
+        });
     });
 }
 
