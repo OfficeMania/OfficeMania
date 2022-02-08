@@ -223,10 +223,10 @@ const interactionNearbyButton: HTMLButtonElement = createInteractionButton(
     }
 );
 appendFAIcon(interactionNearbyButton, "sign-in-alt");
-const [interactionHelp, interactionHelpItem]: [HTMLDivElement, HTMLSpanElement] = createInteractionHelp();
-interactionHelp.style.opacity = "0";
-interactionHelp.style.display = "none";
-helpFooter.append(interactionHelp);
+//const [interactionHelp, interactionHelpItem]: [HTMLDivElement, HTMLSpanElement] = createInteractionHelp();
+//interactionHelp.style.opacity = "0";
+//interactionHelp.style.display = "none";
+//helpFooter.append(interactionHelp);
 
 let interactionInfoShown = false;
 
@@ -237,19 +237,19 @@ export function checkInteractionNearby() {
         if (!interactionInfoShown) {
             interactionInfoShown = true;
             interactionNearbyButton.disabled = false;
-            showElement(interactionHelp, fade && !consumeInteractionClosed());
+            //showElement(interactionHelp, fade && !consumeInteractionClosed());
             showElement(interactionNearbyButton, fade && !consumeInteractionClosed());
         }
-        interactionHelpItem.innerText = solidInfo.content.name;
+        //interactionHelpItem.innerText = solidInfo.content.name;
     } else if (interactionInfoShown) {
         interactionInfoShown = false;
         interactionNearbyButton.disabled = true;
         hideElement(interactionNearbyButton, fade);
-        hideElement(interactionHelp, fade);
+        //hideElement(interactionHelp, fade);
     }
 }
 
-function createInteractionHelp(): [HTMLDivElement, HTMLSpanElement] {
+/*function createInteractionHelp(): [HTMLDivElement, HTMLSpanElement] {
     const divElement: HTMLDivElement = document.createElement("div");
     divElement.id = ID_HELP_INTERACTION;
     const interactionHelpTextPrefix = document.createElement("span");
@@ -267,7 +267,7 @@ function createInteractionHelp(): [HTMLDivElement, HTMLSpanElement] {
     spanElement.id = ID_HELP_INTERACTION_ITEM;
     divElement.append(spanElement);
     return [divElement, spanElement];
-}
+}*/
 
 function showElement(element: HTMLElement, fade: boolean = true) {
     element.style.display = null;

@@ -13,6 +13,7 @@ import {
     InputMode,
     joinAndSync,
     loadCharacter,
+    loadImage,
     loadUser,
     PlayerRecord,
     removeChildren,
@@ -530,6 +531,9 @@ async function main() {
 
     let playerNearbyTimer = 0;
 
+    //load image for help message
+    const pressEImage: HTMLImageElement = await loadImage( "../assets/keys/KeysExtended.png");
+
     async function loop(now: number) {
 
         //update the animationloop
@@ -611,6 +615,13 @@ async function main() {
 
         // Draw each player
         drawPlayers(ourPlayer, players, characters, ctx, width, height);
+
+        //draw press e thing
+        if (checkInteraction()?.content) {
+            ctx.globalAlpha = 0.75;
+            ctx.drawImage(pressEImage, 192, 33, 32, 32, Math.floor(width / 2) + 50, Math.floor(height / 2) + 80, 32, 32);
+            ctx.globalAlpha = 1;
+        }
 
         ctx.restore();
 
