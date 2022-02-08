@@ -11,6 +11,7 @@ export function getAdminRouter(): Router {
 function setupRouter(): void {
     //router.use("/users", getAdminUsersRouter()); //TODO
     //router.use("/config", getAdminConfigRouter()); //TODO
+    router.use("/monitor", express.static("admin/monitor.html"));
     router.use("/config", express.static("admin/config.html"));
     router.use("/", express.static("admin"));
 }
