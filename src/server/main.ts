@@ -75,7 +75,7 @@ async function setupApp(): Promise<Express> {
     /*
      * "Mount" the assets/map directory under "[host]/map"
      */
-    app.use("/map", express.static(path.join(process.cwd(), "assets", "map")));
+    app.use("/map", ensureLoggedInOr404(), express.static(path.join(process.cwd(), "assets", "map")));
 
     /*
      * "Mount" the assets/lib directory under "[host]/lib"
