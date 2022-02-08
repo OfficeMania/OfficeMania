@@ -13,7 +13,7 @@ import { getAuthRouter, getSessionHandler, loggedInOptions, setupAuth } from "./
 import connectionEnsureLogin from "connect-ensure-login";
 import { ensureHasRole, findOrCreateUserByUsername, PasswordVersion, Role } from "./database/entity/user";
 import { connectDatabase } from "./database/database";
-import { getApiRouter } from "./api";
+import { getApiRouter } from "./routes/api";
 import { monitor } from "@colyseus/monitor";
 
 export function ensureLoggedIn(setReturnTo = true): express.RequestHandler {
