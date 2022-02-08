@@ -113,9 +113,21 @@ export function isLoginViaCredentialsAllowed(defaultValue = true): Promise<boole
     return getBooleanOrElse("ALLOW_LOGIN_VIA_CREDENTIALS", ALLOW_LOGIN_VIA_CREDENTIALS, defaultValue);
 }
 
-export function isLoginViaInviteCodeAllowed(defaultValue = false): Promise<boolean> {
+const cacheLoginViaInviteCodeAllowed: {
+    timestamp?: Date,
+    value?: boolean,
+} = {};
+
+export async function isLoginViaInviteCodeAllowed(defaultValue = false): Promise<boolean> {
     //TODO Implement this
-    return getBooleanOrElse("ALLOW_LOGIN_VIA_INVITE_CODE", ALLOW_LOGIN_VIA_INVITE_CODE, defaultValue);
+    const now: Date = new Date();
+    if (cacheLoginViaInviteCodeAllowed.value !== undefined && cacheLoginViaInviteCodeAllowed.timestamp && (now.getTime() - cacheLoginViaInviteCodeAllowed.timestamp.getTime()) < 10000) {
+        return cacheLoginViaInviteCodeAllowed.value;
+    }
+    const value: boolean = await getBooleanOrElse("ALLOW_LOGIN_VIA_INVITE_CODE", ALLOW_LOGIN_VIA_INVITE_CODE, defaultValue);
+    cacheLoginViaInviteCodeAllowed.value = value;
+    cacheLoginViaInviteCodeAllowed.timestamp = now;
+    return value;
 }
 
 export function isSignupDisabled(defaultValue = true): Promise<boolean> {
