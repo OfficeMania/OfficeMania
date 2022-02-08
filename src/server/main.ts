@@ -16,6 +16,23 @@ import { connectDatabase } from "./database/database";
 import { getApiRouter } from "./api";
 import { monitor } from "@colyseus/monitor";
 
+export function ensureLoggedIn(setReturnTo = true): express.RequestHandler {
+    const pathname = "/auth/login";
+    return function(req, res, next) {
+        if (!req.isAuthenticated || !req.isAuthenticated()) {
+            if (!setReturnTo) {
+                return res.redirect(pathname);
+            }
+            // @ts-ignore
+            const urlParameters = new URLSearchParams({
+                returnTo: req.originalUrl || "/",
+            });
+            return res.redirect(`${pathname}?${urlParameters}`);
+        }
+        next();
+    }
+}
+
 async function initDatabase(): Promise<void> {
     // TODO Remove this and use proper user creation etc.
     for (let i = 0; i < 10; i++) {
