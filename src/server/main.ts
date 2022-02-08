@@ -14,7 +14,7 @@ import connectionEnsureLogin from "connect-ensure-login";
 import { ensureHasRole, findOrCreateUserByUsername, PasswordVersion, Role } from "./database/entity/user";
 import { connectDatabase } from "./database/database";
 import { monitor } from "@colyseus/monitor";
-import { setupRoutes } from "./routes";
+import { ensureLoggedInOr404, setupRoutes } from "./routes";
 
 async function initDatabase(): Promise<void> {
     // TODO Remove this and use proper user creation etc.
@@ -70,11 +70,7 @@ async function setupApp(): Promise<Express> {
      * In an HTML-document you can load the images via:
      *   <img src="/img/[image-name]" />
      */
-    app.use(
-        "/img",
-        connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-        express.static(path.join(process.cwd(), "assets", "img"), { maxAge: 31536000000 }),
-    );
+    app.use("/img", ensureLoggedInOr404(), express.static(path.join(process.cwd(), "assets", "img"), { maxAge: 31536000000 }));
 
     /*
      * "Mount" the assets/map directory under "[host]/map"
@@ -84,29 +80,18 @@ async function setupApp(): Promise<Express> {
     /*
      * "Mount" the assets/lib directory under "[host]/lib"
      */
-    app.use(
-        "/lib",
-        connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-        express.static(path.join(process.cwd(), "assets", "lib"), { maxAge: 86400000 }),
-    );
+    app.use("/lib", ensureLoggedInOr404(), express.static(path.join(process.cwd(), "assets", "lib"), { maxAge: 86400000 }));
 
     /*
      * "Mount" the assets/templates directory under "[host]/templates"
      */
-    app.use(
-        "/templates",
-        connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-        express.static(path.join(process.cwd(), "assets", "templates"), { maxAge: 31536000000 }),
+    app.use("/templates", ensureLoggedInOr404(), express.static(path.join(process.cwd(), "assets", "templates"), { maxAge: 31536000000 }),
     );
 
     /*
      * "Mount" the assets directory under "[host]/assets"
      */
-    app.use(
-        "/assets",
-        connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-        express.static(path.join(process.cwd(), "assets")),
-    );
+    app.use("/assets", ensureLoggedInOr404(), express.static(path.join(process.cwd(), "assets")));
 
     /*
      * "Mount" the directory where the client JavaScript is generated to (dist/client)
@@ -115,11 +100,7 @@ async function setupApp(): Promise<Express> {
      * In an HTML-document you can load the scripts via:
      *   <script src="/js/[script-name]"></script>
      */
-    app.use(
-        "/js",
-        connectionEnsureLogin.ensureLoggedIn(loggedInOptions),
-        express.static(path.join(process.cwd(), "js", "client")),
-    );
+    app.use("/js", ensureLoggedInOr404(), express.static(path.join(process.cwd(), "js", "client")));
 
     return app;
 }
