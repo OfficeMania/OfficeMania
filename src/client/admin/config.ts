@@ -82,32 +82,32 @@ async function load(): Promise<void> {
     updateGroups();
 }
 
-function applyValue(key: string, value: string, force = false): Promise<Response | void> {
+function applyValue(key: string, type: number, value: string, force = false): Promise<Response | void> {
     if (!force && cache[key] === value) {
         return;
     }
     cache[key] = value;
-    return fetch(`${configEndpoint}?key=${key}&value=${value}`, { method: "PATCH" }).catch(reason => console.warn(reason));
+    return fetch(`${configEndpoint}?key=${key}&type=${type}&value=${value}`, { method: "PATCH" }).catch(reason => console.warn(reason));
 }
 
 async function applyEnableLogin(): Promise<void> {
-    await applyValue("ENABLE_LOGIN", String(enableLogin.checked));
+    await applyValue("ENABLE_LOGIN", 2, String(enableLogin.checked));
 }
 
 async function applyRequireLogin(): Promise<void> {
-    await applyValue("REQUIRE_LOGIN", String(requireLogin.checked));
+    await applyValue("REQUIRE_LOGIN", 2, String(requireLogin.checked));
 }
 
 async function applyAllowLoginViaInviteCode(): Promise<void> {
-    await applyValue("ALLOW_LOGIN_VIA_INVITE_CODE", String(allowLoginViaInviteCode.checked));
+    await applyValue("ALLOW_LOGIN_VIA_INVITE_CODE", 2, String(allowLoginViaInviteCode.checked));
 }
 
 async function applyEnableSignup(): Promise<void> {
-    await applyValue("DISABLE_SIGNUP", String(!enableSignup.checked));
+    await applyValue("DISABLE_SIGNUP", 2, String(!enableSignup.checked));
 }
 
 async function applyRequireInviteCodeForSignup(): Promise<void> {
-    await applyValue("REQUIRE_INVITE_CODE_FOR_SIGNUP", String(requireInviteCodeForSignup.checked));
+    await applyValue("REQUIRE_INVITE_CODE_FOR_SIGNUP", 2, String(requireInviteCodeForSignup.checked));
 }
 
 async function apply(): Promise<void> {
