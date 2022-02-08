@@ -64,6 +64,7 @@ export class PlayerHandler implements Handler {
         const authData: AuthData = client.userData as AuthData;
         const userSettings: UserSettings | undefined = authData.userSettings;
         const playerState: PlayerState = new PlayerState();
+        playerState.loggedIn = userSettings?.id !== undefined || authData?.inviteCodeToken !== undefined;
         playerState.userId = ensureUserId(userSettings?.id);
         playerState.userRole = ensureRole(userSettings?.role);
         playerState.username = ensureDisplayName(userSettings?.username);
