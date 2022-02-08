@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { IS_DEV, isLoginEnabled, LDAP_OPTIONS } from "../../config";
+import { getLoginInfo, IS_DEV, isLoginEnabled, LDAP_OPTIONS } from "../../config";
 import passport from "passport";
 import path from "path";
 import { AuthError, authErrorToString } from "../../../common";
@@ -48,4 +48,5 @@ function setupRouter(): void {
             res.sendFile(path.join(process.cwd(), "public", "login.html"));
         },
     );
+    router.get("/info", async (req, res) => res.send(await getLoginInfo()));
 }
