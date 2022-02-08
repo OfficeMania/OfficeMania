@@ -19,6 +19,8 @@ export class Machine extends Interactive {
         this.mtype = mtype;
         this.getMessageType();
         this.initPrinting();
+        let f = new FontFace('MobileFont', 'url(../assets/fonts/MobileFont.ttf)');
+        f.load().then(function() {}); //load font beforehand
     }
 
     loop() {}
