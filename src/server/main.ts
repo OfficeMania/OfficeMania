@@ -9,30 +9,12 @@ import { Server } from "colyseus";
 
 import { TURoom } from "./rooms/turoom";
 import { DEBUG, IS_DEV, SERVER_PORT } from "./config";
-import { getAuthRouter, getSessionHandler, loggedInOptions, setupAuth } from "./routes/auth";
+import { getSessionHandler, loggedInOptions } from "./routes/auth";
 import connectionEnsureLogin from "connect-ensure-login";
 import { ensureHasRole, findOrCreateUserByUsername, PasswordVersion, Role } from "./database/entity/user";
 import { connectDatabase } from "./database/database";
-import { getApiRouter } from "./routes/api";
 import { monitor } from "@colyseus/monitor";
-import { getAdminRouter } from "./routes/admin";
-
-export function ensureLoggedIn(setReturnTo = true): express.RequestHandler {
-    const pathname = "/auth/login";
-    return function(req, res, next) {
-        if (!req.isAuthenticated || !req.isAuthenticated()) {
-            if (!setReturnTo) {
-                return res.redirect(pathname);
-            }
-            // @ts-ignore
-            const urlParameters = new URLSearchParams({
-                returnTo: req.originalUrl || "/",
-            });
-            return res.redirect(`${pathname}?${urlParameters}`);
-        }
-        next();
-    };
-}
+import { setupRoutes } from "./routes";
 
 async function initDatabase(): Promise<void> {
     // TODO Remove this and use proper user creation etc.
@@ -73,29 +55,10 @@ async function setupApp(): Promise<Express> {
         .then(() => initDatabase())
         .catch(console.error);
 
-    await setupAuth(app);
-    app.use("/auth", getAuthRouter());
-
-    app.use(
-        "/api",
-        (req, res, next) => {
-            if (!req.isAuthenticated || !req.isAuthenticated()) {
-                return res.sendStatus(401);
-            }
-            next();
-        },
-        getApiRouter(),
-    );
-
-    app.use(
-        "/admin",
-        ensureLoggedIn(),
-        ensureHasRole(Role.ADMIN),
-        getAdminRouter(),
-    );
+    await setupRoutes(app);
 
     // Expose public directory
-    app.use("/", ensureLoggedIn(), express.static("public"));
+    app.use("/", connectionEnsureLogin.ensureLoggedIn(loggedInOptions), express.static("public"));
 
     // "Mount" the public folder as the root of the website
     //app.use('/', serveIndex(path.join(process.cwd(), "public"), {'icons': true}));
