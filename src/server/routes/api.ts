@@ -13,6 +13,6 @@ export function getApiRouter(): Router {
 
 function setupRouter(): void {
     router.use("/users", ensureHasRole(Role.ADMIN), getApiUsersRouter());
-    router.use("/config", ensureHasRole(Role.ADMIN), getApiConfigsRouter()); //TODO Change this to "configs"
+    router.use("/configs", ensureHasRole(Role.ADMIN), getApiConfigsRouter());
     router.get("/test", (req, res) => res.sendStatus(200));
 }

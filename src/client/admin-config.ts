@@ -45,7 +45,7 @@ buttonConfigReset.addEventListener("click", () => load());
 inputElements.forEach(inputElement => inputElement.addEventListener("input", () => updateCacheState()));
 
 const apiEndpoint = "/api";
-const configEndpoint = apiEndpoint + "/config";
+const configEndpoint = apiEndpoint + "/configs";
 
 let cache: Record<string, string> = {};
 
