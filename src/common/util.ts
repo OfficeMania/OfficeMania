@@ -167,6 +167,7 @@ export function convertOrNull<T>(input: any, converter?: (input: any) => T): T |
 
 export interface LoginInfo {
     isSignupDisabled?: boolean,
+    isLoginViaCredentialsAllowed?: boolean
     isLoginViaInviteCodeAllowed?: boolean
 }
 

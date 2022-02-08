@@ -45,6 +45,7 @@ export const REDIS_PASSWORD: string | undefined = process.env.REDIS_PASSWORD;
 
 const ENABLE_LOGIN: boolean | undefined = toBoolean(process.env.ENABLE_LOGIN);
 const REQUIRE_LOGIN: boolean | undefined = toBoolean(process.env.FORCE_LOGIN);
+const ALLOW_LOGIN_VIA_CREDENTIALS: boolean | undefined = toBoolean(process.env.ALLOW_LOGIN_VIA_CREDENTIALS);
 const ALLOW_LOGIN_VIA_INVITE_CODE: boolean | undefined = toBoolean(process.env.ALLOW_LOGIN_VIA_INVITE_CODE);
 const DISABLE_SIGNUP: boolean | undefined = toBoolean(process.env.DISABLE_SIGNUP);
 const REQUIRE_INVITE_CODE_FOR_SIGNUP: boolean | undefined = toBoolean(process.env.REQUIRE_INVITE_CODE_FOR_SIGNUP);
@@ -107,6 +108,11 @@ export async function isLoginRequired(defaultValue = false): Promise<boolean> {
     return value;
 }
 
+export function isLoginViaCredentialsAllowed(defaultValue = true): Promise<boolean> {
+    //TODO Implement this
+    return getBooleanOrElse("ALLOW_LOGIN_VIA_CREDENTIALS", ALLOW_LOGIN_VIA_CREDENTIALS, defaultValue);
+}
+
 export function isLoginViaInviteCodeAllowed(defaultValue = false): Promise<boolean> {
     //TODO Implement this
     return getBooleanOrElse("ALLOW_LOGIN_VIA_INVITE_CODE", ALLOW_LOGIN_VIA_INVITE_CODE, defaultValue);
@@ -120,8 +126,8 @@ export function isInviteCodeRequiredForSignup(defaultValue = false): Promise<boo
     return getBooleanOrElse("REQUIRE_INVITE_CODE_FOR_SIGNUP", REQUIRE_INVITE_CODE_FOR_SIGNUP, defaultValue);
 }
 
-export const CONFIG_KEYS: string[] = ["ENABLE_LOGIN", "REQUIRE_LOGIN", "ALLOW_LOGIN_VIA_INVITE_CODE", "DISABLE_SIGNUP", "REQUIRE_INVITE_CODE_FOR_SIGNUP"];
-export const CONFIG_DEFAULT_VALUES: any[] = [false, false, false, true, false];
+export const CONFIG_KEYS: string[] = ["ENABLE_LOGIN", "REQUIRE_LOGIN", "ALLOW_LOGIN_VIA_CREDENTIALS", "ALLOW_LOGIN_VIA_INVITE_CODE", "DISABLE_SIGNUP", "REQUIRE_INVITE_CODE_FOR_SIGNUP"];
+export const CONFIG_DEFAULT_VALUES: any[] = [false, false, true, false, true, false];
 
 export function getEnvValue(key: string): string | undefined | null {
     if (!CONFIG_KEYS.includes(key)) {
@@ -153,6 +159,7 @@ export async function getValueOrDefault(key: string): Promise<string | undefined
 export async function getLoginInfo(): Promise<LoginInfo> {
     return {
         isSignupDisabled: await isSignupDisabled(),
+        isLoginViaCredentialsAllowed: await isLoginViaCredentialsAllowed(),
         isLoginViaInviteCodeAllowed: await isLoginViaInviteCodeAllowed(),
     };
 }
