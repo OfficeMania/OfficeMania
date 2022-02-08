@@ -149,18 +149,19 @@ function setupSignup(): void {
         User.findOne({ where: { username } })
             .then(user => {
                 if (user) {
-                    return { error: AuthError.USERNAME_TAKEN };
+                    return { user: undefined, error: AuthError.USERNAME_TAKEN };
                 }
                 return createUser(username, password[0]).then(user => ({ user })).catch(reason => {
                     console.error(reason);
-                    return { error: AuthError.USER_CREATION_FAILED };
+                    return { user: undefined, error: AuthError.USER_CREATION_FAILED, errorMessage: IS_DEV ? JSON.stringify(reason) : authErrorToString(AuthError.UNKNOWN) };
                 });
             })
-            .then((wrapper: { user?: User, error?: AuthError }) => {
-                const user: User = wrapper.user;
-                const error: AuthError = wrapper.error;
+            .then((wrapper: { user?: User, error?: AuthError, errorMessage?: string }) => {
+                const user: User | undefined = wrapper.user;
+                const error: AuthError | undefined = wrapper.error;
+                const errorMessage: string | undefined = wrapper.errorMessage;
                 if (error) {
-                    return res.status(500).send({ error, errorMessage: authErrorToString(error) });
+                    return res.status(500).send({ error, errorMessage: errorMessage ?? authErrorToString(error) });
                 }
                 if (user) {
                     return res.send({ user });
@@ -170,7 +171,7 @@ function setupSignup(): void {
             })
             .catch(reason => {
                 console.error(reason);
-                res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: authErrorToString(AuthError.UNKNOWN) });
+                res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: IS_DEV ? JSON.stringify(reason) : authErrorToString(AuthError.UNKNOWN) });
             });
     });
     router.get("/signup", async (req, res) => {
@@ -191,14 +192,14 @@ function setupLogin(): void {
         }
         passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", (error, user, info) => {
             if (error) {
-                return res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: authErrorToString(AuthError.UNKNOWN) });
+                return res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: IS_DEV ? JSON.stringify(error) : authErrorToString(AuthError.UNKNOWN) });
             }
             if (!user) {
                 return res.status(500).send({ error: AuthError.INVALID_CREDENTIALS, errorMessage: authErrorToString(AuthError.INVALID_CREDENTIALS) });
             }
             req.logIn(user, function(error) {
                 if (error) {
-                    return res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: authErrorToString(AuthError.UNKNOWN) });
+                    return res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: IS_DEV ? JSON.stringify(error) : authErrorToString(AuthError.UNKNOWN) });
                 }
                 return res.send({ user });
             });
