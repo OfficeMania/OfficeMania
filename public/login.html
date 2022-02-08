@@ -98,7 +98,7 @@
                 }
             }
             const errorMessage = document.getElementById("error-message");
-            document.forms["form-login"].addEventListener("submit", (event) => {
+            function onSubmit(event) {
                 event.preventDefault();
                 fetch(event.target.action, {
                     method: "POST",
@@ -121,7 +121,9 @@
                         errorMessage.innerText = error;
                         errorMessage.hidden = false;
                     });
-            });
+            }
+            formLogin.addEventListener("submit", (event) => onSubmit(event));
+            formLoginInviteCode.addEventListener("submit", (event) => onSubmit(event));
         </script>
     </body>
 </html>
