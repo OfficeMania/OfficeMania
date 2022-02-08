@@ -194,20 +194,16 @@ function setupLogin(): void {
         }
         passport.authenticate(LDAP_OPTIONS ? "ldapauth" : "local", (error, user, info) => {
             if (error) {
-                req.session.loginError = AuthError.UNKNOWN;
-                return res.redirect("/auth/login");
+                return res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: authErrorToString(AuthError.UNKNOWN) ?? JSON.stringify(error) });
             }
             if (!user) {
-                req.session.loginError = AuthError.INVALID_CREDENTIALS;
-                return res.redirect("/auth/login");
+                return res.status(500).send({ error: AuthError.INVALID_CREDENTIALS, errorMessage: authErrorToString(AuthError.INVALID_CREDENTIALS) });
             }
             req.logIn(user, function(error) {
                 if (error) {
-                    req.session.loginError = AuthError.UNKNOWN;
-                    return res.redirect("/auth/login");
+                    return res.status(500).send({ error: AuthError.UNKNOWN, errorMessage: authErrorToString(AuthError.UNKNOWN) ?? JSON.stringify(error) });
                 }
-                req.session.loginError = AuthError.NO_ERROR;
-                return res.redirect("/");
+                return res.send({ user });
             });
         })(req, res, next);
     });
