@@ -45,6 +45,7 @@
     "@types/ioredis": "^4.28.7",
     "@types/jest": "^26.0.20",
     "@types/jquery": "^3.5.5",
+    "@types/node-fetch": "^3.0.3",
     "@types/passport": "^1.0.7",
     "@types/passport-local": "^1.0.34",
     "@types/serve-index": "^1.7.30",
