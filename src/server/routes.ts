@@ -14,12 +14,7 @@ export async function setupRoutes(app: Express): Promise<void> {
     );
     app.use(
         "/api",
-        (req, res, next) => {
-            if (!req.isAuthenticated || !req.isAuthenticated()) {
-                return res.sendStatus(401);
-            }
-            next();
-        },
+        ensureLoggedInOr404(),
         getApiRouter(),
     );
     app.use("/auth", getAuthRouter());
@@ -37,6 +32,15 @@ export function ensureLoggedIn(setReturnTo = true): express.RequestHandler {
                 returnTo: req.originalUrl || "/",
             });
             return res.redirect(`${pathname}?${urlParameters}`);
+        }
+        next();
+    };
+}
+
+export function ensureLoggedInOr404(): express.RequestHandler {
+    return (req, res, next) => {
+        if (!req.isAuthenticated || !req.isAuthenticated()) {
+            return res.sendStatus(401);
         }
         next();
     };
