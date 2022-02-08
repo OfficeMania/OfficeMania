@@ -44,11 +44,13 @@
                                     <i class="fas fa-eye-slash" id="eye-hide-confirm"></i>
                                 </span>
                             </div>
-                            <hr>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text"><i class="fa fa-ticket-alt"></i></span>
-                                <input type="text" class="form-control" placeholder="Invite Code" name="invite-code"
-                                       autocomplete="invite-code" aria-label="Invite Code">
+                            <div hidden id="container-invite-code">
+                                <hr>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text"><i class="fa fa-ticket-alt"></i></span>
+                                    <input type="text" class="form-control" placeholder="Invite Code" name="invite-code"
+                                           autocomplete="invite-code" aria-label="Invite Code" required>
+                                </div>
                             </div>
                             <button type="submit" class="col-12 btn btn-primary btn-block">Signup</button>
                         </form>
@@ -60,6 +62,14 @@
                 integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
                 crossorigin="anonymous"></script>
         <script>
+            const inviteCodeContainer = document.getElementById("container-invite-code");
+            fetch("/auth/signup/info").then(response => response.json()).then(signupInfo => {
+                if (signupInfo?.isInviteCodeRequiredForSignup) {
+                    inviteCodeContainer.hidden = false;
+                } else {
+                    inviteCodeContainer.remove();
+                }
+            });
             function toggleCreatePasswordVisibility() {
                 const inputPassword = document.getElementById("input-password-create");
                 const eyeShow = document.getElementById("eye-show-create");
