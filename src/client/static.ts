@@ -61,9 +61,8 @@ export const clearButton = $<HTMLButtonElement>("button-whiteboard-clear");
 export const eraserButton = $<HTMLButtonElement>("button-whiteboard-eraser");
 export const penButton = $<HTMLButtonElement>("button-whiteboard-pen");
 export const colorSelector = $<HTMLSelectElement>("whiteboard-color-selector");
-export const size5Button = $<HTMLButtonElement>("button-whiteboard-size5");
-export const size10Button = $<HTMLButtonElement>("button-whiteboard-size10");
+export const sizeSelector = $<HTMLSelectElement>("whiteboard-size-selector");
 export const whiteboardPanel = $<HTMLDivElement>("interactive-bar-whiteboard");
-
+export const whiteboardSizeIcon = $<HTMLElement>("whiteboard-size-icon");
 // @ts-ignore
 export const bsWelcomeModal = new bootstrap.Modal(document.getElementById('welcome-modal'));

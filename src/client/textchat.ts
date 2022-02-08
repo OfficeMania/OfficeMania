@@ -171,7 +171,7 @@ export function textchatPlayerOnChange(playerState: PlayerState) {
 
 //rewrites all the of the clients chats from scratch
 function onChatUpdate(chatDTOs: ChatDTO[]): void {
-    console.debug("onchatupdate call");
+    console.debug(chatDTOs);
     //chats.forEach(() => {chats.pop()});
     //console.log(chats, "chats:");
     let ids: string[] = [];
@@ -179,13 +179,13 @@ function onChatUpdate(chatDTOs: ChatDTO[]): void {
         updateChat(chat);
         ids.push(chat.id);
     });
-    chats.forEach(chat => {
-        if (!ids.includes(chat.id)) {
-            chats.splice(ids.indexOf(chat.id));
+    for(let i = 0; i < chats.length; i++) {
+        if (!ids.includes(chats[i].id)) {
+            console.log("splicing: ", chats[i].id, i)
+            chats.splice(i, 1);
         }
-    });
+    }
 
-    //updateParticipatingChats();
     updateChatList();
 }
 
@@ -218,7 +218,6 @@ function onMessage(chatMessage: ChatMessage) {
     if (textchatDropdownChatsButton.getAttribute("data-id") === chatMessage.chatId) {
         addMessageToBar(chatMessage);
     }
-
 }
 
 //sends text message to server (if its not empty)

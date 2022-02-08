@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { IS_DEV, isInviteCodeRequiredForSignup, isSignupDisabled } from "../../config";
+import { getSignupInfo, IS_DEV, isInviteCodeRequiredForSignup, isSignupDisabled } from "../../config";
 import { InviteCode } from "../../database/entity/invite-code";
 import { createUser, User } from "../../database/entity/user";
 import path from "path";
-import { AuthError, authErrorToString } from "../../../common";
+import { AuthError, authErrorToString, checkUsername } from "../../../common";
 
 const router: Router = Router();
 
@@ -19,6 +19,12 @@ function setupRouter(): void {
             return res.sendStatus(404);
         }
         const username: string = req.body.username;
+        if (!checkUsername(username)) {
+            return res.status(500).send({
+                error: AuthError.USERNAME_INVALID,
+                errorMessage: authErrorToString(AuthError.USERNAME_INVALID),
+            });
+        }
         const password: string[] = req.body.password;
         const inviteCodeString: string | undefined = req.body["invite-code"];
         if (password.length !== 2 || password[0] !== password[1]) {
@@ -41,6 +47,12 @@ function setupRouter(): void {
                 });
             }
             if (inviteCode.usagesLeft === 0) {
+                return res.status(500).send({
+                    error: AuthError.INVITE_CODE_EXPIRED,
+                    errorMessage: authErrorToString(AuthError.INVITE_CODE_EXPIRED),
+                });
+            }
+            if (inviteCode.expiration && (inviteCode.expiration.getTime() < new Date().getTime())) {
                 return res.status(500).send({
                     error: AuthError.INVITE_CODE_EXPIRED,
                     errorMessage: authErrorToString(AuthError.INVITE_CODE_EXPIRED),
@@ -96,4 +108,5 @@ function setupRouter(): void {
         }
         res.sendFile(path.join(process.cwd(), "public", "signup.html"));
     });
+    router.get("/info", async (req, res) => res.send(await getSignupInfo()));
 }

@@ -22,7 +22,6 @@ function updateGroupLogin() {
     for (const element of needsLogin) {
         element.disabled = !enableLogin.checked;
     }
-    allowLoginViaInviteCode.disabled = true; //TODO Remove this after ALLOW_LOGIN_VIA_INVITE_CODE is implemented
 }
 
 function updateGroupSignup() {
@@ -50,10 +49,18 @@ const configEndpoint = apiEndpoint + "/configs";
 let cache: Record<string, string> = {};
 
 function loadValue(key: string): Promise<string | undefined> {
-    return fetch(`${configEndpoint}?key=${key}`).then(response => response.json()).then(response => {
-        cache[key] = response.value;
-        return response.value;
-    }).catch(reason => console.warn(reason));
+    return fetch(`${configEndpoint}?key=${key}`)
+        .then(response => response.json())
+        .then(response => {
+            const value: string | undefined = response.value !== undefined ? String(response.value) : undefined;
+            cache[key] = value;
+            return value;
+        })
+        .catch(reason => {
+            cache[key] = undefined;
+            console.warn(reason);
+            return undefined;
+        });
 }
 
 async function loadEnableLogin(): Promise<void> {
@@ -83,32 +90,32 @@ async function load(): Promise<void> {
     updateGroups();
 }
 
-function applyValue(key: string, value: string, force = false): Promise<Response | void> {
+function applyValue(key: string, type: number, value: string, force = false): Promise<Response | void> {
     if (!force && cache[key] === value) {
         return;
     }
     cache[key] = value;
-    return fetch(`${configEndpoint}?key=${key}&value=${value}`, { method: "PATCH" }).catch(reason => console.warn(reason));
+    return fetch(`${configEndpoint}?key=${key}&type=${type}&value=${value}`, { method: "PATCH" }).catch(reason => console.warn(reason));
 }
 
 async function applyEnableLogin(): Promise<void> {
-    await applyValue("ENABLE_LOGIN", String(enableLogin.checked));
+    await applyValue("ENABLE_LOGIN", 2, String(enableLogin.checked));
 }
 
 async function applyRequireLogin(): Promise<void> {
-    await applyValue("REQUIRE_LOGIN", String(requireLogin.checked));
+    await applyValue("REQUIRE_LOGIN", 2, String(requireLogin.checked));
 }
 
 async function applyAllowLoginViaInviteCode(): Promise<void> {
-    await applyValue("ALLOW_LOGIN_VIA_INVITE_CODE", String(allowLoginViaInviteCode.checked));
+    await applyValue("ALLOW_LOGIN_VIA_INVITE_CODE", 2, String(allowLoginViaInviteCode.checked));
 }
 
 async function applyEnableSignup(): Promise<void> {
-    await applyValue("DISABLE_SIGNUP", String(!enableSignup.checked));
+    await applyValue("DISABLE_SIGNUP", 2, String(!enableSignup.checked));
 }
 
 async function applyRequireInviteCodeForSignup(): Promise<void> {
-    await applyValue("REQUIRE_INVITE_CODE_FOR_SIGNUP", String(requireInviteCodeForSignup.checked));
+    await applyValue("REQUIRE_INVITE_CODE_FOR_SIGNUP", 2, String(requireInviteCodeForSignup.checked));
 }
 
 async function apply(): Promise<void> {
@@ -129,8 +136,6 @@ function areChangesUnsaved(): boolean {
 
 function updateCacheState(): void {
     const changesUnsaved: boolean = areChangesUnsaved();
-    console.debug("changesUnsaved:", changesUnsaved);
-    console.debug("cache:", cache);
     noteUnsavedChanges.hidden = !changesUnsaved;
 }
 

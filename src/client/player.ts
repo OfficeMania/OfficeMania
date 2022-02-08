@@ -20,6 +20,7 @@ export var PLAYER_COLORS = ["red", "blue", "green", "yellow", "black"];
  * a change from the server is reported (in the onAdd, onRemove, onChange methods).
  */
 export interface Player {
+    loggedIn: boolean; // is user logged in?
     userId: string; // user id logged in with
     userRole?: number; // user role logged in with
     roomId: string; //players id in the room

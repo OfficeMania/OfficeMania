@@ -98,7 +98,7 @@ export function getChatEnabled(): boolean {
 
 export function areWeLoggedIn(): boolean {
     const ourPlayer: Player = getOurPlayer();
-    return !literallyUndefined(ourPlayer.userId);
+    return ourPlayer.loggedIn;
 }
 
 export function areWeAdmin(): boolean {
@@ -144,6 +144,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 // console.log("Add", sessionId, playerState);
 
                 let player: Player = {
+                    loggedIn: playerState.loggedIn,
                     userId: playerState.userId,
                     userRole: playerState.userRole,
                     roomId: sessionId,

@@ -61,6 +61,10 @@ export class ChatHandler implements Handler {
             //TODO
             return;
         }
+        
+        if (message === "chats") {
+            this.chats.forEach(chat => console.log(chat.id, chat.name, chat.users))
+        }
         console.debug("Message received:", message);
         const messageIdArray: string[] = JSON.parse(chatMessage.chatId);
         console.debug("chatId:", messageIdArray);
@@ -72,9 +76,9 @@ export class ChatHandler implements Handler {
             const serverMessage: ChatMessage = makeMessage(this.room, client, { chatId: chatId, message: chatMessage.message, userId });
 
             const chat: Chat = this.byChatId(chatId);
-            if (!chat.users.includes(userId)) {
+            /*if (!chat.users.includes(userId)) {
                 chat.users.push(userId);
-            }
+            }*/
             chat.messages.push(serverMessage);
             //chat.messages.forEach(chatMessage => console.log("chatMessage:", JSON.stringify(chatMessage)));
             if (chatId === this.globalChat.id) {
@@ -118,9 +122,9 @@ export class ChatHandler implements Handler {
     onChatUpdate(client: Client) {
         const userId: string = getUserId(client, this.room);
         console.log("Request chat update for User:", userId);
-        const chats: Chat[] = this.byUserId(userId);
-        //chats.forEach(chat => console.log(chat.messages));
-        const chatDTOs: ChatDTO[] = chats.map(chat => ({
+        const userChats: Chat[] = this.byUserId(userId);
+        //userChats.forEach(chat => console.log("chat: ", chat.id));
+        const chatDTOs: ChatDTO[] = userChats.map(chat => ({
             id: chat.id,
             name: chat.name,
             users: chat.users,

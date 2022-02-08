@@ -1,4 +1,5 @@
 import { ConfigEntry } from "./database/entity/config-entry";
+import { LoginInfo, SignupInfo } from "../common";
 
 function toNumber(input?: string, radix = 10): number | undefined {
     if (input === undefined || input === null) {
@@ -44,6 +45,7 @@ export const REDIS_PASSWORD: string | undefined = process.env.REDIS_PASSWORD;
 
 const ENABLE_LOGIN: boolean | undefined = toBoolean(process.env.ENABLE_LOGIN);
 const REQUIRE_LOGIN: boolean | undefined = toBoolean(process.env.FORCE_LOGIN);
+const ALLOW_LOGIN_VIA_CREDENTIALS: boolean | undefined = toBoolean(process.env.ALLOW_LOGIN_VIA_CREDENTIALS);
 const ALLOW_LOGIN_VIA_INVITE_CODE: boolean | undefined = toBoolean(process.env.ALLOW_LOGIN_VIA_INVITE_CODE);
 const DISABLE_SIGNUP: boolean | undefined = toBoolean(process.env.DISABLE_SIGNUP);
 const REQUIRE_INVITE_CODE_FOR_SIGNUP: boolean | undefined = toBoolean(process.env.REQUIRE_INVITE_CODE_FOR_SIGNUP);
@@ -90,13 +92,42 @@ export function isLoginEnabled(defaultValue = false): Promise<boolean> {
     return getBooleanOrElse("ENABLE_LOGIN", ENABLE_LOGIN, defaultValue);
 }
 
-export function isLoginRequired(defaultValue = false): Promise<boolean> {
-    return getBooleanOrElse("REQUIRE_LOGIN", REQUIRE_LOGIN, defaultValue);
+const cacheLoginRequired: {
+    timestamp?: Date,
+    value?: boolean,
+} = {};
+
+export async function isLoginRequired(defaultValue = false): Promise<boolean> {
+    const now: Date = new Date();
+    if (cacheLoginRequired.value !== undefined && cacheLoginRequired.timestamp && (now.getTime() - cacheLoginRequired.timestamp.getTime()) < 1000) {
+        return cacheLoginRequired.value;
+    }
+    const value: boolean = await getBooleanOrElse("REQUIRE_LOGIN", REQUIRE_LOGIN, defaultValue);
+    cacheLoginRequired.value = value;
+    cacheLoginRequired.timestamp = now;
+    return value;
 }
 
-export function isLoginViaInviteCodeAllowed(defaultValue = false): Promise<boolean> {
+export function isLoginViaCredentialsAllowed(defaultValue = true): Promise<boolean> {
     //TODO Implement this
-    return getBooleanOrElse("ALLOW_LOGIN_VIA_INVITE_CODE", ALLOW_LOGIN_VIA_INVITE_CODE, defaultValue);
+    return getBooleanOrElse("ALLOW_LOGIN_VIA_CREDENTIALS", ALLOW_LOGIN_VIA_CREDENTIALS, defaultValue);
+}
+
+const cacheLoginViaInviteCodeAllowed: {
+    timestamp?: Date,
+    value?: boolean,
+} = {};
+
+export async function isLoginViaInviteCodeAllowed(defaultValue = false): Promise<boolean> {
+    //TODO Implement this
+    const now: Date = new Date();
+    if (cacheLoginViaInviteCodeAllowed.value !== undefined && cacheLoginViaInviteCodeAllowed.timestamp && (now.getTime() - cacheLoginViaInviteCodeAllowed.timestamp.getTime()) < 10000) {
+        return cacheLoginViaInviteCodeAllowed.value;
+    }
+    const value: boolean = await getBooleanOrElse("ALLOW_LOGIN_VIA_INVITE_CODE", ALLOW_LOGIN_VIA_INVITE_CODE, defaultValue);
+    cacheLoginViaInviteCodeAllowed.value = value;
+    cacheLoginViaInviteCodeAllowed.timestamp = now;
+    return value;
 }
 
 export function isSignupDisabled(defaultValue = true): Promise<boolean> {
@@ -107,8 +138,8 @@ export function isInviteCodeRequiredForSignup(defaultValue = false): Promise<boo
     return getBooleanOrElse("REQUIRE_INVITE_CODE_FOR_SIGNUP", REQUIRE_INVITE_CODE_FOR_SIGNUP, defaultValue);
 }
 
-export const CONFIG_KEYS: string[] = ["ENABLE_LOGIN", "REQUIRE_LOGIN", "ALLOW_LOGIN_VIA_INVITE_CODE", "DISABLE_SIGNUP", "REQUIRE_INVITE_CODE_FOR_SIGNUP"];
-export const CONFIG_DEFAULT_VALUES: any[] = [false, false, false, true, false];
+export const CONFIG_KEYS: string[] = ["ENABLE_LOGIN", "REQUIRE_LOGIN", "ALLOW_LOGIN_VIA_CREDENTIALS", "ALLOW_LOGIN_VIA_INVITE_CODE", "DISABLE_SIGNUP", "REQUIRE_INVITE_CODE_FOR_SIGNUP"];
+export const CONFIG_DEFAULT_VALUES: any[] = [false, false, true, false, true, false];
 
 export function getEnvValue(key: string): string | undefined | null {
     if (!CONFIG_KEYS.includes(key)) {
@@ -135,4 +166,16 @@ export async function getValueOrDefault(key: string): Promise<string | undefined
     }
     const defaultValue: any = CONFIG_DEFAULT_VALUES[index];
     return await getValue(key) ?? defaultValue;
+}
+
+export async function getLoginInfo(): Promise<LoginInfo> {
+    return {
+        isSignupDisabled: await isSignupDisabled(),
+        isLoginViaCredentialsAllowed: await isLoginViaCredentialsAllowed(),
+        isLoginViaInviteCodeAllowed: await isLoginViaInviteCodeAllowed(),
+    };
+}
+
+export async function getSignupInfo(): Promise<SignupInfo> {
+    return { isInviteCodeRequiredForSignup: await isInviteCodeRequiredForSignup() };
 }

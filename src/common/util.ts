@@ -121,7 +121,7 @@ export function sanitizeUsername(value: string): string {
 }
 
 export function checkDisplayName(value?: string): boolean {
-    if (!value || value.length < 2 || value.length > 20) {
+    if (!value || value.length < 1 || value.length > 20) {
         return false;
     }
     const lowerCase: string = value.toLowerCase();
@@ -132,7 +132,7 @@ export function sanitizeDisplayName(value?: string): string | undefined {
     if (!value) {
         return;
     }
-    return stringSanitizer.sanitize.keepUnicode(value).slice(0, 20);
+    return stringSanitizer.sanitize.keepUnicode(value).slice(0, 20).trim();
 }
 
 export function ensureUserId(value?: string): string {
@@ -167,4 +167,20 @@ export function convertOrNull<T>(input: any, converter?: (input: any) => T): T |
         return null;
     }
     return converter(input);
+}
+
+export interface LoginInfo {
+    isSignupDisabled?: boolean,
+    isLoginViaCredentialsAllowed?: boolean
+    isLoginViaInviteCodeAllowed?: boolean
+}
+
+export interface SignupInfo {
+    isInviteCodeRequiredForSignup?: boolean,
+}
+
+export interface InviteCodeToken {
+    token: string;
+    created: Date;
+    lastUsed?: Date;
 }

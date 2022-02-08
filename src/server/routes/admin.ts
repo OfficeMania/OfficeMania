@@ -9,9 +9,8 @@ export function getAdminRouter(): Router {
 }
 
 function setupRouter(): void {
-    //router.use("/users", getAdminUsersRouter()); //TODO
-    //router.use("/config", getAdminConfigRouter()); //TODO
-    router.use("/monitor", express.static("admin/monitor.html"));
     router.use("/config", express.static("admin/config.html"));
-    router.use("/", express.static("admin"));
+    //router.use("/invites", express.static("admin/invites.html")); //TODO
+    router.use("/monitor", express.static("admin/monitor.html"));
+    router.use("/users", express.static("admin/users.html")); //TODO Edit Users in a Modal
 }

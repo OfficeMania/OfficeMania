@@ -46,6 +46,9 @@ export class User extends BaseEntity {
     @Column({ name: "display_name", type: "varchar", length: 255, nullable: true })
     displayName: string;
 
+    @Column({ default: true })
+    active: boolean;
+
     public checkPassword(password: string): boolean {
         if (!this.passwordVersion) {
             return false;
@@ -140,7 +143,7 @@ export function serializePassword(password: string, version: PasswordVersion): s
 export function createUser(
     username: string,
     password: string = undefined,
-    passwordVersion: PasswordVersion = PasswordVersion.LATEST
+    passwordVersion: PasswordVersion = PasswordVersion.LATEST,
 ): Promise<User> {
     return User.create({ username, password: serializePassword(password, passwordVersion), passwordVersion }).save();
 }
@@ -149,7 +152,7 @@ export async function findOrCreateUserByUsername(
     username: string,
     password: string = undefined,
     passwordVersion: PasswordVersion = PasswordVersion.LATEST,
-    role: Role = Role.USER
+    role: Role = Role.USER,
 ): Promise<User> {
     const user: User | undefined = await User.findOne({ where: { username } });
     if (user) {
@@ -159,6 +162,6 @@ export async function findOrCreateUserByUsername(
         username,
         password: serializePassword(password, passwordVersion),
         passwordVersion,
-        role
+        role,
     }).save();
 }
