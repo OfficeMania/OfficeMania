@@ -15,7 +15,11 @@ export function getCacheRouter(): Router {
 function setupRouter(): void {
     setup("bootstrap.min.css", "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css");
     setup("bootstrap.bundle.min.js", "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js");
-    setup("fontawesome-all.css", "https://use.fontawesome.com/releases/v5.15.4/css/all.css");
+    setup("fontawesome/css/all.css", "https://use.fontawesome.com/releases/v5.15.4/css/all.css");
+    router.get("/fontawesome/*", (req, res, next) => {
+        const subPath: string = req.url.substring("/fontawesome/".length);
+        return res.redirect(`https://use.fontawesome.com/releases/v5.15.4/${subPath}`);
+    });
 }
 
 //TODO set maxAge to 86400000
