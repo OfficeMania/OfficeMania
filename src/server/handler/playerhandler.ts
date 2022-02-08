@@ -19,6 +19,7 @@ import { User } from "../database/entity/user";
 
 export interface AuthData {
     userSettings?: UserSettings;
+    inviteCodeToken?: string;
 }
 
 export interface UserSettings {
