@@ -49,15 +49,18 @@ const configEndpoint = apiEndpoint + "/configs";
 let cache: Record<string, string> = {};
 
 function loadValue(key: string): Promise<string | undefined> {
-    return fetch(`${configEndpoint}?key=${key}`).then(response => response.json()).then(response => {
-        const value: string | undefined = response.value ? String(response.value) : undefined;
-        cache[key] = value;
-        return value;
-    }).catch(reason => {
-        cache[key] = undefined;
-        console.warn(reason);
-        return undefined;
-    });
+    return fetch(`${configEndpoint}?key=${key}`)
+        .then(response => response.json())
+        .then(response => {
+            const value: string | undefined = response.value !== undefined ? String(response.value) : undefined;
+            cache[key] = value;
+            return value;
+        })
+        .catch(reason => {
+            cache[key] = undefined;
+            console.warn(reason);
+            return undefined;
+        });
 }
 
 async function loadEnableLogin(): Promise<void> {
