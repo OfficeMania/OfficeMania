@@ -90,8 +90,20 @@ export function isLoginEnabled(defaultValue = false): Promise<boolean> {
     return getBooleanOrElse("ENABLE_LOGIN", ENABLE_LOGIN, defaultValue);
 }
 
-export function isLoginRequired(defaultValue = false): Promise<boolean> {
-    return getBooleanOrElse("REQUIRE_LOGIN", REQUIRE_LOGIN, defaultValue);
+const cacheLoginRequired: {
+    timestamp?: Date,
+    value?: boolean,
+} = {};
+
+export async function isLoginRequired(defaultValue = false): Promise<boolean> {
+    const now: Date = new Date();
+    if (cacheLoginRequired.timestamp && (now.getTime() - cacheLoginRequired.timestamp.getTime()) < 1000) {
+        return cacheLoginRequired.value;
+    }
+    const value: boolean = await getBooleanOrElse("REQUIRE_LOGIN", REQUIRE_LOGIN, defaultValue);
+    cacheLoginRequired.value = value;
+    cacheLoginRequired.timestamp = now;
+    return value;
 }
 
 export function isLoginViaInviteCodeAllowed(defaultValue = false): Promise<boolean> {
