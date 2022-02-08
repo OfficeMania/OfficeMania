@@ -15,6 +15,7 @@ import { ensureHasRole, findOrCreateUserByUsername, PasswordVersion, Role } from
 import { connectDatabase } from "./database/database";
 import { getApiRouter } from "./routes/api";
 import { monitor } from "@colyseus/monitor";
+import { getAdminRouter } from "./routes/admin";
 
 export function ensureLoggedIn(setReturnTo = true): express.RequestHandler {
     const pathname = "/auth/login";
@@ -87,18 +88,10 @@ async function setupApp(): Promise<Express> {
     );
 
     app.use(
-        "/admin/config",
-        ensureLoggedIn(),
-        ensureHasRole(Role.ADMIN),
-        express.static("admin/config.html"),
-    );
-
-    // Expose admin directory
-    app.use(
         "/admin",
         ensureLoggedIn(),
         ensureHasRole(Role.ADMIN),
-        express.static("admin"),
+        getAdminRouter(),
     );
 
     // Expose public directory
