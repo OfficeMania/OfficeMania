@@ -16,6 +16,8 @@ import Redis from "ioredis";
 import connect_redis from "connect-redis";
 import { getAuthLoginRouter } from "./auth/login";
 import { getAuthSignupRouter } from "./auth/signup";
+import { generateUUIDv4, InviteCodeToken } from "../../common";
+import { InviteCode } from "../database/entity/invite-code";
 
 const RedisStore = connect_redis(session);
 
@@ -27,6 +29,7 @@ declare module "express-session" {
         user: User;
         loginError: number;
         signupError: number;
+        inviteCodeToken?: string;
     }
 }
 
@@ -160,6 +163,37 @@ const ensureSession: express.RequestHandler = (req, res, next) => {
     lookupSession();
 };
 
+let INVITE_CODE_TOKENS: InviteCodeToken[] = [];
+
+const INVITE_CODE_TOKEN_LIFETIME = 60 * 60 * 1000; // 1 hour
+
+function isInviteCodeTokenValid(inviteCodeTokenString: string | undefined): boolean {
+    if (!inviteCodeTokenString) {
+        return false;
+    }
+    const inviteCodeTokens: InviteCodeToken[] = INVITE_CODE_TOKENS.filter(inviteCodeToken => inviteCodeToken.token === inviteCodeTokenString);
+    if (inviteCodeTokens.length === 0) {
+        return false;
+    }
+    const inviteCodeToken: InviteCodeToken = inviteCodeTokens[0];
+    inviteCodeToken.lastUsed = new Date();
+    return true;
+}
+
+function evictInviteCodeTokens(): void {
+    const now: Date = new Date();
+    INVITE_CODE_TOKENS = INVITE_CODE_TOKENS.filter(inviteCodeToken => !(inviteCodeToken.lastUsed && (now.getTime() - inviteCodeToken.lastUsed.getTime()) > INVITE_CODE_TOKEN_LIFETIME));
+}
+
+export function generateInviteCodeToken(): InviteCodeToken {
+    const inviteCodeToken: InviteCodeToken = {
+        token: generateUUIDv4(),
+        created: new Date(),
+    };
+    INVITE_CODE_TOKENS.push(inviteCodeToken);
+    return inviteCodeToken;
+}
+
 export async function setupAuth(app: Express): Promise<void> {
     setupSessionHandler();
     app.use(sessionHandler);
@@ -172,9 +206,10 @@ export async function setupAuth(app: Express): Promise<void> {
     app.use(passport.initialize());
     app.use(passport.session());
     app.use(async (req, res, next) => {
-        if (!(await isLoginRequired())) {
+        if (!(await isLoginRequired()) || isInviteCodeTokenValid(req.session.inviteCodeToken)) {
             req.isAuthenticated = () => true;
         }
         next();
     });
+    setInterval(() => evictInviteCodeTokens(), 60 * 1000);
 }
