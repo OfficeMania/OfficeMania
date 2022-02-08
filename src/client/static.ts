@@ -60,15 +60,9 @@ export const saveButton = $<HTMLButtonElement>("button-whiteboard-save");
 export const clearButton = $<HTMLButtonElement>("button-whiteboard-clear");
 export const eraserButton = $<HTMLButtonElement>("button-whiteboard-eraser");
 export const penButton = $<HTMLButtonElement>("button-whiteboard-pen");
+export const colorSelector = $<HTMLSelectElement>("whiteboard-color-selector");
 export const size5Button = $<HTMLButtonElement>("button-whiteboard-size5");
 export const size10Button = $<HTMLButtonElement>("button-whiteboard-size10");
-export const redButton = $<HTMLButtonElement>("button-whiteboard-red");
-export const pinkButton = $<HTMLButtonElement>("button-whiteboard-pink");
-export const orangeButton = $<HTMLButtonElement>("button-whiteboard-orange");
-export const yellowButton = $<HTMLButtonElement>("button-whiteboard-yellow");
-export const greenButton = $<HTMLButtonElement>("button-whiteboard-green");
-export const blueButton = $<HTMLButtonElement>("button-whiteboard-blue");
-export const blackButton = $<HTMLButtonElement>("button-whiteboard-black");
 export const whiteboardPanel = $<HTMLDivElement>("interactive-bar-whiteboard");
 
 // @ts-ignore

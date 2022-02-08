@@ -405,10 +405,21 @@ body {
     align-items: center;
 }
 
+#whiteboard-color-selector {
+    visibility: hidden;
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    border-radius: 10px;
+    border-style: solid;
+    border-color: rgb(19, 37, 74);
+    background-color: black;
+    color: black;
+}
+
 #interactive-bar-whiteboard {
     display: inline-grid;
     position: relative;
-    height: 602px;
 }
 
 #interactive-bar button {
