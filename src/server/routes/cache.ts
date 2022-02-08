@@ -25,7 +25,11 @@ function setupRouter(): void {
 //TODO set maxAge to 86400000
 function setup(name: string, source: string, maxAge = 1000): void {
     const filePath: string = path.join(process.cwd(), "cache", name);
+    const parentPath: string = filePath.substring(0, Math.max(filePath.lastIndexOf("/"), filePath.lastIndexOf("\\")));
     router.get(`/${name}`, (req, res) => res.sendFile(filePath, { maxAge }));
+    if (!fs.existsSync(parentPath)) {
+        fs.mkdirSync(parentPath, { recursive: true });
+    }
     if (!fs.existsSync(filePath)) {
         fetch(source)
             .then(response => response.text())
