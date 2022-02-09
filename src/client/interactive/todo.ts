@@ -75,7 +75,7 @@ export class Todo extends Interactive {
 
         this.syncServer();
         this.room.send(MessageType.LIST_STOPUSE, this.id.toString());
-
+        this.canvas.getContext("2d").clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.canvas.style.visibility = "hidden";
         setInputMode(InputMode.NORMAL);
     }
