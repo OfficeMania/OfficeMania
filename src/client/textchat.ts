@@ -253,7 +253,7 @@ function addMessageToBar(chatMessage: ChatMessage) {
     messageLine.id = "message-line";
     messageTime.innerText = `${chatMessage.timestamp}  `;
     messageLine.innerText = `${chatMessage.name}: ${chatMessage.message}`;
-    messageLine.innerHTML = messageLine.innerHTML.replace(patternUrl, '<a href="$&">$&</a>');
+    messageLine.innerHTML = messageLine.innerHTML.replace(patternUrl, '<a href="$&" target="_blank">$&</a>');
     messageDiv.append(messageTime);
     messageDiv.append(messageLine);
     if (checkIfOwnMessage(chatMessage)) {
