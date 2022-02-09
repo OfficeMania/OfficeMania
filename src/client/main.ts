@@ -90,7 +90,7 @@ import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen"
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 import { getInFocus, initChatListener } from "./textchat";
 import { Backpack } from "./backpack";
-import { MessageType } from "../common/util";
+import { literallyUndefined, MessageType } from "../common/util";
 import { State } from "../common";
 import {createMapJson, drawMap, GroundType, TileList} from "./newMap";
 
@@ -228,9 +228,15 @@ characterSelect.addEventListener("change", () => checkValidSettings());
 
 function loadUsernameSettings() {
     if (areWeLoggedIn()) {
-        usernameInput.value = getUsername();
-        usernameInput.style.color = null;
-        usernameInput.disabled = false;
+        if (literallyUndefined(getOurPlayer().userId)) {
+            usernameInput.value = "Only Temporarily Logged In";
+            usernameInput.style.color = "orange";
+            usernameInput.disabled = true;
+        } else {
+            usernameInput.value = getUsername();
+            usernameInput.style.color = null;
+            usernameInput.disabled = false;
+        }
     } else {
         usernameInput.value = "Not Logged In";
         usernameInput.style.color = "red";
