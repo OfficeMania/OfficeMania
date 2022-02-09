@@ -262,6 +262,7 @@ function addMessageToBar(chatMessage: ChatMessage) {
 }
 
 function checkIfOwnMessage(message: ChatMessage) {
+    console.log("id: ", getOurPlayer().userId);
     if (message.userId === getOurPlayer().roomId || message.userId === getOurPlayer().userId) {
         return true;
     } else {
@@ -483,7 +484,7 @@ function updateChatName(chat: Chat) {
 }
 
 function sendChatNotification(message: ChatMessage) {
-    if (message.userId && message.userId !== getOurPlayer().roomId) {
+    if (!checkIfOwnMessage(message)) {
         let chatSuffix: string = "";
         if (chats[0].id === message.chatId) {
             chatSuffix = " in Global";
