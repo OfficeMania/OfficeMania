@@ -213,6 +213,7 @@ function onMessageLogs(chatMessages: ChatMessage[]): void {
 
 //write message into chat object, update messagebar if it is selected
 function onMessage(chatMessage: ChatMessage) {
+    console.log(chatMessage)
     const chat: Chat = getChatById(chatMessage.chatId);
     chat.messages.push(chatMessage);
     if (textchatDropdownChatsButton.getAttribute("data-id") === chatMessage.chatId) {
@@ -261,7 +262,7 @@ function addMessageToBar(chatMessage: ChatMessage) {
 }
 
 function checkIfOwnMessage(message: ChatMessage) {
-    if (message.userId === getOurPlayer().roomId) {
+    if (message.userId === getOurPlayer().roomId || message.userId === getOurPlayer().userId) {
         return true;
     } else {
         return false;

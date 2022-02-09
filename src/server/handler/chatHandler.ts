@@ -73,6 +73,7 @@ export class ChatHandler implements Handler {
             const chatId = messageIdArray[0];
             console.log(chatId);
             const userId: string = getUserId(client, this.room);
+            console.log("userid is: ", userId)
             const serverMessage: ChatMessage = makeMessage(this.room, client, { chatId: chatId, message: chatMessage.message, userId });
 
             const chat: Chat = this.byChatId(chatId);
@@ -309,10 +310,15 @@ export class ChatHandler implements Handler {
 }
 
 function getUserId(client: Client, room: Room<State>): string {
+    console.log("getuser call: ", client.sessionId);
     room.state.players.forEach((p,k) => {
         if (k === client.sessionId) {
+            console.log("found client: ", p.userId);
             if (p.userId) {
-                return p.userId
+                return p.userId;
+            }
+            else {
+                console.log("no userid found")
             }
         }
     });

@@ -372,10 +372,7 @@ body {
     position: absolute;
 }
 
-#interactive,
-#interactive-whiteboard-canvas,
-#interactive-chess-canvas,
-#interactive-pong-canvas {
+#interactive {
     position:absolute;
     z-index: 1;
     width: 60%;

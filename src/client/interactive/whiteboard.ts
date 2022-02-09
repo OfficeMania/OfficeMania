@@ -16,7 +16,6 @@ import {
     saveButton,
     sizeSelector,
     whiteboardPanel,
-    interactiveWhiteboardCanvas,
     whiteboardSizeIcon
 } from "../static";
 import { ArraySchema } from "@colyseus/schema";
@@ -109,7 +108,7 @@ export class Whiteboard extends Interactive{
 
     constructor() {
 
-        super("whiteboard", false, 1, interactiveWhiteboardCanvas)
+        super("whiteboard", false, 1)
 
         this.wID = Whiteboard.whiteboardCount;
         Whiteboard.whiteboardCount++;
