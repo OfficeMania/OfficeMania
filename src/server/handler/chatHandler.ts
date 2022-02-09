@@ -246,8 +246,8 @@ export class ChatHandler implements Handler {
             const serverMessage = makeMessage(this.room, client, { message, chatId: newChat.id });
             newChat.messages.push(serverMessage);
             this.chats.push(newChat);
-            console.log("newchat users: ", newChat.users)
-            getClientsByUserId(getColyseusId(ourPlayer.id, this.room), this.room).forEach(client => {
+            console.log("newchat users: ", newChat.users);
+            getClientsByUserId(ourPlayer.id, this.room).forEach(client => {
                 console.log("sending to client", client.sessionId)
                 this.onChatUpdate(client);
                 this.onLog(client, newChat.id);
@@ -256,7 +256,7 @@ export class ChatHandler implements Handler {
             //this.onChatUpdate();
             otherPlayers.forEach(p => {
                 if (p.data.userId && p.data.userId !== "undefined") {
-                    let a = getClientsByUserId(getColyseusId(p.data.userId, this.room), this.room);
+                    let a = getClientsByUserId(p.data.userId, this.room);
                     console.log(a);
                     a.forEach(client => {
                         console.log("sending to client", client.sessionId)
@@ -388,7 +388,16 @@ function addZero(i) {
 
 //get all the clients (different pcs f.e.) that are connected to userId
 function getClientsByUserId(userId: string, room: Room<State>): Client[] {
-    return room.clients.filter((client: Client) => room.state.players[client.sessionId].userId === userId);
+    const cl: Client[] = [];
+    room.clients.forEach((client: Client) => {
+        room.state.players.forEach((p,playerKey) => {
+            if (playerKey === client.sessionId && (p.userId === userId || playerKey === userId)) {
+                console.log("found");
+                cl.push(client);
+            }
+        })
+    })
+    return cl;
 }
 
 function updateChatName(chat: Chat, room: Room) {
