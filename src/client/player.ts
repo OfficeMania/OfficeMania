@@ -3,6 +3,8 @@ import { solidInfo } from "./map";
 import { Direction, MessageType } from "../common/util";
 import { getCorrectedPlayerCoordinates } from "./util";
 import { Backpack } from "./backpack";
+import { State } from "../common";
+import { isGetAccessor } from "typescript";
 //import { lowestX, lowestY } from "./main"
 
 //all variables needed to adjust movement speed and length.
@@ -86,7 +88,7 @@ export function updatePosition(player: Player, room: Room) {
     }
 }
 
-export function updateOwnPosition(player: Player, room: Room, collisionInfo: solidInfo[][]) {
+export function updateOwnPosition(player: Player, room: Room<State>, collisionInfo: solidInfo[][]) {
     let [x, y] = getCorrectedPlayerCoordinates(player);
 
     //initiates movement in one direction and blocks the other directions till the next tile
@@ -94,7 +96,8 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
         if (player.priorDirections[0] === Direction.DOWN && player.moveDirection === null) {
             if (
                 (collisionInfo[x][y + 1] === undefined || !collisionInfo[x][y + 1].isSolid) && //dont go in direction if there are objects
-                (collisionInfo[x + 1][y + 1] === undefined || !collisionInfo[x + 1][y + 1].isSolid)
+                (collisionInfo[x + 1][y + 1] === undefined || !collisionInfo[x + 1][y + 1].isSolid) ||
+                (room.state.players.get(player.roomId).isSitting && player.facing === Direction.DOWN)
             ) {
                 let content = collisionInfo[x][y + 1].content;
                 let content2 = collisionInfo[x + 1][y + 1].content;
@@ -133,7 +136,8 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
             if (
                 y > 0 &&
                 (collisionInfo[x][y - 1] === undefined || !collisionInfo[x][y - 1].isSolid) && //dont go in direction if there are objects
-                (collisionInfo[x + 1][y - 1] === undefined || !collisionInfo[x + 1][y - 1].isSolid)
+                (collisionInfo[x + 1][y - 1] === undefined || !collisionInfo[x + 1][y - 1].isSolid) ||
+                (room.state.players.get(player.roomId).isSitting && player.facing === Direction.UP)
             ) {
                 //dont go in direction if there are objects
                 //if there is a door
@@ -171,7 +175,8 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
             }
         }
         if (player.priorDirections[0] === Direction.LEFT && player.moveDirection === null) {
-            if (x > 0 && (collisionInfo[x - 1][y] === undefined || !collisionInfo[x - 1][y].isSolid)) {
+            if (x > 0 && (collisionInfo[x - 1][y] === undefined || !collisionInfo[x - 1][y].isSolid) ||
+            (room.state.players.get(player.roomId).isSitting && player.facing === Direction.LEFT)) {
                 //dont go in direction if there are objects
                 //if there is a door
                 let content = collisionInfo[x - 1][y].content;
@@ -204,7 +209,8 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
             }
         }
         if (player.priorDirections[0] === Direction.RIGHT && player.moveDirection === null) {
-            if (collisionInfo[x + 2][y] === undefined || !collisionInfo[x + 2][y].isSolid) {
+            if (collisionInfo[x + 2][y] === undefined || !collisionInfo[x + 2][y].isSolid ||
+                (room.state.players.get(player.roomId).isSitting && player.facing === Direction.RIGHT)) {
                 //dont go in direction if there are objects
                 //if there is a door
                 let content = collisionInfo[x + 2][y].content;

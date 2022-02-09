@@ -1,9 +1,10 @@
 import { Room } from "colyseus.js";
 import { Player, STEP_SIZE } from "./player";
-import { getCorrectedPlayerCoordinates, getRoom, PlayerRecord } from "./util";
+import { getCollisionInfo, getCorrectedPlayerCoordinates, getRoom, PlayerRecord } from "./util";
 import { PlayerState, State } from "../common";
 import { Direction } from "../common/util";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
+import { Chair } from "./interactive/chairs";
 
 function calculateAnimation(player: Player) {
     let mode: string;
@@ -21,7 +22,13 @@ function calculateAnimation(player: Player) {
         }
 
         //TODO richtung des stuhls, auf dem die Peron ist?
-        direction = Direction.RIGHT;
+        let[x, y] = getCorrectedPlayerCoordinates(player);
+        let collisioninfo = getCollisionInfo();
+        let content = collisioninfo[x]?.[y]?.content;
+        if (content && content.name === "Chair") {
+            direction = content.chairDirection;
+            player.facing = direction;
+        }
         
         player.moving = 0;
         player.standing++;

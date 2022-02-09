@@ -6,9 +6,6 @@ import { Interactive } from "./interactive";
 
 
 export class Chair extends Interactive {
-    //helps to know in wich direction the player looks
-    chairDirection: Direction;
-
     //helps to know where the player schould sit
     posX: number;
     posY: number;
