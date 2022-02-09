@@ -71,36 +71,9 @@ export class Whiteboard extends Interactive{
         console.log(number);
         this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
         this.draw(Number(number));
-        switch (this.currentColor) {
-            case 2:
-                colorSelector.style.backgroundColor = "red";
-                colorSelector.style.color = "red";
-                break;
-            case 3:
-                colorSelector.style.backgroundColor = "magenta";
-                colorSelector.style.color = "magenta";
-                break;
-            case 4:
-                colorSelector.style.backgroundColor = "orange";
-                colorSelector.style.color = "orange";
-                break;
-            case 5:
-                colorSelector.style.backgroundColor = "yellow";
-                colorSelector.style.color = "yellow";
-                break;
-            case 6:
-                colorSelector.style.backgroundColor = "green";
-                colorSelector.style.color = "green";
-                break;
-            case 7:
-                colorSelector.style.backgroundColor = "blue";
-                colorSelector.style.color = "blue";
-                break;
-            default: //case 0
-                colorSelector.style.backgroundColor = "black";
-                colorSelector.style.color = "black";
-                break;
-        }
+        let colors: string[] = ["black", undefined, "red", "magenta", "orange", "yellow", "green", "blue"];
+        colorSelector.style.backgroundColor = colors[this.currentColor];
+        colorSelector.style.color = colors[this.currentColor];
     }
 
 
@@ -117,15 +90,10 @@ export class Whiteboard extends Interactive{
         this.players = getPlayers();
 
         this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
-
         this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
-
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
-
         this.room.onMessage(MessageType.WHITEBOARD_SAVE, (message) => this.save(this, message));
-
         this.room.onMessage(MessageType.WHITEBOARD_DRAW, () => this.draw(this.currentColor));
-
         this.room.onMessage(MessageType.WHITEBOARD_ERASE, () => this.erase());
 
         this.resize(this);
@@ -197,8 +165,6 @@ export class Whiteboard extends Interactive{
         this.canvas.addEventListener('mouseup',this.mouseup);
         this.canvas.addEventListener('mouseenter',this.mouseenter);
 
-
-
         clearButton.addEventListener("click", this.clearCommand);
         saveButton.addEventListener("click", this.savePressed);
         eraserButton.addEventListener("click", this.erasePressed);
@@ -232,7 +198,6 @@ export class Whiteboard extends Interactive{
         sizeSelector.style.visibility = "visible";
         colorSelector.style.visibility = "visible";
         whiteboardSizeIcon.style.visibility = "visible";
-
 
         whiteboardPanel.style.visibility = "vsible";
 
@@ -317,8 +282,6 @@ export class Whiteboard extends Interactive{
         } else if (parseInt(this.canvas.style.height) > window.innerHeight) {
             this.canvas.style.height = String(parseInt(this.canvas.style.width) / 2)
         }
-
-        // clearButton.style.top = rect.top + "px";
     }
 
     drawOthers(clientID: string, whiteboard: Whiteboard) {
@@ -367,11 +330,8 @@ export class Whiteboard extends Interactive{
                 j = 0;
             }
         }
-        //ctx.stroke(); // draw it!
-
 
         whiteboard.whiteboardPlayer[clientID] = max - 2;
-
     }
 
     // new position from mouse event
@@ -407,37 +367,15 @@ export class Whiteboard extends Interactive{
 
         ctx.lineWidth = this.size;
         ctx.lineCap = 'round';
+        let colors: string[] = ["black", "white", "red", "magenta", "orange", "yellow", "green", "blue"];
         if (this.isPen) {
-            switch (this.currentColor) {
-                case 2:
-                    ctx.strokeStyle = "red";
-                    break;
-                case 3:
-                    ctx.strokeStyle = "magenta";
-                    break;
-                case 4:
-                    ctx.strokeStyle = "orange";
-                    break;
-                case 5:
-                    ctx.strokeStyle = "yellow";
-                    break;
-                case 6:
-                    ctx.strokeStyle = "green";
-                    break;
-                case 7:
-                    ctx.strokeStyle = "blue";
-                    break;
-                default: //case 0
-                    ctx.strokeStyle = "black";
-                    break;
-            }
+            ctx.strokeStyle = colors[this.currentColor];
         } else {
             ctx.strokeStyle = 'white';
         }
 
         ctx.moveTo(firstX, firstY); // from
         ctx.lineTo(secondX, secondY); // to
-
         ctx.stroke(); // draw it!
     }
 

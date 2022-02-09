@@ -38,13 +38,13 @@ class VideoContainer {
     private readonly _container: HTMLDivElement;
     private readonly _video: HTMLVideoElement;
     private readonly _overlay: HTMLDivElement;
-    private readonly _buttonToggleSize: HTMLButtonElement;
+    private readonly _buttonToggleSize: HTMLElement;
 
     constructor(video: HTMLVideoElement) {
         this._container = document.createElement("div");
         this._video = video;
         this._overlay = document.createElement("div");
-        this._buttonToggleSize = document.createElement("button");
+        this._buttonToggleSize = document.createElement("i");
         this.init();
     }
 
@@ -72,7 +72,7 @@ class VideoContainer {
         return this._overlay;
     }
 
-    get buttonToggleSize(): HTMLButtonElement {
+    get buttonToggleSize(): HTMLElement {
         return this._buttonToggleSize;
     }
 

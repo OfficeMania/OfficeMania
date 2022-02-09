@@ -71,17 +71,11 @@ export class ChatHandler implements Handler {
         const chatIds: string[] = this.chats.map(chat => chat.id);
         if (chatIds.includes(messageIdArray[0])) {
             const chatId = messageIdArray[0];
-            console.log(chatId);
             const userId: string = getUserId(client, this.room);
-            console.log("userid is: ", userId)
             const serverMessage: ChatMessage = makeMessage(this.room, client, { chatId: chatId, message: chatMessage.message, userId });
 
             const chat: Chat = this.byChatId(chatId);
-            /*if (!chat.users.includes(userId)) {
-                chat.users.push(userId);
-            }*/
             chat.messages.push(serverMessage);
-            //chat.messages.forEach(chatMessage => console.log("chatMessage:", JSON.stringify(chatMessage)));
             if (chatId === this.globalChat.id) {
                 this.room.clients.forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
             } else {
@@ -198,12 +192,10 @@ export class ChatHandler implements Handler {
     }
 
     onChatAdd(client: Client, chatMessage: ChatMessage) {
-        console.log(chatMessage, client.id);
         if (!chatMessage.message || chatMessage.message === "") {
             return;
         }
         const ids: string[] = chatMessage.message.split(",");
-        console.log("adding new chat with ",ids, client.id);
 
         let ourPlayer: { data: PlayerState; id: string };
         const otherPlayers: { data: PlayerState; id: string }[] = [];
@@ -221,9 +213,6 @@ export class ChatHandler implements Handler {
         if (chatMessage.chatId === "new") {
             //add new chat
             console.log("Create new chat:", ourPlayer.id);
-            otherPlayers.forEach(p => {
-                console.log(p.id);
-            });
 
             // create new chat between client and playerid
             const newChat: Chat = new Chat("");
@@ -246,9 +235,8 @@ export class ChatHandler implements Handler {
             const serverMessage = makeMessage(this.room, client, { message, chatId: newChat.id });
             newChat.messages.push(serverMessage);
             this.chats.push(newChat);
-            console.log("newchat users: ", newChat.users)
-            getClientsByUserId(getColyseusId(ourPlayer.id, this.room), this.room).forEach(client => {
-                console.log("sending to client", client.sessionId)
+            //console.log("newchat users: ", newChat.users);
+            getClientsByUserId(ourPlayer.id, this.room).forEach(client => {
                 this.onChatUpdate(client);
                 this.onLog(client, newChat.id);
             });
@@ -256,17 +244,13 @@ export class ChatHandler implements Handler {
             //this.onChatUpdate();
             otherPlayers.forEach(p => {
                 if (p.data.userId && p.data.userId !== "undefined") {
-                    let a = getClientsByUserId(getColyseusId(p.data.userId, this.room), this.room);
-                    console.log(a);
-                    a.forEach(client => {
-                        console.log("sending to client", client.sessionId)
+                    getClientsByUserId(p.data.userId, this.room).forEach(client => {
                         this.onChatUpdate(client);
                         this.onLog(client, newChat.id);
                     });
                 }
                 else {
                     getClientsByUserId(p.id, this.room).forEach(client => {
-                        console.log("sending to client", client.sessionId)
                         this.onChatUpdate(client);
                         this.onLog(client, newChat.id);
                     })
@@ -305,7 +289,7 @@ export class ChatHandler implements Handler {
                                 this.onLog(client, chat.id);
                             });
                     } else {
-                        console.log("user " + otherPlayer.id + " already in chat " + chat.id);
+                        console.log(`User ${otherPlayer.id} already in chat ${chat.id}`);
                     }
                 });
             }
@@ -337,14 +321,11 @@ export class ChatHandler implements Handler {
 }
 
 function getUserId(client: Client, room: Room<State>): string {
-    //console.log("getuser call: ", client.sessionId);
     let id: string = client.sessionId; 
     room.state.players.forEach((p,k) => {
         if (k === client.sessionId) {
-            //console.log("found client: ", p.userId);
             if (p.userId !== "undefined") {
                 id = p.userId;
-                //console.log("id changed");
             }
         }
     });
@@ -388,17 +369,17 @@ function addZero(i) {
 
 //get all the clients (different pcs f.e.) that are connected to userId
 function getClientsByUserId(userId: string, room: Room<State>): Client[] {
-    let clients: Client[] = [];
-    room.clients.forEach(client => {
-        if (getUserId(client, room) === userId) {
-            console.log("found client: ", client.sessionId)
-            clients.push(client);
-        }
-    });
-    return clients;
+    const cl: Client[] = [];
+    room.clients.forEach((client: Client) => {
+        room.state.players.forEach((p,playerKey) => {
+            if (playerKey === client.sessionId && (p.userId === userId || playerKey === userId)) {
+                cl.push(client);
+            }
+        })
+    })
+    return cl;
 }
 
 function updateChatName(chat: Chat, room: Room) {
-    
     chat.name = chat.users.filter(user => !!room.state.players.get(getColyseusId(user, room))).map(user => room.state.players.get(getColyseusId(user, room)).displayName).join(", ");
 }
