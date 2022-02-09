@@ -400,7 +400,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         this.hide();
         this.canvas.onmousedown = null;
         chessImportButton.click = null;
-        this.room.removeAllListeners(); //Dangerous move
+        //this.room.removeAllListeners(); //Dangerous move
         this.room.send(MessageType.CHESS_LEAVE);
         resetVariables();
         checkInputMode();
