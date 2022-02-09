@@ -70,7 +70,7 @@ body {
 
 button{
     height: 40px;
-    width: 40px;
+    min-width: 40px;
     cursor: pointer;
     transition: opacity var(--transition-speed);
     font-size: 110%;
