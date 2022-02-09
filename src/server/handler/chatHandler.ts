@@ -388,14 +388,7 @@ function addZero(i) {
 
 //get all the clients (different pcs f.e.) that are connected to userId
 function getClientsByUserId(userId: string, room: Room<State>): Client[] {
-    let clients: Client[] = [];
-    room.clients.forEach(client => {
-        if (getUserId(client, room) === userId) {
-            console.log("found client: ", client.sessionId)
-            clients.push(client);
-        }
-    });
-    return clients;
+    return room.clients.filter((client: Client) => room.state.players[client.sessionId].userId === userId);
 }
 
 function updateChatName(chat: Chat, room: Room) {
