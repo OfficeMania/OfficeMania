@@ -162,7 +162,7 @@ export function checkInputMode() {
 }
 
 function adminConfig() {
-    window.location.href = "/admin/config";
+    window.open("/admin/config");
 }
 
 function login() {
