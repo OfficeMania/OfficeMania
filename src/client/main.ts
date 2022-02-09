@@ -443,7 +443,8 @@ async function main() {
         map.lowestX,
         map.lowestY,
         map.highestY,
-        map.highestX
+        map.highestX,
+        map.objects
     );
 
     //i guess it should not be here but i don't know where it should be

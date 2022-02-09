@@ -3,7 +3,7 @@ import {Room} from "colyseus.js";
 import {Interactive} from "./interactive/interactive"
 import {Door, DoorDirection} from "./interactive/door";
 import {PingPongTable} from "./interactive/pingpongtable";
-import {Direction, State} from "../common";
+import {Direction, State, STEP_SIZE} from "../common";
 import {Whiteboard} from "./interactive/whiteboard";
 import {Todo} from "./interactive/todo";
 import {CoffeeMachine} from "./interactive/machines/coffeeMachine";
@@ -74,14 +74,16 @@ class MapInfo {
     textures: Map<string, HTMLImageElement>;
     resolution: number;
     canvas: HTMLCanvasElement;
+    objects: Objects[];
 
-    constructor(layers: Layer[], tileSets: TileSet[], canvas: HTMLCanvasElement, resolution: number, textures: Map<string, HTMLImageElement>, lowestX: number, lowestY: number, highestY: number, highestX: number) {
+    constructor(layers: Layer[], tileSets: TileSet[], canvas: HTMLCanvasElement, resolution: number, textures: Map<string, HTMLImageElement>, lowestX: number, lowestY: number, highestY: number, highestX: number, objects: Objects[]) {
         this.lowestX = lowestX;
         this.lowestY = lowestY;
         this.highestY = highestY;
         this.highestX = highestX;
         this.layers = layers;
         this.tileSets = tileSets;
+        this.objects = objects;
         this.heightOfMap = canvas.height / (resolution);
         this.widthOfMap = canvas.width / (resolution);
         this.ctx = canvas.getContext("2d");
@@ -90,6 +92,49 @@ class MapInfo {
         this.canvas = canvas;
     }
 
+}
+
+class Objects {
+    private readonly _id: number;
+    private readonly _height: number;
+    private readonly _width: number;
+    private readonly _x: number;
+    private readonly _y: number;
+
+    constructor(height: number, id: number, width: number, x: number, y: number) {
+        this._id = id;
+        this._width = width;
+        this._height = height;
+
+        if(x % STEP_SIZE !== 0) {
+            x = x - (x % STEP_SIZE);
+        }
+        if(y % STEP_SIZE !== 0) {
+            y = y - (y % STEP_SIZE)
+        }
+        this._x = x;
+        this._y = y;
+    }
+
+    get id(): number {
+        return this._id;
+    }
+
+    get height(): number {
+        return this._height;
+    }
+
+    get width(): number {
+        return this._width;
+    }
+
+    get x(): number {
+        return this._x;
+    }
+
+    get y(): number {
+        return this._y;
+    }
 }
 
 class Layer {
@@ -219,12 +264,42 @@ function fillSolidInfos(map: MapInfo) {
     }
 
     const lastTileSet = map.tileSets[map.tileSets.length - 1];
+
+    //fill content with infos from ObjectLayer
+    for(const object of map.objects) {
+        const basePosX = ((object.x / map.resolution) - mapStartX) * 2;
+        const basePosY = ((object.y / map.resolution) - mapStartY) * 2;
+        const height = Math.round(object.height / map.resolution);
+        const width = Math.round(object.width / map.resolution);
+
+        /*const sofa = object.id === 19 || object.id === 20 || object.id === 21 || object.id === 22;
+        if(sofa) {
+            let i = 0;
+            console.log(height + " | " + width);
+            while(i < height * 2) {
+                const interactive: Interactive = getInteractive(object.id, basePosX, basePosY + i, room, map);
+                setSolidInfoMap(solidInfoMap, basePosX, basePosY + i, (solidInfo) => solidInfo.setContent(interactive));
+                i = i + 2;
+            }
+            i = 2;
+            while(i < width) {
+                const interactive: Interactive = getInteractive(object.id, basePosX + 1, basePosY, room, map);
+                setSolidInfoMap(solidInfoMap, basePosX + i, basePosY, (solidInfo) => solidInfo.setContent(interactive));
+                i = i + 2;
+            }
+            continue;
+        }*/
+
+        const interactive: Interactive = getInteractive(object.id, basePosX, basePosY, room, map);
+        setContentMap(solidInfoMap, basePosX, basePosY, height, width, (solidInfo) => solidInfo.setContent(interactive));
+    }
+    
     for (const layer of map.layers) {
         const isSolidLayer = layer.name === LAYER_NAME_SOLID;
         const isContentLayer = layer.name === LAYER_NAME_CONTENT;
         const isRoomsLayer = layer.name === LAYER_NAME_ROOMS;
         const isConferenceRoomsLayer = layer.name === LAYER_NAME_CONFERENCE_ROOMS;
-        if (!(isSolidLayer || isContentLayer || isRoomsLayer || isConferenceRoomsLayer)) {
+        if (!(isSolidLayer || isRoomsLayer || isConferenceRoomsLayer)) {
             continue;
         }
         for (const chunk of layer.chunks) {
@@ -274,7 +349,7 @@ function fillSolidInfos(map: MapInfo) {
                             if (numbBin.charAt(3) === "1") {
                                 solidInfoMap[basePosX + 1][basePosY + 1].setIsSolid();
                             }
-                        } else if (isContentLayer && value !== 0) {
+                        } /*else if (isContentLayer && value !== 0) {
                             const interactive: Interactive = getInteractive(value, basePosX, basePosY, room, map);
                             if(interactive && interactive.name === "Door" && interactive.direction === DoorDirection.NORTH) {
                                 setSolidInfoMap(solidInfoMap, basePosX, basePosY - 2, (solidInfo) => solidInfo.setContent(interactive));
@@ -284,7 +359,7 @@ function fillSolidInfos(map: MapInfo) {
                                 setSolidInfoMap(solidInfoMap, basePosX + 2, basePosY, (solidInfo) => solidInfo.setContent(interactive));
                             }
                             setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setContent(interactive));
-                        } else if (isConferenceRoomsLayer && value === 1) {
+                        } */else if (isConferenceRoomsLayer && value === 1) {
                             setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setIsConferenceRoom(true));
                         } else if (isRoomsLayer) {
                             setSolidInfoMap(solidInfoMap, basePosX, basePosY, (solidInfo) => solidInfo.setRoomId(value));
@@ -302,6 +377,17 @@ function setSolidInfoMap(solidInfoMap: solidInfo[][], basePosX: number, basePosY
     callback(solidInfoMap[basePosX + 1][basePosY]);
     callback(solidInfoMap[basePosX][basePosY + 1]);
     callback(solidInfoMap[basePosX + 1][basePosY + 1]);
+}
+
+function setContentMap(solidInfoMap: solidInfo[][], basePosX: number, basePosY: number, height: number, width: number, callback: (solidInfo) => void) {
+    for(let i = 0; i <= height; i++) {
+        for(let j = 0; j <= width; j++) {
+        callback(solidInfoMap[basePosX + j][basePosY + i]);
+        callback(solidInfoMap[basePosX + 1 + j][basePosY + i]);
+        callback(solidInfoMap[basePosX + j][basePosY + 1 + i]);
+        callback(solidInfoMap[basePosX + 1 + j][basePosY + 1 + i]);
+        }
+    }
 }
 
 function getInteractive(value: number, basePosX: number, basePosY: number, room: Room<State>, map: MapInfo) {
@@ -407,6 +493,9 @@ async function convertMapData(mapJson: {[key: string]: any}, room: Room, canvas:
     //saves the tileSets from the map
     const tileSets: TileSet[] = [];
 
+    //saves the objects for the objects
+    const objects: Objects [] = [];
+
     paths = [];
 
     room.state.templatePaths.forEach((path) => paths.push(path));
@@ -433,7 +522,15 @@ async function convertMapData(mapJson: {[key: string]: any}, room: Room, canvas:
 
     for (const mapJsonLayer of mapJson.layers) {
         const chunks: Chunk[] = [];
-        if(!mapJsonLayer.chunks) continue; //TODO NOT GOOD, quick fix for object layer ignoring
+
+        //add objectLayer
+        if(mapJsonLayer.name === "Interactives") {
+            for(const object of mapJsonLayer.objects) {
+                objects.push(new Objects(object.height, parseInt(object.type), object.width, object.x, object.y));
+            }
+            continue;
+        }
+
         for (const mapJsonChunk of mapJsonLayer.chunks) {
             chunks.push(new Chunk(mapJsonChunk.x, mapJsonChunk.y, mapJsonChunk.data));
             if (!isSet) {
@@ -464,7 +561,7 @@ async function convertMapData(mapJson: {[key: string]: any}, room: Room, canvas:
         tileSets[t].tileWidth = image.naturalWidth;
         textures.set(tileSets[t].path, image);
     }
-    return new MapInfo(layers, tileSets, canvas, resolution, textures, lowestX, lowestY, highestY, highestX);
+    return new MapInfo(layers, tileSets, canvas, resolution, textures, lowestX, lowestY, highestY, highestX, objects);
 }
 
 /*
