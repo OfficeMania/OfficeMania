@@ -18,6 +18,8 @@ import { Chat, ChatDTO, ChatMessage } from "../common/handler/chat-handler";
 import { PlayerState } from "../common/states/player-state";
 import { getUser, setShowParticipantsTab } from "./conference/conference";
 
+const patternUrl: RegExp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
+
 //tracks if button/shortcut have been pressed
 let _showTextchat = false;
 
@@ -251,6 +253,7 @@ function addMessageToBar(chatMessage: ChatMessage) {
     messageLine.id = "message-line";
     messageTime.innerText = `${chatMessage.timestamp}  `;
     messageLine.innerText = `${chatMessage.name}: ${chatMessage.message}`;
+    messageLine.innerHTML = messageLine.innerHTML.replace(patternUrl, '<a href="$&" target="_blank">$&</a>');
     messageDiv.append(messageTime);
     messageDiv.append(messageLine);
     if (checkIfOwnMessage(chatMessage)) {
