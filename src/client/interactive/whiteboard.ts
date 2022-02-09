@@ -90,15 +90,10 @@ export class Whiteboard extends Interactive{
         this.players = getPlayers();
 
         this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
-
         this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
-
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
-
         this.room.onMessage(MessageType.WHITEBOARD_SAVE, (message) => this.save(this, message));
-
         this.room.onMessage(MessageType.WHITEBOARD_DRAW, () => this.draw(this.currentColor));
-
         this.room.onMessage(MessageType.WHITEBOARD_ERASE, () => this.erase());
 
         this.resize(this);
@@ -170,8 +165,6 @@ export class Whiteboard extends Interactive{
         this.canvas.addEventListener('mouseup',this.mouseup);
         this.canvas.addEventListener('mouseenter',this.mouseenter);
 
-
-
         clearButton.addEventListener("click", this.clearCommand);
         saveButton.addEventListener("click", this.savePressed);
         eraserButton.addEventListener("click", this.erasePressed);
@@ -205,7 +198,6 @@ export class Whiteboard extends Interactive{
         sizeSelector.style.visibility = "visible";
         colorSelector.style.visibility = "visible";
         whiteboardSizeIcon.style.visibility = "visible";
-
 
         whiteboardPanel.style.visibility = "vsible";
 
@@ -290,8 +282,6 @@ export class Whiteboard extends Interactive{
         } else if (parseInt(this.canvas.style.height) > window.innerHeight) {
             this.canvas.style.height = String(parseInt(this.canvas.style.width) / 2)
         }
-
-        // clearButton.style.top = rect.top + "px";
     }
 
     drawOthers(clientID: string, whiteboard: Whiteboard) {
@@ -340,11 +330,8 @@ export class Whiteboard extends Interactive{
                 j = 0;
             }
         }
-        //ctx.stroke(); // draw it!
-
 
         whiteboard.whiteboardPlayer[clientID] = max - 2;
-
     }
 
     // new position from mouse event
@@ -389,7 +376,6 @@ export class Whiteboard extends Interactive{
 
         ctx.moveTo(firstX, firstY); // from
         ctx.lineTo(secondX, secondY); // to
-
         ctx.stroke(); // draw it!
     }
 
