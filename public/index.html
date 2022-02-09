@@ -254,14 +254,23 @@
                             <div><em class="fa fa-circle" id="whiteboard-size-icon"></em><span></span></div>
                         </div>
                         <select id="whiteboard-color-selector">
-                            <option value="0">black</option> 
-                            <option value="2">red</option>
-                            <option value="3">pink</option>
-                            <option value="4">orange</option>
-                            <option value="5">yellow</option>
-                            <option value="6">green</option>
-                            <option value="7">blue</option>
+                            <option class="black" value="0">black</option> 
+                            <option class="red" value="2">red</option>
+                            <option class="pink" value="3">pink</option>
+                            <option class="orange" value="4">orange</option>
+                            <option class="yellow" value="5">yellow</option>
+                            <option class="green" value="6">green</option>
+                            <option class="blue" value="7">blue</option>
                         </select>
+                        <style type="text/css">
+                            option.black {background-color: black; color: white;}
+                            option.red {background-color: red; color: black;}
+                            option.pink {background-color: magenta; color: black;}
+                            option.orange {background-color: orange; color: black;}
+                            option.yellow {background-color: yellow; color: black;}
+                            option.green {background-color: green; color: black;}
+                            option.blue {background-color: blue; color: black;}
+                        </style>
 
                     </div>
                 </div>
