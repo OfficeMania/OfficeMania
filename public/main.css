@@ -688,6 +688,7 @@ button:active{
     height: 100%;
     width: 100%;
     opacity: 100%;
+    z-index: 1;
 }
 
 #loading-cat {
@@ -698,6 +699,7 @@ button:active{
     height: 10%;
     visibility: visible;
     transition: 0.5s;
+    z-index: 2;
 }
 
 @font-face {
