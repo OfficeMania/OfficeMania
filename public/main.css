@@ -68,9 +68,7 @@ body {
     flex-direction: row;
 }
 
-#panel-buttons button,
-#textchat-bar button,
-#interactive-bar button{
+button{
     height: 40px;
     width: 40px;
     cursor: pointer;
@@ -86,15 +84,11 @@ body {
     box-shadow: 0 4px #999;
 }
 
-#panel-buttons button:hover,
-#textchat-bar button:hover,
-#interactive-bar button:hover{
+button:hover{
     background-color: #dddddd;
 }
 
-#panel-buttons button:active,
-#textchat-bar button:active,
-#interactive-bar button:active{
+button:active{
     background-color: #cccccc;
     box-shadow: 0 2px #666;
     transform: translateY(2px);
@@ -727,7 +721,7 @@ body {
     height: 40px;
 }
 #user-list button{
-    width: calc(20% - 5px);
+    width: 15%;
     height: 40px;
 }
 #user-list li {
