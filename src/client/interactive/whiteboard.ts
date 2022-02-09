@@ -407,30 +407,9 @@ export class Whiteboard extends Interactive{
 
         ctx.lineWidth = this.size;
         ctx.lineCap = 'round';
+        let colors: string[] = ["black", "white", "red", "magenta", "orange", "yellow", "green", "blue"];
         if (this.isPen) {
-            switch (this.currentColor) {
-                case 2:
-                    ctx.strokeStyle = "red";
-                    break;
-                case 3:
-                    ctx.strokeStyle = "magenta";
-                    break;
-                case 4:
-                    ctx.strokeStyle = "orange";
-                    break;
-                case 5:
-                    ctx.strokeStyle = "yellow";
-                    break;
-                case 6:
-                    ctx.strokeStyle = "green";
-                    break;
-                case 7:
-                    ctx.strokeStyle = "blue";
-                    break;
-                default: //case 0
-                    ctx.strokeStyle = "black";
-                    break;
-            }
+            ctx.strokeStyle = colors[this.currentColor];
         } else {
             ctx.strokeStyle = 'white';
         }
