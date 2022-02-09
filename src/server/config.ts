@@ -88,7 +88,7 @@ async function getBooleanOrElse(
     return toBoolean(configEntry.value) ?? defaultValue;
 }
 
-export function isLoginEnabled(defaultValue = false): Promise<boolean> {
+export function isLoginEnabled(defaultValue = true): Promise<boolean> {
     return getBooleanOrElse("ENABLE_LOGIN", ENABLE_LOGIN, defaultValue);
 }
 
@@ -139,7 +139,7 @@ export function isInviteCodeRequiredForSignup(defaultValue = false): Promise<boo
 }
 
 export const CONFIG_KEYS: string[] = ["ENABLE_LOGIN", "REQUIRE_LOGIN", "ALLOW_LOGIN_VIA_CREDENTIALS", "ALLOW_LOGIN_VIA_INVITE_CODE", "DISABLE_SIGNUP", "REQUIRE_INVITE_CODE_FOR_SIGNUP"];
-export const CONFIG_DEFAULT_VALUES: any[] = [false, false, true, false, true, false];
+export const CONFIG_DEFAULT_VALUES: any[] = [true, false, true, false, true, false];
 
 export function getEnvValue(key: string): string | undefined | null {
     if (!CONFIG_KEYS.includes(key)) {
