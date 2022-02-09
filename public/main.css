@@ -682,7 +682,7 @@ button:active{
 #loading-screen {
     position: fixed;
     transition: 0.5s;
-    background-color: #d0be9c;
+    background-image: url('../assets/templates/background_grass_6.png');;
     visibility: visible;
     display: flex;
     height: 100%;
