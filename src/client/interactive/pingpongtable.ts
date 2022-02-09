@@ -130,6 +130,8 @@ export class PingPongTable extends Interactive {
     leave() {
         if (this.leavable) {
             removeCloseInteractionButton();
+            this.canvas.getContext("2d").clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.canvas.style.outline = "none";
             ourGame.canvas.style.visibility = "hidden";
             //this.room.removeAllListeners();
             this.room.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);

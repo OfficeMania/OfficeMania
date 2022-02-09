@@ -28,7 +28,8 @@ export class Pong {
         this.ctx = this.canvas.getContext("2d");
         this.ctx.fillStyle = "black"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
+        //this.canvas.style.borderStyle = "medium solid magenta";
+        //this.canvas.style.borderWidth = "5px 5px 7px 5px"
         this.loop();
     }
 

@@ -61,6 +61,7 @@ export class Notes extends Interactive {
     }
 
     leave() {
+        this.canvas.getContext("2d").clearRect(0, 0, this.canvas.width, this.canvas.height);
         removeCloseInteractionButton();
         this.canvas.style.visibility = "hidden";
         checkInputMode();
