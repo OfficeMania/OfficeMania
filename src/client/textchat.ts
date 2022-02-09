@@ -200,10 +200,11 @@ function onMessageLogs(chatMessages: ChatMessage[]): void {
     chats.forEach(chat => {
         if (chatIds.includes(chat.id)) {
             chat.messages.forEach(() => chat.messages.pop());
+            if (textchatDropdownChatsButton.getAttribute("data-id") === chat.id) {
+                clearTextchatBar();
+            }
         }
-        if (textchatDropdownChatsButton.getAttribute("data-id") === chat.id) {
-            clearTextchatBar();
-        }
+        
     });
     chatMessages.forEach(message => {
         onMessage(message);
