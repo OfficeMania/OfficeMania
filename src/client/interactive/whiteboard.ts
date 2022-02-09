@@ -71,36 +71,9 @@ export class Whiteboard extends Interactive{
         console.log(number);
         this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
         this.draw(Number(number));
-        switch (this.currentColor) {
-            case 2:
-                colorSelector.style.backgroundColor = "red";
-                colorSelector.style.color = "red";
-                break;
-            case 3:
-                colorSelector.style.backgroundColor = "magenta";
-                colorSelector.style.color = "magenta";
-                break;
-            case 4:
-                colorSelector.style.backgroundColor = "orange";
-                colorSelector.style.color = "orange";
-                break;
-            case 5:
-                colorSelector.style.backgroundColor = "yellow";
-                colorSelector.style.color = "yellow";
-                break;
-            case 6:
-                colorSelector.style.backgroundColor = "green";
-                colorSelector.style.color = "green";
-                break;
-            case 7:
-                colorSelector.style.backgroundColor = "blue";
-                colorSelector.style.color = "blue";
-                break;
-            default: //case 0
-                colorSelector.style.backgroundColor = "black";
-                colorSelector.style.color = "black";
-                break;
-        }
+        let colors: string[] = ["black", undefined, "red", "magenta", "orange", "yellow", "green", "blue"];
+        colorSelector.style.backgroundColor = colors[this.currentColor];
+        colorSelector.style.color = colors[this.currentColor];
     }
 
 
