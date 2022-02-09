@@ -113,7 +113,6 @@ export function initChatListener() {
     updateUserList();
 
     textchatDropdownAddUsers.addEventListener("click", () => {
-        console.log("add");
         const ids: string[] = [];
         for (let i = 0; i < textchatDropdownUsers.children.length; i++) {
             // @ts-ignore
@@ -121,13 +120,11 @@ export function initChatListener() {
                 ids.push(textchatDropdownUsers.children[i].id);
             }
         }
-        console.log(ids);
         modifyChat(ids, textchatDropdownChatsButton.getAttribute("data-id"));
         unCheck();
     });
 
     textchatDropdownNewChat.addEventListener("click", () => {
-        console.log("new");
         const ids: string[] = [];
         for (let i = 0; i < textchatDropdownUsers.children.length; i++) {
             // @ts-ignore
@@ -138,17 +135,19 @@ export function initChatListener() {
         modifyChat(ids);
         unCheck();
     });
+
+
     getRoom().onMessage(MessageType.CHAT_UPDATE, (message: string) => onChatUpdate(JSON.parse(message)));
     getRoom().onMessage(MessageType.CHAT_LOG, (message: string) => onMessageLogs(JSON.parse(message)));
     getRoom().send(MessageType.CHAT_UPDATE);
     getRoom().send(MessageType.CHAT_LOG);
     getRoom().onMessage(MessageType.CHAT_SEND, (message: ChatMessage) => {
-        console.debug("onmessage call")
         onMessage(message);
         sendChatNotification(message);
     });
 }
 
+//function to be executed onPlayerChange
 export function textchatPlayerOnChange(playerState: PlayerState) {
     if (playerState) {
         let uid: string = "";
@@ -171,11 +170,10 @@ export function textchatPlayerOnChange(playerState: PlayerState) {
     }
 }
 
-//rewrites all the of the clients chats from scratch
+//updates the chats object of client
 function onChatUpdate(chatDTOs: ChatDTO[]): void {
-    console.debug(chatDTOs);
-    //chats.forEach(() => {chats.pop()});
-    //console.log(chats, "chats:");
+    //console.debug(chatDTOs);
+
     let ids: string[] = [];
     chatDTOs.forEach(chat => {
         updateChat(chat);
@@ -183,7 +181,6 @@ function onChatUpdate(chatDTOs: ChatDTO[]): void {
     });
     for(let i = 0; i < chats.length; i++) {
         if (!ids.includes(chats[i].id)) {
-            console.log("splicing: ", chats[i].id, i)
             chats.splice(i, 1);
         }
     }
@@ -191,7 +188,7 @@ function onChatUpdate(chatDTOs: ChatDTO[]): void {
     updateChatList();
 }
 
-//
+//update/refill all messages in chat object and update displayed messages
 function onMessageLogs(chatMessages: ChatMessage[]): void {
     console.debug("onmessagelogs call");
     let chatIds: string[] = [];
@@ -209,13 +206,13 @@ function onMessageLogs(chatMessages: ChatMessage[]): void {
         }
     });
     chatMessages.forEach(message => {
-        onMessage(message)
+        onMessage(message);
     });
 }
 
 //write message into chat object, update messagebar if it is selected
 function onMessage(chatMessage: ChatMessage) {
-    console.log(chatMessage)
+    console.log(`New message: `, chatMessage)
     const chat: Chat = getChatById(chatMessage.chatId);
     chat.messages.push(chatMessage);
     if (textchatDropdownChatsButton.getAttribute("data-id") === chatMessage.chatId) {
@@ -225,7 +222,6 @@ function onMessage(chatMessage: ChatMessage) {
 
 //sends text message to server (if its not empty)
 function sendMessage(message: string, chatId: string) {
-    //console.log(message);
     chatId = JSON.stringify([chatId]);
     if (textchatDropdownChatsButton.getAttribute("data-id") === chats[1].id) {
         const ids: string[] = [];
@@ -265,7 +261,6 @@ function addMessageToBar(chatMessage: ChatMessage) {
 }
 
 function checkIfOwnMessage(message: ChatMessage) {
-    console.log("id: ", getOurPlayer().userId);
     if (message.userId === getOurPlayer().roomId || message.userId === getOurPlayer().userId) {
         return true;
     } else {
@@ -276,9 +271,7 @@ function checkIfOwnMessage(message: ChatMessage) {
 //for sending the adding/removing command to server
 function modifyChat(whoToAdd: string[], chatId: string = "new") {
     //if chat is selected, add to it (even if global, garbage sorting on handler side)
-    console.log("not yet implemented");
     const message: string = whoToAdd.toString();
-    console.log(message);
     getRoom().send(MessageType.CHAT_ADD, { message, chatId });
 }
 
@@ -286,11 +279,11 @@ function leaveChat(chatId: string) {
     getRoom().send(MessageType.CHAT_LEAVE, { message: "", chatId });
 }
 
+//update listed chats
 function updateChatList() {
     if (!textchatDropdownChatsButton.getAttribute("data-id")) {
         updateChatListButton(chats[0].id);
     }
-    //add any chats
 
     //all chats ids that are displayed
     const chatList: string[] = [];
@@ -302,13 +295,13 @@ function updateChatList() {
     //all chatids that should be displayed
     const chatIds: string[] = [];
 
+    //add any chats
     chats.forEach(chat => {
         chatIds.push(chat.id);
         if (!chatList.includes(chat.id)) {
             addChatListOption(chat);
         }
         let a: number = chatIds.indexOf(chat.id);
-        console.log(chat.name);
         // @ts-ignore
         textchatDropdownChats.children[a].children[0].children[0].innerText = chat.name;
         if (chat.id === textchatDropdownChatsButton.getAttribute("data-id")) {
@@ -316,16 +309,16 @@ function updateChatList() {
         }
     });
 
-    //remove any chats
+    //remove chats that shouldn't be there
     for (let i = 0; i < textchatDropdownChats.children.length; i++) {
         if (!chatIds.includes(textchatDropdownChats.children[i].id)) {
             textchatDropdownChats.children[i].remove();
-            console.log("remove");
             i--;
         }
     }
 }
 
+//update displayed users
 function updateUserList() {
     const uIdList: string[] = [];
 
@@ -340,7 +333,6 @@ function updateUserList() {
         userIds.push(key);
 
         if (!uIdList.includes(key) && key != getOurPlayer().roomId) {
-            console.log("inserting");
             addUserListOption(value.displayName, key);
         } else if (uIdList.includes(key)) {
             //renaming logic
@@ -356,11 +348,11 @@ function updateUserList() {
         if (!userIds.includes(textchatDropdownUsers.children[i].id)) {
             textchatDropdownUsers.children[i].remove();
             i--;
-            console.log("removing");
         }
     }
 }
 
+//add proper html elements for chat item
 function addChatListOption(chat: Chat) {
     const a = document.createElement("a");
     //a.innerText = chat.name;
@@ -389,9 +381,10 @@ function addChatListOption(chat: Chat) {
     const li = document.createElement("li");
     li.append(a);
     li.id = chat.id;
+    //change displayed chats to selected one
     li.addEventListener("click", () => {
         if (textchatDropdownChatsButton.getAttribute("data-id") === chat.id) {
-            console.log("already there");
+            console.log("Chat already selected");
             return;
         }
 
@@ -400,14 +393,11 @@ function addChatListOption(chat: Chat) {
         clearTextchatBar();
 
         getChatById(chat.id).messages.forEach(addMessageToBar);
-
-        console.log(getChatById(chat.id));
-
-
     });
     textchatDropdownChats.append(li);
 }
 
+//add html li element for user
 function addUserListOption(name: string, key: string) {
     const input = document.createElement("input");
     input.classList.add("form-check-input");
@@ -430,6 +420,7 @@ function addUserListOption(name: string, key: string) {
     textchatDropdownUsers.append(li);
 }
 
+//display new chat in chat-list-button
 function updateChatListButton(id: string) {
     let a = "";
     chats.forEach(chat => {
@@ -443,26 +434,27 @@ function updateChatListButton(id: string) {
 }
 
 function clearTextchatBar() {
+    console.log("clearing bar");
     while (textchatBar.firstChild) {
         textchatBar.firstChild.remove();
     }
 }
 
+
+//uncheck checkboxes
 function unCheck() {
     textchatDropdownUsersButton.click();
     $(":checkbox").prop("checked", false);
 }
 
 function updatePlayerName(userId: string) {
-    console.log("updating plaer: ", userId);
+    console.log("Updating player: ", userId);
     const chatList: Chat[] = chats.filter(chat => chat.users.includes(userId));
-    console.log(chatList);
     chatList.forEach(chat => updateChatName(chat));
 }
 
 function updateChatName(chat: Chat) {
     chat.name = "";
-    console.log(chat);
     chat.users.forEach((user) => {
         if (user.length !== 9) {
             getRoom().state.players.forEach((p,k,) => {
@@ -478,7 +470,7 @@ function updateChatName(chat: Chat) {
             chat.name = getRoom().state.players.get(user).displayName;
         } else {
             chat.name += ", " + getRoom().state.players.get(user).displayName;
-            console.log("add name: ", getRoom().state.players.get(user).displayName);
+            //console.log("Add name: ", getRoom().state.players.get(user).displayName);
         }
     });
     if (chat.name === "") {
