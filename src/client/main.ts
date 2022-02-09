@@ -622,11 +622,11 @@ async function main() {
         requestAnimationFrame(loop);
     }
 
-    //loadingScreen.style.display = "none";
     setShowLoadingscreen(false);
     interactiveCanvas.style.visibility = "hidden";
     backpackCanvas.style.visibility = "hidden";
     checkInputMode();
+
     // Start game loop
     requestAnimationFrame(loop);
 }

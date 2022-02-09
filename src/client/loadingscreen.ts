@@ -29,58 +29,25 @@ const writing: boolean[][] = [[],
 [],
 ]
 export async function initLoadingScreenLoading(){
-    /*if (canvas.style.display === "none") {
-        console.log("Loading screen is already over");
-        return;
-    }*/
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    //ctx.fillStyle = "black";
-    //ctx.fillRect(200,200,200,200);
-    
-    //let x = 0;
-    //choose direction, x += dir*(6*width) (0=r, 1=u, 2=l, 3=d)
-    //let dir: number = 0;
-    //x += dir * 6 * playerWidth
-    //while (loadCounter < 2000) {
-
-            //counter animation
-        //if (loadCounter % 60 <= 10) {
-            //do nothing
-        //} else if (loadCounter % 60 <= 20) {
-        //    x += playerWidth;
-        //} else if (loadCounter % 60 <= 30) {
-        //    x += 2 * playerWidth;
-        //} else if (loadCounter % 60 <= 40) {
-        //    x += 3 * playerWidth;
-        //} else if (loadCounter % 60 <= 50) {
-        //    x += 4 * playerWidth;
-        //} else {
-        //    x += 5 * playerWidth;
-        //}
-
-        //spriteX = x;
-        //spriteY = 2 * playerHeight;
-        //if(loadCounter % 100 === 0) {
-            //console.log("holle :)")
-            ctx.fillStyle = "#d0be9c";
-            //ctx.fillRect(0,0, canvas.width, canvas.height)
-            writeOfficeMania(ctx);
-            //ctx.drawImage(characters["Adam_48x48.png"], spriteX, spriteY, playerWidth, playerHeight, canvas.width- playerSizeX*2, canvas.height - playerSizeY*1.5, playerSizeX, playerSizeY);
-
-        //}
-        
-        //loadCounter++;
-    //}
-    //canvas.style.visibility = "hidden";
+    writeOfficeMania(ctx);
 }   
 
 export function setShowLoadingscreen(show: boolean) {
-    //console.log("called")
+
+    let opacity = 100;
+    while (opacity >= 0) {
+        canvas.style.opacity = opacity + "%";
+        loadingCat.style.opacity = opacity + "%";
+        opacity -= 0.5;
+    }
+
     showLoadingScreen = show;
     canvas.style.visibility = "hidden";
     loadingCat.style.visibility = "hidden";
 }  
+
 function writeOfficeMania(ctx: CanvasRenderingContext2D) {
     let scaleX: number = Math.floor(canvas.width / writingGapX);
     let scaleY: number = Math.floor(canvas.height / 13);
@@ -92,15 +59,12 @@ function writeOfficeMania(ctx: CanvasRenderingContext2D) {
         while (scale*compensationY< 100) {
             compensationY++;
         }
-        //console.log(compensationY);
     }
     else {
         scale = scaleY;
     }
-    //console.log("canvas: " + canvas.width + " scale: " + scale);
     for(let i = 0; i < writing.length; i++) {
         let line = writing[i];
-        //console.log(line.length);
         for (let j = 0; j < line.length; j++) {
             
             if (writing[i][j]) {
