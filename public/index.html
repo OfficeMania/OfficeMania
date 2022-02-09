@@ -247,10 +247,13 @@
                         <button id="button-whiteboard-eraser"><em class="fa fa-eraser"></em><span></span></button>
                         <div>    
                             <select id="whiteboard-size-selector">
-                                <option value="5">small</option>
-                                <option value="10">medium</option>
-                                <option value="15">large</option>
+                                <option class="size" value="5">small</option>
+                                <option class="size" value="10">medium</option>
+                                <option class="size" value="15">large</option>
                             </select>
+                            <style type="text/css">
+                                option.size {background-color: white; color: black;}
+                            </style>
                             <div><em class="fa fa-circle" id="whiteboard-size-icon"></em><span></span></div>
                         </div>
                         <select id="whiteboard-color-selector">
