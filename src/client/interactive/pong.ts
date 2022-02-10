@@ -34,8 +34,6 @@ export class Pong {
     }
 
     loop() {
-        this.updatePong();
-        this.paint();
         //this.room.send(MessageType.INTERACTION, PongMessage.END);
     }
 
@@ -82,7 +80,7 @@ export class Pong {
             let scoreTab: string = getPlayerByRoomId(this.playerA.id).displayName + ": " + this.playerA.score.toString() + " : " + this.playerB?.score.toString() + " :" + getPlayerByRoomId(this.playerB?.id).displayName;
             this.ctx.fillStyle = "white";
             this.ctx.textAlign = "center";
-            this.ctx.font = "30px Arial"
+            this.ctx.font = "30px Arial";
             this.ctx.fillText(scoreTab, this.canvas.width / 2, 50);
         }
         this.canvas.style.outline = "black 3px solid";
