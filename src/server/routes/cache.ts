@@ -25,14 +25,19 @@ async function setupCache(source: url.URL | string, recursive = false, maxAge = 
     }
     const nameRaw: string = source.host + source.pathname;
     const nameSanitized: string = nameRaw.replace(/[^a-z0-9.\-@/]/gi, "_");
+    router.get(`/${nameSanitized}`, (req, res) => {
+        if (!fs.existsSync(filePath)) {
+            return res.redirect(source.toString());
+        }
+        res.sendFile(filePath, { maxAge });
+    });
+    if (recursive) {
+        setupRecursiveRedirect(source);
+    }
     const filePath: string = path.join(process.cwd(), "cache", nameSanitized);
     const parentPath: string = filePath.substring(0, Math.max(filePath.lastIndexOf("/"), filePath.lastIndexOf("\\")));
     if (!fs.existsSync(parentPath)) {
         fs.mkdirSync(parentPath, { recursive: true });
-    }
-    if (!fs.existsSync(parentPath)) {
-        setupRedirect(source, recursive);
-        return;
     }
     if (!fs.existsSync(filePath)) {
         const data: string | undefined = await fetch(source)
@@ -42,26 +47,6 @@ async function setupCache(source: url.URL | string, recursive = false, maxAge = 
             fs.writeFileSync(filePath, data);
             console.debug(`Cached ${nameSanitized} ${data.length / 1000} KB from ${source}`);
         }
-    }
-    if (!fs.existsSync(filePath)) {
-        setupRedirect(source, recursive);
-        return;
-    }
-    router.get(`/${nameSanitized}`, (req, res) => res.sendFile(filePath, { maxAge }));
-    if (recursive) {
-        setupRecursiveRedirect(source);
-    }
-}
-
-function setupRedirect(source: url.URL | string, recursive = false): void {
-    if (typeof source === "string") {
-        source = new url.URL(source);
-    }
-    const nameRaw: string = source.host + source.pathname;
-    const nameSanitized: string = nameRaw.replace(/[^a-z0-9.\-@/]/gi, "_");
-    router.get(`/${nameSanitized}`, (req, res) => res.redirect(source.toString()));
-    if (recursive) {
-        setupRecursiveRedirect(source);
     }
 }
 
