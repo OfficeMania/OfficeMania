@@ -35,4 +35,8 @@ The guide for customizing or replacing the default map can be found in the [MODI
 ## A brief introduction to OfficeMania
 
 OfficeMania bla bla
-Screenshots bla bla
+
+<img src="assets/screenshots/meeting.png" alt="drawing" width="24%"/>
+<img src="assets/screenshots/office.png" alt="drawing" width="24%"/>
+<img src="assets/screenshots/outdoor.png" alt="drawing" width="25%"/>
+<img src="assets/screenshots/party.png" alt="drawing" width="25%"/>
