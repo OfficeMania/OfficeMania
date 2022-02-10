@@ -134,7 +134,7 @@ function initNewState(room: Room<State>, client: Client) {
     console.log(room.state.pongStates[ar.toString()].posPlayerA);
 }
 
-function leavePongGame(room: Room<State>, client: Client) {
+function leavePongGame(room: Room<State>, client: Client, hostWon?: boolean) {
     const n = getPongGame(room, client);
     if (n === -1) {
         return;
@@ -148,9 +148,27 @@ function leavePongGame(room: Room<State>, client: Client) {
     });
     room.state.pongStates.delete(n.toString());
     setTimeout(() => {
-        //client.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
-        otherClient?.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE)
+        if (hostWon && hostWon === true) {
+            console.log("a won")
+            client.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE_VICTORY);
+            otherClient?.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE_DEFEAT);
+
+        }
+        else if (hostWon) {
+            console.log("b won")
+            client.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE_DEFEAT);
+            otherClient?.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE_VICTORY);
+            
+        }
+        else {
+            
+            console.log("left")
+            client.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
+            otherClient?.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
+            
+        }
     }, 1000);
+    
 }
 
 
@@ -226,8 +244,13 @@ function onPongUpdate(client: Client, room: Room<State>) {
         gameState.posBallX = posX;
         //console.log(gameState.posBallX +" " + gameState.posBallY)
         //exit condition
-        if (gameState.scoreA === 5 || gameState.scoreB === 5) {
-            leavePongGame(room, client);
+        if (gameState.scoreA === 2) {
+            console.log("leaving Pong, a won")
+            leavePongGame(room, client, true);
+        }
+        else if (gameState.scoreB === 2) {
+            console.log("leaving Pong, b won")
+            leavePongGame(room, client, false);
         }
     }
 }
