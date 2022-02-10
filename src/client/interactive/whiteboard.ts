@@ -44,6 +44,7 @@ export class Whiteboard extends Interactive{
     private size: number = 5;
     private numberOfDrawnPixel: number = 0;
     private currentlyDrawing: boolean = false;
+    private colors: string[] = ["black", "white", "red", "magenta", "orange", "yellow", "green", "blue"];
 
     changeSize = (size) => {
         this.size = Number(size);
@@ -71,9 +72,8 @@ export class Whiteboard extends Interactive{
         console.log(number);
         this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
         this.draw(Number(number));
-        let colors: string[] = ["black", undefined, "red", "magenta", "orange", "yellow", "green", "blue"];
-        colorSelector.style.backgroundColor = colors[this.currentColor];
-        colorSelector.style.color = colors[this.currentColor];
+        colorSelector.style.backgroundColor = this.colors[this.currentColor];
+        colorSelector.style.color = this.colors[this.currentColor];
     }
 
 
@@ -302,7 +302,9 @@ export class Whiteboard extends Interactive{
 
         for (var i: number = start; i + 3 < max; i++) {
             if (paths[i] === -1) {
-                indexOfStroke++;
+                if (paths[i+1] !== -1) {
+                    indexOfStroke++;
+                }
                 j = 0;
                 continue;
             } else if (paths[i + 1] === -1) {
@@ -367,9 +369,8 @@ export class Whiteboard extends Interactive{
 
         ctx.lineWidth = this.size;
         ctx.lineCap = 'round';
-        let colors: string[] = ["black", "white", "red", "magenta", "orange", "yellow", "green", "blue"];
         if (this.isPen) {
-            ctx.strokeStyle = colors[this.currentColor];
+            ctx.strokeStyle = this.colors[this.currentColor];
         } else {
             ctx.strokeStyle = 'white';
         }
