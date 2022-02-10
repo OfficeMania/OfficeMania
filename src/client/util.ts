@@ -111,6 +111,9 @@ export function areWeAdmin(): boolean {
  * from the url. Note that this function currently does no error handling.
  */
 export function loadImage(url: string): Promise<HTMLImageElement> {
+    if (!url) {
+        return;
+    }
     return new Promise(resolve => {
         const image = new Image();
         image.addEventListener("load", () => resolve(image));
