@@ -379,6 +379,7 @@ export class Whiteboard extends Interactive{
         ctx.moveTo(firstX, firstY); // from
         ctx.lineTo(secondX, secondY); // to
         ctx.stroke(); // draw it!
+        ctx.closePath();
     }
 
 
