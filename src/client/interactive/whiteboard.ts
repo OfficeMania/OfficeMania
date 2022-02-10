@@ -301,7 +301,7 @@ export class Whiteboard extends Interactive{
 
         let indexOfStroke = 0;
 
-        for (var i: number = start; i + 3 < max; i++) {
+        for (var i: number = 0; i + 3 < max; i++) {
             if (paths[i] === -1) {
                 if (paths[i+1] !== -1) {
                     indexOfStroke++;
@@ -333,8 +333,6 @@ export class Whiteboard extends Interactive{
                 j = 0;
             }
         }
-
-        whiteboard.whiteboardPlayer[clientID] = max - 2;
     }
 
     // new position from mouse event
@@ -393,19 +391,19 @@ export class Whiteboard extends Interactive{
             this.currentlyDrawing = false;
         }
         if (this.isPen) {
-            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -1]);
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -2]); //-2: dont save color again (already saved)
         } else {
-            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, 1, this.size, -1])
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, 1, this.size, -2]) //-2: dont save color again (already saved)
         }
     }
 
     mouseDown(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
         if (this.isPen) {
-            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -2]) //-2: dont save color again (already saved)
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -1])
             whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, whiteboard.x, whiteboard.y]);
         } else {
-            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, 1, this.size, -2]) //-2: dont save color again (already saved)
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, 1, this.size, -1])
             whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, 1, this.size, whiteboard.x, whiteboard.y]);
         }
     }

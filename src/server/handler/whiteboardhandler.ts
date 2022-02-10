@@ -51,6 +51,8 @@ function onNewWhiteboard(room: Room<State>, client: Client, wID: number){
 function onClear(room: Room<State>, client: Client, wID: number) {
     for (const [, player] of room.state.whiteboard.at(wID).whiteboardPlayer) {
         player.paths = new ArraySchema<number>();
+        player.sizes = new ArraySchema<number>();
+        player.color = new ArraySchema<string>();
     }
     room.broadcast(MessageType.WHITEBOARD_CLEAR, wID, {except: client});
 }
