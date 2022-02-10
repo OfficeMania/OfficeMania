@@ -7,6 +7,7 @@ import { DoorState } from "./door-state";
 import { TodoState } from "./todo-state";
 import { NotesState } from "./notes-state";
 import { ChessState } from "./chess-state";
+import { ChairState } from "./chair-state";
 
 /*
  * The state of a room. Each variable that is annotated with a @type decorator
@@ -50,4 +51,7 @@ export class State extends Schema {
 
     @type(NotesState)
     notesState: NotesState = new NotesState();
+    
+    @type({ map: ChairState })
+    chairStates: MapSchema<ChairState> = new MapSchema<ChairState>();
 }

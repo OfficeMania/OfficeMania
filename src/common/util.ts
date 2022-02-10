@@ -75,6 +75,9 @@ export enum MessageType {
     CHAT_ADD = "chatAdd",
     CHAT_LEAVE = "chatLeave",
     CHAT_UPDATE_DISPLAY_NAME = "chatUpdateDisplayName",
+    //ChairHandler
+    CHAIR_NEW = "chair-new",
+    CHAIR_SIT = "chair-sit"
 }
 
 export enum GameMode {
