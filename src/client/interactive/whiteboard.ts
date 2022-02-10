@@ -383,23 +383,41 @@ export class Whiteboard extends Interactive{
 
     mouseUp(e, whiteboard: Whiteboard) {
         if (this.currentlyDrawing) { //send last pixel of stroke to server
-            this.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, this.x, this.y]);
+            if (this.isPen) {
+                this.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, this.x, this.y]);    
+            } else {
+                this.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, 1, this.size, this.x, this.y]);
+            }
             this.currentlyDrawing = false;
         }
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -1])
+        if (this.isPen) {
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -1]);
+        } else {
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, 1, this.size, -1])
+        }
     }
 
     mouseDown(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -2]) //-2: dont save color again (already saved)
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, whiteboard.x, whiteboard.y])
+        if (this.isPen) {
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -2]) //-2: dont save color again (already saved)
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, whiteboard.x, whiteboard.y]);
+        } else {
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, 1, this.size, -2]) //-2: dont save color again (already saved)
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, 1, this.size, whiteboard.x, whiteboard.y]);
+        }
     }
 
     mouseEnter(e, whiteboard: Whiteboard){
         this.setPosition(e, whiteboard);
         if (e.buttons !== 1) return;
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -1])
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, whiteboard.x, whiteboard.y])
+        if (this.isPen) {
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, -1])
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, this.currentColor, this.size, whiteboard.x, whiteboard.y]);
+        } else {
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, 1, this.size, -1])
+            whiteboard.room.send(MessageType.WHITEBOARD_PATH, [whiteboard.wID, 1, this.size, whiteboard.x, whiteboard.y])
+        }
     }
 
     private draw(color: number) {
@@ -409,7 +427,6 @@ export class Whiteboard extends Interactive{
 
     private erase() {
         this.isPen = false;
-        this.currentColor = 1;
     }
 
     //doesnt really work
