@@ -15,6 +15,7 @@ export class Computer extends Interactive {
         this.ctx = this.canvas.getContext("2d");
         this.iframe.id = "computer-iframe";
         this.iframe.src = "https://dustinbrett.com/";
+        this.iframe.style.boxShadow = "0 0 0 10px hsl(0, 0%, 0%), 0 0 50px hsl(0, 0%, 75.3%), 0 0 0 50px hsl(0, 0%, 20.4%)"
     }
 
     /*<iframe src="https://www.tu-braunschweig.de/" style="height:500px;width:500px" title="Iframe Example">*/
