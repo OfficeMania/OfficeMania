@@ -199,7 +199,7 @@ export class Whiteboard extends Interactive{
         colorSelector.style.visibility = "visible";
         whiteboardSizeIcon.style.visibility = "visible";
 
-        whiteboardPanel.style.visibility = "vsible";
+        whiteboardPanel.style.visibility = "visible";
 
         checkInputMode()
 
@@ -217,6 +217,7 @@ export class Whiteboard extends Interactive{
         ctx.fillStyle = "white"
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "black"
+        ctx.strokeStyle = "black";
         ctx.beginPath();
         ctx.lineWidth = 10;
         ctx.rect(0, 0, canvas.width, canvas.height);
