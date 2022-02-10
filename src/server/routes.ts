@@ -55,7 +55,7 @@ function setupVersion(app: Express): void {
     const headPath: string = path.join(process.cwd(), ".git", "HEAD");
     const refPattern: RegExp = /ref: (.+)/;
     const hashPattern: RegExp = /([0-9a-fA-F]+)/;
-    let head: string | undefined = undefined;
+    let commit: string | undefined = undefined;
     if (fs.existsSync(headPath)) {
         let headContent: string = fs.readFileSync(headPath).toString();
         const refMatch: RegExpMatchArray = headContent.match(refPattern);
@@ -70,15 +70,17 @@ function setupVersion(app: Express): void {
         }
         const hashMatch: RegExpMatchArray = headContent.match(hashPattern);
         if (hashMatch && hashMatch.length > 0) {
-            head = hashMatch[1];
+            commit = hashMatch[1];
         }
     } else {
         console.warn(`File "${headPath}" does not exist`);
     }
+    const repoTemplate: string | undefined = process.env.VERSION_REPO_TEMPLATE;
+    const url: string | undefined = commit && repoTemplate ? repoTemplate.replace("${commit}", commit) : undefined;
     app.use("/version", (req, res) => {
-        if (!head) {
+        if (!commit) {
             return res.status(404).send({});
         }
-        res.send({ head, repo: process.env.GIT_REPO });
+        res.send({ commit, url });
     });
 }
