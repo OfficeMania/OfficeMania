@@ -221,6 +221,7 @@ export class Whiteboard extends Interactive{
         ctx.lineWidth = 10;
         ctx.rect(0, 0, canvas.width, canvas.height);
         ctx.stroke();
+        ctx.closePath();
     }
 
     redraw(whiteboard: Whiteboard){
