@@ -17,11 +17,6 @@ async function setupRouter(): Promise<void> {
     await setupCache("https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css");
     await setupCache("https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js");
     await setupCache("https://use.fontawesome.com/releases/v5.15.4/css/all.css", true);
-    const temp: string = "/use.fontawesome.com/";
-    router.get(temp + "*", (req, res, next) => {
-        const subPath: string = req.url.substring(temp.length);
-        return res.redirect(`https://use.fontawesome.com/${subPath}`);
-    });
 }
 
 async function setupCache(source: url.URL | string, recursive = false, maxAge = 86400000): Promise<void> {
@@ -53,6 +48,9 @@ async function setupCache(source: url.URL | string, recursive = false, maxAge = 
         return;
     }
     router.get(`/${nameSanitized}`, (req, res) => res.sendFile(filePath, { maxAge }));
+    if (recursive) {
+        setupRecursiveRedirect(source);
+    }
 }
 
 function setupRedirect(source: url.URL | string, recursive = false): void {
@@ -62,4 +60,16 @@ function setupRedirect(source: url.URL | string, recursive = false): void {
     const nameRaw: string = source.host + source.pathname;
     const nameSanitized: string = nameRaw.replace(/[^a-z0-9.\-@/]/gi, "_");
     router.get(`/${nameSanitized}`, (req, res) => res.redirect(source.toString()));
+    if (recursive) {
+        setupRecursiveRedirect(source);
+    }
+}
+
+function setupRecursiveRedirect(source: url.URL): void {
+    const prefix: string = `/${source.host}/`;
+    const prefixLength: number = prefix.length;
+    router.get(prefix + "*", (req, res) => {
+        const subPath: string = req.url.substring(prefixLength);
+        return res.redirect(`${source.protocol}//${source.host}/${subPath}`);
+    });
 }
