@@ -15,7 +15,10 @@ export function getCacheRouter(): Router {
 
 async function setupRouter(): Promise<void> {
     await setupCache("https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css");
+    await setupCache("https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css.map");
     await setupCache("https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js");
+    await setupCache("https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js.map");
+    await setupCache("https://use.fontawesome.com/releases/v5.15.4/css/all.css.map");
     await setupCache("https://use.fontawesome.com/releases/v5.15.4/css/all.css", true);
 }
 
