@@ -1,8 +1,6 @@
 import { MapInfo } from "../map";
 import { MapData } from "../newMap";
 
-type SpaceType = [number, number] | [[number, number], [number, number]];
-
 type ResultSpace = { x: number, y: number };
 type ResultChunkSpace = { chunkX: number, dataX: number, chunkY: number, dataY: number };
 
@@ -72,9 +70,6 @@ abstract class AbstractChunkSpace {
 
 const TILE_SIZE = 48;
 const STEP_SIZE = TILE_SIZE / 2;
-
-const xCorrection = -74;
-const yCorrection = -79;
 
 class CanvasSpace extends AbstractSpace {
 
