@@ -21,13 +21,16 @@ function calculateAnimation(player: Player) {
             }
         }
 
-        //TODO richtung des stuhls, auf dem die Peron ist?
         let[x, y] = getCorrectedPlayerCoordinates(player);
         let collisioninfo = getCollisionInfo();
         let content = collisioninfo[x]?.[y]?.content;
         if (content && content.name === "Chair") {
             direction = content.chairDirection;
+        }
+        if(direction) {
             player.facing = direction;
+        } else {
+            direction = player.facing;
         }
         
         player.moving = 0;
