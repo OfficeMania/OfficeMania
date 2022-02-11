@@ -21,6 +21,7 @@ import { Player } from "../player";
 import { checkInputMode, START_POSITION_X, START_POSITION_Y } from "../main";
 import { setInputMode } from "../input";
 import { Animation, doorAnimation, drawMap, GroundType, MapData } from "../newMap";
+import { Space } from "../util/space";
 
 export enum DoorDirection {
     UNKNOWN,
@@ -88,14 +89,13 @@ export class Door extends Interactive {
             let message = [this.id, this.playerId];
             this.room.send(MessageType.DOOR_LOCK, message);
 
-            for (const door of Door.doors) {
-                let x = door.posX - 72 + (8 - this.posX);
-                let y = door.posY - 79 + (-17 - this.posY);
-                if (x == this.posX && y == this.posY) {
-                    this.room.send(MessageType.DOOR_LOCK, [door.id, this.playerId]);
-                    door.isClosed = true;
-                }
-            }
+            const oldDoorPos = Space.NEW_MAP.toOldMapSolidInfo(this.posX, this.posY);
+            Door.doors
+                .filter(oldDoor => oldDoor.posX === oldDoorPos.x && oldDoor.posY === oldDoorPos.y)
+                .forEach(oldDoor => {
+                    this.room.send(MessageType.DOOR_LOCK, [oldDoor.id, this.playerId]);
+                    oldDoor.isClosed = true;
+                });
             this.inCloseAnimation = true;
         }
     }
@@ -249,19 +249,19 @@ export class Door extends Interactive {
     draw(spriteSheet: HTMLCanvasElement, background: HTMLCanvasElement, map: MapData, tileSize: number) {
         let ctx = background.getContext("2d");
         ctx.clearRect(
-            (this.animation.posx + Math.abs(map._lowestPosx)) * tileSize, 
-            (this.animation.posy + Math.abs(map._lowestPosy)) * tileSize, 
+            (this.animation.posx + Math.abs(map._lowestPosx)) * tileSize,
+            (this.animation.posy + Math.abs(map._lowestPosy)) * tileSize,
             this.animation.width * tileSize, this.animation.height * tileSize);
 
-        for (let i = 0; i < map._layerList.length; i++) { 
+        for (let i = 0; i < map._layerList.length; i++) {
             drawMap(
-                map, 
-                spriteSheet, 
-                background, 
-                this.animation.posx, 
-                this.animation.posy, 
-                this.animation.posx + this.animation.width - 1, 
-                this.animation.posy + this.animation.height - 1, 
+                map,
+                spriteSheet,
+                background,
+                this.animation.posx,
+                this.animation.posy,
+                this.animation.posx + this.animation.width - 1,
+                this.animation.posy + this.animation.height - 1,
                 i);
         }
         for (let y = this.animation.posy; y < this.animation.posy + this.animation.height; y++) {
@@ -277,7 +277,7 @@ export class Door extends Interactive {
 
     drawNewDoor(spriteSheet: HTMLCanvasElement, background: HTMLCanvasElement, map: MapData, tileSize: number) {
         if(this.inCloseAnimation || this.inOpenAnimation) {
-            
+
             this.draw(spriteSheet, background, map, tileSize);
             if (this.inCloseAnimation) {
                 this.animation.setStateClosing(map._texturePaths);
