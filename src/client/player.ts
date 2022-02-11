@@ -94,13 +94,29 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
     let [x, y] = getCorrectedPlayerCoordinates(player);
     let [newX, newY] = getNewCorrectedPlayerCoordinate(player);
 
+    //wenn ich sitze
+    //player.direction ist die richtung des Stuhls. => irrelevant
+    //die richtung in die ich will ist player.facing?
+    //ist in der Richtung solid?
+    const sittingDown = room.state.players.get(player.roomId).isSitting &&
+                        (collisionInfo[x][y + 2] === undefined || !collisionInfo[x][y + 2].isSolid) &&
+                        (collisionInfo[x + 2][y + 2] === undefined || !collisionInfo[x + 2][y + 2].isSolid)
+    const sittingUp = room.state.players.get(player.roomId).isSitting &&
+                        (collisionInfo[x][y - 2] === undefined || !collisionInfo[x][y - 2].isSolid) &&
+                        (collisionInfo[x + 2][y - 2] === undefined || !collisionInfo[x + 2][y - 2].isSolid)
+    const sittingLeft = room.state.players.get(player.roomId).isSitting &&
+                        (collisionInfo[x - 2][y] === undefined || !collisionInfo[x - 2][y].isSolid)
+    const sittingRight = room.state.players.get(player.roomId).isSitting &&
+                        (collisionInfo[x + 2][y] === undefined || !collisionInfo[x + 2][y].isSolid)
+
+
     //initiates movement in one direction and blocks the other directions till the next tile
     if (player.priorDirections.length > 0) {
         if (player.priorDirections[0] === Direction.DOWN && player.moveDirection === null) {
             if (
                 (collisionInfo[x][y + 1] === undefined || !collisionInfo[x][y + 1].isSolid) && //dont go in direction if there are objects
                 (collisionInfo[x + 1][y + 1] === undefined || !collisionInfo[x + 1][y + 1].isSolid) ||
-                (room.state.players.get(player.roomId).isSitting && player.facing === Direction.DOWN)
+                sittingDown
             ) {
                 let content = collisionInfo[x][y + 1].content;
                 let content2 = collisionInfo[x + 1][y + 1].content;
@@ -141,7 +157,7 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
                 y > 0 &&
                 (collisionInfo[x][y - 1] === undefined || !collisionInfo[x][y - 1].isSolid) && //dont go in direction if there are objects
                 (collisionInfo[x + 1][y - 1] === undefined || !collisionInfo[x + 1][y - 1].isSolid) ||
-                (room.state.players.get(player.roomId).isSitting && player.facing === Direction.UP)
+                sittingUp
             ) {
                 //dont go in direction if there are objects
                 //if there is a door
@@ -180,7 +196,7 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
         }
         if (player.priorDirections[0] === Direction.LEFT && player.moveDirection === null) {
             if (x > 0 && (collisionInfo[x - 1][y] === undefined || !collisionInfo[x - 1][y].isSolid) ||
-            (room.state.players.get(player.roomId).isSitting && player.facing === Direction.LEFT)) {
+            sittingLeft) {
                 //dont go in direction if there are objects
                 //if there is a door
                 let content = collisionInfo[x][y].content;
@@ -214,7 +230,7 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
         }
         if (player.priorDirections[0] === Direction.RIGHT && player.moveDirection === null) {
             if (collisionInfo[x + 2][y] === undefined || !collisionInfo[x + 2][y].isSolid ||
-                (room.state.players.get(player.roomId).isSitting && player.facing === Direction.RIGHT)) {
+                sittingRight) {
                 //dont go in direction if there are objects
                 //if there is a door
                 let content = collisionInfo[x + 2][y].content;
