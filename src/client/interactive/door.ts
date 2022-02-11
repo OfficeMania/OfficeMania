@@ -244,6 +244,13 @@ export class Door extends Interactive {
             this.draw(spriteSheet, background, map, tileSize);
         }
         this.isClosed = doorState?.isClosed;
+        for (const door of Door.doors) {
+            let x = door.posX -72 + (8 - this.posX);
+            let y = door.posY - 79 + (-17 - this.posY);
+            if (x == this.posX && y == this.posY) {
+                door.isClosed = doorState?.isClosed;
+            }
+        }
     }
 
     draw(spriteSheet: HTMLCanvasElement, background: HTMLCanvasElement, map: MapData, tileSize: number) {
