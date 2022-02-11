@@ -220,43 +220,37 @@ export function checkInteraction(map?: MapData, executeInteraction: boolean = fa
         console.log("Interaction called.");
     }
     const ourPlayer = getOurPlayer();
+    const [newFacingX, newFacingY] = getNewPlayerFacingCoordinates(ourPlayer);
+    let correctX = newFacingX % 16;
+    let correctY = (newFacingY + 1) % 16;
+    let copyX = correctX;
+    let copyY = correctY;
+
+    if (copyX < 0) {
+        correctX = 16 - Math.abs(correctX);
+    }
+    else if (copyX == -16 % 16) {
+        correctX = 0;
+    }
+    if (copyY < 0) {
+        correctY = 16 - Math.abs(correctY);
+    }
+    else if (copyY == -16 % 16) {
+        correctY = 0;
+    }
+
+    const ChunkX = newFacingX - correctX;
+    const ChunkY = (newFacingY + 1) - correctY;
     let content: Interactive;
-
     if (map) {
-
-        const [newFacingX, newFacingY] = getNewPlayerFacingCoordinates(ourPlayer);
-        let correctX = newFacingX % 16;
-        let correctY = (newFacingY + 1) % 16;
-        let copyX = correctX;
-        let copyY = correctY;
-
-        if (copyX < 0) {
-            correctX = 16 - Math.abs(correctX);
-        }
-        else if (copyX == -16 % 16) {
-            correctX = 0;
-        }
-        if (copyY < 0) {
-            correctY = 16 - Math.abs(correctY);
-        }
-        else if (copyY == -16 % 16) {
-            correctY = 0;
-        }
-
-        const ChunkX = newFacingX - correctX;
-        const ChunkY = (newFacingY + 1) - correctY;
-        
         const chunk = <Chunk> map.getChunk(ChunkX + "." + ChunkY);
     
         content = chunk.data[correctX][correctY]._interactive;
     }
-
     else {
         const [facingX, facingY] = getCorrectedPlayerFacingCoordinates(ourPlayer);
         content = getCollisionInfo()?.[facingX]?.[facingY]?.content;
     }
-
-    
     if (!content) {
         //console.warn(`no interactive for ${newFacingX}:${newFacingY}`);
         return null;
