@@ -62,16 +62,22 @@ export class TURoom extends Room<State> {
     }
 
     async onAuth(client: Client, options: any, req: http.IncomingMessage): Promise<AuthData> {
-        const session: { passport: { user: string } } = req["session"];
+        const session: { passport?: { user?: string }, inviteCodeToken?: string } = req["session"];
         if (!session) {
             return {};
         }
         const userId: string = session?.passport?.user;
         if (!userId) {
+            if (session?.inviteCodeToken) {
+                return { inviteCodeToken: session.inviteCodeToken };
+            }
             return {};
         }
         const user: User = await User.findOne(userId);
         if (!user) {
+            if (session?.inviteCodeToken) {
+                return { inviteCodeToken: session.inviteCodeToken };
+            }
             return {};
         }
         return {
@@ -82,6 +88,7 @@ export class TURoom extends Room<State> {
                 displayName: user.displayName,
                 character: user.character,
             },
+            inviteCodeToken: session?.inviteCodeToken,
         };
     }
 

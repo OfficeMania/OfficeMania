@@ -14,6 +14,9 @@ export class InviteCode extends BaseEntity {
     @Column({ name: "usages_left", type: "int", default: -1 })
     usagesLeft: number;
 
+    @Column({ nullable: true })
+    expiration?: Date;
+
     @CreateDateColumn({ name: "created_at" })
     createdAt: Date;
 

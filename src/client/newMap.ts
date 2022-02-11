@@ -18,6 +18,7 @@ import { Computer } from "./interactive/computer";
 import { WaterCooler } from "./interactive/machines/waterCooler";
 import { Notes } from "./interactive/notes";
 import { MapInfo } from "./map";
+import { Chair } from "./interactive/chairs";
 export class Chunk {
 
     private readonly _posX: number;
@@ -663,6 +664,19 @@ function getInteractive(value: number, basePosX: number, basePosY: number, path:
         }
         case 18: {
             return new Cat();
+        }
+        //chairs
+        case 19: {
+            return new Chair(Direction.UP, basePosX, basePosY);
+        }
+        case 20: {
+            return new Chair(Direction.DOWN, basePosX, basePosY);
+        }
+        case 21: {
+            return new Chair(Direction.LEFT, basePosX, basePosY);
+        }
+        case 22: {
+            return new Chair(Direction.RIGHT, basePosX, basePosY);
         }
     }
     return null;

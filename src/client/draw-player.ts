@@ -1,14 +1,44 @@
 import { Room } from "colyseus.js";
 import { Player, STEP_SIZE } from "./player";
-import { PlayerRecord } from "./util";
-import { State } from "../common";
+import { getCollisionInfo, getCorrectedPlayerCoordinates, getRoom, PlayerRecord } from "./util";
+import { PlayerState, State } from "../common";
 import { Direction } from "../common/util";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
+import { Chair } from "./interactive/chairs";
 
 function calculateAnimation(player: Player) {
     let mode: string;
     let direction: Direction;
-    if (player.moveDirection === null || player.changeDirection) {
+    if (getRoom().state.players[player.roomId].isSitting) {
+        //sitting animation
+        mode = "sitting";
+        // sprite had time to turn before moving, so changeDirection can be false
+        if (player.changeDirection) {
+            if (player.waitBeforeMoving === 0) {
+                player.changeDirection = false;
+            } else {
+                player.waitBeforeMoving--;
+            }
+        }
+
+        //TODO richtung des stuhls, auf dem die Peron ist?
+        let[x, y] = getCorrectedPlayerCoordinates(player);
+        let collisioninfo = getCollisionInfo();
+        let content = collisioninfo[x]?.[y]?.content;
+        if (content && content.name === "Chair") {
+            direction = content.chairDirection;
+            player.facing = direction;
+        }
+        
+        player.moving = 0;
+        player.standing++;
+        const number = player.standing % 300;
+        if (number < 200) {
+            player.animationStep = (number / 40) | 0;
+        } else {
+            player.animationStep = 5;
+        }
+    } else if (player.moveDirection === null || player.changeDirection) {
         // standing animation
         mode = "standing";
         // sprite had time to turn before moving, so changeDirection can be false

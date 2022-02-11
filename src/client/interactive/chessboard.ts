@@ -4,7 +4,8 @@ import { ChessColor, ChessState, getOppositeChessColor, MessageType, State } fro
 import { createCloseInteractionButton, getRoom, removeCloseInteractionButton } from "../util";
 import { checkInputMode } from "../main";
 import { chessExportButton, chessImportButton, interactiveBarChess } from "../static";
-import jsChessEngine from "js-chess-engine";
+
+const jsChessEngine = require('js-chess-engine');
 
 enum ChessSquareColor {
     NORMAL_WHITE = "white",
@@ -400,7 +401,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         this.hide();
         this.canvas.onmousedown = null;
         chessImportButton.click = null;
-        this.room.removeAllListeners();
+        //this.room.removeAllListeners(); //Dangerous move
         this.room.send(MessageType.CHESS_LEAVE);
         resetVariables();
         checkInputMode();

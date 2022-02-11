@@ -9,7 +9,7 @@ const formSettings: HTMLFormElement = $<HTMLFormElement>("settings-form");
 const templateSetting: HTMLTemplateElement = $<HTMLTemplateElement>("template-setting");
 
 const apiEndpoint = "/api";
-const configEndpoint = apiEndpoint + "/config";
+const configEndpoint = apiEndpoint + "/configs";
 
 class Setting {
     private readonly _div: HTMLDivElement;

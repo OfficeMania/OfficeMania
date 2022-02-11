@@ -13,6 +13,7 @@ import {
     InputMode,
     joinAndSync,
     loadCharacter,
+    loadImage,
     loadUser,
     PlayerRecord,
     removeChildren,
@@ -69,7 +70,6 @@ import {
     doors,
     foreground,
     interactiveCanvas,
-    loadingScreen,
     loginButton,
     logoutButton,
     muteButton,
@@ -91,7 +91,7 @@ import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen"
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 import { getInFocus, initChatListener } from "./textchat";
 import { Backpack } from "./backpack";
-import { MessageType } from "../common/util";
+import { literallyUndefined, MessageType } from "../common/util";
 import { State } from "../common";
 import {createMapJson, drawMap, GroundType, TileList} from "./newMap";
 
@@ -163,7 +163,7 @@ export function checkInputMode() {
 }
 
 function adminConfig() {
-    window.location.href = "/admin/config";
+    window.open("/admin/config");
 }
 
 function login() {
@@ -229,9 +229,15 @@ characterSelect.addEventListener("change", () => checkValidSettings());
 
 function loadUsernameSettings() {
     if (areWeLoggedIn()) {
-        usernameInput.value = getUsername();
-        usernameInput.style.color = null;
-        usernameInput.disabled = false;
+        if (literallyUndefined(getOurPlayer().userId)) {
+            usernameInput.value = "Only Temporarily Logged In";
+            usernameInput.style.color = "orange";
+            usernameInput.disabled = true;
+        } else {
+            usernameInput.value = getUsername();
+            usernameInput.style.color = null;
+            usernameInput.disabled = false;
+        }
     } else {
         usernameInput.value = "Not Logged In";
         usernameInput.style.color = "red";
@@ -446,7 +452,8 @@ async function main() {
         map.lowestX,
         map.lowestY,
         map.highestY,
-        map.highestX
+        map.highestX,
+        map.objects
     );
 
     initDoorState(newMap, ctxB);
@@ -522,6 +529,9 @@ async function main() {
      */
 
     let playerNearbyTimer = 0;
+
+    //load image for help message
+    const pressEImage: HTMLImageElement = await loadImage( "../assets/keys/KeysExtended.png");
 
     async function loop(now: number) {
 
@@ -606,6 +616,14 @@ async function main() {
         // Draw each player
         drawPlayers(ourPlayer, players, characters, ctx, width, height);
 
+        //draw press e thing
+        //we still want the e even though we are sitting on a chair because 
+        if (checkInteraction()?.content) {
+            ctx.globalAlpha = 0.75;
+            ctx.drawImage(pressEImage, 192, 33, 32, 32, Math.floor(width / 2) + 50, Math.floor(height / 2) + 80, 32, 32);
+            ctx.globalAlpha = 1;
+        }
+
         ctx.restore();
 
         //drawWhiteboard(canvas, whiteboard.getCanvas())
@@ -618,11 +636,11 @@ async function main() {
         requestAnimationFrame(loop);
     }
 
-    //loadingScreen.style.display = "none";
     setShowLoadingscreen(false);
     interactiveCanvas.style.visibility = "hidden";
     backpackCanvas.style.visibility = "hidden";
     checkInputMode();
+
     // Start game loop
     requestAnimationFrame(loop);
 }

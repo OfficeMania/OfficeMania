@@ -1,46 +1,33 @@
 import { Router } from "express";
-import { ensureHasRole, Role, User } from "./database/entity/user";
-import { createOrUpdate } from "./database/database";
-import { ConfigEntry } from "./database/entity/config-entry";
+import { ConfigEntry } from "../../database/entity/config-entry";
+import { getValueOrDefault } from "../../config";
+import { convertOrNull } from "../../../common";
+import { createOrUpdate } from "../../database/database";
 import { getManager } from "typeorm";
-import { convertOrNull } from "../common";
-import { getValue } from "./config";
 
 const router: Router = Router();
 
 setupRouter();
 
-export function getApiRouter(): Router {
+export function getApiConfigsRouter(): Router {
     return router;
 }
 
 function setupRouter(): void {
-    router.get("/test", (req, res) => res.sendStatus(200));
-    router.get("/user/:id", ensureHasRole(Role.ADMIN), (req, res) => {
-        const id: string = req.params.id;
-        User.findOne(id)
-            .then((user: User) => {
-                if (!user) {
-                    return res.sendStatus(404);
-                }
-                res.json({ id: user.id, username: user.username, role: user.role });
-            })
-            .catch(() => res.sendStatus(500));
-    });
-    router.get("/config", ensureHasRole(Role.ADMIN), async (req, res) => {
+    router.get("/", async (req, res) => {
         const key = req.query.key;
         if (!key) {
             return ConfigEntry.find()
                 .then(configEntries => res.send(configEntries))
                 .catch(reason => res.status(500).send(reason));
         }
-        const value: string | undefined | null = await getValue(String(key));
+        const value: string | undefined = await getValueOrDefault(String(key));
         if (value === undefined) {
             return res.sendStatus(404);
         }
         return res.send({ key, value });
     });
-    router.put("/config", ensureHasRole(Role.ADMIN), (req, res) => {
+    router.put("/", (req, res) => {
         const key: string | undefined = req.query.key ? String(req.query.key) : undefined;
         if (!key) {
             return res.status(500).send("Missing query parameter 'key'");
@@ -55,7 +42,7 @@ function setupRouter(): void {
             .then(configEntry => res.send(configEntry))
             .catch(reason => res.status(500).send(reason));
     });
-    router.patch("/config", ensureHasRole(Role.ADMIN), (req, res) => {
+    router.patch("/", (req, res) => {
         const key: string | undefined = req.query.key ? String(req.query.key) : undefined;
         if (!key) {
             return res.status(500).send("Missing query parameter 'key'");
@@ -67,7 +54,7 @@ function setupRouter(): void {
             .then(configEntry => res.send(configEntry))
             .catch(reason => res.status(500).send(reason));
     });
-    router.delete("/config", ensureHasRole(Role.ADMIN), (req, res) => {
+    router.delete("/", (req, res) => {
         const key = req.query.key;
         if (!key) {
             return res.status(500).send("Missing query parameter 'key'");

@@ -15,12 +15,14 @@ export class Interactive {
     canvas: HTMLCanvasElement;
     input: Direction[] = [null];
     direction: DoorDirection;
+    //helps to know in wich direction the player looks while sitting (I#m open for advise how to avoid this)
+    chairDirection: Direction;
 
-    constructor(name: string, singleton: boolean = true, maxPlayer: number = 1) {
+    constructor(name: string, singleton: boolean = true, maxPlayer: number = 1, canvasElement: HTMLCanvasElement = interactiveCanvas) {
         this._name = name;
         this._singleton = singleton;
         this._maxPlayer = maxPlayer;
-        this.canvas = interactiveCanvas;
+        this.canvas = canvasElement;
 
     }
 

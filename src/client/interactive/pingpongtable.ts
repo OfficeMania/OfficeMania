@@ -10,6 +10,7 @@ import {
     PlayerRecord,
     removeCloseInteractionButton,
 } from "../util";
+import { interactiveCanvas } from "../static";
 import { Interactive } from "./interactive";
 import { Pong, PongPlayer } from "./pong";
 
@@ -69,6 +70,17 @@ export class PingPongTable extends Interactive {
                 }
                 case PongMessage.LEAVE: {
                     this.onLeave();
+                    break;
+                }
+                case PongMessage.LEAVE_VICTORY: {
+                    console.log("victory")
+                    this.onLeave(true);
+                    break;
+                }
+                case PongMessage.LEAVE_DEFEAT: {
+                    console.log("defeat")
+                    this.onLeave(false);
+                    break;
                 }
                 default:
                     break;
@@ -121,25 +133,61 @@ export class PingPongTable extends Interactive {
     loop() {
         if (ourGame) {
             this.room.send(MessageType.PONG_UPDATE);
-            ourGame.loop();
+            ourGame.updatePong();
+            ourGame.paint();
             this.updateInput();
         }
     }
 
-    leave() {
-        if (this.leavable) {
-            removeCloseInteractionButton();
-            ourGame.canvas.style.visibility = "hidden";
-            this.room.removeAllListeners();
-            this.room.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
-            ourGame = null;
-            checkInputMode();
+    leave(victory?: boolean) {
+        if (this.leavable && ourGame) { 
+            let ctx = this.canvas.getContext("2d");   
+            //for another life  
+            if (victory === true || victory === false) {
+                console.log("showing victory screen")
+                ctx.fillStyle = "white";
+                ctx.textAlign = "center";
+                ctx.font = "30px Arial";
+                if (victory) {
+                    console.log("Pong: Victory!");
+                    ctx.fillText("dafeet", this.canvas.width / 2, this.canvas.height/2);
+                }
+                else {
+                    console.log("Pong: Defeat!");
+                    ctx.fillText("dafeet", this.canvas.width / 2, this.canvas.height/2);
+                }
+                setTimeout(() => {
+                    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.canvas.style.outline = "none";
+                    this.canvas.style.visibility = "hidden";
+                    removeCloseInteractionButton();
+                    this.room.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
+                    ourGame = null;
+                    checkInputMode();
+                }, 5000);
+            }
+            else {
+                ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.canvas.style.visibility = "hidden";
+                this.canvas.style.outline = "none";
+                removeCloseInteractionButton();
+                this.room.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
+                ourGame = null;
+                checkInputMode();
+            }
+                
+            
         }
     }
 
-    onLeave() {
+    onLeave(victory?: boolean) {
         if (!this.room.state.pongStates[ourGame.selfGameId.toString()]) {
-            this.leave();
+            if (victory === true || victory === false) {
+                this.leave(victory);
+            }
+            else {
+                this.leave();
+            }
         }
     }
 

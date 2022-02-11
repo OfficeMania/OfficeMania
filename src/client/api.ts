@@ -8,5 +8,5 @@ export function getUserById(userId: string): Promise<User> {
     if (!userId || userId === "undefined") {
         return;
     }
-    return fetch(`/api/user/${userId}`).then(response => response.json());
+    return fetch(`/api/users/${userId}`).then(response => response.json());
 }

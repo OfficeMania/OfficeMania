@@ -221,3 +221,16 @@ docker build \
   --pull \
   -t index.docker.io/panzer1119/officemania:latest .
 ```
+
+# TODO
+- Add Parameter Explanation for bcrypt/password versioning, (jwt?) secrets etc
+- Add PostgreSQL Container
+- Add commands to create Migrations
+
+```bash
+npm run typeorm migration:generate -- -p -n $NAME --dry-run
+```
+
+```bash
+npm run typeorm migration:generate -- -p -n $NAME
+```

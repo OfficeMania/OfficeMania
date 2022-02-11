@@ -8,6 +8,9 @@ export const KEY_SPEAKER_DEVICE_ID = "speakerDeviceId";
 export const KEY_CAMERA_DEVICE_ID = "cameraDeviceId";
 export const KEY_CURRENT_VERSION = "currentVersion";
 
+export var TILE_SIZE = 48;
+export var STEP_SIZE = TILE_SIZE / 2;
+
 export enum Direction {
     LEFT = "left",
     RIGHT = "right",
@@ -37,6 +40,7 @@ export enum MessageType {
     UPDATE_USERNAME = "updateUsername",
     UPDATE_DISPLAY_NAME = "updateDisplayName",
     UPDATE_PARTICIPANT_ID = "updateParticipantId",
+    SIT = "sit",
     // PongHandler
     PONG_MOVE = "pongMove",
     PONG_INTERACTION = "pongInteraction",
@@ -71,6 +75,9 @@ export enum MessageType {
     CHAT_ADD = "chatAdd",
     CHAT_LEAVE = "chatLeave",
     CHAT_UPDATE_DISPLAY_NAME = "chatUpdateDisplayName",
+    //ChairHandler
+    CHAIR_NEW = "chair-new",
+    CHAIR_SIT = "chair-sit"
 }
 
 export enum GameMode {
@@ -117,7 +124,7 @@ export function sanitizeUsername(value: string): string {
 }
 
 export function checkDisplayName(value?: string): boolean {
-    if (!value || value.length < 2 || value.length > 20) {
+    if (!value || value.length < 1 || value.length > 20) {
         return false;
     }
     const lowerCase: string = value.toLowerCase();
@@ -128,7 +135,7 @@ export function sanitizeDisplayName(value?: string): string | undefined {
     if (!value) {
         return;
     }
-    return stringSanitizer.sanitize.keepUnicode(value).slice(0, 20);
+    return stringSanitizer.sanitize.keepUnicode(value).slice(0, 20).trim();
 }
 
 export function ensureUserId(value?: string): string {
@@ -163,4 +170,20 @@ export function convertOrNull<T>(input: any, converter?: (input: any) => T): T |
         return null;
     }
     return converter(input);
+}
+
+export interface LoginInfo {
+    isSignupDisabled?: boolean,
+    isLoginViaCredentialsAllowed?: boolean
+    isLoginViaInviteCodeAllowed?: boolean
+}
+
+export interface SignupInfo {
+    isInviteCodeRequiredForSignup?: boolean,
+}
+
+export interface InviteCodeToken {
+    token: string;
+    created: Date;
+    lastUsed?: Date;
 }

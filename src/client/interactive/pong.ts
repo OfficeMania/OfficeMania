@@ -28,13 +28,12 @@ export class Pong {
         this.ctx = this.canvas.getContext("2d");
         this.ctx.fillStyle = "black"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
+        //this.canvas.style.borderStyle = "medium solid magenta";
+        //this.canvas.style.borderWidth = "5px 5px 7px 5px"
         this.loop();
     }
 
     loop() {
-        this.updatePong();
-        this.paint();
         //this.room.send(MessageType.INTERACTION, PongMessage.END);
     }
 
@@ -81,7 +80,7 @@ export class Pong {
             let scoreTab: string = getPlayerByRoomId(this.playerA.id).displayName + ": " + this.playerA.score.toString() + " : " + this.playerB?.score.toString() + " :" + getPlayerByRoomId(this.playerB?.id).displayName;
             this.ctx.fillStyle = "white";
             this.ctx.textAlign = "center";
-            this.ctx.font = "30px Arial"
+            this.ctx.font = "30px Arial";
             this.ctx.fillText(scoreTab, this.canvas.width / 2, 50);
         }
         this.canvas.style.outline = "black 3px solid";

@@ -14,11 +14,13 @@ import {
     sanitizeDisplayName,
     sanitizeUsername,
     State,
+    STEP_SIZE,
 } from "../../common";
 import { User } from "../database/entity/user";
 
 export interface AuthData {
     userSettings?: UserSettings;
+    inviteCodeToken?: string;
 }
 
 export interface UserSettings {
@@ -57,12 +59,15 @@ export class PlayerHandler implements Handler {
         this.room.onMessage(MessageType.UPDATE_PARTICIPANT_ID, (client: Client, message: string) =>
             this.updateParticipantId(client, message)
         );
+
+        this.room.onMessage(MessageType.SIT, (client: Client, message: number[]) => this.onSit(client, message))
     }
 
     onJoin(client: Client): void {
         const authData: AuthData = client.userData as AuthData;
         const userSettings: UserSettings | undefined = authData.userSettings;
         const playerState: PlayerState = new PlayerState();
+        playerState.loggedIn = userSettings?.id !== undefined || authData?.inviteCodeToken !== undefined;
         playerState.userId = ensureUserId(userSettings?.id);
         playerState.userRole = ensureRole(userSettings?.role);
         playerState.username = ensureDisplayName(userSettings?.username);
@@ -97,6 +102,8 @@ export class PlayerHandler implements Handler {
 
     private onMove(client: Client, direction: Direction): void {
         const playerState: PlayerState = this.getPlayerData(client);
+        playerState.isSitting = false;
+        //correct coordinates if sitting was true TODO
         switch (direction) {
             case Direction.DOWN: {
                 playerState.y++;
@@ -207,5 +214,13 @@ export class PlayerHandler implements Handler {
         const playerState: PlayerState = this.getPlayerData(client);
         playerState.character = value;
         client.send(MessageType.UPDATE_CHARACTER, value);
+    }
+    
+    private onSit(client:Client, message: number[]): void {
+        const playerState: PlayerState = this.getPlayerData(client);
+        playerState.isSitting = true;
+        //correct coordinates
+        playerState.x = message[0];
+        playerState.y = message[1];
     }
 }

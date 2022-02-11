@@ -4,6 +4,7 @@ import { MessageType, State, WhiteboardPlayerState, WhiteboardState } from "../.
 import { ArraySchema } from "@colyseus/schema";
 
 let whiteboardCount = 300
+const colors: string[] = ["black", "white", "red", "magenta", "orange", "yellow", "green", "blue"];
 
 export class WhiteboardHandler implements Handler {
 
@@ -50,6 +51,8 @@ function onNewWhiteboard(room: Room<State>, client: Client, wID: number){
 function onClear(room: Room<State>, client: Client, wID: number) {
     for (const [, player] of room.state.whiteboard.at(wID).whiteboardPlayer) {
         player.paths = new ArraySchema<number>();
+        player.sizes = new ArraySchema<number>();
+        player.color = new ArraySchema<string>();
     }
     room.broadcast(MessageType.WHITEBOARD_CLEAR, wID, {except: client});
 }
@@ -69,33 +72,7 @@ function onErase(room:Room<State>, client: Client, wID: number) {
 function onPath(room: Room<State>, client: Client, message: number[]) {           //message: [wID, color, size, x, y]
     var wID: number = message.shift();
     var color: number = message.shift();
-    switch (color) {
-        case 1:
-            var colorStr: string = "white";
-            break;
-        case 2:
-            var colorStr: string = "red";
-            break;
-        case 3:
-            var colorStr: string = "magenta";
-            break;
-        case 4:
-            var colorStr: string = "orange";
-            break;
-        case 5:
-            var colorStr: string = "yellow";
-            break;
-        case 6:
-            var colorStr: string = "green";
-            break;
-        case 7:
-            var colorStr: string = "blue";
-            break;
-        default: //case 0
-            var colorStr: string = "black";
-            break;
-    }
-
+    var colorStr: string = colors[color];
     var size: number = message.shift();
     if (message[0] < 0) {
         let length = room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.length;

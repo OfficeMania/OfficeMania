@@ -15,7 +15,7 @@ const config: Configuration = {
     entry: {
         main: './src/client/main',
         admin: './src/client/admin',
-        "admin-config": './src/client/admin-config',
+        "admin-config": './src/client/admin/config',
     },
     plugins: [
         new webpack.ProgressPlugin(),

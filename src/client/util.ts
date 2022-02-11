@@ -98,7 +98,7 @@ export function getChatEnabled(): boolean {
 
 export function areWeLoggedIn(): boolean {
     const ourPlayer: Player = getOurPlayer();
-    return !literallyUndefined(ourPlayer.userId);
+    return ourPlayer.loggedIn;
 }
 
 export function areWeAdmin(): boolean {
@@ -111,6 +111,9 @@ export function areWeAdmin(): boolean {
  * from the url. Note that this function currently does no error handling.
  */
 export function loadImage(url: string): Promise<HTMLImageElement> {
+    if (!url) {
+        return;
+    }
     return new Promise(resolve => {
         const image = new Image();
         image.addEventListener("load", () => resolve(image));
@@ -144,6 +147,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 // console.log("Add", sessionId, playerState);
 
                 let player: Player = {
+                    loggedIn: playerState.loggedIn,
                     userId: playerState.userId,
                     userRole: playerState.userRole,
                     roomId: sessionId,
@@ -232,8 +236,8 @@ export function getCookie(key: string) {
 
 //const xCorrection = Math.abs(_mapInfo.lowestX - _mapInfo.highestX) - START_POSITION_X;
 //const yCorrection = Math.abs(_mapInfo.lowestX - _mapInfo.highestX) - START_POSITION_X;
-const xCorrection = -74;
-const yCorrection = -79;
+export const xCorrection = -74;
+export const yCorrection = -79;
 
 export function getCorrectedPlayerFacingCoordinates(player: Player): [number, number] {
     let deltaX = 0;
@@ -314,7 +318,7 @@ export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionI
         const progress = i / length;
         const x = currentX(progress);
         const y = currentY(progress);
-        if (collisionInfo[x][y]?.isSolid || collisionInfo[x][y]?.content?.proofIfClosed()) {
+        if (collisionInfo[x][y]?.isSolid || (collisionInfo[x][y]?.content?.name === "Door" && collisionInfo[x][y]?.content?.proofIfClosed())) {
             return false;
         }
     }
