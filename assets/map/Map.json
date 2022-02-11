@@ -2550,7 +2550,7 @@
                  "y":-1008
                 }, 
                 {
-                 "height":72,
+                 "height":48,
                  "id":37,
                  "name":"whiteboard",
                  "rotation":0,
@@ -2558,10 +2558,10 @@
                  "visible":true,
                  "width":96,
                  "x":432,
-                 "y":-1224
+                 "y":-1200
                 }, 
                 {
-                 "height":72,
+                 "height":48,
                  "id":38,
                  "name":"whiteboard",
                  "rotation":0,
@@ -2569,10 +2569,10 @@
                  "visible":true,
                  "width":96,
                  "x":528,
-                 "y":-1224
+                 "y":-1200
                 }, 
                 {
-                 "height":72,
+                 "height":48,
                  "id":39,
                  "name":"whiteboard",
                  "rotation":0,
@@ -2580,10 +2580,10 @@
                  "visible":true,
                  "width":96,
                  "x":624,
-                 "y":-1224
+                 "y":-1200
                 }, 
                 {
-                 "height":72,
+                 "height":48,
                  "id":40,
                  "name":"whiteboard",
                  "rotation":0,
@@ -2591,10 +2591,10 @@
                  "visible":true,
                  "width":96,
                  "x":576,
-                 "y":-600
+                 "y":-576
                 }, 
                 {
-                 "height":72,
+                 "height":48,
                  "id":41,
                  "name":"whiteboard",
                  "rotation":0,
@@ -2602,10 +2602,10 @@
                  "visible":true,
                  "width":96,
                  "x":672,
-                 "y":-600
+                 "y":-576
                 }, 
                 {
-                 "height":72,
+                 "height":48,
                  "id":42,
                  "name":"whiteboard",
                  "rotation":0,
@@ -2613,7 +2613,7 @@
                  "visible":true,
                  "width":96,
                  "x":768,
-                 "y":-600
+                 "y":-576
                 }, 
                 {
                  "height":48,
@@ -2726,7 +2726,7 @@
                  "y":-240
                 }, 
                 {
-                 "height":72,
+                 "height":48,
                  "id":53,
                  "name":"whiteboard",
                  "rotation":0,
@@ -2734,7 +2734,7 @@
                  "visible":true,
                  "width":96,
                  "x":148,
-                 "y":-265.333333333333
+                 "y":-240
                 }, 
                 {
                  "height":47.9999999999999,
@@ -2814,7 +2814,7 @@
                  "y":-1176
                 }, 
                 {
-                 "height":72,
+                 "height":48,
                  "id":61,
                  "name":"computer",
                  "rotation":0,
@@ -2822,7 +2822,7 @@
                  "visible":true,
                  "width":96,
                  "x":-48,
-                 "y":-264
+                 "y":-240
                 }, 
                 {
                  "height":48,
@@ -3023,7 +3023,7 @@
                  "y":24
                 }, 
                 {
-                 "height":96,
+                 "height":72,
                  "id":80,
                  "name":"water cooler",
                  "rotation":0,
@@ -3031,7 +3031,7 @@
                  "visible":true,
                  "width":48,
                  "x":432,
-                 "y":-552
+                 "y":-528
                 }, 
                 {
                  "height":96,
@@ -3761,7 +3761,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "x":0,
          "y":0
         }],
@@ -3769,7 +3769,7 @@
  "nextobjectid":148,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.8.0",
+ "tiledversion":"1.6.0",
  "tileheight":48,
  "tilesets":[
         {
@@ -3922,6 +3922,6 @@
         }],
  "tilewidth":48,
  "type":"map",
- "version":"1.8",
+ "version":"1.6",
  "width":100
 }
