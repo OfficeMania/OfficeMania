@@ -156,49 +156,14 @@ export class Door extends Interactive {
                 callPlayers.push(player.roomId);
             }
         }
+        console.log(callPlayers);
         this.room.send(MessageType.DOOR_KNOCK, callPlayers);
     }
 
     checkRoom(player: Player, roomId: String): boolean {
         const collisionInfo: solidInfo[][] = getCollisionInfo();
-        var roomX: number;
-        var roomY: number;
-        var posX: number;
-        var posY: number;
-        for (const door of Door.doors) {
-            let x = door.posX - 72 + (8 - this.posX);
-            let y = door.posY - 79 + (-17 - this.posY);
-            if (this.direction == DoorDirection.NORTH) {
-                y += 2;
-            }
-            if (x == this.posX && y == this.posY) {
-                posX = door.posX;
-                posY = door.posY;
-            }
-        }
-        switch (this.direction) {
-            case DoorDirection.NORTH: {
-                roomX = posX;
-                roomY = posY + 2;
-                break;
-            }
-            case DoorDirection.SOUTH: {
-                roomX = posX;
-                roomY = posY - 1;
-                break;
-            }
-            case DoorDirection.WEST: {
-                roomX = posX + 2;
-                roomY = posY;
-                break;
-            }
-            case DoorDirection.EAST: {
-                roomX = posX - 1;
-                roomY = posY;
-                break;
-            }
-        }
-        if(collisionInfo[roomX][roomY]?.roomId + "" === roomId) {
+        const [posX, posY] = getCorrectedPlayerCoordinates(player);
+        if(collisionInfo[posX][posY]?.roomId + "" === roomId) {
             return true;
         }
         return false;
@@ -219,6 +184,9 @@ export class Door extends Interactive {
             if (x == this.posX && y == this.posY) {
                 posX = door.posX;
                 posY = door.posY;
+                if (this.direction == DoorDirection.NORTH) {
+                    posY += 2;
+                }
             }
         }
         switch (this.direction) {
