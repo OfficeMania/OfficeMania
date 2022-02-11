@@ -545,7 +545,7 @@ button:active{
     margin: 5px 10px 5px 0;
 }
 
-.fa-microphone-slash {
+#video-bar .fa-microphone-slash {
     color: red;
     position:absolute;
     top: 10px;
