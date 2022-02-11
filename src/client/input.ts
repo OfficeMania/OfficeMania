@@ -26,6 +26,7 @@ import {
     shareButton,
 } from "./static";
 import { Chunk, MapData } from "./newMap";
+import { Door } from "./interactive/door";
 
 let inputMode: InputMode = InputMode.IGNORE;
 
@@ -248,6 +249,10 @@ export function checkNewInteraction(map: MapData, executeInteraction: boolean = 
         console.error(`no interactive for ${newFacingX}:${newFacingY}`);
         return null;
     }
+    if (!(content instanceof Door)) {
+        return null;
+    }
+
     content && executeInteraction && content.onInteraction();
     currentInteraction = content;
     return currentInteraction;
