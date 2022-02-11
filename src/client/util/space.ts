@@ -398,8 +398,8 @@ class OldMapChunkSpace extends AbstractChunkSpace {
 class OldMapSolidInfoSpace extends AbstractSpace {
 
     private _map: MapInfo;
-    private _translateAntiX: number = -2 * 16; // lowestMapX = -32
-    private _translateAntiY: number = -3 * 16; // lowestMapY = -48
+    private _translateAntiX: number = -2 * 16; // map.lowestX = -32
+    private _translateAntiY: number = -3 * 16; // map.lowestY = -48
 
     get map(): MapInfo {
         return this._map;
@@ -439,8 +439,8 @@ class OldMapSolidInfoSpace extends AbstractSpace {
      */
     toMapJson(x: number, y: number): ResultSpace {
         return {
-            x: (x / 2) + this.translateAntiX,
-            y: (y / 2) + this.translateAntiY,
+            x: (x / 2) + (this.map?.lowestX ?? this.translateAntiX),
+            y: (y / 2) + (this.map?.lowestY ?? this.translateAntiY),
         };
     }
 
@@ -458,8 +458,8 @@ class OldMapSolidInfoSpace extends AbstractSpace {
      */
     toNewMap(x: number, y: number): ResultSpace {
         return {
-            x: (x + (2 * this.translateAntiX)) / 2,
-            y: (y + (2 * this.translateAntiY)) / 2,
+            x: (x + (2 * (this.map?.lowestX ?? this.translateAntiX))) / 2,
+            y: (y + (2 * (this.map?.lowestY ?? this.translateAntiY))) / 2,
         };
     }
 
@@ -486,8 +486,8 @@ class OldMapSolidInfoSpace extends AbstractSpace {
      */
     fromMapJson(x: number, y: number): ResultSpace {
         return {
-            x: (x - this.translateAntiX) * 2,
-            y: (y - this.translateAntiY) * 2,
+            x: (x - (this.map?.lowestX ?? this.translateAntiX)) * 2,
+            y: (y - (this.map?.lowestY ?? this.translateAntiY)) * 2,
         };
     }
 
@@ -504,8 +504,8 @@ class OldMapSolidInfoSpace extends AbstractSpace {
      */
     fromNewMap(x: number, y: number): ResultSpace {
         return {
-            x: (x * 2) - (2 * this.translateAntiX),
-            y: (y * 2) - (2 * this.translateAntiY),
+            x: (x * 2) - (2 * (this.map?.lowestX ?? this.translateAntiX)),
+            y: (y * 2) - (2 * (this.map?.lowestY ?? this.translateAntiY)),
         };
     }
 
