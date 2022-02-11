@@ -177,6 +177,9 @@ export class Door extends Interactive {
         for (const door of Door.doors) {
             let x = door.posX - 72 + (8 - this.posX);
             let y = door.posY - 79 + (-17 - this.posY);
+            if (this.direction == DoorDirection.NORTH) {
+                y += 2;
+            }
             if (x == this.posX && y == this.posY) {
                 posX = door.posX;
                 posY = door.posY;
@@ -247,6 +250,9 @@ export class Door extends Interactive {
         for (const door of Door.doors) {
             let x = door.posX -72 + (8 - this.posX);
             let y = door.posY - 79 + (-17 - this.posY);
+            if (this.direction == DoorDirection.NORTH) {
+                y += 2;
+            }
             if (x == this.posX && y == this.posY) {
                 door.isClosed = doorState?.isClosed;
             }
