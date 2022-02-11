@@ -440,7 +440,7 @@ class OldMapSolidInfoSpace extends AbstractSpace {
     toMapJson(x: number, y: number): ResultSpace {
         return {
             x: (x / 2) + this.translateAntiX,
-            y: (y / 2) + this.translateAntiX,
+            y: (y / 2) + this.translateAntiY,
         };
     }
 
