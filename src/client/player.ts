@@ -183,7 +183,7 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
             (room.state.players.get(player.roomId).isSitting && player.facing === Direction.LEFT)) {
                 //dont go in direction if there are objects
                 //if there is a door
-                let content = collisionInfo[x - 1][y].content;
+                let content = collisionInfo[x][y].content;
                 if (
                     (content && content.name === "Door" && !content.proofIfClosed()) ||
                     !content ||
