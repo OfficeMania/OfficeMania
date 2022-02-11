@@ -26,7 +26,6 @@ import {
     shareButton,
 } from "./static";
 import { Chunk, MapData } from "./newMap";
-import { PingPongTable } from "./interactive/pingpongtable";
 
 let inputMode: InputMode = InputMode.IGNORE;
 
