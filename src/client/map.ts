@@ -380,8 +380,8 @@ function setSolidInfoMap(solidInfoMap: solidInfo[][], basePosX: number, basePosY
 }
 
 function setContentMap(solidInfoMap: solidInfo[][], basePosX: number, basePosY: number, height: number, width: number, callback: (solidInfo) => void) {
-    for(let i = 0; i <= height; i++) {
-        for(let j = 0; j <= width; j++) {
+    for(let i = 0; i <= height * 2; i += 2) {
+        for(let j = 0; j <= width * 2; j += 2) {
         callback(solidInfoMap[basePosX + j][basePosY + i]);
         callback(solidInfoMap[basePosX + 1 + j][basePosY + i]);
         callback(solidInfoMap[basePosX + j][basePosY + 1 + i]);
