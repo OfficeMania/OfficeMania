@@ -164,7 +164,7 @@ export class Door extends Interactive {
         const collisionInfo: solidInfo[][] = getCollisionInfo();
         let [posX, posY] = getCorrectedPlayerCoordinates(player);
         if (this.direction == DoorDirection.NORTH) {
-            posY += 2;
+            posY -= 2;
         }
         if(collisionInfo[posX][posY]?.roomId + "" === roomId) {
             return true;
