@@ -94,6 +94,7 @@ import { Backpack } from "./backpack";
 import { literallyUndefined, MessageType } from "../common/util";
 import { State } from "../common";
 import {createMapJson, drawMap, GroundType, TileList} from "./newMap";
+import { Space } from "./util/space";
 
 export const characters: { [key: string]: AnimatedSpriteSheet } = {};
 export const START_POSITION_X = 5;
@@ -455,6 +456,8 @@ async function main() {
         map.highestX,
         map.objects
     );
+    Space.OLD_MAP_SOLID_INFO.map = currentMap;
+    console.debug("OLD currentMap:", currentMap);
 
     initDoorState(newMap, ctxB);
 
