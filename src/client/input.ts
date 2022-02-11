@@ -69,11 +69,11 @@ function onDirectionKeyDown(event: KeyboardEvent, key: string, direction: Direct
             input = getOurPlayer().priorDirections;
             break;
         case InputMode.INTERACTION:
-            const content: Interactive = checkInteraction();
-            if (!content) {
+            const solidInfo: solidInfo = checkInteraction();
+            if (!solidInfo?.content) {
                 break;
             }
-            input = content.input;
+            input = solidInfo.content.input;
             break;
     }
     if (!input) {
@@ -94,11 +94,11 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
             input = getOurPlayer().priorDirections;
             break;
         case InputMode.INTERACTION:
-            const content: Interactive = checkInteraction();
-            if (!content) {
+            const solidInfo: solidInfo = checkInteraction();
+            if (!solidInfo?.content) {
                 break;
             }
-            input = content.input;
+            input = solidInfo.content.input;
             break;
     }
     if (!input) {
@@ -115,7 +115,7 @@ export function loadInputFunctions(map: MapData) {
         const ourPlayer = getOurPlayer();
         if (e.key === "Escape") {
             if (inputMode === InputMode.INTERACTION) {
-                checkInteraction().leave();
+                checkInteraction().content.leave();
                 return;
             }
             if (inputMode === InputMode.BACKPACK) {
@@ -130,7 +130,7 @@ export function loadInputFunctions(map: MapData) {
         }
         if (
             inputMode === InputMode.IGNORE ||
-            (inputMode === InputMode.INTERACTION && interactionIgnore.includes(checkInteraction()?.name)) ||
+            (inputMode === InputMode.INTERACTION && interactionIgnore.includes(checkInteraction()?.content?.name)) ||
             inputMode === InputMode.BACKPACK
         ) {
             //console.log("exiting");
@@ -145,7 +145,8 @@ export function loadInputFunctions(map: MapData) {
         onDirectionKeyDown(e, "ArrowLeft", Direction.LEFT);
         onDirectionKeyDown(e, "ArrowRight", Direction.RIGHT);
         //player interacts with object in front of him
-        onPureKey(e, "e", () => checkInteraction(map, true));
+        onPureKey(e, "e", () => checkInteraction(true));
+        onPureKey(e, "e", () => checkNewInteraction(map, true));
         onPureKey(e, "i", () => ourPlayer.backpack.draw());
         if (inputMode === InputMode.INTERACTION) {
             return;
@@ -196,8 +197,7 @@ export function loadInputFunctions(map: MapData) {
     window.addEventListener("blur", onBlur);
 }
 
-//redundant
-export function oldshit(executeInteraction: boolean = false): solidInfo {
+export function checkInteraction(executeInteraction: boolean = false): solidInfo {
     if (executeInteraction) {
         console.log("Interaction called.");
     }
@@ -214,7 +214,7 @@ export function oldshit(executeInteraction: boolean = false): solidInfo {
     return solidInfo;
 }
 
-export function checkInteraction(map?: MapData, executeInteraction: boolean = false): Interactive {
+export function checkNewInteraction(map: MapData, executeInteraction: boolean = false): Interactive {
     if (executeInteraction) {
         console.log("Interaction called.");
     }
@@ -240,18 +240,12 @@ export function checkInteraction(map?: MapData, executeInteraction: boolean = fa
 
     const ChunkX = newFacingX - correctX;
     const ChunkY = (newFacingY + 1) - correctY;
-    let content: Interactive;
-    if (map) {
-        const chunk = <Chunk> map.getChunk(ChunkX + "." + ChunkY);
-    
-        content = chunk.data[correctX][correctY]._interactive;
-    }
-    else {
-        const [facingX, facingY] = getCorrectedPlayerFacingCoordinates(ourPlayer);
-        content = getCollisionInfo()?.[facingX]?.[facingY]?.content;
-    }
+
+    const chunk = <Chunk> map.getChunk(ChunkX + "." + ChunkY);
+
+    const content = chunk.data[correctX][correctY]._interactive;
     if (!content) {
-        //console.warn(`no interactive for ${newFacingX}:${newFacingY}`);
+        console.error(`no interactive for ${newFacingX}:${newFacingY}`);
         return null;
     }
     content && executeInteraction && content.onInteraction();
@@ -264,7 +258,7 @@ const ID_HELP_INTERACTION = "help-interaction";
 const ID_HELP_INTERACTION_ITEM = "help-interaction-item";
 
 const interactionNearbyButton: HTMLButtonElement = createInteractionButton(
-    () => checkInteraction(undefined, true),
+    () => checkInteraction(true),
     ID_BUTTON_INTERACT,
     button => {
         button.style.opacity = "0";
@@ -280,9 +274,9 @@ appendFAIcon(interactionNearbyButton, "sign-in-alt");
 let interactionInfoShown = false;
 
 export function checkInteractionNearby() {
-    const content: Interactive = checkInteraction();
+    const solidInfo: solidInfo = checkInteraction();
     const fade: boolean = inputMode === InputMode.NORMAL;
-    if (content && inputMode !== InputMode.INTERACTION) {
+    if (solidInfo?.content && inputMode !== InputMode.INTERACTION) {
         if (!interactionInfoShown) {
             interactionInfoShown = true;
             interactionNearbyButton.disabled = false;

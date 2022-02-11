@@ -48,9 +48,9 @@ import {
 } from "./conference/conference";
 import { playerLoop } from "./movement";
 import {
-    oldshit,
-    checkInteractionNearby,
     checkInteraction,
+    checkInteractionNearby,
+    checkNewInteraction,
     currentInteraction,
     getInputMode,
     loadInputFunctions,
@@ -620,8 +620,8 @@ async function main() {
         drawPlayers(ourPlayer, players, characters, ctx, width, height);
 
         //draw press e thing
-        //we still want the e even though we are sitting on a chair because reasons
-        if (checkInteraction()) {
+        //we still want the e even though we are sitting on a chair because 
+        if (checkInteraction()?.content) {
             ctx.globalAlpha = 0.75;
             ctx.drawImage(pressEImage, 192, 33, 32, 32, Math.floor(width / 2) + 50, Math.floor(height / 2) + 80, 32, 32);
             ctx.globalAlpha = 1;
@@ -631,8 +631,8 @@ async function main() {
 
         //drawWhiteboard(canvas, whiteboard.getCanvas())
         if (getInputMode() === InputMode.INTERACTION) {
-            //checkInteraction()?.content?.loop();
-            checkInteraction(newMap)?.loop();
+            checkInteraction()?.content?.loop();
+            checkNewInteraction(newMap)?.loop();
         }
 
         // Repeat game loop
