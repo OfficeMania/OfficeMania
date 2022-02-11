@@ -253,8 +253,8 @@ class MapJsonInteractiveSpace extends AbstractSpace {
 class NewMapSpace extends AbstractSpace {
 
     private _map: MapData;
-    private _translateAntiX: number = -2 * 16; // lowestMapX = -32
-    private _translateAntiY: number = -3 * 16; // lowestMapY = -48
+    private _translateAntiX: number = -2 * 16; // map._lowestPosx = -32
+    private _translateAntiY: number = -3 * 16; // map._lowestPosy = -48
 
     get map(): MapData {
         return this._map;
@@ -282,8 +282,8 @@ class NewMapSpace extends AbstractSpace {
 
     toCanvas(x: number, y: number): ResultSpace {
         return {
-            x: (x - this.translateAntiX) * TILE_SIZE,
-            y: (y - this.translateAntiY) * TILE_SIZE,
+            x: (x - (this.map?._lowestPosx ?? this.translateAntiX)) * TILE_SIZE,
+            y: (y - (this.map?._lowestPosy ?? this.translateAntiY)) * TILE_SIZE,
         };
     }
 
@@ -311,8 +311,8 @@ class NewMapSpace extends AbstractSpace {
 
     fromCanvas(x: number, y: number): ResultSpace {
         return {
-            x: (x / TILE_SIZE) + this.translateAntiX,
-            y: (y / TILE_SIZE) + this.translateAntiY,
+            x: (x / TILE_SIZE) + (this.map?._lowestPosx ?? this.translateAntiX),
+            y: (y / TILE_SIZE) + (this.map?._lowestPosy ?? this.translateAntiY),
         };
     }
 
