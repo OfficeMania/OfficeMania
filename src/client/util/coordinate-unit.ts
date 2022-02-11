@@ -107,7 +107,10 @@ class NewMapCoordinateUnit extends AbstractCoordinateUnit {
     }
 
     toSolidInfo(x: number, y: number): [number, number] {
-        throw new Error("Not implemented yet"); //TODO
+        return [
+            Math.round(((x + Math.abs(this._map._lowestPosx)) * TILE_SIZE) / STEP_SIZE - xCorrection),
+            Math.round(((y + Math.abs(this._map._lowestPosy)) * TILE_SIZE) / STEP_SIZE - yCorrection),
+        ];
     }
 
     toNewMap(x: number, y: number): [number, number] {
@@ -122,7 +125,10 @@ class NewMapCoordinateUnit extends AbstractCoordinateUnit {
     }
 
     fromSolidInfo(x: number, y: number): [number, number] {
-        throw new Error("Not implemented yet"); //TODO
+        return [
+            Math.round(((x + xCorrection) * STEP_SIZE / TILE_SIZE) - Math.abs(this._map._lowestPosx)),
+            Math.round(((y + yCorrection) * STEP_SIZE / TILE_SIZE) - Math.abs(this._map._lowestPosy)),
+        ];
     }
 
     fromNewMap(x: number, y: number): [number, number] {
