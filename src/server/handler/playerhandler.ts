@@ -60,7 +60,7 @@ export class PlayerHandler implements Handler {
             this.updateParticipantId(client, message)
         );
 
-        this.room.onMessage(MessageType.SIT, (client: Client, message: number[]) => this.onSit(client, message))
+        this.room.onMessage(MessageType.SIT, (client: Client, message) => this.onSit(client, message))
     }
 
     onJoin(client: Client): void {
@@ -216,11 +216,11 @@ export class PlayerHandler implements Handler {
         client.send(MessageType.UPDATE_CHARACTER, value);
     }
     
-    private onSit(client:Client, message: number[]): void {
+    private onSit(client:Client, message): void {
         const playerState: PlayerState = this.getPlayerData(client);
         playerState.isSitting = true;
         //correct coordinates
-        playerState.x = message[0];
-        playerState.y = message[1];
+        playerState.x = message.xPos;
+        playerState.y = message.yPos;
     }
 }

@@ -38,8 +38,10 @@ export class Chair extends Interactive {
             */
             player.positionX = x;
             player.positionY = y;
+            player.scaledX = this.posX + xCorrection;
+            player.scaledY = this.posY + yCorrection;
             
-            getRoom().send(MessageType.SIT, [x, y]);
+            getRoom().send(MessageType.SIT, {xPos: player.scaledX, yPos: player.scaledY});
         } else {
             sendNotification("You can not sit on someone else's lap");
         }
