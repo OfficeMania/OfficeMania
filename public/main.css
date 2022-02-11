@@ -282,6 +282,7 @@ button:active{
 
 .video-container {
     position: relative;
+    width: fit-content;
 }
 
 #video-bar .video-container {
