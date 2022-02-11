@@ -253,8 +253,8 @@ class MapJsonInteractiveSpace extends AbstractSpace {
 class NewMapSpace extends AbstractSpace {
 
     private _map: MapData;
-    private _translateX: number = -(-2 * 16); // lowestMapX = -32
-    private _translateY: number = -(-3 * 16); // lowestMapY = -48
+    private _translateAntiX: number = -2 * 16; // lowestMapX = -32
+    private _translateAntiY: number = -3 * 16; // lowestMapY = -48
 
     get map(): MapData {
         return this._map;
@@ -264,26 +264,26 @@ class NewMapSpace extends AbstractSpace {
         this._map = value;
     }
 
-    private get translateX(): number {
-        return this._translateX;
+    private get translateAntiX(): number {
+        return this._translateAntiX;
     }
 
-    private set translateX(value: number) {
-        this._translateX = value;
+    private set translateAntiX(value: number) {
+        this._translateAntiX = value;
     }
 
-    private get translateY(): number {
-        return this._translateY;
+    private get translateAntiY(): number {
+        return this._translateAntiY;
     }
 
-    private set translateY(value: number) {
-        this._translateY = value;
+    private set translateAntiY(value: number) {
+        this._translateAntiY = value;
     }
 
     toCanvas(x: number, y: number): ResultSpace {
         return {
-            x: (x + this.translateX) * TILE_SIZE,
-            y: (y + this.translateY) * TILE_SIZE,
+            x: (x - this.translateAntiX) * TILE_SIZE,
+            y: (y - this.translateAntiY) * TILE_SIZE,
         };
     }
 
@@ -311,8 +311,8 @@ class NewMapSpace extends AbstractSpace {
 
     fromCanvas(x: number, y: number): ResultSpace {
         return {
-            x: (x / TILE_SIZE) - this.translateX,
-            y: (y / TILE_SIZE) - this.translateY,
+            x: (x / TILE_SIZE) + this.translateAntiX,
+            y: (y / TILE_SIZE) + this.translateAntiY,
         };
     }
 
@@ -398,8 +398,8 @@ class OldMapChunkSpace extends AbstractChunkSpace {
 class OldMapSolidInfoSpace extends AbstractSpace {
 
     private _map: MapInfo;
-    private _translateX: number = -(-2 * 16); // lowestMapX = -32
-    private _translateY: number = -(-3 * 16); // lowestMapY = -48
+    private _translateAntiX: number = -2 * 16; // lowestMapX = -32
+    private _translateAntiY: number = -3 * 16; // lowestMapY = -48
 
     get map(): MapInfo {
         return this._map;
@@ -409,20 +409,20 @@ class OldMapSolidInfoSpace extends AbstractSpace {
         this._map = value;
     }
 
-    private get translateX(): number {
-        return this._translateX;
+    private get translateAntiX(): number {
+        return this._translateAntiX;
     }
 
-    private set translateX(value: number) {
-        this._translateX = value;
+    private set translateAntiX(value: number) {
+        this._translateAntiX = value;
     }
 
-    private get translateY(): number {
-        return this._translateY;
+    private get translateAntiY(): number {
+        return this._translateAntiY;
     }
 
-    private set translateY(value: number) {
-        this._translateY = value;
+    private set translateAntiY(value: number) {
+        this._translateAntiY = value;
     }
 
     toCanvas(x: number, y: number): ResultSpace {
@@ -439,8 +439,8 @@ class OldMapSolidInfoSpace extends AbstractSpace {
      */
     toMapJson(x: number, y: number): ResultSpace {
         return {
-            x: (x / 2) - this.translateX,
-            y: (y / 2) - this.translateX,
+            x: (x / 2) + this.translateAntiX,
+            y: (y / 2) + this.translateAntiX,
         };
     }
 
@@ -458,8 +458,8 @@ class OldMapSolidInfoSpace extends AbstractSpace {
      */
     toNewMap(x: number, y: number): ResultSpace {
         return {
-            x: (x - (2 * this.translateX)) / 2,
-            y: (y - (2 * this.translateY)) / 2,
+            x: (x + (2 * this.translateAntiX)) / 2,
+            y: (y + (2 * this.translateAntiY)) / 2,
         };
     }
 
@@ -486,8 +486,8 @@ class OldMapSolidInfoSpace extends AbstractSpace {
      */
     fromMapJson(x: number, y: number): ResultSpace {
         return {
-            x: (x + this.translateX) * 2,
-            y: (y + this.translateY) * 2,
+            x: (x - this.translateAntiX) * 2,
+            y: (y - this.translateAntiY) * 2,
         };
     }
 
@@ -504,8 +504,8 @@ class OldMapSolidInfoSpace extends AbstractSpace {
      */
     fromNewMap(x: number, y: number): ResultSpace {
         return {
-            x: (x * 2) + (2 * this.translateX),
-            y: (y * 2) + (2 * this.translateY),
+            x: (x * 2) - (2 * this.translateAntiX),
+            y: (y * 2) - (2 * this.translateAntiY),
         };
     }
 
