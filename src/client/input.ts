@@ -115,7 +115,7 @@ export function loadInputFunctions(map: MapData) {
         const ourPlayer = getOurPlayer();
         if (e.key === "Escape") {
             if (inputMode === InputMode.INTERACTION) {
-                checkInteraction().leave();
+                checkInteraction(map).leave();
                 return;
             }
             if (inputMode === InputMode.BACKPACK) {
@@ -256,7 +256,7 @@ export function checkInteraction(map?: MapData, executeInteraction: boolean = fa
         content = getCollisionInfo()?.[facingX]?.[facingY]?.content;
     }
 
-    
+
     if (!content) {
         //console.warn(`no interactive for ${newFacingX}:${newFacingY}`);
         return null;
