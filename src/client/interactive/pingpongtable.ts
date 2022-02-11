@@ -22,6 +22,7 @@ export class PingPongTable extends Interactive {
     ourPlayer: Player;
     players: PlayerRecord;
     previousInput: Direction[];
+    leavable: boolean;
 
     constructor() {
         super("Pong table", false, 2);
@@ -29,6 +30,7 @@ export class PingPongTable extends Interactive {
         this.players = getPlayers();
         this.input = [null];
         this.previousInput = this.input;
+        this.leavable = false;
     }
 
     onInteraction() {
@@ -55,6 +57,7 @@ export class PingPongTable extends Interactive {
             switch (message) {
                 case PongMessage.INIT: {
                     this.getPong();
+                    this.leavable = true;
                     break;
                 }
                 case PongMessage.UPDATE: {
@@ -137,10 +140,8 @@ export class PingPongTable extends Interactive {
     }
 
     leave(victory?: boolean) {
-        console.log("leaving pong") 
-        if (ourGame) { 
-            console.log("leaving pong") 
-            let ctx = this.canvas.getContext("2d");  
+        if (this.leavable && ourGame) { 
+            let ctx = this.canvas.getContext("2d");   
             //for another life  
             if (victory === true || victory === false) {
                 console.log("showing victory screen")
@@ -180,7 +181,7 @@ export class PingPongTable extends Interactive {
     }
 
     onLeave(victory?: boolean) {
-        if (ourGame && !this.room.state.pongStates[ourGame.selfGameId.toString()]) {
+        if (!this.room.state.pongStates[ourGame.selfGameId.toString()]) {
             if (victory === true || victory === false) {
                 this.leave(victory);
             }
