@@ -156,12 +156,16 @@ export class Door extends Interactive {
                 callPlayers.push(player.roomId);
             }
         }
+        console.log("Hello there");
         this.room.send(MessageType.DOOR_KNOCK, callPlayers);
     }
 
     checkRoom(player: Player, roomId: String): boolean {
         const collisionInfo: solidInfo[][] = getCollisionInfo();
-        const [posX, posY] = getCorrectedPlayerCoordinates(player);
+        let [posX, posY] = getCorrectedPlayerCoordinates(player);
+        if (this.direction == DoorDirection.NORTH) {
+            posY += 2;
+        }
         if(collisionInfo[posX][posY]?.roomId + "" === roomId) {
             return true;
         }
