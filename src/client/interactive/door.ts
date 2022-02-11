@@ -3,6 +3,8 @@ import {
     createCloseInteractionButton,
     getCollisionInfo,
     getCorrectedPlayerCoordinates,
+    getNewCorrectedPlayerCoordinate,
+    getNewPlayerFacingCoordinates,
     getOurPlayer,
     getPlayers,
     getRoom,
@@ -13,12 +15,12 @@ import {
 } from "../util";
 import { Chunk, MapInfo, solidInfo, TileSet } from "../map";
 import { Room } from "colyseus.js";
-import { MessageType, State } from "../../common";
+import { Direction, MessageType, State } from "../../common";
 import { doors, interactiveCanvas } from "../static";
 import { Player } from "../player";
-import { checkInputMode } from "../main";
+import { checkInputMode, START_POSITION_X, START_POSITION_Y } from "../main";
 import { setInputMode } from "../input";
-import { Animation, drawMap, GroundType, MapData } from "../newMap";
+import { Animation, doorAnimation, drawMap, GroundType, MapData } from "../newMap";
 
 export enum DoorDirection {
     UNKNOWN,
@@ -36,121 +38,37 @@ export class Door extends Interactive {
     posY: number;
     map: MapInfo;
     texture: HTMLImageElement;
-    tileSet: TileSet;
     private room: Room<State>;
     static doors: Door[] = [];
-    chunkStartX: number;
-    chunkStartY: number;
-    chunkX: number;
-    chunkY: number;
-    ctx: CanvasRenderingContext2D;
     chunk: Chunk;
-    animationCounter: number;
     inOpenAnimation: boolean;
     inCloseAnimation: boolean
-    firstTimeDrawn: boolean;
-    syncIndex: boolean;
-    asyncIsClosed: boolean;
-    delay: number;
-    groundTileset: TileSet;
-    groundTexture: HTMLImageElement;
-    groundChunk: Chunk;
-    lastIsClosed: boolean;
-    syncDelay: number;
     path: string;
-    animation: Animation;
+    animation: doorAnimation;
     newMap: MapData;
+    id: string;
 
-    constructor(direction: DoorDirection, posX: number, posY: number, path: string, animation: Animation) {
+    constructor(direction: DoorDirection, posX: number, posY: number, path: string, animation: doorAnimation) {
         super("Door", true, 1);
         this.isClosed = false;
-        this.lastIsClosed = false;
         this.direction = direction;
         this.posX = posX;
         this.posY = posY;
         this.path = path;
         this.room = getRoom();
-        let id = posX + "" + posY;
-        this.room.send(MessageType.DOOR_NEW, id);
-        //this.setTexture();
+        this.id = posX + "." + posY;
+        this.room.send(MessageType.DOOR_NEW, this.id);
         Door.doors.push(this);
-        this.ctx = doors.getContext("2d");
-        this.animationCounter = 0;
         this.inOpenAnimation = false;
         this.inCloseAnimation = false;
-        this.firstTimeDrawn = false;
-        this.syncIndex = false;
-        this.asyncIsClosed = false;
-        this.delay = 4;
-        this.syncDelay = 0;
         this.animation = animation;
     }
 
     onInteraction(): void {
         let player = getOurPlayer();
-        let [x, y] = getCorrectedPlayerCoordinates(player);
+        //let [x, y] = getCorrectedPlayerCoordinates(player);
+        let [x, y] = getNewCorrectedPlayerCoordinate(player);
         this.startInteraction(x, y, player.roomId);
-    }
-
-    calculateX(correction: number) {
-        return (this.posX + correction) / 2 + this.map.lowestX;
-    }
-
-    calculateY(correction: number) {
-        return (this.posY + correction) / 2 + this.map.lowestY;
-    }
-
-    chunkCorrection(i: number) {
-        if (i < 0) {
-            return 16 - Math.abs(i);
-        } else {
-            return i;
-        }
-    }
-
-    setTexture() {
-        let x = this.calculateX(0);
-        let y = this.calculateY(0);
-
-        this.chunkX = x % 16;
-        this.chunkY = y % 16;
-
-        this.chunkX = this.chunkCorrection(this.chunkX);
-        this.chunkY = this.chunkCorrection(this.chunkY);
-
-        this.chunkStartX = Math.floor(x / 16) * 16;
-        this.chunkStartY = Math.floor(y / 16) * 16;
-
-        for (const layer of this.map.layers) {
-            if (layer.name === "Doors") {
-                for (const chunk of layer.chunks) {
-                    if (this.chunkStartX === chunk.posX && this.chunkStartY === chunk.posY) {
-                        if (!chunk.tileSetForElement[this.chunkX][this.chunkY]) {
-                            //why are there two doors with this?
-                            // console.log("ehhhh");
-                            return;
-                        } else {
-                            this.tileSet = chunk.tileSetForElement[this.chunkX][this.chunkY];
-                            this.texture = this.map.textures.get(this.tileSet.path);
-                            this.chunk = chunk;
-                        }
-                    }
-                }
-            } else if (layer.name !== "Doors") {
-                for (const groundChunk of layer.chunks) {
-                    if (this.chunkStartX === groundChunk.posX && this.chunkStartY === groundChunk.posY) {
-                        if (!groundChunk.tileSetForElement[this.chunkX][this.chunkY]) {
-                            //why are there two doors with this?
-                            // console.log("ehhhh");
-                        } else {
-                            this.groundTileset = groundChunk.tileSetForElement[this.chunkX][this.chunkY];
-                            this.groundTexture = this.map.textures.get(this.groundTileset.path);
-                            this.groundChunk = groundChunk;
-                        }
-                    }
-                }
-            }
-        }
     }
 
     proofIfClosed() {
@@ -167,11 +85,18 @@ export class Door extends Interactive {
         } else {
             this.playerId = id;
             this.isClosed = true;
-            let message = [this.posX + "" + this.posY, this.playerId];
+            let message = [this.id, this.playerId];
             this.room.send(MessageType.DOOR_LOCK, message);
+
+            for (const door of Door.doors) {
+                let x = door.posX - 72 + (8 - this.posX);
+                let y = door.posY - 79 + (-17 - this.posY);
+                if (x == this.posX && y == this.posY) {
+                    this.room.send(MessageType.DOOR_LOCK, [door.id, this.playerId]);
+                    door.isClosed = true;
+                }
+            }
             this.inCloseAnimation = true;
-            console.log(this.inCloseAnimation);
-            console.log(this);
         }
     }
 
@@ -208,14 +133,21 @@ export class Door extends Interactive {
 
     unlockDoor() {
         this.isClosed = false;
-        this.room.send(MessageType.DOOR_UNLOCK, this.posX + "" + this.posY);
+        this.room.send(MessageType.DOOR_UNLOCK, this.id);
         this.inOpenAnimation = true;
+        for (const door of Door.doors) {
+            let x = door.posX -72 + (8 - this.posX);
+            let y = door.posY - 79 + (-17 - this.posY);
+            if (x == this.posX && y == this.posY) {
+                this.room.send(MessageType.DOOR_UNLOCK, door.id);
+                door.isClosed = false;
+            }
+        }
     }
 
     //id descripes who knocks
     knockDoor(id: string): void  {
         const roomId = "" + this.getRoomId();
-
         const callPlayers: string[] = [];
         const players: PlayerRecord = getPlayers();
         for (const player of Object.values(players)) {
@@ -224,7 +156,6 @@ export class Door extends Interactive {
                 callPlayers.push(player.roomId);
             }
         }
-
         this.room.send(MessageType.DOOR_KNOCK, callPlayers);
     }
 
@@ -241,25 +172,35 @@ export class Door extends Interactive {
         const collisionInfo: solidInfo[][] = getCollisionInfo();
         var roomX: number;
         var roomY: number;
+        var posX: number;
+        var posY: number;
+        for (const door of Door.doors) {
+            let x = door.posX - 72 + (8 - this.posX);
+            let y = door.posY - 79 + (-17 - this.posY);
+            if (x == this.posX && y == this.posY) {
+                posX = door.posX;
+                posY = door.posY;
+            }
+        }
         switch (this.direction) {
             case DoorDirection.NORTH: {
-                roomX = this.posX;
-                roomY = this.posY + 2;
+                roomX = posX;
+                roomY = posY + 2;
                 break;
             }
             case DoorDirection.SOUTH: {
-                roomX = this.posX;
-                roomY = this.posY - 1;
+                roomX = posX;
+                roomY = posY - 1;
                 break;
             }
             case DoorDirection.WEST: {
-                roomX = this.posX + 2;
-                roomY = this.posY;
+                roomX = posX + 2;
+                roomY = posY;
                 break;
             }
             case DoorDirection.EAST: {
-                roomX = this.posX - 1;
-                roomY = this.posY;
+                roomX = posX - 1;
+                roomY = posY;
                 break;
             }
         }
@@ -268,6 +209,9 @@ export class Door extends Interactive {
     }
 
     startInteraction(playerX: number, playerY: number, playerId: string) {
+        if (this.animation === null) {
+            return;
+        }
         const isVertical: boolean = this.direction === DoorDirection.NORTH || this.direction === DoorDirection.SOUTH;
         const isBigger: boolean = this.direction === DoorDirection.EAST || this.direction === DoorDirection.SOUTH;
         const player = isVertical ? playerY : playerX;
@@ -285,229 +229,69 @@ export class Door extends Interactive {
     }
 
     sync() {
-        const doorState = this.room.state.doorStates[this.posX + "" + this.posY];
-        this.lastIsClosed = doorState?.isClosed;
+        const doorState = this.room.state.doorStates[this.id];
         this.playerId = doorState?.playerId;
     }
 
-    update() {
-
-        const doorState = this.room.state.doorStates[this.posX + "" + this.posY];
-        this.isClosed = doorState?.isClosed;
-
-        if (this.syncDelay > 0) {
-            this.syncDelay++;
-        }
-        if (this.lastIsClosed !== this.isClosed) {
-            if (doorState?.isClosed && !this.inOpenAnimation) {
-                this.animationCounter = 4;
-                this.inOpenAnimation = true;
-                this.syncDelay = 1;
-                this.syncIndex = false;
-            } else if (!doorState?.isClosed && !this.inOpenAnimation) {
-                this.animationCounter = 0;
-                this.inOpenAnimation = true;
-                this.syncDelay = 1;
-                this.syncIndex = false;
+    update(spriteSheet: HTMLCanvasElement, background: HTMLCanvasElement, map: MapData, tileSize: number) {
+        const doorState = this.room.state.doorStates[this.id];
+        if (this.isClosed != doorState?.isClosed && !this.inCloseAnimation && !this.inOpenAnimation) {
+            if (doorState?.isClosed) {
+                this.animation._animationState = 0;
+            } else {
+                this.animation._animationState = this.animation._animationSteps - 1;
             }
+            this.draw(spriteSheet, background, map, tileSize);
         }
-        if (this.syncDelay === 20) {
-            this.syncIndex = true;
-            this.syncDelay = 0;
+        this.isClosed = doorState?.isClosed;
+    }
+
+    draw(spriteSheet: HTMLCanvasElement, background: HTMLCanvasElement, map: MapData, tileSize: number) {
+        let ctx = background.getContext("2d");
+        ctx.clearRect(
+            (this.animation.posx + Math.abs(map._lowestPosx)) * tileSize, 
+            (this.animation.posy + Math.abs(map._lowestPosy)) * tileSize, 
+            this.animation.width * tileSize, this.animation.height * tileSize);
+
+        for (let i = 0; i < map._layerList.length; i++) { 
+            drawMap(
+                map, 
+                spriteSheet, 
+                background, 
+                this.animation.posx, 
+                this.animation.posy, 
+                this.animation.posx + this.animation.width - 1, 
+                this.animation.posy + this.animation.height - 1, 
+                i);
+        }
+        for (let y = this.animation.posy; y < this.animation.posy + this.animation.height; y++) {
+            for (let x = this.animation.posx; x < this.animation.posx + this.animation.width; x++) {
+
+                const dx = (x + Math.abs(map._lowestPosx)) * 48;
+                const dy = (y + Math.abs(map._lowestPosy)) * 48;
+
+                this.animation.drawAnimation(ctx, dx, dy, x - this.animation.posx, y - this.animation.posy);
+            }
         }
     }
 
     drawNewDoor(spriteSheet: HTMLCanvasElement, background: HTMLCanvasElement, map: MapData, tileSize: number) {
-        let ctx = background.getContext("2d");
-        if(this.inCloseAnimation) {
-            ctx.clearRect(
-                (this.animation.posx + Math.abs(map._lowestPosx)) * tileSize, 
-                (this.animation.posy + Math.abs(map._lowestPosy)) * tileSize, 
-                this.animation.width * tileSize, this.animation.height * tileSize);
+        if(this.inCloseAnimation || this.inOpenAnimation) {
+            
+            this.draw(spriteSheet, background, map, tileSize);
+            if (this.inCloseAnimation) {
+                this.animation.setStateClosing(map._texturePaths);
+                if (this.animation._inCloseAnimation == false) {
+                    this.inCloseAnimation = false;
 
-            console.log("HI");
-
-            for (let i = 0; i < map._layerList.length; i++) {
-                drawMap(
-                    map, 
-                    spriteSheet, 
-                    background, 
-                    this.animation.posx, 
-                    this.animation.posy, 
-                    this.animation.posx + this.animation.width - 1, 
-                    this.animation.posy + this.animation.height - 1, 
-                        i);
-            }
-        }
-    }
-
-    drawDoor() {
-        let lastCounter = this.animationCounter;
-        const resolution = this.map.resolution;
-        //
-        const tx = this.chunk.tileSetX[this.chunkX][this.chunkY];
-        const ty = this.chunk.tileSetY[this.chunkX][this.chunkY];
-        //
-        const bx = this.chunkStartX + this.chunkX + Math.floor(this.map.widthOfMap / 2);
-        const by = this.chunkStartY + this.chunkY + Math.floor(this.map.heightOfMap / 2);
-        //
-        const bxTimes = bx * resolution;
-        const bxMinusTimes = (bx - 1) * resolution;
-        const bxPlusTimes = (bx + 1) * resolution;
-        //
-        const bottomDeep = new DoorPart(ty + resolution, (by + 1) * resolution);
-        const bottom = new DoorPart(ty, by * resolution);
-        const middle = new DoorPart(ty - resolution, (by - 1) * resolution);
-        const top = new DoorPart(ty - resolution * 2, (by - 2) * resolution);
-        if (this.inAnimation && this.syncIndex && this.delay === 5) {
-            //TODO Do not sync door animation with server? Just animate it on message/event...
-            this.syncDelay = 0;
-            if (this.isClosed) {
-                this.animationCounter--;
-                if (this.animationCounter < 1) {
-                    this.inAnimation = false;
-                    this.syncIndex = false;
                 }
-            } else {
-                this.animationCounter++;
-                if (this.animationCounter > 3) {
-                    this.inAnimation = false;
-                    this.syncIndex = false;
+            } else if (this.inOpenAnimation) {
+                this.animation.setStateOpen(map._texturePaths);
+                if (this.animation._inOpenAnimation == false) {
+                    this.inOpenAnimation = false;
                 }
             }
-            if (lastCounter !== this.animationCounter) {
-                const sxOpenVertical = tx + this.animationCounter * resolution;
-                const sxOpenHorizontalLeft = tx + (this.animationCounter * 2 - 1) * resolution;
-                const sxOpenHorizontalRight = tx + this.animationCounter * 2 * resolution;
-                switch (this.direction) {
-                    case DoorDirection.NORTH: {
-                        this.ctx.clearRect(bxTimes, top.dy, resolution, resolution * 3);
-                        break;
-                    }
-                    case DoorDirection.EAST: {
-                        // this.ctx.clearRect(bxTimes, top.dy, resolution * 2, resolution * 3);
-                        this.ctx.clearRect(bxMinusTimes, top.dy, resolution * 2, resolution * 3);
-                        break;
-                    }
-                    case DoorDirection.SOUTH: {
-                        this.ctx.clearRect(bxTimes, middle.dy, resolution, resolution * 3);
-                        break;
-                    }
-                    case DoorDirection.WEST: {
-                        this.ctx.clearRect(bxMinusTimes, top.dy, resolution * 2, resolution * 3);
-                        break;
-                    }
-                }
-                this.drawDoorIntern(
-                    resolution,
-                    sxOpenVertical,
-                    sxOpenHorizontalLeft,
-                    sxOpenHorizontalRight,
-                    bxTimes,
-                    bxMinusTimes,
-                    bxPlusTimes,
-                    bottomDeep,
-                    bottom,
-                    middle,
-                    top
-                );
-            }
         }
-        if (!this.firstTimeDrawn) {
-            const sxOpenVertical = tx + 4 * resolution;
-            const sxOpenHorizontalLeft = tx + 7 * resolution;
-            const sxOpenHorizontalRight = tx + 8 * resolution;
-            this.drawDoorIntern(
-                resolution,
-                sxOpenVertical,
-                sxOpenHorizontalLeft,
-                sxOpenHorizontalRight,
-                bxTimes,
-                bxMinusTimes,
-                bxPlusTimes,
-                bottomDeep,
-                bottom,
-                middle,
-                top
-            );
-            this.firstTimeDrawn = true;
-        }
-        if (this.delay === 5) {
-            this.delay = 0;
-        }
-        this.delay++;
-    }
-
-    private drawDoorIntern(
-        resolution: number,
-        sxVertical: number,
-        sxHorizontalLeft: number,
-        sxHorizontalRight: number,
-        dxMiddle: number,
-        dxLeft: number,
-        dxRight: number,
-        bottomDeep: DoorPart,
-        bottom: DoorPart,
-        middle: DoorPart,
-        top: DoorPart
-    ) {
-        switch (this.direction) {
-            case DoorDirection.NORTH: {
-                this.drawVertical(resolution, sxVertical, dxMiddle, bottom, middle, top);
-                break;
-            }
-            case DoorDirection.EAST: {
-                // this.drawHorizontal(resolution, sxHorizontalLeft, sxHorizontalRight, dxMiddle, dxRight, bottom, middle, top);
-                this.drawHorizontal(
-                    resolution,
-                    sxHorizontalLeft,
-                    sxHorizontalRight,
-                    dxLeft,
-                    dxMiddle,
-                    bottom,
-                    middle,
-                    top
-                );
-                break;
-            }
-            case DoorDirection.SOUTH: {
-                this.drawVertical(resolution, sxVertical, dxMiddle, bottomDeep, bottom, middle);
-                break;
-            }
-            case DoorDirection.WEST: {
-                this.drawHorizontal(
-                    resolution,
-                    sxHorizontalLeft,
-                    sxHorizontalRight,
-                    dxLeft,
-                    dxMiddle,
-                    bottom,
-                    middle,
-                    top
-                );
-                break;
-            }
-        }
-    }
-
-    private drawHorizontal(
-        resolution: number,
-        sxLeft: number,
-        sxRight: number,
-        dxLeft: number,
-        dxRight: number,
-        bottom: DoorPart,
-        middle: DoorPart,
-        top: DoorPart
-    ) {
-        this.drawVertical(resolution, sxLeft, dxLeft, bottom, middle, top); // Draw left Part of the Door
-        this.drawVertical(resolution, sxRight, dxRight, bottom, middle, top); // Draw right Part of the Door
-    }
-
-    private drawVertical(length: number, sx: number, dx: number, bottom: DoorPart, middle: DoorPart, top: DoorPart) {
-        this.ctx.drawImage(this.texture, sx, bottom.sy, length, length, dx, bottom.dy, length, length); // Draw bottom Part of the Door
-        this.ctx.drawImage(this.texture, sx, middle.sy, length, length, dx, middle.dy, length, length); // Draw middle Part of the Door
-        this.ctx.drawImage(this.texture, sx, top.sy, length, length, dx, top.dy, length, length); // Draw top Part of the Door
     }
 }
 
@@ -515,34 +299,41 @@ export function updateDoors(spriteSheet: HTMLCanvasElement, background: HTMLCanv
     Door.doors.forEach(value => {
         if (value.posX <= map._highestPosx && value.posY <= map._highestPosy) {
             value.sync();
-            value.update();
+            value.update(spriteSheet, background, map, tileSize);
             value.drawNewDoor(spriteSheet, background, map, tileSize);
         }
     });
 }
 
-class DoorPart {
-    private _sy: number;
-    private _dy: number;
-
-    constructor(sx: number, dy: number) {
-        this._sy = sx;
-        this._dy = dy;
-    }
-
-    get sy(): number {
-        return this._sy;
-    }
-
-    set sy(value: number) {
-        this._sy = value;
-    }
-
-    get dy(): number {
-        return this._dy;
-    }
-
-    set dy(value: number) {
-        this._dy = value;
-    }
+export function setDoorTextures(map: MapData) {
+    Door.doors.forEach(value => {
+        if (value.posX <= map._highestPosx && value.posY <= map._highestPosy) {
+            value.animation.getImage(map._texturePaths.getPath(value.path));
+        }
+    });
+}
+export function initDoorState(map: MapData, ctx: CanvasRenderingContext2D) {
+    Door.doors.forEach(value => {
+        if (value.posX <= map._highestPosx && value.posY <= map._highestPosy) {
+            value.animation.initCounter();
+            value.animation.drawDoorsFirstTime(map, ctx);
+        }
+    });
+    getRoom().state.doorStates.forEach((door, key) => {
+        door.onChange = (changes) => {
+            changes.forEach(change => {
+                if (change.field === "isClosed") {
+                    for (const door of Door.doors) {
+                        if (key === door.id) {
+                            if (getRoom().state.doorStates.get(key).isClosed) {
+                                door.inCloseAnimation = true;
+                            } else {
+                                door.inOpenAnimation = true;
+                            }
+                        }
+                    }
+                }
+            })
+        }
+    })
 }

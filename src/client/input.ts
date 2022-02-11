@@ -4,6 +4,7 @@ import {
     createInteractionButton,
     getCollisionInfo,
     getCorrectedPlayerFacingCoordinates,
+    getNewPlayerFacingCoordinates,
     getOurPlayer,
     InputMode,
     payRespect,
@@ -24,6 +25,7 @@ import {
     settingsCancelButton,
     shareButton,
 } from "./static";
+import { Chunk, MapData } from "./newMap";
 
 let inputMode: InputMode = InputMode.IGNORE;
 
@@ -108,7 +110,7 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
     }
 }
 
-export function loadInputFunctions() {
+export function loadInputFunctions(map: MapData) {
     function onKeyDown(e: KeyboardEvent) {
         const ourPlayer = getOurPlayer();
         if (e.key === "Escape") {
@@ -144,6 +146,7 @@ export function loadInputFunctions() {
         onDirectionKeyDown(e, "ArrowRight", Direction.RIGHT);
         //player interacts with object in front of him
         onPureKey(e, "e", () => checkInteraction(true));
+        onPureKey(e, "e", () => checkNewInteraction(map, true));
         onPureKey(e, "i", () => ourPlayer.backpack.draw());
         if (inputMode === InputMode.INTERACTION) {
             return;
@@ -196,11 +199,12 @@ export function loadInputFunctions() {
 
 export function checkInteraction(executeInteraction: boolean = false): solidInfo {
     if (executeInteraction) {
-        console.log("called manually, want to switch2);");
+        console.log("Interaction called.");
     }
     const ourPlayer = getOurPlayer();
     const [facingX, facingY] = getCorrectedPlayerFacingCoordinates(ourPlayer);
     const solidInfo: solidInfo = getCollisionInfo()?.[facingX]?.[facingY];
+
     if (!solidInfo) {
         console.error(`no solidInfo for ${facingX}:${facingY}`);
         return null;
@@ -208,6 +212,45 @@ export function checkInteraction(executeInteraction: boolean = false): solidInfo
     solidInfo.content && executeInteraction && solidInfo.content.onInteraction();
     currentInteraction = solidInfo.content;
     return solidInfo;
+}
+
+export function checkNewInteraction(map: MapData, executeInteraction: boolean = false): Interactive {
+    if (executeInteraction) {
+        console.log("Interaction called.");
+    }
+    const ourPlayer = getOurPlayer();
+    const [newFacingX, newFacingY] = getNewPlayerFacingCoordinates(ourPlayer);
+    let correctX = newFacingX % 16;
+    let correctY = (newFacingY + 1) % 16;
+    let copyX = correctX;
+    let copyY = correctY;
+
+    if (copyX < 0) {
+        correctX = 16 - Math.abs(correctX);
+    }
+    else if (copyX == -16 % 16) {
+        correctX = 0;
+    }
+    if (copyY < 0) {
+        correctY = 16 - Math.abs(correctY);
+    }
+    else if (copyY == -16 % 16) {
+        correctY = 0;
+    }
+
+    const ChunkX = newFacingX - correctX;
+    const ChunkY = (newFacingY + 1) - correctY;
+
+    const chunk = <Chunk> map.getChunk(ChunkX + "." + ChunkY);
+
+    const content = chunk.data[correctX][correctY]._interactive;
+    if (!content) {
+        console.error(`no interactive for ${newFacingX}:${newFacingY}`);
+        return null;
+    }
+    content && executeInteraction && content.onInteraction();
+    currentInteraction = content;
+    return currentInteraction;
 }
 
 const ID_BUTTON_INTERACT = "button-interact";

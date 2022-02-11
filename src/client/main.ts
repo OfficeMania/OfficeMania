@@ -49,6 +49,7 @@ import { playerLoop } from "./movement";
 import {
     checkInteraction,
     checkInteractionNearby,
+    checkNewInteraction,
     currentInteraction,
     getInputMode,
     loadInputFunctions,
@@ -85,7 +86,7 @@ import {
     welcomeModal,
     welcomeOkButton,
 } from "./static";
-import { updateDoors } from "./interactive/door";
+import { initDoorState, setDoorTextures, updateDoors } from "./interactive/door";
 import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 import { getInFocus, initChatListener } from "./textchat";
@@ -415,8 +416,10 @@ async function main() {
         drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, i);
     }
 
+    setDoorTextures(newMap);
+
     //For getting the SpriteSheet as png
-    //let img = background.toDataURL("image/png");
+    //let img = spriteSheet.toDataURL("image/png");
     //document.write('<img src="' + img + '"/>');
 
     /*
@@ -445,6 +448,8 @@ async function main() {
         map.highestY,
         map.highestX
     );
+
+    initDoorState(newMap, ctxB);
 
     //i guess it should not be here but i don't know where it should be
     ourPlayer.backpack = new Backpack();
@@ -500,7 +505,7 @@ async function main() {
      */
 
     //loads all the input functions
-    loadInputFunctions();
+    loadInputFunctions(newMap);
 
     // message recieve test
 
@@ -580,7 +585,6 @@ async function main() {
                 }
             }
         }
-
         ctx.drawImage(
             background,
             posX - Math.floor(width / 2),
@@ -593,9 +597,11 @@ async function main() {
             height);
 
         //check if a doorState changed
-        updateDoors(spriteSheet, background, newMap, 48);
+        updateDoors(spriteSheet, background, newMap, TILE_SIZE);
 
         ctx.save();
+
+        //console.log("Position: ", coordinateX, coordinateY);
 
         // Draw each player
         drawPlayers(ourPlayer, players, characters, ctx, width, height);
@@ -605,6 +611,7 @@ async function main() {
         //drawWhiteboard(canvas, whiteboard.getCanvas())
         if (getInputMode() === InputMode.INTERACTION) {
             checkInteraction()?.content?.loop();
+            checkNewInteraction(newMap)?.loop();
         }
 
         // Repeat game loop

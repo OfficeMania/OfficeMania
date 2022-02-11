@@ -11,7 +11,7 @@ import { Todo } from "./interactive/todo";
 import { CoffeeMachine } from "./interactive/machines/coffeeMachine";
 import { Donuts } from "./interactive/donuts";
 import { VendingMachine } from "./interactive/machines/vendingMachine";
-import { State } from "../common";
+import { Direction, State } from "../common";
 import { Cat } from "./interactive/cat";
 import { ChessBoard } from "./interactive/chessboard";
 import { Computer } from "./interactive/computer";
@@ -45,16 +45,16 @@ export class Chunk {
 
 export class Animation {
 
-    private _path: string; //Path from the animation
-    private _animationState: number; //The current state of the snimation
-    private _width: number; //Width of the animation
-    private _height: number; //Height of the animation
-    private _posx: number //xpos
-    private _posy: number //ypos
-    private _groundType: GroundType //The time it will be drawn
-    private _counter: number;
-    private _image: HTMLImageElement;
-    private _speed: number;
+    public _path: string; //Path from the animation
+    public _animationState: number; //The current state of the snimation
+    protected _width: number; //Width of the animation
+    protected _height: number; //Height of the animation
+    protected _posx: number //xpos
+    protected _posy: number //ypos
+    protected _groundType: number //The time it will be drawn
+    public _counter: number;
+    protected _image: HTMLImageElement;
+    protected _speed: number;
 
     public get animationState() { return this._animationState; };
     public get path() { return this._path; };
@@ -64,7 +64,7 @@ export class Animation {
     public get width() { return this._width; };
     public get height() { return this._height; };
 
-    constructor(path:string, width: number, height: number, posx: number, posy: number, groundType: GroundType, speed: number) {
+    constructor(path:string, width: number, height: number, posx: number, posy: number, groundType: number, speed: number) {
 
         this._path = path;
         this._width = width;
@@ -77,7 +77,7 @@ export class Animation {
         this._speed = speed;
     }
 
-    private async getImage(path: string) {
+    public async getImage(path: string) {
         if (this._image == undefined) {
             this._image = await loadImage(path);
         }
@@ -95,9 +95,62 @@ export class Animation {
         
         ctx.drawImage(this._image, posx * 48 + this._animationState * this._width * 48 , posy * 48, 48, 48, dx, dy, 48, 48);
     }
+}
 
+export class doorAnimation extends Animation {
 
+    public _inCloseAnimation: boolean;
+    public _inOpenAnimation: boolean;
+    public _layerindex: number;
+    public _animationSteps: number;
 
+    constructor(path:string, width: number, height: number, posx: number, posy: number, groundType: number, speed: number, layerIndex: number, animationSteps: number) {
+        super(path, width, height, posx, posy, groundType, speed);
+        this._inOpenAnimation = false;
+        this._inCloseAnimation = false;
+        this._layerindex = layerIndex;
+        this._animationSteps = animationSteps;
+    }
+
+    public initCounter() {
+        this._animationState = this._animationSteps - 1;
+        this._counter = (this._animationSteps) * this._speed;
+    }
+
+    public drawDoorsFirstTime(map: MapData, ctx: CanvasRenderingContext2D) {
+
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                const dx = Math.abs(map._lowestPosx) * 48 + this.posx * 48 + x * 48;
+                const dy = Math.abs(map._lowestPosy) * 48 + this.posy * 48 + y * 48;
+                this.drawAnimation(ctx, dx, dy, x, y);
+            }
+        }
+    }
+
+    public async setStateOpen(texturePaths: TexturePaths) {
+        let width = this._image.naturalWidth / 48 / this._width;
+        if (this.animationState >= this._animationSteps - 1) {
+            this._inOpenAnimation = false;
+            return;
+        }
+        this._inOpenAnimation = true;
+        this._counter++;
+        this._counter = this._counter % (this._speed * width);
+        this._animationState = Math.floor(this._counter / this._speed);
+    }
+
+    public async setStateClosing(texturePaths: TexturePaths) {
+        let width = this._image.naturalWidth / 48 / this._width;
+        if (this.animationState <= 0) {
+            this._inCloseAnimation = false;
+            return;
+        }
+        this._inCloseAnimation = true;
+        this._counter--;
+        this._counter = this._counter % (this._speed * width);
+        this._animationState = Math.floor(this._counter / this._speed);
+    }
 }
 
 export enum GroundType {
@@ -225,6 +278,11 @@ class dataFromPos {
         for (let i = 0; i < layerSize; i++) {
             this._textureIdB[i] = -1;
         }
+        this._textureIdF = [];
+        for (let i = 0; i < layerSize; i++) {
+            this._textureIdF[i] = -1;
+        }
+
         this._interactive = null;
         this._isConferencRoom = false;
         this._roomId = 0;
@@ -270,6 +328,7 @@ export class MapData {
     public _highestPosx: number;
     public _highestPosy: number;
     public _layerList: string[];
+    public _doorLayerIndexList: number[];
 
     constructor(paths: TexturePaths) {
         this._map = new Map<string, Chunk>();
@@ -277,6 +336,7 @@ export class MapData {
         this._animationList = [];
         this._texturePaths = paths;
         this._layerList = [];
+        this._doorLayerIndexList = [];
     }
 
     public setBoundaries(lowestX: number, lowestY: number, highestX: number, highestY: number) {
@@ -294,6 +354,21 @@ export class MapData {
 
                 if (mergedChunk.data[x][y]._textureIdB[layerId] == -1) {
                     mergedChunk.data[x][y]._textureIdB[layerId] = chunk.data[x][y]._textureIdB[layerId];
+                }
+                if (mergedChunk.data[x][y]._textureIdF[layerId] == -1) {
+                    mergedChunk.data[x][y]._textureIdF[layerId] = chunk.data[x][y]._textureIdF[layerId];
+                }
+                if (!mergedChunk.data[x][y]._interactive) {
+                    mergedChunk.data[x][y]._interactive = chunk.data[x][y]._interactive;
+                }
+                if (!mergedChunk.data[x][y]._isConferencRoom) {
+                    mergedChunk.data[x][y]._isConferencRoom = chunk.data[x][y]._isConferencRoom;
+                }
+                if (!mergedChunk.data[x][y]._roomId) {
+                    mergedChunk.data[x][y]._roomId = chunk.data[x][y]._roomId;
+                }
+                if (!mergedChunk.data[x][y]._solidInfo) {
+                    mergedChunk.data[x][y]._solidInfo = chunk.data[x][y]._solidInfo;
                 }
             }
         }
@@ -339,6 +414,56 @@ export class MapData {
                 return i;
             }
         }
+    }
+
+    public getCorrectChunk(x: number, y: number) {
+            let correctX = x % 16;
+            let correctY = y % 16;
+            let copyX = correctX;
+            let copyY = correctY;
+
+            if (copyX < 0) {
+                correctX = 16 - Math.abs(correctX);
+            }
+            else if (copyX == -16 % 16) {
+                correctX = 0;
+            }
+            if (copyY < 0) {
+                correctY = 16 - Math.abs(correctY);
+            }
+            else if (copyY == -16 % 16) {
+                correctY = 0;
+            }
+
+            const ChunkX = x - correctX;
+            const ChunkY = y - correctY;
+
+            return <Chunk> this.getChunk(ChunkX + "." + ChunkY);
+    }
+
+    public correctMod(x: number, y: number) {
+            let correctX = x % 16;
+            let correctY = y % 16;
+            let copyX = correctX;
+            let copyY = correctY;
+
+            if (copyX < 0) {
+                correctX = 16 - Math.abs(correctX);
+            }
+            else if (copyX == -16 % 16) {
+                correctX = 0;
+            }
+            if (copyY < 0) {
+                correctY = 16 - Math.abs(correctY);
+            }
+            else if (copyY == -16 % 16) {
+                correctY = 0;
+            }
+            
+            return [
+                correctX,
+                correctY,
+            ];
     }
 
     public mergeAnimation() {
@@ -409,6 +534,11 @@ async function createSpriteSheet(map: MapData, canvas: HTMLCanvasElement) {
 
 export function drawMap(map: MapData, spriteSheet: HTMLCanvasElement, canvas: HTMLCanvasElement, startx: number, starty: number, endx:number, endy: number, layerIndex: number) {
 
+    for (const INDEX of map._doorLayerIndexList) {
+        if (layerIndex === INDEX) {
+            return;
+        }
+    }
     let ctx = canvas.getContext("2d");
     let mapChunks: Map<string, Chunk>;
     let size = Math.ceil(Math.sqrt(map._tileList.list.length))
@@ -475,23 +605,23 @@ export function drawMap(map: MapData, spriteSheet: HTMLCanvasElement, canvas: HT
     }
 }
 
-function getInteractive(value: number, basePosX: number, basePosY: number, path: string) {
+function getInteractive(value: number, basePosX: number, basePosY: number, path: string, layerIndex: number) {
     switch (value) {
         //doors
         case 1: {
-            return new Door(DoorDirection.NORTH, basePosX, basePosY, path, new Animation(path, 1, 2, basePosX, basePosY, GroundType.BackGround7, 20));
+            return new Door(DoorDirection.NORTH, basePosX, basePosY, path, new doorAnimation(path, 1, 3, basePosX, basePosY - 2, GroundType.BackGround7, 5, layerIndex, 5));
         }
         case 2: {
-            return new Door(DoorDirection.EAST, basePosX, basePosY, path, new Animation(path, 1, 2, basePosX, basePosY, GroundType.BackGround7, 20));
+            return new Door(DoorDirection.EAST, basePosX, basePosY, path, new doorAnimation(path, 2, 3, basePosX - 1, basePosY - 2, GroundType.BackGround7, 5, layerIndex, 5));
         }
         case 3: {
-            return new Door(DoorDirection.SOUTH, basePosX, basePosY, path, new Animation(path, 1, 2, basePosX, basePosY, GroundType.BackGround7, 20));
+            return new Door(DoorDirection.SOUTH, basePosX, basePosY, path, new doorAnimation(path, 1, 3, basePosX, basePosY - 1, GroundType.BackGround7, 5, layerIndex, 5));
         }
         case 4: {
-            return new Door(DoorDirection.WEST, basePosX, basePosY, path, new Animation(path, 1, 2, basePosX, basePosY, GroundType.BackGround7, 20));
+            return new Door(DoorDirection.WEST, basePosX, basePosY, path, new doorAnimation(path, 2, 3, basePosX, basePosY - 2, GroundType.BackGround7, 5, layerIndex, 5));
         }
         case 5: {
-            return new Door(DoorDirection.ALWAYS_OPEN, basePosX, basePosY, path, new Animation(path, 1, 2, basePosX, basePosY, GroundType.BackGround7, 20));
+            return new Door(DoorDirection.ALWAYS_OPEN, basePosX, basePosY, path, new doorAnimation(path, 1, 3, basePosX, basePosY, GroundType.BackGround7, 5, layerIndex, 5));
         }
         //pongtable
         case 6: {
@@ -600,7 +730,7 @@ function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
                             path = tileSet.source;
                         }
                         //if this is true we found the right png with help of the firstGridId
-                        if (!(newFirstGridId < tileSet.firstgid || tileSet === lastTileSet)) {
+                        if (!(newFirstGridId < tileSet.firstgid || tileSet.firstgid === lastTileSet.firstGridId)) {
                             continue;
                         }
 
@@ -634,13 +764,66 @@ function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
                                     chunk.data[x][y]._solidInfo[1][1] = true;
                                 }
                             } else if (mapJsonLayer.name == "Content" && value !== 0) {
-                                const interactive: Interactive = getInteractive(value, chunk.posX + x, chunk.posY + y, path);
+                                const interactive: Interactive = getInteractive(value, chunk.posX + x, chunk.posY + y, path, LAYER_INDEX);
                                 chunk.data[x][y]._interactive = interactive;
+                                if (interactive instanceof Door) {
+                                    const chunkToChange = <Chunk> map.getChunk(chunk.posX + "." + chunk.posY);
+                                    for (let i = LAYER_INDEX - 1; i >= 0; i --) {
+                                        if (chunkToChange.data[x][y]._textureIdB[i] !== -1) {
+                                            let door = <Door> interactive;
+                                            let tile = map._tileList.getTile(chunkToChange.data[x][y]._textureIdB[i]);
+                                            door.path = tile.path;
+                                            door.animation._path = tile.path;
+                                            door.animation._layerindex = i;
+                                            let indexToCompare = 0;
+                                            for (const INDEX of map._doorLayerIndexList) {
+                                                if (INDEX !== i) {
+                                                    indexToCompare++;
+                                                }
+                                            }
+                                            if (map._doorLayerIndexList.length === 0 || indexToCompare === map._doorLayerIndexList.length) {
+                                                map._doorLayerIndexList.push(i);
+                                            }
+                                            chunk.data[x][y]._interactive = door;
+                                            i = 0;
+                                        }
+                                    }
+                                    const newInteractive = chunk.data[x][y]._interactive;
+                                    let newChunk: Chunk;
+                                    let newChunkY = mapJsonChunk.y;
+                                    let newY = y;
+                                    const DOOR = <Door> interactive;
+                                    if (DOOR.direction == DoorDirection.SOUTH) {
+                                        newY += 1;
+                                        if (y == 15) {
+                                            newChunkY += 16;
+                                            newY = 0;
+                                            newChunk = new Chunk(mapJsonChunk.x, newChunkY, map._layerList.length);
+                                            newChunk.data[x][newY]._interactive = newInteractive;
+                                            map.addChunk(newChunk, LAYER_INDEX);
+                                        } else {
+                                            chunk.data[x][newY]._interactive = newInteractive;
+                                        }
+                                    } else {
+                                        newY -= 1;
+                                        if (y == 0) {
+                                            newChunkY -= 16;
+                                            newY = 15;
+                                            newChunk = new Chunk(mapJsonChunk.x, newChunkY, map._layerList.length);
+                                            newChunk.data[x][newY]._interactive = newInteractive;
+                                            map.addChunk(newChunk, LAYER_INDEX);
+                                        } else {
+                                            chunk.data[x][newY]._interactive = newInteractive;
+
+                                        }
+                                    }
+                                }
                             } else if (mapJsonLayer.name == "Conference rooms" && value === 1) {
                                 chunk.data[x][y]._isConferencRoom = true;
                             } else if (mapJsonLayer.name == "Rooms") {
                                 chunk.data[x][y]._roomId = value;
                             }
+                            map.addChunk(chunk, LAYER_INDEX);
                             break;
                         }
 
@@ -661,6 +844,5 @@ function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
         }
     }
     map.setBoundaries(lowestX, lowestY, highestX, highestY);
-    console.log(map);
     return map;
 }

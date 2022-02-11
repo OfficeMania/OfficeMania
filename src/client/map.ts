@@ -307,19 +307,19 @@ function getInteractive(value: number, basePosX: number, basePosY: number, room:
     switch (value) {
         //doors
         case 1: {
-            return new Door(DoorDirection.NORTH, basePosX, basePosY, map);
+            return new Door(DoorDirection.NORTH, basePosX, basePosY, "", null);
         }
         case 2: {
-            return new Door(DoorDirection.EAST, basePosX, basePosY, map);
+            return new Door(DoorDirection.EAST, basePosX, basePosY, "", null);
         }
         case 3: {
-            return new Door(DoorDirection.SOUTH, basePosX, basePosY, map);
+            return new Door(DoorDirection.SOUTH, basePosX, basePosY, "", null);
         }
         case 4: {
-            return new Door(DoorDirection.WEST, basePosX, basePosY, map);
+            return new Door(DoorDirection.WEST, basePosX, basePosY, "", null);
         }
         case 5: {
-            return new Door(DoorDirection.ALWAYS_OPEN, basePosX, basePosY, map);
+            return new Door(DoorDirection.ALWAYS_OPEN, basePosX, basePosY, "", null);
         }
         //pongtable
         case 6: {

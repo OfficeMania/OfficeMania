@@ -1,8 +1,10 @@
 import { Room } from "colyseus.js";
 import { solidInfo } from "./map";
 import { Direction, MessageType } from "../common/util";
-import { getCorrectedPlayerCoordinates } from "./util";
+import { getCorrectedPlayerCoordinates, getNewCorrectedPlayerCoordinate } from "./util";
 import { Backpack } from "./backpack";
+import { Chunk, MapData } from "./newMap";
+import { Door } from "./interactive/door";
 //import { lowestX, lowestY } from "./main"
 
 //all variables needed to adjust movement speed and length.
@@ -87,6 +89,7 @@ export function updatePosition(player: Player, room: Room) {
 
 export function updateOwnPosition(player: Player, room: Room, collisionInfo: solidInfo[][]) {
     let [x, y] = getCorrectedPlayerCoordinates(player);
+    let [newX, newY] = getNewCorrectedPlayerCoordinate(player);
 
     //initiates movement in one direction and blocks the other directions till the next tile
     if (player.priorDirections.length > 0) {
@@ -97,6 +100,7 @@ export function updateOwnPosition(player: Player, room: Room, collisionInfo: sol
             ) {
                 let content = collisionInfo[x][y + 1].content;
                 let content2 = collisionInfo[x + 1][y + 1].content;
+
                 if (
                     (content && content.name === "Door" && !content.proofIfClosed()) ||
                     !content ||

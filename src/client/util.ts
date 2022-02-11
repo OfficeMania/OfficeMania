@@ -13,7 +13,7 @@ import {
     literallyUndefined,
     MessageType,
 } from "../common/util";
-import { characters, checkInputMode } from "./main";
+import { characters, checkInputMode, START_POSITION_X, START_POSITION_Y } from "./main";
 import { bsWelcomeModal, panelButtonsInteraction, usernameInputWelcome, welcomeModal } from "./static";
 import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
 import AnimationData, { createAnimationData } from "./graphic/animation-data";
@@ -256,6 +256,40 @@ export function getCorrectedPlayerFacingCoordinates(player: Player): [number, nu
         Math.round(player.positionX / STEP_SIZE - xCorrection + deltaX),
         Math.round(player.positionY / STEP_SIZE - yCorrection + deltaY),
     ];
+}
+
+export function getNewPlayerFacingCoordinates(player: Player): [number, number] {
+    let facingX: number;
+    let facingY: number;
+    switch (player.facing) {
+        case Direction.LEFT:
+            facingX = Math.ceil(player.positionX / STEP_SIZE / 2 - 1 + START_POSITION_X);
+            facingY = Math.floor(player.positionY / STEP_SIZE / 2 + START_POSITION_Y);
+            break;
+        case Direction.RIGHT:
+            facingX = Math.floor(player.positionX / STEP_SIZE / 2 + 1 + START_POSITION_X);
+            facingY = Math.floor(player.positionY / STEP_SIZE / 2 + START_POSITION_Y);
+            break;
+        case Direction.UP:
+            facingX = Math.floor(player.positionX / STEP_SIZE / 2 + START_POSITION_X);
+            facingY = Math.ceil(player.positionY / STEP_SIZE / 2 - 1 + START_POSITION_Y);
+            break;
+        case Direction.DOWN:
+            facingX = Math.floor(player.positionX / STEP_SIZE / 2 + START_POSITION_X);
+            facingY = Math.floor(player.positionY / STEP_SIZE / 2 + 1 + START_POSITION_Y);
+            break;
+    }
+    return [
+        facingX,
+        facingY,
+    ];
+}
+
+export function getNewCorrectedPlayerCoordinate(player: Player): [number, number] {
+    return [
+        Math.round(player.positionX / STEP_SIZE / 2 + START_POSITION_X),
+        Math.round(player.positionY / STEP_SIZE / 2 + START_POSITION_Y),
+    ]
 }
 
 export function getCorrectedPlayerCoordinates(player: Player): [number, number] {
