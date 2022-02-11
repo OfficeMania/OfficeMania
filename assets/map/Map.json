@@ -2308,7 +2308,7 @@
                  "y":-672
                 }, 
                 {
-                 "height":96,
+                 "height":48,
                  "id":10,
                  "name":"door south",
                  "rotation":0,
@@ -2319,7 +2319,7 @@
                  "y":-816
                 }, 
                 {
-                 "height":96,
+                 "height":48,
                  "id":11,
                  "name":"door south",
                  "rotation":0,
@@ -2936,17 +2936,6 @@
                 }, 
                 {
                  "height":48,
-                 "id":72,
-                 "name":"computer",
-                 "rotation":0,
-                 "type":"12",
-                 "visible":true,
-                 "width":48,
-                 "x":768,
-                 "y":-336
-                }, 
-                {
-                 "height":48,
                  "id":73,
                  "name":"computer",
                  "rotation":0,
@@ -3142,17 +3131,6 @@
                  "width":48,
                  "x":1008,
                  "y":-936
-                }, 
-                {
-                 "height":48,
-                 "id":92,
-                 "name":"papers",
-                 "rotation":0,
-                 "type":"14",
-                 "visible":true,
-                 "width":48,
-                 "x":672,
-                 "y":-216
                 }, 
                 {
                  "height":48,
@@ -3758,15 +3736,26 @@
                  "width":48,
                  "x":600,
                  "y":-1488
+                }, 
+                {
+                 "height":288,
+                 "id":149,
+                 "name":"Paper",
+                 "rotation":0,
+                 "type":"17",
+                 "visible":true,
+                 "width":192,
+                 "x":624,
+                 "y":-384
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }],
  "nextlayerid":64,
- "nextobjectid":148,
+ "nextobjectid":151,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.6.0",
