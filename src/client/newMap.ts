@@ -19,6 +19,7 @@ import { WaterCooler } from "./interactive/machines/waterCooler";
 import { Notes } from "./interactive/notes";
 import { MapInfo } from "./map";
 import { Chair } from "./interactive/chairs";
+import { Space } from "./util/space";
 export class Chunk {
 
     private readonly _posX: number;
@@ -686,6 +687,7 @@ function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
 
     let paths = createTexturePaths(room);
     let map = new MapData(paths);
+    Space.NEW_MAP.map = map;
     let usedPngFiles: usedPngFile[] = [];
     let lowestX: number;
     let lowestY: number;
