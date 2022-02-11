@@ -94,10 +94,6 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
     let [x, y] = getCorrectedPlayerCoordinates(player);
     let [newX, newY] = getNewCorrectedPlayerCoordinate(player);
 
-    //wenn ich sitze
-    //player.direction ist die richtung des Stuhls. => irrelevant
-    //die richtung in die ich will ist player.facing?
-    //ist in der Richtung solid?
     const sittingDown = room.state.players.get(player.roomId).isSitting &&
                         (collisionInfo[x][y + 2] === undefined || !collisionInfo[x][y + 2].isSolid) &&
                         (collisionInfo[x + 2][y + 2] === undefined || !collisionInfo[x + 2][y + 2].isSolid)
