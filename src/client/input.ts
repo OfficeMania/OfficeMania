@@ -198,6 +198,7 @@ export function loadInputFunctions(map: MapData) {
 }
 
 //redundant
+/*
 export function oldshit(executeInteraction: boolean = false): solidInfo {
     if (executeInteraction) {
         console.log("Interaction called.");
@@ -213,7 +214,7 @@ export function oldshit(executeInteraction: boolean = false): solidInfo {
     solidInfo.content && executeInteraction && solidInfo.content.onInteraction();
     currentInteraction = solidInfo.content;
     return solidInfo;
-}
+}*/
 
 export function checkInteraction(map?: MapData, executeInteraction: boolean = false): Interactive {
     if (executeInteraction) {

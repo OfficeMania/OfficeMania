@@ -48,7 +48,6 @@ import {
 } from "./conference/conference";
 import { playerLoop } from "./movement";
 import {
-    oldshit,
     checkInteractionNearby,
     checkInteraction,
     currentInteraction,
