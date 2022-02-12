@@ -5,12 +5,12 @@ import {
     textchatBar,
     textchatButton,
     textchatContainer,
-    textchatDropdownAddUsers,
+    textchatAddUsers,
     textchatDropdownChats,
-    textchatDropdownChatsButton,
-    textchatDropdownNewChat,
+    textchatChatsButton,
+    textchatNewChat,
     textchatDropdownUsers,
-    textchatDropdownUsersButton,
+    textchatUsersButton,
     textchatSendButton,
 } from "./static";
 import { getOurPlayer, getRoom, sendNotification } from "./util";
@@ -105,14 +105,14 @@ export function initChatListener() {
     });
 
     textchatSendButton.addEventListener("click", () => {
-        sendMessage(textchatArea.value, textchatDropdownChatsButton.getAttribute("data-id"));
+        sendMessage(textchatArea.value, textchatChatsButton.getAttribute("data-id"));
         //console.log(textchatSelect.selectedOptions[0].innerText)
         textchatArea.value = "";
     });
 
     updateUserList();
 
-    textchatDropdownAddUsers.addEventListener("click", () => {
+    textchatAddUsers.addEventListener("click", () => {
         const ids: string[] = [];
         for (let i = 0; i < textchatDropdownUsers.children.length; i++) {
             // @ts-ignore
@@ -120,11 +120,11 @@ export function initChatListener() {
                 ids.push(textchatDropdownUsers.children[i].id);
             }
         }
-        modifyChat(ids, textchatDropdownChatsButton.getAttribute("data-id"));
+        modifyChat(ids, textchatChatsButton.getAttribute("data-id"));
         unCheck();
     });
 
-    textchatDropdownNewChat.addEventListener("click", () => {
+    textchatNewChat.addEventListener("click", () => {
         const ids: string[] = [];
         for (let i = 0; i < textchatDropdownUsers.children.length; i++) {
             // @ts-ignore
@@ -200,7 +200,7 @@ function onMessageLogs(chatMessages: ChatMessage[]): void {
     chats.forEach(chat => {
         if (chatIds.includes(chat.id)) {
             chat.messages.forEach(() => chat.messages.pop());
-            if (textchatDropdownChatsButton.getAttribute("data-id") === chat.id) {
+            if (textchatChatsButton.getAttribute("data-id") === chat.id) {
                 clearTextchatBar();
             }
         }
@@ -216,7 +216,7 @@ function onMessage(chatMessage: ChatMessage) {
     console.log(`New message: `, chatMessage)
     const chat: Chat = getChatById(chatMessage.chatId);
     chat.messages.push(chatMessage);
-    if (textchatDropdownChatsButton.getAttribute("data-id") === chatMessage.chatId) {
+    if (textchatChatsButton.getAttribute("data-id") === chatMessage.chatId) {
         addMessageToBar(chatMessage);
     }
 }
@@ -224,7 +224,7 @@ function onMessage(chatMessage: ChatMessage) {
 //sends text message to server (if its not empty)
 function sendMessage(message: string, chatId: string) {
     chatId = JSON.stringify([chatId]);
-    if (textchatDropdownChatsButton.getAttribute("data-id") === chats[1].id) {
+    if (textchatChatsButton.getAttribute("data-id") === chats[1].id) {
         const ids: string[] = [];
         chatId = "";
         getRoom().state.players.forEach((p, k) => {
@@ -282,7 +282,7 @@ function leaveChat(chatId: string) {
 
 //update listed chats
 function updateChatList() {
-    if (!textchatDropdownChatsButton.getAttribute("data-id")) {
+    if (!textchatChatsButton.getAttribute("data-id")) {
         updateChatListButton(chats[0].id);
     }
 
@@ -305,7 +305,7 @@ function updateChatList() {
         let a: number = chatIds.indexOf(chat.id);
         // @ts-ignore
         textchatDropdownChats.children[a].children[0].children[0].innerText = chat.name;
-        if (chat.id === textchatDropdownChatsButton.getAttribute("data-id")) {
+        if (chat.id === textchatChatsButton.getAttribute("data-id")) {
             updateChatListButton(chat.id);
         }
     });
@@ -374,7 +374,7 @@ function addChatListOption(chat: Chat) {
             updateChatListButton(chats[0].id);
             clearTextchatBar();
             getChatById(chats[0].id).messages.forEach(addMessageToBar);
-            textchatDropdownChatsButton.click();
+            textchatChatsButton.click();
         });
         a.appendChild(bin);
     }
@@ -384,7 +384,7 @@ function addChatListOption(chat: Chat) {
     li.id = chat.id;
     //change displayed chats to selected one
     li.addEventListener("click", () => {
-        if (textchatDropdownChatsButton.getAttribute("data-id") === chat.id) {
+        if (textchatChatsButton.getAttribute("data-id") === chat.id) {
             console.log("Chat already selected");
             return;
         }
@@ -429,8 +429,8 @@ function updateChatListButton(id: string) {
             a = chat.name;
         }
     });
-    textchatDropdownChatsButton.innerText = a;
-    textchatDropdownChatsButton.setAttribute("data-id", id);
+    textchatChatsButton.innerText = a;
+    textchatChatsButton.setAttribute("data-id", id);
 
 }
 
@@ -444,7 +444,7 @@ function clearTextchatBar() {
 
 //uncheck checkboxes
 function unCheck() {
-    textchatDropdownUsersButton.click();
+    textchatUsersButton.click();
     $(":checkbox").prop("checked", false);
 }
 

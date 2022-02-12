@@ -13,14 +13,13 @@ import {
     literallyUndefined,
     MessageType,
 } from "../common/util";
-import { characters, checkInputMode, START_POSITION_X, START_POSITION_Y } from "./main";
-import { bsWelcomeModal, panelButtonsInteraction, usernameInputWelcome, welcomeModal } from "./static";
+import { characters, START_POSITION_X, START_POSITION_Y } from "./main";
+import { panelButtonsInteraction } from "./static";
 import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
 import AnimationData, { createAnimationData } from "./graphic/animation-data";
 import { PlayerState } from "../common/states/player-state";
 import { textchatPlayerOnChange } from "./textchat";
 import { updateUsers } from "./conference/conference";
-import { convertCompilerOptionsFromJson } from "typescript";
 import { MapData } from "./newMap";
 
 export enum InputMode {

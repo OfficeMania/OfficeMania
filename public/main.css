@@ -672,31 +672,6 @@ button:active{
     }
 
 }
-#help-footer {
-    position: fixed;
-    width: 100%;
-    left: 0;
-    bottom: 0;
-}
-
-#help-interaction {
-    margin-left: 5%;
-    margin-bottom: 3%;
-    transition: opacity var(--transition-speed);
-}
-
-#help-interaction span {
-    font-size: 30px;
-    font-weight: bolder;
-    -webkit-text-fill-color: white;
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: black;
-}
-
-#help-interaction img {
-    margin-bottom: 15px;
-    margin-right: 10px;
-}
 
 #loading-screen {
     position: fixed;

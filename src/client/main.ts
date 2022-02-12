@@ -50,7 +50,6 @@ import {
 import { playerLoop } from "./movement";
 import {
     checkInteraction,
-    checkInteractionNearby,
     checkNewInteraction,
     currentInteraction,
     getInputMode,
@@ -94,7 +93,11 @@ import { getInFocus, initChatListener } from "./textchat";
 import { Backpack } from "./backpack";
 import { literallyUndefined, MessageType } from "../common/util";
 import { State } from "../common";
+<<<<<<< HEAD
 import {createMapJson, drawChairsAbovePlayers, drawMap, GroundType, TileList} from "./newMap";
+=======
+import { createMapJson, drawMap } from "./newMap";
+>>>>>>> 1cfb5b5dc0aa8494db6a8a2a77aec5171fd8c6a8
 import { Space } from "./util/space";
 
 export const characters: { [key: string]: AnimatedSpriteSheet } = {};
@@ -520,8 +523,8 @@ async function main() {
      */
 
     //loads all the input functions
-    loadInputFunctions(newMap);
     setNewMap(newMap);
+    loadInputFunctions();
 
     // message recieve test
 
@@ -578,9 +581,6 @@ async function main() {
             updateUsers();
             //updateChat();
         }
-
-        //check if interaction is nearby
-        checkInteractionNearby();
 
         for (const ANIMATION of newMap._animationList) {
             if (Math.abs(coordinateX - ANIMATION.posx) <= Math.floor(width / 2 / TILE_SIZE) && Math.abs(coordinateY - ANIMATION.posy) <= Math.floor(height / 2 / TILE_SIZE)) {
