@@ -10,7 +10,6 @@ import {
     PlayerRecord,
     removeCloseInteractionButton,
 } from "../util";
-import { interactiveCanvas } from "../static";
 import { Interactive } from "./interactive";
 import { Pong, PongPlayer } from "./pong";
 
@@ -89,7 +88,6 @@ export class PingPongTable extends Interactive {
     }
 
     getPong() {
-        let stateSize = this.getHighestIndex();
         this.room.state.pongStates.forEach(state => {
             if (state.playerA === this.ourPlayer.roomId || state.playerB === this.ourPlayer.roomId) {
                 ourGame = this.getPongFromState(state);
@@ -181,7 +179,7 @@ export class PingPongTable extends Interactive {
     }
 
     onLeave(victory?: boolean) {
-        if (!this.room.state.pongStates[ourGame.selfGameId.toString()]) {
+        if (ourGame && !this.room.state.pongStates[ourGame.selfGameId.toString()]) {
             if (victory === true || victory === false) {
                 this.leave(victory);
             }
