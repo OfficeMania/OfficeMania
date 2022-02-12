@@ -93,11 +93,7 @@ import { getInFocus, initChatListener } from "./textchat";
 import { Backpack } from "./backpack";
 import { literallyUndefined, MessageType } from "../common/util";
 import { State } from "../common";
-<<<<<<< HEAD
-import {createMapJson, drawChairsAbovePlayers, drawMap, GroundType, TileList} from "./newMap";
-=======
-import { createMapJson, drawMap } from "./newMap";
->>>>>>> 1cfb5b5dc0aa8494db6a8a2a77aec5171fd8c6a8
+import { createMapJson, drawChairsAbovePlayers, drawMap } from "./newMap";
 import { Space } from "./util/space";
 
 export const characters: { [key: string]: AnimatedSpriteSheet } = {};
