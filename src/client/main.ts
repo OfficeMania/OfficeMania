@@ -26,6 +26,7 @@ import {
     setLocalCharacter,
     setLocalDisplayName,
     setMapInfo,
+    setNewMap,
     setOurPlayer,
     setPlayers,
     setRoom,
@@ -516,6 +517,7 @@ async function main() {
 
     //loads all the input functions
     loadInputFunctions(newMap);
+    setNewMap(newMap);
 
     // message recieve test
 
@@ -632,7 +634,7 @@ async function main() {
         //drawWhiteboard(canvas, whiteboard.getCanvas())
         if (getInputMode() === InputMode.INTERACTION) {
             checkInteraction()?.content?.loop();
-            checkNewInteraction(newMap)?.loop();
+            checkNewInteraction()?.loop();
         }
 
         // Repeat game loop

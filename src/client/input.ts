@@ -4,6 +4,7 @@ import {
     createInteractionButton,
     getCollisionInfo,
     getCorrectedPlayerFacingCoordinates,
+    getNewMap,
     getNewPlayerFacingCoordinates,
     getOurPlayer,
     InputMode,
@@ -147,7 +148,7 @@ export function loadInputFunctions(map: MapData) {
         onDirectionKeyDown(e, "ArrowRight", Direction.RIGHT);
         //player interacts with object in front of him
         onPureKey(e, "e", () => checkInteraction(true));
-        onPureKey(e, "e", () => checkNewInteraction(map, true));
+        onPureKey(e, "e", () => checkNewInteraction(true));
         onPureKey(e, "i", () => ourPlayer.backpack.draw());
         if (inputMode === InputMode.INTERACTION) {
             return;
@@ -215,7 +216,7 @@ export function checkInteraction(executeInteraction: boolean = false): solidInfo
     return solidInfo;
 }
 
-export function checkNewInteraction(map: MapData, executeInteraction: boolean = false): Interactive {
+export function checkNewInteraction(executeInteraction: boolean = false): Interactive {
     if (executeInteraction) {
         console.log("Interaction called.");
     }
@@ -242,7 +243,7 @@ export function checkNewInteraction(map: MapData, executeInteraction: boolean = 
     const ChunkX = newFacingX - correctX;
     const ChunkY = (newFacingY + 1) - correctY;
 
-    const chunk = <Chunk> map.getChunk(ChunkX + "." + ChunkY);
+    const chunk = <Chunk> getNewMap().getChunk(ChunkX + "." + ChunkY);
 
     const content = chunk.data[correctX][correctY]._interactive;
     if (!content) {
@@ -263,7 +264,10 @@ const ID_HELP_INTERACTION = "help-interaction";
 const ID_HELP_INTERACTION_ITEM = "help-interaction-item";
 
 const interactionNearbyButton: HTMLButtonElement = createInteractionButton(
-    () => checkInteraction(true),
+    () => {
+        checkInteraction(true);
+        checkNewInteraction(true);
+    },
     ID_BUTTON_INTERACT,
     button => {
         button.style.opacity = "0";
