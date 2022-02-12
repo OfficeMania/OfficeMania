@@ -94,7 +94,7 @@ import { getInFocus, initChatListener } from "./textchat";
 import { Backpack } from "./backpack";
 import { literallyUndefined, MessageType } from "../common/util";
 import { State } from "../common";
-import {createMapJson, drawMap, GroundType, TileList} from "./newMap";
+import {createMapJson, drawChairsAbovePlayers, drawMap, GroundType, TileList} from "./newMap";
 import { Space } from "./util/space";
 
 export const characters: { [key: string]: AnimatedSpriteSheet } = {};
@@ -431,7 +431,7 @@ async function main() {
     setDoorTextures(newMap);
 
     //For getting the SpriteSheet as png
-    //let img = spriteSheet.toDataURL("image/png");
+    //let img = foreground.toDataURL("image/png");
     //document.write('<img src="' + img + '"/>');
 
     /*
@@ -567,7 +567,7 @@ async function main() {
         coordinateX = (ourPlayer.positionX / TILE_SIZE) + START_POSITION_X;
         posX = Math.abs(coordinateX - newMap._lowestPosx) * TILE_SIZE;
         coordinateY = (ourPlayer.positionY / TILE_SIZE) + START_POSITION_Y;
-        posY = Math.abs(coordinateY- newMap._lowestPosy) * TILE_SIZE;
+        posY = Math.abs(coordinateY - newMap._lowestPosy) * TILE_SIZE;
 
         //detection if someone is nearby, executed only every 20th time
         playerNearbyTimer++;
@@ -634,6 +634,8 @@ async function main() {
         }
 
         ctx.restore();
+
+        drawChairsAbovePlayers(players, foreground, canvas, ourPlayer);
 
         //drawWhiteboard(canvas, whiteboard.getCanvas())
         if (getInputMode() === InputMode.INTERACTION) {

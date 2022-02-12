@@ -1,9 +1,9 @@
 import { Room } from "colyseus.js";
-import { loadImage } from "./util";
+import { getMapInfo, getNewCorrectedPlayerCoordinate, getNewMap, getRoom, loadImage, PlayerRecord } from "./util";
 import {Interactive} from "./interactive/interactive"
 import { helpExitButton } from "./static";
-import { lowestX, lowestY } from "./main";
-import { classicNameResolver } from "typescript";
+import { lowestX, lowestY, START_POSITION_X, START_POSITION_Y } from "./main";
+import { classicNameResolver, getEffectiveTypeParameterDeclarations } from "typescript";
 import { Door, DoorDirection } from "./interactive/door";
 import { PingPongTable } from "./interactive/pingpongtable";
 import { Whiteboard } from "./interactive/whiteboard";
@@ -11,7 +11,7 @@ import { Todo } from "./interactive/todo";
 import { CoffeeMachine } from "./interactive/machines/coffeeMachine";
 import { Donuts } from "./interactive/donuts";
 import { VendingMachine } from "./interactive/machines/vendingMachine";
-import { Direction, State } from "../common";
+import { Direction, State, TILE_SIZE } from "../common";
 import { Cat } from "./interactive/cat";
 import { ChessBoard } from "./interactive/chessboard";
 import { Computer } from "./interactive/computer";
@@ -20,6 +20,7 @@ import { Notes } from "./interactive/notes";
 import { MapInfo } from "./map";
 import { Chair } from "./interactive/chairs";
 import { Space } from "./util/space";
+import { Player } from "./player";
 export class Chunk {
 
     private readonly _posX: number;
@@ -331,6 +332,8 @@ export class MapData {
     public _layerList: string[];
     public _doorLayerIndexList: number[];
 
+    public _bool: boolean;
+
     constructor(paths: TexturePaths) {
         this._map = new Map<string, Chunk>();
         this._tileList = new TileList();
@@ -338,6 +341,9 @@ export class MapData {
         this._texturePaths = paths;
         this._layerList = [];
         this._doorLayerIndexList = [];
+
+
+        this._bool = true;
     }
 
     public setBoundaries(lowestX: number, lowestY: number, highestX: number, highestY: number) {
@@ -356,9 +362,6 @@ export class MapData {
                 if (mergedChunk.data[x][y]._textureIdB[layerId] == -1) {
                     mergedChunk.data[x][y]._textureIdB[layerId] = chunk.data[x][y]._textureIdB[layerId];
                 }
-                if (mergedChunk.data[x][y]._textureIdF[layerId] == -1) {
-                    mergedChunk.data[x][y]._textureIdF[layerId] = chunk.data[x][y]._textureIdF[layerId];
-                }
                 if (!mergedChunk.data[x][y]._interactive) {
                     mergedChunk.data[x][y]._interactive = chunk.data[x][y]._interactive;
                 }
@@ -370,6 +373,9 @@ export class MapData {
                 }
                 if (!mergedChunk.data[x][y]._solidInfo) {
                     mergedChunk.data[x][y]._solidInfo = chunk.data[x][y]._solidInfo;
+                }
+                if (layerId == -1 && mergedChunk.data[x][y]._textureIdF == -1) {
+                    mergedChunk.data[x][y]._textureIdF = chunk.data[x][y]._textureIdF;
                 }
             }
         }
@@ -533,6 +539,49 @@ async function createSpriteSheet(map: MapData, canvas: HTMLCanvasElement) {
     return canvas;
 }
 
+export function drawChairsAbovePlayers(players: PlayerRecord, foreground: HTMLCanvasElement, canvas: HTMLCanvasElement, ourPlayer: Player) {
+    Object.values(players)
+        .forEach((player: Player) => {
+            if(getRoom().state.players.get(player.roomId).isSitting) {
+                
+                let ctx = canvas.getContext("2d");
+                const [x, y] = getNewCorrectedPlayerCoordinate(player);
+                let correctX = x % 16;
+                let correctY = (y + 1) % 16;
+                let copyX = correctX;
+                let copyY = correctY;
+
+                if (copyX < 0) {
+                    correctX = 16 - Math.abs(correctX);
+                }
+                else if (copyX == -16 % 16) {
+                    correctX = 0;
+                }
+                if (copyY < 0) {
+                    correctY = 16 - Math.abs(correctY);
+                }
+                else if (copyY == -16 % 16) {
+                    correctY = 0;
+                }
+
+                const ChunkX = x - correctX;
+                const ChunkY = (y + 1) - correctY;
+
+                let chunk = <Chunk> getNewMap().getChunk(ChunkX + "." + ChunkY);
+
+                chunk.data[correctX][correctY]._drawInForeground = true;
+                getNewMap().addChunk(chunk, -1);
+
+                let coordinateX = (ourPlayer.positionX / 48) + START_POSITION_X;
+                let coordinateY = (ourPlayer.positionY / 48) + START_POSITION_Y;
+                let posX = (x - coordinateX) * 48 + Math.round(canvas.width / 2);
+                let posY = (y - coordinateY) * 48 + Math.round(canvas.height / 2) + 48;
+
+                ctx.drawImage(foreground, (x - getNewMap()._lowestPosx) * 48, (y - getNewMap()._lowestPosy + 1) * 48, 48, 96, posX, posY, 48, 96);
+
+            }
+        });
+}
 export function drawMap(map: MapData, spriteSheet: HTMLCanvasElement, canvas: HTMLCanvasElement, startx: number, starty: number, endx:number, endy: number, layerIndex: number) {
 
     for (const INDEX of map._doorLayerIndexList) {
@@ -598,12 +647,15 @@ export function drawMap(map: MapData, spriteSheet: HTMLCanvasElement, canvas: HT
                 animationToDraw.drawAnimation(ctx, dx, dy, animationX, animationY);
                 continue;
             }
-            if (chunk.data[correctX][correctY]._textureIdB[layerIndex] == -1) {
-                continue;
-            }
-            if (layerIndex != -1) {
+            if (layerIndex !== -1) {
+                if (chunk.data[correctX][correctY]._textureIdB[layerIndex] == -1) {
+                    continue;
+                }
                 ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdB[layerIndex] % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdB[layerIndex] / size) * 48, 48, 48, dx, dy, 48, 48);
             } else {
+                if (chunk.data[correctX][correctY]._textureIdF == -1) {
+                    continue;
+                }
                 ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdF % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdF / size) * 48, 48, 48, dx, dy, 48, 48);
             }   
         }
@@ -857,6 +909,7 @@ function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
                         chunk.data[x][y]._textureIdB[LAYER_INDEX] = index; //Adds the index of the texture in the TileList. New textures will be saved first in the list
                         if (mapJsonLayer.name === "<foreground> chairs") {
                             chunk.data[x][y]._textureIdF = index;
+                            map.addChunk(chunk, -1);
                         }
                         map.addChunk(chunk, LAYER_INDEX);
                         break;
