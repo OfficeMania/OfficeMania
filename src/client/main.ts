@@ -414,14 +414,18 @@ async function main() {
     background.height = Math.abs(newMap._highestPosy + 1 - newMap._lowestPosy) * 48;
     foreground.width = background.width;
     foreground.height = background.height;
+
+    doors.width = background.width;
+    doors.height = background.height;
+
     let ctxB = background.getContext("2d");
-    let ctxF = foreground.getContext("2d");
 
     await newMap.updateAnimationCounter();
 
     for (let i = 0; i < newMap._layerList.length; i++) {
         drawMap(newMap, spriteSheet, background, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, i);
     }
+    drawMap(newMap, spriteSheet, foreground, newMap._lowestPosx, newMap._lowestPosy, newMap._highestPosx, newMap._highestPosy, -1)
 
     setDoorTextures(newMap);
 
@@ -441,7 +445,7 @@ async function main() {
 
     //load map from server
     const mapJson = await fetch("/map/Map.json").then(response => response.json());
-    const map: MapInfo = await convertMapData(mapJson, room, foreground); // foreground is for testing;
+    const map: MapInfo = await convertMapData(mapJson, room, doors); // foreground is for testing;
     setMapInfo(map);
 
     let currentMap = new MapInfo(
