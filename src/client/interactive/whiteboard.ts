@@ -101,9 +101,9 @@ export class Whiteboard extends Interactive{
 
     onInteraction(){
         if (this.isVisible) {
-            this.hide()
+            this.leave();
         } else {
-            this.show()
+            this.show();
             createCloseInteractionButton(() => this.leave());
         }
     }

@@ -21,6 +21,7 @@ import { PlayerState } from "../common/states/player-state";
 import { textchatPlayerOnChange } from "./textchat";
 import { updateUsers } from "./conference/conference";
 import { convertCompilerOptionsFromJson } from "typescript";
+import { MapData } from "./newMap";
 
 export enum InputMode {
     NORMAL = "normal",
@@ -39,6 +40,7 @@ let _mapInfo: MapInfo = undefined;
 let _ourPlayer: Player = undefined;
 let _players: PlayerRecord = undefined;
 let _chatEnabled: boolean = false;
+let _newMap: MapData = undefined;
 
 export function setClient(client: Client) {
     _client = client;
@@ -104,6 +106,14 @@ export function areWeLoggedIn(): boolean {
 export function areWeAdmin(): boolean {
     const ourPlayer: Player = getOurPlayer();
     return ourPlayer.userRole === 1;
+}
+
+export function setNewMap(newMap: MapData) {
+    _newMap = newMap;
+}
+
+export function getNewMap(): MapData {
+    return _newMap;
 }
 
 /*

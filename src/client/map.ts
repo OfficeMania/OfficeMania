@@ -269,8 +269,14 @@ function fillSolidInfos(map: MapInfo) {
     for(const object of map.objects) {
         const basePosX = ((object.x / map.resolution) - mapStartX) * 2;
         const basePosY = ((object.y / map.resolution) - mapStartY) * 2;
-        const height = Math.round(object.height / map.resolution);
-        const width = Math.round(object.width / map.resolution);
+        let height = Math.round(object.height / map.resolution);
+        let width = Math.round(object.width / map.resolution);
+        if(height <= 0) {
+            height = STEP_SIZE;
+        }
+        if(width <= 0) {
+            width = STEP_SIZE;
+        }
 
         /*const sofa = object.id === 19 || object.id === 20 || object.id === 21 || object.id === 22;
         if(sofa) {
@@ -381,7 +387,7 @@ function setSolidInfoMap(solidInfoMap: solidInfo[][], basePosX: number, basePosY
 
 function setContentMap(solidInfoMap: solidInfo[][], basePosX: number, basePosY: number, height: number, width: number, callback: (solidInfo) => void) {
     for(let i = 0; i <= height; i ++) {
-        for(let j = 0; j <= width; j ++) {
+        for(let j = 0; j < width; j ++) {
         callback(solidInfoMap[basePosX + j][basePosY + i]);
         callback(solidInfoMap[basePosX + 1 + j][basePosY + i]);
         callback(solidInfoMap[basePosX + j][basePosY + 1 + i]);

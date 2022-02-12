@@ -3,7 +3,7 @@ import { Client, Room } from "colyseus";
 import { MessageType, State } from "../../common";
 import { ChairState } from "../../common/states/chair-state";
 
-export class DoorHandler implements Handler {
+export class ChairHandler implements Handler {
 
     room: Room<State>;
 
