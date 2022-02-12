@@ -3745,17 +3745,6 @@
                  "y":-1488
                 }, 
                 {
-                 "height":390.666666666667,
-                 "id":149,
-                 "name":"Paper",
-                 "rotation":0,
-                 "type":"17",
-                 "visible":true,
-                 "width":286.666666666666,
-                 "x":624,
-                 "y":-384
-                }, 
-                {
                  "height":48,
                  "id":151,
                  "name":"chair north",
@@ -3875,6 +3864,50 @@
                  "width":72,
                  "x":1511.75,
                  "y":-1008
+                }, 
+                {
+                 "height":144,
+                 "id":166,
+                 "name":"notes",
+                 "rotation":0,
+                 "type":"17",
+                 "visible":true,
+                 "width":96,
+                 "x":720,
+                 "y":-240
+                }, 
+                {
+                 "height":144,
+                 "id":169,
+                 "name":"notes",
+                 "rotation":0,
+                 "type":"17",
+                 "visible":true,
+                 "width":96,
+                 "x":720,
+                 "y":-384
+                }, 
+                {
+                 "height":144,
+                 "id":170,
+                 "name":"notes",
+                 "rotation":0,
+                 "type":"17",
+                 "visible":true,
+                 "width":96,
+                 "x":624,
+                 "y":-384
+                }, 
+                {
+                 "height":144,
+                 "id":171,
+                 "name":"notes",
+                 "rotation":0,
+                 "type":"17",
+                 "visible":true,
+                 "width":96,
+                 "x":624,
+                 "y":-240
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -3883,10 +3916,10 @@
          "y":0
         }],
  "nextlayerid":64,
- "nextobjectid":164,
+ "nextobjectid":172,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.6.0",
+ "tiledversion":"1.7.2",
  "tileheight":48,
  "tilesets":[
         {

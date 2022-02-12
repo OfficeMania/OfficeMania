@@ -267,12 +267,13 @@ export class TileList {
 
 class dataFromPos {
 
-    public _textureIdF: number[]; // For Foregound
+    public _textureIdF: number; // For Foregound
     public _textureIdB: number[]; // For Background
     public _solidInfo: boolean[][];
     public _interactive: Interactive;
     public _isConferencRoom: boolean;
     public _roomId: number;
+    public _drawInForeground: boolean;
 
     constructor(layerSize: number) {
 
@@ -280,14 +281,12 @@ class dataFromPos {
         for (let i = 0; i < layerSize; i++) {
             this._textureIdB[i] = -1;
         }
-        this._textureIdF = [];
-        for (let i = 0; i < layerSize; i++) {
-            this._textureIdF[i] = -1;
-        }
+        this._textureIdF = -1;
 
         this._interactive = null;
         this._isConferencRoom = false;
         this._roomId = 0;
+        this._drawInForeground = false;
 
         this._solidInfo = [];
         this._solidInfo[0] = [];
@@ -602,7 +601,11 @@ export function drawMap(map: MapData, spriteSheet: HTMLCanvasElement, canvas: HT
             if (chunk.data[correctX][correctY]._textureIdB[layerIndex] == -1) {
                 continue;
             }
-            ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdB[layerIndex] % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdB[layerIndex] / size) * 48, 48, 48, dx, dy, 48, 48);
+            if (layerIndex != -1) {
+                ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdB[layerIndex] % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdB[layerIndex] / size) * 48, 48, 48, dx, dy, 48, 48);
+            } else {
+                ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdF % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdF / size) * 48, 48, 48, dx, dy, 48, 48);
+            }   
         }
     }
 }
@@ -852,6 +855,9 @@ function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
 
                         let index = map._tileList.addTile(path, data - id);
                         chunk.data[x][y]._textureIdB[LAYER_INDEX] = index; //Adds the index of the texture in the TileList. New textures will be saved first in the list
+                        if (mapJsonLayer.name === "<foreground> chairs") {
+                            chunk.data[x][y]._textureIdF = index;
+                        }
                         map.addChunk(chunk, LAYER_INDEX);
                         break;
                     }

@@ -1,9 +1,7 @@
 import {
-    appendFAIcon,
-    consumeInteractionClosed,
-    createInteractionButton,
     getCollisionInfo,
     getCorrectedPlayerFacingCoordinates,
+    getNewMap,
     getNewPlayerFacingCoordinates,
     getOurPlayer,
     InputMode,
@@ -19,7 +17,6 @@ import {
     camButton,
     helpButton,
     helpExitButton,
-    helpFooter,
     muteButton,
     settingsButton,
     settingsCancelButton,
@@ -111,7 +108,7 @@ function onDirectionKeyUp(event: KeyboardEvent, key: string, direction: Directio
     }
 }
 
-export function loadInputFunctions(map: MapData) {
+export function loadInputFunctions() {
     function onKeyDown(e: KeyboardEvent) {
         const ourPlayer = getOurPlayer();
         if (e.key === "Escape") {
@@ -146,8 +143,10 @@ export function loadInputFunctions(map: MapData) {
         onDirectionKeyDown(e, "ArrowLeft", Direction.LEFT);
         onDirectionKeyDown(e, "ArrowRight", Direction.RIGHT);
         //player interacts with object in front of him
-        onPureKey(e, "e", () => checkInteraction(true));
-        onPureKey(e, "e", () => checkNewInteraction(map, true));
+        onPureKey(e, "e", () => {
+            checkInteraction(true);
+            checkNewInteraction(true);
+        });
         onPureKey(e, "i", () => ourPlayer.backpack.draw());
         if (inputMode === InputMode.INTERACTION) {
             return;
@@ -215,7 +214,7 @@ export function checkInteraction(executeInteraction: boolean = false): solidInfo
     return solidInfo;
 }
 
-export function checkNewInteraction(map: MapData, executeInteraction: boolean = false): Interactive {
+export function checkNewInteraction(executeInteraction: boolean = false): Interactive {
     if (executeInteraction) {
         console.log("Interaction called.");
     }
@@ -242,95 +241,20 @@ export function checkNewInteraction(map: MapData, executeInteraction: boolean = 
     const ChunkX = newFacingX - correctX;
     const ChunkY = (newFacingY + 1) - correctY;
 
-    const chunk = <Chunk> map.getChunk(ChunkX + "." + ChunkY);
+    const chunk = <Chunk> getNewMap().getChunk(ChunkX + "." + ChunkY);
 
     const content = chunk.data[correctX][correctY]._interactive;
-    if (!content) {
-        console.error(`no interactive for ${newFacingX}:${newFacingY}`);
+    
+    if (!(content instanceof Door)) {
         return null;
     }
-    if (!(content instanceof Door)) {
+
+    if (!content) {
+        console.error(`no interactive for ${newFacingX}:${newFacingY}`);
         return null;
     }
 
     content && executeInteraction && content.onInteraction();
     currentInteraction = content;
     return currentInteraction;
-}
-
-const ID_BUTTON_INTERACT = "button-interact";
-const ID_HELP_INTERACTION = "help-interaction";
-const ID_HELP_INTERACTION_ITEM = "help-interaction-item";
-
-const interactionNearbyButton: HTMLButtonElement = createInteractionButton(
-    () => checkInteraction(true),
-    ID_BUTTON_INTERACT,
-    button => {
-        button.style.opacity = "0";
-        button.style.display = "none";
-    }
-);
-appendFAIcon(interactionNearbyButton, "sign-in-alt");
-//const [interactionHelp, interactionHelpItem]: [HTMLDivElement, HTMLSpanElement] = createInteractionHelp();
-//interactionHelp.style.opacity = "0";
-//interactionHelp.style.display = "none";
-//helpFooter.append(interactionHelp);
-
-let interactionInfoShown = false;
-
-export function checkInteractionNearby() {
-    const solidInfo: solidInfo = checkInteraction();
-    const fade: boolean = inputMode === InputMode.NORMAL;
-    if (solidInfo?.content && inputMode !== InputMode.INTERACTION) {
-        if (!interactionInfoShown) {
-            interactionInfoShown = true;
-            interactionNearbyButton.disabled = false;
-            //showElement(interactionHelp, fade && !consumeInteractionClosed());
-            showElement(interactionNearbyButton, fade && !consumeInteractionClosed());
-        }
-        //interactionHelpItem.innerText = solidInfo.content.name;
-    } else if (interactionInfoShown) {
-        interactionInfoShown = false;
-        interactionNearbyButton.disabled = true;
-        hideElement(interactionNearbyButton, fade);
-        //hideElement(interactionHelp, fade);
-    }
-}
-
-/*function createInteractionHelp(): [HTMLDivElement, HTMLSpanElement] {
-    const divElement: HTMLDivElement = document.createElement("div");
-    divElement.id = ID_HELP_INTERACTION;
-    const interactionHelpTextPrefix = document.createElement("span");
-    interactionHelpTextPrefix.innerText = "Press ";
-    divElement.append(interactionHelpTextPrefix);
-    const interactionHelpKey: HTMLImageElement = document.createElement("img");
-    interactionHelpKey.src = "../assets/img/transparent_32x32.png";
-    interactionHelpKey.classList.add("key", "key-small");
-    interactionHelpKey.style.backgroundPosition = "calc(6 * -32px) calc(-33px)";
-    divElement.append(interactionHelpKey);
-    const interactionHelpText = document.createElement("span");
-    interactionHelpText.innerText = "to interact with ";
-    divElement.append(interactionHelpText);
-    const spanElement = document.createElement("span");
-    spanElement.id = ID_HELP_INTERACTION_ITEM;
-    divElement.append(spanElement);
-    return [divElement, spanElement];
-}*/
-
-function showElement(element: HTMLElement, fade: boolean = true) {
-    element.style.display = null;
-    if (fade) {
-        setTimeout(() => (element.style.opacity = "1"), 10);
-    } else {
-        element.style.opacity = "1";
-    }
-}
-
-function hideElement(element: HTMLElement, fade: boolean = true) {
-    element.style.opacity = "0";
-    if (fade) {
-        setTimeout(() => (element.style.display = interactionInfoShown ? null : "none"), 510);
-    } else {
-        element.style.display = "none";
-    }
 }
