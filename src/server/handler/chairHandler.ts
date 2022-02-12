@@ -13,7 +13,6 @@ export class ChairHandler implements Handler {
 
     onCreate(options: any) {
         this.room.onMessage(MessageType.CHAIR_NEW, ((client, message) => onNew(this.room, client, message)));
-        this.room.onMessage(MessageType.CHAIR_NEW, ((client, message) => changeSitting(this.room, client, message)));
     }
 
     onJoin(client: Client) {
@@ -43,13 +42,16 @@ function onNew(room: Room<State>, client: Client, message) {
     }
 }
 
-function changeSitting(room: Room<State>, client: Client, message) {
-    if(room.state.chairStates[message[0]].isUsed === false) {
-        room.state.chairStates[message[0]].isUsed = true;
-        room.state.chairStates[message[0]].playerId = message[1];
-        return;
+export function changeSitting(room: Room<State>, client: Client, message) {
+    console.log(message);
+    let chair = room.state.chairStates[message];
+    if(chair.isUsed === false) {
+        chair.isUsed = true;
+        chair.playerId = client.id;
+        console.log(chair.isUsed + " | " + message);
+    } else {
+        chair.isUsed = false;
+        chair.playerId = "";
     }
-    room.state.chairStates[message[0]].isUsed = false;
-    room.state.chairStates[message[0]].playerId = "";
 
 }

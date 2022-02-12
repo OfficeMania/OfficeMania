@@ -14,6 +14,7 @@ import { ChatHandler } from "../handler/chatHandler";
 import http from "http";
 import path from "path";
 import { User } from "../database/entity/user";
+import { ChairHandler } from "../handler/chairHandler";
 
 const chessHandler: ChessHandler = new ChessHandler();
 const doorHandler: DoorHandler = new DoorHandler();
@@ -24,6 +25,7 @@ const todoListHandler: TodoListHandler = new TodoListHandler();
 const machineHandler: MachineHandler = new MachineHandler();
 const notesHandler: NotesHandler = new NotesHandler();
 const chatHandler: ChatHandler = new ChatHandler();
+const chairHandler: ChairHandler = new ChairHandler();
 const handlers: Handler[] = [
     chessHandler,
     doorHandler,
@@ -34,6 +36,7 @@ const handlers: Handler[] = [
     machineHandler,
     notesHandler,
     chatHandler,
+    chairHandler,
 ];
 
 /*

@@ -17,6 +17,7 @@ import {
     STEP_SIZE,
 } from "../../common";
 import { User } from "../database/entity/user";
+import { changeSitting } from "./chairHandler";
 
 export interface AuthData {
     userSettings?: UserSettings;
@@ -40,7 +41,7 @@ export class PlayerHandler implements Handler {
 
     onCreate(options: any): void {
         //receives movement from all the clients
-        this.room.onMessage(MessageType.MOVE, (client: Client, message: Direction) => this.onMove(client, message));
+        this.room.onMessage(MessageType.MOVE, (client: Client, message: Direction) => this.onMove(this.room, client, message));
         //recives sync message
         this.room.onMessage(MessageType.SYNC, (client: Client, message: number[]) => this.onSync(client, message));
         //receives name changes
@@ -60,7 +61,7 @@ export class PlayerHandler implements Handler {
             this.updateParticipantId(client, message)
         );
 
-        this.room.onMessage(MessageType.SIT, (client: Client, message) => this.onSit(client, message))
+        this.room.onMessage(MessageType.SIT, (client: Client, message) => this.onSit(this.room, client, message))
     }
 
     onJoin(client: Client): void {
@@ -100,10 +101,12 @@ export class PlayerHandler implements Handler {
         }
     }
 
-    private onMove(client: Client, direction: Direction): void {
+    private onMove(room: Room<State>, client: Client, direction: Direction): void {
         const playerState: PlayerState = this.getPlayerData(client);
-        playerState.isSitting = false;
-        //correct coordinates if sitting was true TODO
+        if(playerState.isSitting === true) {
+            playerState.isSitting = false;
+            changeSitting(room, client, playerState.x + "" + playerState.y);
+        }
         switch (direction) {
             case Direction.DOWN: {
                 playerState.y++;
@@ -216,11 +219,12 @@ export class PlayerHandler implements Handler {
         client.send(MessageType.UPDATE_CHARACTER, value);
     }
     
-    private onSit(client:Client, message): void {
+    private onSit(room: Room<State>, client:Client, message): void {
         const playerState: PlayerState = this.getPlayerData(client);
         playerState.isSitting = true;
         //correct coordinates
         playerState.x = message.xPos;
         playerState.y = message.yPos;
+        changeSitting(room, client, playerState.x + "" + playerState.y);
     }
 }
