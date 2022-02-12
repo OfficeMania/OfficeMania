@@ -50,7 +50,6 @@ import {
 import { playerLoop } from "./movement";
 import {
     checkInteraction,
-    checkInteractionNearby,
     checkNewInteraction,
     currentInteraction,
     getInputMode,
@@ -520,8 +519,8 @@ async function main() {
      */
 
     //loads all the input functions
-    loadInputFunctions(newMap);
     setNewMap(newMap);
+    loadInputFunctions();
 
     // message recieve test
 
@@ -578,9 +577,6 @@ async function main() {
             updateUsers();
             //updateChat();
         }
-
-        //check if interaction is nearby
-        checkInteractionNearby();
 
         for (const ANIMATION of newMap._animationList) {
             if (Math.abs(coordinateX - ANIMATION.posx) <= Math.floor(width / 2 / TILE_SIZE) && Math.abs(coordinateY - ANIMATION.posy) <= Math.floor(height / 2 / TILE_SIZE)) {
