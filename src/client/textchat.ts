@@ -28,6 +28,8 @@ var _inFocus = false;
 
 const chats: Chat[] = [];
 
+var unread: boolean = false;
+
 function getChatById(chatId: string): Chat {
     const chat = chats.find(chat => chat.id === chatId);
     if (!chat) {
@@ -63,8 +65,14 @@ export function getInFocus() {
 
 //toggles chat visibility
 function toggleTextchatBar() {
-    if (getShowTextchatBar()) setShowTextchatBar(false);
-    else setShowTextchatBar(true);
+    if (getShowTextchatBar()) {
+        setShowTextchatBar(false);
+    }
+    else {
+        setShowTextchatBar(true);
+        unread = false;
+        textchatButton.style.backgroundColor = "#f8f8f8"
+    }
     checkInputMode();
     setShowParticipantsTab(false);
 }
@@ -480,13 +488,10 @@ function updateChatName(chat: Chat) {
 }
 
 function sendChatNotification(message: ChatMessage) {
-    if (!checkIfOwnMessage(message)) {
-        let chatSuffix: string = "";
-        if (chats[0].id === message.chatId) {
-            chatSuffix = " in Global";
-        } else if (chats[1].id === message.chatId) {
-            chatSuffix = " in Nearby";
-        }
-        sendNotification(`${message.name}${chatSuffix} says: ${message.message}`);
+    if (!checkIfOwnMessage(message) && !unread && !_showTextchat) {
+        sendNotification(`Recieved new messages.`);
+        textchatButton.style.backgroundColor = "#ff5d5d";
+        unread = true;
     }
+
 }
