@@ -94,6 +94,7 @@ export class Notes extends Interactive {
 
         this.ctx.fillStyle = "black";
         this.ctx.font = "25px DejaVu Sans Mono";
+        this.ctx.textAlign = "left";
         this.ctx.lineWidth = 3;
 
         let i = 0;
