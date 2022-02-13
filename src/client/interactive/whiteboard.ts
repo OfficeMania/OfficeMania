@@ -258,7 +258,7 @@ export class Whiteboard extends Interactive {
             return;
         }
         for (const id in whiteboard.whiteboardPlayer) {
-            whiteboard.whiteboardPlayer[id] = 0;
+            whiteboard.resetPlayer(id);
         }
         whiteboard.setup(whiteboard.canvas);
     }
