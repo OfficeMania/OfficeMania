@@ -245,6 +245,10 @@ button:active{
     overflow: hidden;
 }
 
+#video-bar video {
+    max-height: 300px;
+}
+
 .video-container video {
     z-index: 0;
     max-width: 100%;
@@ -253,7 +257,6 @@ button:active{
     border-radius: 15px;
     border-style: solid;
     border-width: 2px;
-    max-height: 40vh;
 }
 
 .video-overlay {
