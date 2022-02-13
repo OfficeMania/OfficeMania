@@ -99,18 +99,22 @@ button:active{
 /* Tooltip text */
 
 #panel-buttons .tooltip-text {
-    font-size: 10px;
     position: absolute;
     visibility: hidden;
-    background-color: #ffffffaa;
-    color: #000;
     
+    background-color: #ffffffaa;
+    font-size: 10px;
+    color: #000;
+
     padding: 2px 5px 2px 5px;
     border-radius: 6px;
-    /* Position the tooltip text - see examples below! */
+
+    /* Position the tooltip text */
     text-align: center;
     top: 90%;
-    left: 20%;
+    left: 50%;
+    /* Variable transformation depending on span width, only fiddeling */
+    transform: translateX(-40%);
     z-index: 2;
 }
 
