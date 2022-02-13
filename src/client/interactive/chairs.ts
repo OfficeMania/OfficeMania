@@ -13,6 +13,8 @@ export class Chair extends Interactive {
 
     id: string;
 
+    lastSent: number = Date.now();
+
     constructor(direction: Direction, posX: number, posY: number){
         super("Chair");
         this.posX = posX;
@@ -43,7 +45,11 @@ export class Chair extends Interactive {
             
             getRoom().send(MessageType.SIT, {xPos: player.scaledX, yPos: player.scaledY});
         } else {
-            sendNotification("You can not sit on someone else's lap");
+            const temp: number = Date.now();
+            if (temp - this.lastSent > 2000) {
+                sendNotification("You can not sit on someone else's lap");
+                this.lastSent = temp;
+            }
         }
     }
 
