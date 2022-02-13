@@ -126,6 +126,7 @@ export class ChatHandler implements Handler {
         }));
         chatDTOs.unshift({ id: this.nearbyChat.id, name: this.nearbyChat.name });
         chatDTOs.unshift({ id: this.globalChat.id, name: this.globalChat.name });
+        console.log("ChatDTOs: ", chatDTOs);
         client.send(MessageType.CHAT_UPDATE, JSON.stringify(chatDTOs));
     }
 
