@@ -70,8 +70,6 @@ function toggleTextchatBar() {
     }
     else {
         setShowTextchatBar(true);
-        unread = false;
-        textchatButton.style.backgroundColor = "#f8f8f8"
     }
     checkInputMode();
     setShowParticipantsTab(false);
@@ -100,6 +98,8 @@ export function initChatListener() {
     //changing of inputmode if text area is in use or not
     textchatArea.onfocus = function() {
         setInFocus(true);
+        textchatChatsButton.classList.remove("unread");
+        removeUnreadFromChatButton();
     };
     textchatArea.onblur = function() {
         setInFocus(false);
@@ -119,6 +119,11 @@ export function initChatListener() {
     });
 
     updateUserList();
+
+    textchatChatsButton.addEventListener("click", () => {
+        textchatChatsButton.classList.remove("unread");
+        removeUnreadFromChatButton();
+    });
 
     textchatAddUsers.addEventListener("click", () => {
         const ids: string[] = [];
@@ -396,7 +401,8 @@ function addChatListOption(chat: Chat) {
             console.log("Chat already selected");
             return;
         }
-
+        li.classList.remove("unread");
+        removeUnreadFromChatButton();
         updateChatListButton(chat.id);
 
         clearTextchatBar();
@@ -439,6 +445,8 @@ function updateChatListButton(id: string) {
     });
     textchatChatsButton.innerText = a;
     textchatChatsButton.setAttribute("data-id", id);
+    textchatChatsButton.classList.remove("unread");
+    removeUnreadFromChatButton();
 
 }
 
@@ -488,10 +496,30 @@ function updateChatName(chat: Chat) {
 }
 
 function sendChatNotification(message: ChatMessage) {
-    if (!checkIfOwnMessage(message) && !unread && !_showTextchat) {
+    if (checkIfOwnMessage(message)) {
+        return;
+    }
+    if (!unread && !_showTextchat) {
         sendNotification(`Recieved new messages.`);
-        textchatButton.style.backgroundColor = "#ff5d5d";
+    }
+    if (!unread) {
+        textchatButton.classList.add("unread");
         unread = true;
     }
+    for (let i = 0; textchatDropdownChats.children.length > i; i++) {
+        if (textchatChatsButton.getAttribute("data-id") === message.chatId) {
+            textchatChatsButton.classList.add("unread");
+        }
+        else if (textchatDropdownChats.children[i].id === message.chatId) {
+            
+            textchatDropdownChats.children[i].classList.add("unread");
+        }
+    } 
+}
 
+function removeUnreadFromChatButton() {
+    if ($(".unread").length === 1) {
+        textchatButton.classList.remove("unread");
+        unread = false;
+    }
 }
