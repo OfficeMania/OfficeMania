@@ -61,7 +61,7 @@ function onClear(room: Room<State>, client: Client, whiteboardId: number) {
         value.paths.clear();
         value.currentPath = null;
     });
-    room.broadcast(MessageType.WHITEBOARD_CLEAR, whiteboardId, { except: client });
+    setTimeout(() => room.broadcast(MessageType.WHITEBOARD_CLEAR, whiteboardId, { except: client }), 110);
 }
 
 function onSave(room: Room<State>, client: Client, whiteboardId: number) {
@@ -93,5 +93,5 @@ function onPath(room: Room<State>, client: Client, message: WhiteboardPathSegmen
         whiteboardPlayer.paths.push(whiteboardPlayer.currentPath);
         whiteboardPlayer.currentPath = null;
     }
-    room.broadcast(MessageType.WHITEBOARD_REDRAW, client, { except: client });
+    setTimeout(() => room.broadcast(MessageType.WHITEBOARD_REDRAW, client, { except: client }), 110);
 }
