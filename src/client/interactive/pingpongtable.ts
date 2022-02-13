@@ -21,7 +21,6 @@ export class PingPongTable extends Interactive {
     ourPlayer: Player;
     players: PlayerRecord;
     previousInput: Direction[];
-    leavable: boolean;
 
     constructor() {
         super("Pong table", false, 2);
@@ -29,7 +28,6 @@ export class PingPongTable extends Interactive {
         this.players = getPlayers();
         this.input = [null];
         this.previousInput = this.input;
-        this.leavable = false;
     }
 
     onInteraction() {
@@ -55,16 +53,13 @@ export class PingPongTable extends Interactive {
             //console.log("interatction message recieved in client " + message)
             switch (message) {
                 case PongMessage.INIT: {
+                    //console.log("initializing game")
                     this.getPong();
-                    this.leavable = true;
+                    this.updateState();
                     break;
                 }
                 case PongMessage.UPDATE: {
-                    if (ourGame) {
-                        ourGame.selfGameId = this.getGame(this.ourPlayer.roomId);
-                        this.updateState();
-                        ourGame.paint();
-                    }
+                    this.updateState();
                     break;
                 }
                 case PongMessage.LEAVE: {
@@ -91,6 +86,7 @@ export class PingPongTable extends Interactive {
         this.room.state.pongStates.forEach(state => {
             if (state.playerA === this.ourPlayer.roomId || state.playerB === this.ourPlayer.roomId) {
                 ourGame = this.getPongFromState(state);
+                ourGame.selfGameId = this.getGame(this.ourPlayer.roomId);
             }
         });
     }
@@ -134,12 +130,30 @@ export class PingPongTable extends Interactive {
             ourGame.updatePong();
             ourGame.paint();
             this.updateInput();
+            if(ourGame.gameOver !== 0) {
+                if (ourGame.gameOver === 1 && ourGame.playerA.id === getOurPlayer().roomId) {
+                    this.leave(true);
+                } else {
+                    this.leave(false);
+                }
+            }
         }
     }
 
     leave(victory?: boolean) {
-        if (this.leavable && ourGame) { 
-            let ctx = this.canvas.getContext("2d");   
+        if (ourGame) {
+            this.room.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
+            this.onLeave(victory);            
+        }
+    }
+
+    onLeave(victory?: boolean) {
+        
+        if (ourGame) { 
+            let ctx = this.canvas.getContext("2d");
+            ourGame.updatePong();
+            ourGame.paint();
+            ourGame = null;
             //for another life  
             if (victory === true || victory === false) {
                 console.log("showing victory screen")
@@ -147,11 +161,11 @@ export class PingPongTable extends Interactive {
                 ctx.textAlign = "center";
                 ctx.font = "30px Arial";
                 if (victory) {
-                    console.log("Pong: Victory!");
-                    ctx.fillText("dafeet", this.canvas.width / 2, this.canvas.height/2);
+                    //console.log("Pong: Victory!");
+                    ctx.fillText("viktori", this.canvas.width / 2, this.canvas.height/2);
                 }
                 else {
-                    console.log("Pong: Defeat!");
+                    //console.log("Pong: Defeat!");
                     ctx.fillText("dafeet", this.canvas.width / 2, this.canvas.height/2);
                 }
                 setTimeout(() => {
@@ -159,8 +173,6 @@ export class PingPongTable extends Interactive {
                     this.canvas.style.outline = "none";
                     this.canvas.style.visibility = "hidden";
                     removeCloseInteractionButton();
-                    this.room.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
-                    ourGame = null;
                     checkInputMode();
                 }, 5000);
             }
@@ -169,23 +181,10 @@ export class PingPongTable extends Interactive {
                 this.canvas.style.visibility = "hidden";
                 this.canvas.style.outline = "none";
                 removeCloseInteractionButton();
-                this.room.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
-                ourGame = null;
                 checkInputMode();
             }
                 
             
-        }
-    }
-
-    onLeave(victory?: boolean) {
-        if (ourGame && !this.room.state.pongStates[ourGame.selfGameId.toString()]) {
-            if (victory === true || victory === false) {
-                this.leave(victory);
-            }
-            else {
-                this.leave();
-            }
         }
     }
 
@@ -195,7 +194,7 @@ export class PingPongTable extends Interactive {
         if (playerA) {
             if (!ourGame.playerA) {
                 ourGame.playerA = new PongPlayer(
-                    this.room.state.pongStates[this.getGame(this.ourPlayer.roomId).toString()].playerA
+                    this.room.state.pongStates[ourGame.selfGameId.toString()].playerA
                 );
             }
         } else {

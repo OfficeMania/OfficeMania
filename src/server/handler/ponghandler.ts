@@ -3,10 +3,17 @@ import { Client, Room } from "colyseus";
 import { Handler } from "./handler";
 
 const batSections: number[] = [-0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5]
-let hasScored: boolean = false;
 
 const taskExecutor: TaskExecutor<void> = new TaskExecutor<void>();
 
+const ballSpeed: number = 5;
+const ballSize: number = 30;
+const playerSpeed: number = 10;
+const batSize: number = 150;
+const maxScore: number = 5;
+
+
+let hasScored: boolean = false;
 export class PongHandler implements Handler {
 
     room: Room<State>;
@@ -35,15 +42,61 @@ export class PongHandler implements Handler {
 
 }
 
+function onPongUpdate(client: Client, room: Room<State>) {
+    const gameState: PongState = room.state.pongStates[getPongGame(room, client).toString()];
+    if (gameState && client.sessionId === gameState.playerA) {
+        //exit condition
+        if (gameState.scoreA === maxScore) {
+            gameState.gameEnd = 1;
+            return;
+        } else if (gameState.scoreB === maxScore) {
+            gameState.gameEnd = 2;
+            return;
+        }
+        let posX = gameState.posBallX;
+        let posY = gameState.posBallY;
+        posX += gameState.velBallX * gameState.velocities.at(0);
+        //console.log(posX);
+        posY += gameState.velBallY * gameState.velocities.at(0);
+        if ((posY > 720 - gameState.sizes.at(0) / 2 && gameState.velBallY > 0) || (posY < 0 + gameState.sizes.at(0) / 2 && gameState.velBallY < 0)) {
+            gameState.velBallY *= -1;
+        }
+
+        gameState.posBallY = posY;
+        if (hasScored) {
+            return;
+        }
+        if (posX > 1380 - gameState.sizes.at(0) / 2) {
+            if (gameState.playerB) {
+                gameState.scoreA++;
+                hasScored = true;
+                startNextRound(gameState);
+            } else gameState.velBallX *= -1;
+
+            //console.log("hit the wall")
+        } else if (posX < -100 + gameState.sizes.at(0) / 2) {
+            if (gameState.playerB) {
+                gameState.scoreB++;
+                hasScored = true;
+                startNextRound(gameState);
+            } else gameState.velBallX *= -1;
+        }
+        checkCollision(client, gameState);
+        gameState.posBallX = posX;
+        //console.log(gameState.posBallX +" " + gameState.posBallY)
+    }
+}
+
 function joinPong(room: Room<State>, client) {
+    const emptyGame = getEmptyPongGame(room);
     if (getPongGame(room, client) === -1) {
-        const emptyGame = getEmptyPongGame(room);
         console.debug("empty game: " + emptyGame);
         if (emptyGame !== -1) {
             const emptyState: PongState = room.state.pongStates[emptyGame.toString()];
             if (emptyState) {
                 emptyState.playerB = client.sessionId;
-                emptyState.posPlayerB = 360 - (emptyState.sizes.at(1) / 2)
+                emptyState.posPlayerB = 360 - (emptyState.sizes.at(1) / 2);
+                startNewRound(emptyState);
             }
         } else {
             initNewState(room, client);
@@ -51,7 +104,6 @@ function joinPong(room: Room<State>, client) {
     }
     setTimeout(() => {
         client.send(MessageType.PONG_INTERACTION, PongMessage.INIT);
-        console.debug("sent message init to client")
         room.clients.forEach((client) => client.send(MessageType.PONG_INTERACTION, PongMessage.UPDATE));
     }, 200);
 }
@@ -117,12 +169,12 @@ function onPongMovePlayer(message: string, gameState: PongState, pos: number, ca
 
 function initNewState(room: Room<State>, client: Client) {
     console.log("creating new pongstate");
-    console.log(getNextPongSlot(room));
+    //console.log(getNextPongSlot(room));
     let ar = getNextPongSlot(room);
     let newState = new PongState();
     newState.playerA = client.sessionId;
-    newState.velocities.push(10, 10);
-    newState.sizes.push(30, 150)
+    newState.velocities.push(ballSpeed, playerSpeed);
+    newState.sizes.push(ballSize, batSize)
     newState.posPlayerA = 360 - (newState.sizes.at(1) / 2);
     newState.velBallX = 0.8;
     newState.velBallY = 0.2;
@@ -130,8 +182,8 @@ function initNewState(room: Room<State>, client: Client) {
     newState.posBallY = 320 - (newState.sizes.at(0) / 2);
     newState.scoreA = 0;
     newState.scoreB = 0;
+    newState.gameEnd = 0;
     room.state.pongStates[ar.toString()] = newState;
-    console.log(room.state.pongStates[ar.toString()].posPlayerA);
 }
 
 function leavePongGame(room: Room<State>, client: Client, hostWon?: boolean) {
@@ -161,13 +213,11 @@ function leavePongGame(room: Room<State>, client: Client, hostWon?: boolean) {
             
         }
         else {
-            
             console.log("left")
             client.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
             otherClient?.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
-            
         }
-    }, 1000);
+    }, 100);
     
 }
 
@@ -209,51 +259,6 @@ function getNextPongSlot(room: Room<State>): number {
     return -1;
 }
 
-function onPongUpdate(client: Client, room: Room<State>) {
-    const gameState: PongState = room.state.pongStates[getPongGame(room, client).toString()];
-    if (gameState && client.sessionId === gameState.playerA) {
-        let posX = gameState.posBallX;
-        let posY = gameState.posBallY;
-        posX += gameState.velBallX * gameState.velocities.at(0);
-        //console.log(posX);
-        posY += gameState.velBallY * gameState.velocities.at(0);
-        if ((posY > 720 - gameState.sizes.at(0) / 2 && gameState.velBallY > 0) || (posY < 0 + gameState.sizes.at(0) / 2 && gameState.velBallY < 0)) {
-            gameState.velBallY *= -1;
-        }
-
-        gameState.posBallY = posY;
-        if (hasScored) {
-            return;
-        }
-        if (posX > 1380 - gameState.sizes.at(0) / 2) {
-            if (gameState.playerB) {
-                gameState.scoreA++;
-                hasScored = true;
-                startNextRound(gameState);
-            } else gameState.velBallX *= -1;
-
-            //console.log("hit the wall")
-        } else if (posX < -100 + gameState.sizes.at(0) / 2) {
-            if (gameState.playerB) {
-                gameState.scoreB++;
-                hasScored = true;
-                startNextRound(gameState);
-            } else gameState.velBallX *= -1;
-        }
-        checkCollision(client, gameState);
-        gameState.posBallX = posX;
-        //console.log(gameState.posBallX +" " + gameState.posBallY)
-        //exit condition
-        if (gameState.scoreA === 2) {
-            console.log("leaving Pong, a won")
-            leavePongGame(room, client, true);
-        }
-        else if (gameState.scoreB === 2) {
-            console.log("leaving Pong, b won")
-            leavePongGame(room, client, false);
-        }
-    }
-}
 
 function checkCollision(client: Client, gameState: PongState) {
     if (gameState.posBallX <= 20 && gameState.posBallX >= 0 && gameState.velBallX < 0) {
@@ -298,6 +303,10 @@ function startNewRound(game: PongState) {
     game.velBallX = Math.random();
     if (game.velBallX < 0.2) {
         game.velBallX = 0.2;
+    }
+    const dir = Math.random();
+    if (dir < 0.5) {
+        game.velBallX *= -1;
     }
     game.velBallY = 1 - Math.abs(game.velBallX);
     hasScored = false;

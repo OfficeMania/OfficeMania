@@ -5,7 +5,7 @@ import { PongState, State } from "../../common";
 export class Pong {
 
     selfGameId: number = -1;
-    inGame = false;
+    gameOver: number = 0;
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
     p: HTMLParagraphElement;
@@ -17,7 +17,7 @@ export class Pong {
     posBallX: number;
     posBallY: number;
 
-    sizeBat: number = 100;
+    sizeBat: number = 0;
     room: Room<State>
 
     constructor(canvas: HTMLCanvasElement, room: Room<State>, players: PlayerRecord, id: string) {
@@ -30,7 +30,6 @@ export class Pong {
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         //this.canvas.style.borderStyle = "medium solid magenta";
         //this.canvas.style.borderWidth = "5px 5px 7px 5px"
-        this.loop();
     }
 
     loop() {
@@ -55,7 +54,11 @@ export class Pong {
             }
             this.posBallX = currentState.posBallX;
             this.posBallY = currentState.posBallY;
+            if (currentState.gameEnd != 0) {
+                this.gameOver = currentState.gameEnd;
+            }
         }
+        
     }
 
     paint() {

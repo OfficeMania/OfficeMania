@@ -33,6 +33,10 @@ export class PongState extends Schema {
     @type("number")
     scoreB: number;
 
+    //0: not ended, 1: host won, 2: guest won
+    @type("number")
+    gameEnd: number;
+
     //0: sizeBall, 1: sizeBat
     @type({ array: "number" })
     sizes = new ArraySchema<number>();
