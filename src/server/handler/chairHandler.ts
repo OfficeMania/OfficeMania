@@ -43,12 +43,10 @@ function onNew(room: Room<State>, client: Client, message) {
 }
 
 export function changeSitting(room: Room<State>, client: Client, message) {
-    console.log(message);
     let chair = room.state.chairStates[message];
     if(chair.isUsed === false) {
         chair.isUsed = true;
         chair.playerId = client.id;
-        console.log(chair.isUsed + " | " + message);
     } else {
         chair.isUsed = false;
         chair.playerId = "";

@@ -156,7 +156,7 @@ export class Door extends Interactive {
                 callPlayers.push(player.roomId);
             }
         }
-        console.log(callPlayers);
+        //console.log(callPlayers);
         this.room.send(MessageType.DOOR_KNOCK, callPlayers);
     }
 
