@@ -1,9 +1,15 @@
 import { Handler } from "./handler";
 import { Client, Room } from "colyseus";
-import { MessageType, State, WhiteboardPlayerState, WhiteboardState } from "../../common";
-import { ArraySchema } from "@colyseus/schema";
+import {
+    MessageType,
+    State,
+    WhiteboardPathSegmentMessage,
+    WhiteboardPlayerPathState,
+    WhiteboardPlayerState,
+    WhiteboardState,
+} from "../../common";
 
-let whiteboardCount = 300
+let whiteboardCount = 300;
 const colors: string[] = ["black", "white", "red", "magenta", "orange", "yellow", "green", "blue"];
 
 export class WhiteboardHandler implements Handler {
@@ -21,8 +27,8 @@ export class WhiteboardHandler implements Handler {
         this.room.onMessage(MessageType.WHITEBOARD_CREATE, (client, message) => onNewWhiteboard(this.room, client, message));
         this.room.onMessage(MessageType.WHITEBOARD_DRAW, (client, message) => onDraw(this.room, client, message));
         this.room.onMessage(MessageType.WHITEBOARD_ERASE, (client, message) => onErase(this.room, client, message));
-        for(var i = 0; i < whiteboardCount; i++){
-            this.room.state.whiteboard.push(new WhiteboardState());
+        for (var i = 0; i < whiteboardCount; i++) {
+            this.room.state.whiteboards.push(new WhiteboardState());
         }
     }
 
@@ -40,51 +46,62 @@ export class WhiteboardHandler implements Handler {
 
 }
 
-function onNewWhiteboard(room: Room<State>, client: Client, wID: number){
-    if(wID > whiteboardCount){
-        room.state.whiteboard.push(new WhiteboardState());
+function onNewWhiteboard(room: Room<State>, client: Client, wID: number) {
+    if (wID > whiteboardCount) {
+        room.state.whiteboards.push(new WhiteboardState());
         whiteboardCount++;
     }
-    room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId] = new WhiteboardPlayerState();
+    room.state.whiteboards.at(wID).whiteboardPlayers[client.sessionId] = new WhiteboardPlayerState();
 }
 
-function onClear(room: Room<State>, client: Client, wID: number) {
-    for (const [, player] of room.state.whiteboard.at(wID).whiteboardPlayer) {
-        player.paths = new ArraySchema<number>();
-        player.sizes = new ArraySchema<number>();
-        player.color = new ArraySchema<string>();
+function onClear(room: Room<State>, client: Client, whiteboardId: number) {
+    const whiteboard: WhiteboardState | undefined = room.state.whiteboards.at(whiteboardId);
+    if (!whiteboard) {
+        return;
     }
-    room.broadcast(MessageType.WHITEBOARD_CLEAR, wID, {except: client});
+    whiteboard.whiteboardPlayers.forEach(value => {
+        value.paths.clear();
+        value.currentPath = null;
+    });
+    room.broadcast(MessageType.WHITEBOARD_CLEAR, whiteboardId, { except: client });
 }
 
-function onSave(room:Room<State>, client: Client, wID: number) {
+function onSave(room: Room<State>, client: Client, wID: number) {
     //nothing?
 }
 
-function onDraw(room:Room<State>, client: Client, wID: number) {
+function onDraw(room: Room<State>, client: Client, wID: number) {
     //nothing?
 }
 
-function onErase(room:Room<State>, client: Client, wID: number) {
+function onErase(room: Room<State>, client: Client, wID: number) {
     //nothing?
 }
 
-function onPath(room: Room<State>, client: Client, message: number[]) {           //message: [wID, color, size, x, y]
-    var wID: number = message.shift();
-    var color: number = message.shift();
-    var colorStr: string = colors[color];
-    var size: number = message.shift();
-    if (message[0] < 0) {
-        let length = room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.length;
-        if (room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.at(length-2) > -1) { // only push -1 if last element is not already -1
-            room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.push(-1); //-1 means end of line/beginning of new line
-        }
-        if (message[0] === -1) {
-            room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].color.push(colorStr);
-            room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].sizes.push(size);
-        }
-    } else {
-        room.state.whiteboard.at(wID).whiteboardPlayer[client.sessionId].paths.push(...message);
+function onPath(room: Room<State>, client: Client, message: WhiteboardPathSegmentMessage) {           //message: [wID, color, size, x, y]
+    const whiteboardIndex: number = message.whiteboardId;
+    const isEnd: boolean = message.isEnd;
+    const points: number[] | undefined = message.points;
+    const colorId: number | undefined = message.colorId;
+    const color: string | undefined = colorId !== undefined ? colors?.[colorId] : undefined;
+    const size: number | undefined = message.size;
+    const whiteboard: WhiteboardState = room.state.whiteboards.at(whiteboardIndex);
+    const whiteboardPlayer: WhiteboardPlayerState = whiteboard.whiteboardPlayers[client.sessionId];
+    const currentPath: WhiteboardPlayerPathState = !!whiteboardPlayer.currentPath ? whiteboardPlayer.currentPath : (whiteboardPlayer.currentPath = new WhiteboardPlayerPathState());
+    if (points) {
+        currentPath.points.push(...points);
     }
-    room.broadcast(MessageType.WHITEBOARD_REDRAW, client, {except: client});
+    if (!!color) {
+        currentPath.color = color;
+    } else if (colorId === -1) {
+        currentPath.color = "eraser";
+    }
+    if (!!size) {
+        currentPath.size = size;
+    }
+    if (isEnd) {
+        whiteboardPlayer.paths.push(whiteboardPlayer.currentPath);
+        whiteboardPlayer.currentPath = null;
+    }
+    room.broadcast(MessageType.WHITEBOARD_REDRAW, client, { except: client });
 }
