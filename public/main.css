@@ -51,6 +51,7 @@ body {
     display: flex;
     flex-direction: row;
     background: #707183e8;
+    z-index: 1;
 }
 
 #panel-buttons #panel-buttons-interaction {
@@ -626,7 +627,7 @@ button:active{
     height: 100%;
     width: 100%;
     opacity: 100%;
-    z-index: 1;
+    z-index: 2;
 }
 
 #loading-cat {
