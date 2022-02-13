@@ -310,8 +310,11 @@ export class Whiteboard extends Interactive {
         const currentPath: WhiteboardPlayerPathState | undefined = whiteboardPlayer.currentPath;
 
         const context: CanvasRenderingContext2D = whiteboard.canvas.getContext("2d");
-        paths.forEach(value => Whiteboard.drawWhiteboardPlayerPath(context, value));
+
+        paths.slice(this.whiteboardPlayer[clientID] ?? 0).forEach(value => Whiteboard.drawWhiteboardPlayerPath(context, value));
         currentPath && Whiteboard.drawWhiteboardPlayerPath(context, currentPath);
+
+        this.whiteboardPlayer[clientID] = paths.length;
     }
 
     private static drawWhiteboardPlayerPath(context: CanvasRenderingContext2D, path: WhiteboardPlayerPathState): void {
