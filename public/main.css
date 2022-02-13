@@ -512,6 +512,7 @@ button:active{
 }
 
 #textchat-container {
+    right: 0;
     position: fixed;
     background-color: var(--bg-primary-op);
 
@@ -588,9 +589,6 @@ button:active{
         height: calc(100vh - 64px);
     }
 
-    #textchat-container {
-        right: 0;
-    }
 
     #textchat-container.horizontal-animation {
         bottom: 0;
@@ -712,13 +710,15 @@ button:active{
     padding-right: 20px;
 }
 
-#select-textchat{
-    float: left;
-    width: 80%;
+#button-chat-list {
+    overflow-y: scroll;
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
 }
-#select-users {
-    width: 20%;
+#button-chat-list::-webkit-scrollbar {
+    display: none; /* Chrome */
 }
+
 #typing-field {
     resize: none;
     width: 80%;
