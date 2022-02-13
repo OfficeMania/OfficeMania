@@ -25,7 +25,7 @@ export class WhiteboardHandler implements Handler {
         this.room.onMessage(MessageType.WHITEBOARD_SAVE, (client, message) => onSave(this.room, client, message));
         this.room.onMessage(MessageType.WHITEBOARD_PATH, (client, message) => onPath(this.room, client, message));
         this.room.onMessage(MessageType.WHITEBOARD_CREATE, (client, message) => onNewWhiteboard(this.room, client, message));
-        for (var i = 0; i < whiteboardCount; i++) {
+        for (let i = 0; i < whiteboardCount; i++) {
             this.room.state.whiteboards.push(new WhiteboardState());
         }
     }
@@ -44,12 +44,12 @@ export class WhiteboardHandler implements Handler {
 
 }
 
-function onNewWhiteboard(room: Room<State>, client: Client, wID: number) {
-    if (wID > whiteboardCount) {
+function onNewWhiteboard(room: Room<State>, client: Client, whiteboardId: number) {
+    if (whiteboardId > whiteboardCount) {
         room.state.whiteboards.push(new WhiteboardState());
         whiteboardCount++;
     }
-    room.state.whiteboards.at(wID).whiteboardPlayers[client.sessionId] = new WhiteboardPlayerState();
+    room.state.whiteboards.at(whiteboardId).whiteboardPlayers[client.sessionId] = new WhiteboardPlayerState();
 }
 
 function onClear(room: Room<State>, client: Client, whiteboardId: number) {
@@ -64,11 +64,11 @@ function onClear(room: Room<State>, client: Client, whiteboardId: number) {
     room.broadcast(MessageType.WHITEBOARD_CLEAR, whiteboardId, { except: client });
 }
 
-function onSave(room: Room<State>, client: Client, wID: number) {
+function onSave(room: Room<State>, client: Client, whiteboardId: number) {
     //nothing?
 }
 
-function onPath(room: Room<State>, client: Client, message: WhiteboardPathSegmentMessage) {           //message: [wID, color, size, x, y]
+function onPath(room: Room<State>, client: Client, message: WhiteboardPathSegmentMessage) {
     const whiteboardIndex: number = message.whiteboardId;
     const isEnd: boolean = message.isEnd;
     const points: number[] | undefined = message.points;
