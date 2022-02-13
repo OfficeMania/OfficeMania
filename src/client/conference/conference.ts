@@ -441,16 +441,16 @@ export function setAudioButtonMute(muted: boolean, supported: boolean, sharing: 
     muteButton.disabled = !supported;
     muteButton.innerHTML =
         muted || !supported
-            ? '<em class = "fa fa-microphone-slash"></em><span></span>'
-            : '<em class = "fa fa-microphone"></em><span></span>';
+            ? '<em class = "fa fa-microphone-slash"></em><span class="tooltip-text">Unmute</span>'
+            : '<em class = "fa fa-microphone"></em><span class="tooltip-text">Mute</span>';
 }
 
 export function setVideoButtonMute(muted: boolean, supported: boolean, sharing: boolean) {
     camButton.disabled = !supported;
-    const camNormal = '<em class = "fa fa-video"></em><span></span>';
-    const camMuted = '<em class = "fa fa-video-slash"></em><span></span>';
-    const sharingNormal = '<em class = "fa fa-pause"></em><span></span>';
-    const sharingMuted = '<em class = "fa fa-play"></em><span></span>';
+    const camNormal = '<em class = "fa fa-video"></em><span class="tooltip-text">Pause Webcam</span>';
+    const camMuted = '<em class = "fa fa-video-slash"></em><span class="tooltip-text">Resume Webcam</span>';
+    const sharingNormal = '<em class = "fa fa-pause"></em><span class="tooltip-text">Pause Screenshare</span>';
+    const sharingMuted = '<em class = "fa fa-play"></em><span class="tooltip-text">Resume Screenshare</span>';
     const textNormal = sharing ? sharingNormal : camNormal;
     const textMuted = sharing ? sharingMuted : camMuted;
     camButton.innerHTML = muted || !supported ? textMuted : textNormal;
@@ -458,9 +458,12 @@ export function setVideoButtonMute(muted: boolean, supported: boolean, sharing: 
 
 export function setSwitchToDesktop(enabled: boolean, supported: boolean = false) {
     shareButton.disabled = !supported;
-    shareButton.innerHTML = enabled
-        ? '<em class = "fa fa-user"></em><span></span>'
-        : '<em class = "fa fa-desktop"></em><span></span>';
+    if (enabled) {
+        shareButton.innerHTML = '<em class = "fa fa-user"></em><span class="tooltip-text">End Screenshare</span>';
+    }
+    else {
+        shareButton.innerHTML = '<em class = "fa fa-desktop"></em><span class="tooltip-text">Screenshare</span>';
+    }
 }
 
 export function updateButtons() {
