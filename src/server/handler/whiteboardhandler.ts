@@ -25,8 +25,6 @@ export class WhiteboardHandler implements Handler {
         this.room.onMessage(MessageType.WHITEBOARD_SAVE, (client, message) => onSave(this.room, client, message));
         this.room.onMessage(MessageType.WHITEBOARD_PATH, (client, message) => onPath(this.room, client, message));
         this.room.onMessage(MessageType.WHITEBOARD_CREATE, (client, message) => onNewWhiteboard(this.room, client, message));
-        this.room.onMessage(MessageType.WHITEBOARD_DRAW, (client, message) => onDraw(this.room, client, message));
-        this.room.onMessage(MessageType.WHITEBOARD_ERASE, (client, message) => onErase(this.room, client, message));
         for (var i = 0; i < whiteboardCount; i++) {
             this.room.state.whiteboards.push(new WhiteboardState());
         }
@@ -67,14 +65,6 @@ function onClear(room: Room<State>, client: Client, whiteboardId: number) {
 }
 
 function onSave(room: Room<State>, client: Client, wID: number) {
-    //nothing?
-}
-
-function onDraw(room: Room<State>, client: Client, wID: number) {
-    //nothing?
-}
-
-function onErase(room: Room<State>, client: Client, wID: number) {
     //nothing?
 }
 

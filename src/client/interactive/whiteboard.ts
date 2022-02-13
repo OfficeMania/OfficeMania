@@ -62,14 +62,8 @@ export class Whiteboard extends Interactive {
     mouseup = (e) => this.mouseUp(e, this);
     mouseenter = (e) => this.mouseEnter(e, this);
     clearCommand = () => this.clearPressed(this);
-    drawPressed = () => {
-        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
-        this.draw(this.currentColor);
-    };
-    erasePressed = () => {
-        this.room.send(MessageType.WHITEBOARD_ERASE, this.wID);
-        this.erase();
-    };
+    drawPressed = () => this.draw(this.currentColor);
+    erasePressed = () => this.erase();
     savePressed = () => {
         this.room.send(MessageType.WHITEBOARD_SAVE, this.wID);
         this.save(this, this.wID);
@@ -77,7 +71,6 @@ export class Whiteboard extends Interactive {
 
     changeColor = (number) => {
         console.log(number);
-        this.room.send(MessageType.WHITEBOARD_DRAW, this.wID);
         this.draw(Number(number));
         colorSelector.style.backgroundColor = this.colors[this.currentColor];
         colorSelector.style.color = this.colors[this.currentColor];
@@ -100,8 +93,6 @@ export class Whiteboard extends Interactive {
         this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
         this.room.onMessage(MessageType.WHITEBOARD_SAVE, (message) => this.save(this, message));
-        this.room.onMessage(MessageType.WHITEBOARD_DRAW, () => this.draw(this.currentColor));
-        this.room.onMessage(MessageType.WHITEBOARD_ERASE, () => this.erase());
 
         this.resize(this);
     }
