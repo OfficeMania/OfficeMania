@@ -268,17 +268,19 @@ export class ChatHandler implements Handler {
         } else {
             //add to existing
             if (chatMessage.chatId === this.globalChat.id || chatMessage.chatId === this.nearbyChat.id) {
-                console.log("is globul or nearby");
+                console.log("Trying to add a player to Global or Nearby Chat.");
                 return;
             } else {
                 const chat: Chat = this.byChatId(chatMessage.chatId);
                 otherPlayers.forEach(otherPlayer => {
                     if (!(chat.users.includes(otherPlayer.id) || chat.users.includes(otherPlayer.data.userId))) {
-                        if (otherPlayer.data.userId) {
+                        if (otherPlayer.data.userId && otherPlayer.data.userId !== "undefined") {
                             chat.users.push(otherPlayer.data.userId);
+                            console.log(`Adding userid ${otherPlayer.data.userId} to chat ${chat.id}.`)
                         }
                         else {
                             chat.users.push(otherPlayer.id);
+                            console.log(`Adding sessionid ${otherPlayer.id} to chat ${chat.id}.`)
                         }
 
                         //make a message
