@@ -3901,6 +3901,17 @@
                  "width":96,
                  "x":624,
                  "y":-240
+                }, 
+                {
+                 "height":48,
+                 "id":172,
+                 "name":"chair west",
+                 "rotation":0,
+                 "type":"21",
+                 "visible":true,
+                 "width":48,
+                 "x":-458.606060606061,
+                 "y":-845.090909090909
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -3909,7 +3920,7 @@
          "y":0
         }],
  "nextlayerid":64,
- "nextobjectid":172,
+ "nextobjectid":173,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.6.0",
