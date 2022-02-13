@@ -99,7 +99,7 @@ button:active{
 /* Tooltip text */
 
 #panel-buttons .tooltip-text {
-    font-size: 12px;
+    font-size: 10px;
     position: absolute;
     visibility: hidden;
     background-color: #ffffffaa;
@@ -109,9 +109,9 @@ button:active{
     border-radius: 6px;
     /* Position the tooltip text - see examples below! */
     text-align: center;
-    top: 110%;
-    left: 50%;
-    margin-left: -15px; /* Use half of the width (120/2 = 60), to center the tooltip */
+    top: 90%;
+    left: 20%;
+    z-index: 2;
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
