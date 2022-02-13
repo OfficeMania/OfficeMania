@@ -763,6 +763,10 @@ button:active{
     float: left;
 }
 
+.unread {
+    background-color: #ff5d5d !important;
+}
+
 .sent-message,
 .received-message {
     position: relative;
