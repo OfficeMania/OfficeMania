@@ -560,6 +560,10 @@ let interactionClosed: boolean = false;
 export function createCloseInteractionButton(listener: () => void) {
     const button: HTMLButtonElement = createInteractionButton(listener, "button-close-interaction");
     appendFAIcon(button, "times");
+    const span = document.createElement("span");
+    span.classList.add("tooltip-text");
+    span.innerText = "Exit";
+    button.append(span);
     button.addEventListener("click", () => (interactionClosed = true));
 }
 
