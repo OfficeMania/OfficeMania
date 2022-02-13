@@ -220,16 +220,16 @@ export class Whiteboard extends Interactive {
     }
 
     setup(canvas) {
-        var ctx = canvas.getContext("2d");
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "black";
-        ctx.strokeStyle = "black";
-        ctx.beginPath();
-        ctx.lineWidth = 10;
-        ctx.rect(0, 0, canvas.width, canvas.height);
-        ctx.stroke();
-        ctx.closePath();
+        const context: CanvasRenderingContext2D = canvas.getContext("2d");
+        context.fillStyle = "white";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "black";
+        context.strokeStyle = "black";
+        context.beginPath();
+        context.lineWidth = 10;
+        context.rect(0, 0, canvas.width, canvas.height);
+        context.stroke();
+        context.closePath();
     }
 
     redraw(whiteboard: Whiteboard) {
@@ -257,22 +257,22 @@ export class Whiteboard extends Interactive {
         if (whiteboard.whiteboardId !== message) {
             return;
         }
-        for (var id in whiteboard.whiteboardPlayer) {
+        for (const id in whiteboard.whiteboardPlayer) {
             whiteboard.whiteboardPlayer[id] = 0;
         }
         whiteboard.setup(whiteboard.canvas);
     }
 
     save(whiteboard: Whiteboard, message: number) {
-        if (whiteboard.whiteboardId != message) {
+        if (whiteboard.whiteboardId !== message) {
             return;
         }
         // This code will automatically save the current canvas as a .png file.
-        var canvas = <HTMLCanvasElement>document.getElementById("interactive");
+        const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("interactive");
         // Convert the canvas to data
-        var image = canvas.toDataURL();
+        const image: string = canvas.toDataURL();
         // Create a link
-        var aDownloadLink = document.createElement("a");
+        const aDownloadLink: HTMLAnchorElement = document.createElement("a");
         // Add the name of the file to the link
         aDownloadLink.download = "whiteboard_image.png";
         // Attach the data to the link
@@ -282,7 +282,7 @@ export class Whiteboard extends Interactive {
     }
 
     resize(whiteboard: Whiteboard) {
-        var rect: DOMRect = whiteboard.canvas.getBoundingClientRect();
+        const rect: DOMRect = whiteboard.canvas.getBoundingClientRect();
 
         whiteboard.offsetX = rect.left;
         whiteboard.offsetY = rect.top;
@@ -369,21 +369,21 @@ export class Whiteboard extends Interactive {
     }
 
     drawLine(firstX: number, firstY: number, secondX: number, secondY: number, whiteboard: Whiteboard) {
-        var ctx = whiteboard.canvas.getContext("2d");
-        ctx.beginPath(); // begin
+        const context: CanvasRenderingContext2D = whiteboard.canvas.getContext("2d");
+        context.beginPath(); // begin
 
-        ctx.lineWidth = this.size;
-        ctx.lineCap = "round";
+        context.lineWidth = this.size;
+        context.lineCap = "round";
         if (this.isPen) {
-            ctx.strokeStyle = this.colors[this.currentColor];
+            context.strokeStyle = this.colors[this.currentColor];
         } else {
-            ctx.strokeStyle = "white";
+            context.strokeStyle = "white";
         }
 
-        ctx.moveTo(firstX, firstY); // from
-        ctx.lineTo(secondX, secondY); // to
-        ctx.stroke(); // draw it!
-        //ctx.closePath();
+        context.moveTo(firstX, firstY); // from
+        context.lineTo(secondX, secondY); // to
+        context.stroke(); // draw it!
+        //context.closePath();
     }
 
 
@@ -424,14 +424,14 @@ export class Whiteboard extends Interactive {
 
     //doesnt really work
     async resize2(width: number, height: number) {
-        var imageSrc = this.canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-        var oldWidth = this.canvas.width;
-        var oldHeight = this.canvas.height;
+        const imageSrc: string = this.canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        const oldWidth: number = this.canvas.width;
+        const oldHeight: number = this.canvas.height;
         this.canvas.width = width - 200;
         this.canvas.height = height - 200;
-        var ctx = this.canvas.getContext("2d");
-        var image = await loadImage(imageSrc);
-        ctx.drawImage(image, 0, 0, oldWidth, oldHeight, 0, 0, width - 200, height - 200);
+        const context: CanvasRenderingContext2D = this.canvas.getContext("2d");
+        const image: HTMLImageElement = await loadImage(imageSrc);
+        context.drawImage(image, 0, 0, oldWidth, oldHeight, 0, 0, width - 200, height - 200);
     }
 
 }
