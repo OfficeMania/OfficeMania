@@ -3,10 +3,17 @@ import { Client, Room } from "colyseus";
 import { Handler } from "./handler";
 
 const batSections: number[] = [-0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5]
-let hasScored: boolean = false;
 
 const taskExecutor: TaskExecutor<void> = new TaskExecutor<void>();
 
+const ballSpeed: number = 5;
+const ballSize: number = 30;
+const playerSpeed: number = 10;
+const batSize: number = 150;
+const maxScore: number = 5;
+
+
+let hasScored: boolean = false;
 export class PongHandler implements Handler {
 
     room: Room<State>;
@@ -117,12 +124,12 @@ function onPongMovePlayer(message: string, gameState: PongState, pos: number, ca
 
 function initNewState(room: Room<State>, client: Client) {
     console.log("creating new pongstate");
-    console.log(getNextPongSlot(room));
+    //console.log(getNextPongSlot(room));
     let ar = getNextPongSlot(room);
     let newState = new PongState();
     newState.playerA = client.sessionId;
-    newState.velocities.push(10, 10);
-    newState.sizes.push(30, 150)
+    newState.velocities.push(ballSpeed, playerSpeed);
+    newState.sizes.push(ballSize, batSize)
     newState.posPlayerA = 360 - (newState.sizes.at(1) / 2);
     newState.velBallX = 0.8;
     newState.velBallY = 0.2;
@@ -130,8 +137,8 @@ function initNewState(room: Room<State>, client: Client) {
     newState.posBallY = 320 - (newState.sizes.at(0) / 2);
     newState.scoreA = 0;
     newState.scoreB = 0;
+    newState.gameEnd = 0;
     room.state.pongStates[ar.toString()] = newState;
-    console.log(room.state.pongStates[ar.toString()].posPlayerA);
 }
 
 function leavePongGame(room: Room<State>, client: Client, hostWon?: boolean) {
