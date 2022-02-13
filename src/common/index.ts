@@ -3,6 +3,7 @@ export * from "./handler/chat-handler";
 export * from "./handler/chess-handler";
 export * from "./handler/machine-handler";
 export * from "./handler/pong-handler";
+export * from "./handler/whiteboard-handler";
 
 // Export States
 export * from "./states/chess-state";
