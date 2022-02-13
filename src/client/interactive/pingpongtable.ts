@@ -21,7 +21,6 @@ export class PingPongTable extends Interactive {
     ourPlayer: Player;
     players: PlayerRecord;
     previousInput: Direction[];
-    leavable: boolean;
 
     constructor() {
         super("Pong table", false, 2);
@@ -29,7 +28,6 @@ export class PingPongTable extends Interactive {
         this.players = getPlayers();
         this.input = [null];
         this.previousInput = this.input;
-        this.leavable = false;
     }
 
     onInteraction() {
@@ -55,16 +53,13 @@ export class PingPongTable extends Interactive {
             //console.log("interatction message recieved in client " + message)
             switch (message) {
                 case PongMessage.INIT: {
+                    //console.log("initializing game")
                     this.getPong();
-                    this.leavable = true;
+                    this.updateState();
                     break;
                 }
                 case PongMessage.UPDATE: {
-                    if (ourGame) {
-                        ourGame.selfGameId = this.getGame(this.ourPlayer.roomId);
-                        this.updateState();
-                        ourGame.paint();
-                    }
+                    this.updateState();
                     break;
                 }
                 case PongMessage.LEAVE: {
@@ -91,6 +86,7 @@ export class PingPongTable extends Interactive {
         this.room.state.pongStates.forEach(state => {
             if (state.playerA === this.ourPlayer.roomId || state.playerB === this.ourPlayer.roomId) {
                 ourGame = this.getPongFromState(state);
+                ourGame.selfGameId = this.getGame(this.ourPlayer.roomId);
             }
         });
     }
