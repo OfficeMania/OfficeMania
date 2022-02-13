@@ -230,9 +230,13 @@ export class Door extends Interactive {
         if (this.animation === null) {
             return;
         }
+        let correction = 0;
+        if (this.direction == DoorDirection.WEST) {
+            correction++;
+        }
         const isVertical: boolean = this.direction === DoorDirection.NORTH || this.direction === DoorDirection.SOUTH;
         const isBigger: boolean = this.direction === DoorDirection.EAST || this.direction === DoorDirection.SOUTH;
-        const player = isVertical ? playerY : playerX;
+        const player = isVertical ? playerY : playerX - correction;
         const pos = isVertical ? this.posY : this.posX;
         if (isBigger ? player > pos : player < pos) {
             //you knock on door every time you are outside of the room
