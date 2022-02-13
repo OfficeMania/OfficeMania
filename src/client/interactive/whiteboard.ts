@@ -175,9 +175,11 @@ export class Whiteboard extends Interactive {
         sizeSelector.addEventListener("change", (e) => {
             this.changeSize(sizeSelector.value);
         });
+        this.changeSize(sizeSelector.options[0].value);
         colorSelector.addEventListener("change", (e) => {
             this.changeColor(colorSelector.value);
         });
+        this.changeColor(colorSelector.options[0].value);
 
 
         //size changed
