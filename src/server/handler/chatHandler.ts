@@ -231,31 +231,40 @@ export class ChatHandler implements Handler {
                 }
             });
             updateChatName(newChat, this.room);
-            const message = "Created chat";
-            const serverMessage = makeMessage(this.room, client, { message, chatId: newChat.id });
-            newChat.messages.push(serverMessage);
             this.chats.push(newChat);
-            //console.log("newchat users: ", newChat.users);
+
+
             getClientsByUserId(ourPlayer.id, this.room).forEach(client => {
                 this.onChatUpdate(client);
-                this.onLog(client, newChat.id);
             });
 
-            //this.onChatUpdate();
             otherPlayers.forEach(p => {
                 if (p.data.userId && p.data.userId !== "undefined") {
                     getClientsByUserId(p.data.userId, this.room).forEach(client => {
                         this.onChatUpdate(client);
-                        this.onLog(client, newChat.id);
                     });
                 }
                 else {
                     getClientsByUserId(p.id, this.room).forEach(client => {
                         this.onChatUpdate(client);
-                        this.onLog(client, newChat.id);
                     })
                 }
             });
+            
+            const message = "Created chat";
+            const serverMessage: ChatMessage = {
+                timestamp: getFormattedTime(),
+                name: "Server",
+                chatId: newChat.id,
+                message: `User ${this.room.state.players[client.sessionId].displayName} created a new Chat.`,
+                userId: "",
+            };
+            newChat.messages.push(serverMessage);
+            
+            this.room.clients
+                    .filter(client => newChat.users.includes(getUserId(client, this.room)))
+                    .forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
+            
         } else {
             //add to existing
             if (chatMessage.chatId === this.globalChat.id || chatMessage.chatId === this.nearbyChat.id) {
