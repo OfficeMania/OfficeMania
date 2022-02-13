@@ -37,6 +37,10 @@ export class Chair extends Interactive {
             let player = getOurPlayer();
             let x = this.posX *STEP_SIZE + xCorrection * STEP_SIZE;
             let y = this.posY *STEP_SIZE + yCorrection * STEP_SIZE;
+
+            if(this.chairDirection === Direction.DOWN || this.chairDirection === Direction.UP) {
+                y += STEP_SIZE;
+            }
             
             player.positionX = x;
             player.positionY = y;
