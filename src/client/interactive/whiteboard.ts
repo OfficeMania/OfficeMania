@@ -44,7 +44,7 @@ export class Whiteboard extends Interactive {
     private room: Room<State>;
     private players: PlayerRecord;
     private whiteboardPlayer: { [key: string]: number } = {};
-    wID: number = 0;
+    whiteboardId: number = 0;
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
     currentColor: number = 0; //black
@@ -65,8 +65,8 @@ export class Whiteboard extends Interactive {
     drawPressed = () => this.draw(this.currentColor);
     erasePressed = () => this.erase();
     savePressed = () => {
-        this.room.send(MessageType.WHITEBOARD_SAVE, this.wID);
-        this.save(this, this.wID);
+        this.room.send(MessageType.WHITEBOARD_SAVE, this.whiteboardId);
+        this.save(this, this.whiteboardId);
     };
 
     changeColor = (number) => {
@@ -83,13 +83,13 @@ export class Whiteboard extends Interactive {
 
         super("whiteboard", false, 1);
 
-        this.wID = Whiteboard.whiteboardCount;
+        this.whiteboardId = Whiteboard.whiteboardCount;
         Whiteboard.whiteboardCount++;
 
         this.room = getRoom();
         this.players = getPlayers();
 
-        this.room.send(MessageType.WHITEBOARD_CREATE, this.wID);
+        this.room.send(MessageType.WHITEBOARD_CREATE, this.whiteboardId);
         this.room.onMessage(MessageType.WHITEBOARD_REDRAW, (client) => this.drawOthers(client.sessionId, this));
         this.room.onMessage(MessageType.WHITEBOARD_CLEAR, (message) => this.clear(this, message));
         this.room.onMessage(MessageType.WHITEBOARD_SAVE, (message) => this.save(this, message));
@@ -151,7 +151,7 @@ export class Whiteboard extends Interactive {
 
         checkInputMode();
 
-        if (Whiteboard.currentWhiteboard === this.wID) {
+        if (Whiteboard.currentWhiteboard === this.whiteboardId) {
             Whiteboard.currentWhiteboard = -1;
         }
     }
@@ -209,7 +209,7 @@ export class Whiteboard extends Interactive {
 
         checkInputMode();
 
-        Whiteboard.currentWhiteboard = this.wID;
+        Whiteboard.currentWhiteboard = this.whiteboardId;
 
         this.resize(this);
         this.setup(this.canvas);
@@ -234,7 +234,7 @@ export class Whiteboard extends Interactive {
 
     redraw(whiteboard: Whiteboard) {
         whiteboard.setup(whiteboard.canvas);
-        const whiteboardState: WhiteboardState | undefined = whiteboard.room.state.whiteboards.at(whiteboard.wID);
+        const whiteboardState: WhiteboardState | undefined = whiteboard.room.state.whiteboards.at(whiteboard.whiteboardId);
         if (!whiteboardState) {
             return;
         }
@@ -249,12 +249,12 @@ export class Whiteboard extends Interactive {
     }
 
     clearPressed(whiteboard: Whiteboard) {
-        whiteboard.room.send(MessageType.WHITEBOARD_CLEAR, whiteboard.wID);
-        whiteboard.clear(whiteboard, whiteboard.wID);
+        whiteboard.room.send(MessageType.WHITEBOARD_CLEAR, whiteboard.whiteboardId);
+        whiteboard.clear(whiteboard, whiteboard.whiteboardId);
     }
 
     clear(whiteboard: Whiteboard, message: number) {
-        if (whiteboard.wID !== message) {
+        if (whiteboard.whiteboardId !== message) {
             return;
         }
         for (var id in whiteboard.whiteboardPlayer) {
@@ -264,7 +264,7 @@ export class Whiteboard extends Interactive {
     }
 
     save(whiteboard: Whiteboard, message: number) {
-        if (whiteboard.wID != message) {
+        if (whiteboard.whiteboardId != message) {
             return;
         }
         // This code will automatically save the current canvas as a .png file.
@@ -298,10 +298,10 @@ export class Whiteboard extends Interactive {
     }
 
     drawOthers(clientID: string, whiteboard: Whiteboard) {
-        if (Whiteboard.currentWhiteboard !== this.wID) {
+        if (Whiteboard.currentWhiteboard !== this.whiteboardId) {
             return;
         }
-        const whiteboardState: WhiteboardState | undefined = whiteboard.room.state.whiteboards.at(whiteboard.wID);
+        const whiteboardState: WhiteboardState | undefined = whiteboard.room.state.whiteboards.at(whiteboard.whiteboardId);
         if (!whiteboardState) {
             return;
         }
@@ -358,7 +358,7 @@ export class Whiteboard extends Interactive {
 
         if (this.numberOfDrawnPixel % 4 === 0) { //only send each eth pixel to server => draw short lines rather than each pixel
         }
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, createMessage(whiteboard.wID, false, [whiteboard.x, whiteboard.y], this.isPen ? this.currentColor : -1, this.size));
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, createMessage(whiteboard.whiteboardId, false, [whiteboard.x, whiteboard.y], this.isPen ? this.currentColor : -1, this.size));
         this.numberOfDrawnPixel++;
         this.currentlyDrawing = true;
     }
@@ -389,13 +389,13 @@ export class Whiteboard extends Interactive {
 
     mouseUp(e, whiteboard: Whiteboard) {
         this.currentlyDrawing = false;
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, createMessage(whiteboard.wID, true, this.currentlyDrawing ? [this.x, this.y] : undefined, this.isPen ? this.currentColor : -1, this.size));
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, createMessage(whiteboard.whiteboardId, true, this.currentlyDrawing ? [this.x, this.y] : undefined, this.isPen ? this.currentColor : -1, this.size));
     }
 
     mouseDown(e, whiteboard: Whiteboard) {
         this.currentlyDrawing = true;
         this.setPosition(e, whiteboard);
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, createMessage(whiteboard.wID, false, [whiteboard.x, whiteboard.y], this.isPen ? this.currentColor : -1, this.size));
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, createMessage(whiteboard.whiteboardId, false, [whiteboard.x, whiteboard.y], this.isPen ? this.currentColor : -1, this.size));
     }
 
     mouseEnter(e, whiteboard: Whiteboard) {
