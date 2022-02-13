@@ -122,7 +122,7 @@ export class ChatHandler implements Handler {
         const chatDTOs: ChatDTO[] = userChats.map(chat => ({
             id: chat.id,
             name: chat.name,
-            users: chat.users,
+            users: chat.users.map(userId => getColyseusId(userId, this.room)),
         }));
         chatDTOs.unshift({ id: this.nearbyChat.id, name: this.nearbyChat.name });
         chatDTOs.unshift({ id: this.globalChat.id, name: this.globalChat.name });
