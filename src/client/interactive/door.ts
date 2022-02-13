@@ -31,6 +31,9 @@ export enum DoorDirection {
     WEST,
     ALWAYS_OPEN,
 }
+
+let lastKnocked: number = Date.now();
+
 export class Door extends Interactive {
     isClosed: boolean;
     direction: DoorDirection;
@@ -145,19 +148,27 @@ export class Door extends Interactive {
         }
     }
 
-    //id descripes who knocks
+    //id describes who knocks
     knockDoor(id: string): void  {
-        const roomId = "" + this.getRoomId();
-        const callPlayers: string[] = [];
-        const players: PlayerRecord = getPlayers();
-        for (const player of Object.values(players)) {
-            //if player is in the room and the player isn't us
-            if (this.checkRoom(player, roomId) && player.roomId !== id) {
-                callPlayers.push(player.roomId);
+        const temp = Date.now()
+        if (temp - lastKnocked > 2000) {
+            const roomId: string = this.getRoomId().toString();
+            const callPlayers: string[] = [];
+            const players: PlayerRecord = getPlayers();
+            for (const player of Object.values(players)) {
+                //if player is in the room and the player isn't us
+                if (this.checkRoom(player, roomId) && player.roomId !== id) {
+                    callPlayers.push(player.roomId);
+                }
             }
+            //console.log(callPlayers);
+            this.room.send(MessageType.DOOR_KNOCK, callPlayers);
+            lastKnocked = temp;
+            console.log("Knocked (Local)");
         }
-        //console.log(callPlayers);
-        this.room.send(MessageType.DOOR_KNOCK, callPlayers);
+        else {
+            //console.warn("Faggot dont spam");
+        }
     }
 
     checkRoom(player: Player, roomId: String): boolean {

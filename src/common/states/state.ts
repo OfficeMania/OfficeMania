@@ -35,7 +35,7 @@ export class State extends Schema {
     conference: ConferenceState = new ConferenceState();
 
     @type({ array: WhiteboardState })
-    whiteboard: ArraySchema<WhiteboardState> = new ArraySchema<WhiteboardState>();
+    whiteboards: ArraySchema<WhiteboardState> = new ArraySchema<WhiteboardState>();
 
     @type({ map: PongState })
     pongStates: MapSchema<PongState> = new MapSchema<PongState>();
@@ -51,7 +51,7 @@ export class State extends Schema {
 
     @type(NotesState)
     notesState: NotesState = new NotesState();
-    
+
     @type({ map: ChairState })
     chairStates: MapSchema<ChairState> = new MapSchema<ChairState>();
 }

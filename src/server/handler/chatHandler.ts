@@ -151,11 +151,11 @@ export class ChatHandler implements Handler {
             // Chat no longer exists
             return;
         }
-        console.debug(`User ${userId} left Chat ${chatId}`);
+        console.debug(`User ${userId} left Chat ${chatId}.`);
         const userIndex: number = chat.users.indexOf(userId);
         if (userIndex < 0) {
             // Client is not part of Chat
-            console.debug(`User ${userId} already left Chat ${chatId}`);
+            console.debug(`User ${userId} already left Chat ${chatId}.`);
             return;
         }
         chat.users.splice(userIndex, 1);
@@ -164,14 +164,11 @@ export class ChatHandler implements Handler {
         const leaveMessage: ChatMessage = {
             timestamp: getFormattedTime(),
             chatId,
-            message: `User "${name}" left the Chat`,
+            message: `User "${name}" left the Chat.`,
+            name: "Server",
         }
-        if (this.room.state.players.has(client.sessionId)) {
-            leaveMessage.name = name;
-        }
-        else {
-            leaveMessage.name = "Server";
-            leaveMessage.message = `User "${name}" was removed from the Chat`
+        if (!this.room.state.players.has(client.sessionId)) {
+            leaveMessage.message = `User "${name}" was removed from the Chat.`
         }
         
         this.sendChatMessage(chat, leaveMessage);
@@ -231,52 +228,58 @@ export class ChatHandler implements Handler {
                 }
             });
             updateChatName(newChat, this.room);
-            const message = "Created chat";
-            const serverMessage = makeMessage(this.room, client, { message, chatId: newChat.id });
-            newChat.messages.push(serverMessage);
             this.chats.push(newChat);
-            //console.log("newchat users: ", newChat.users);
+
+
             getClientsByUserId(ourPlayer.id, this.room).forEach(client => {
                 this.onChatUpdate(client);
-                this.onLog(client, newChat.id);
             });
 
-            //this.onChatUpdate();
             otherPlayers.forEach(p => {
                 if (p.data.userId && p.data.userId !== "undefined") {
                     getClientsByUserId(p.data.userId, this.room).forEach(client => {
                         this.onChatUpdate(client);
-                        this.onLog(client, newChat.id);
                     });
                 }
                 else {
                     getClientsByUserId(p.id, this.room).forEach(client => {
                         this.onChatUpdate(client);
-                        this.onLog(client, newChat.id);
                     })
                 }
             });
+            
+            const message = "Created chat";
+            const serverMessage: ChatMessage = {
+                timestamp: getFormattedTime(),
+                name: "Server",
+                chatId: newChat.id,
+                message: `User "${ourPlayer.data.displayName}" created a new Chat.`,
+                userId: "",
+            };
+            newChat.messages.push(serverMessage);
+            
+            this.room.clients
+                    .filter(client => newChat.users.includes(getUserId(client, this.room)))
+                    .forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
+            
         } else {
             //add to existing
             if (chatMessage.chatId === this.globalChat.id || chatMessage.chatId === this.nearbyChat.id) {
-                console.log("is globul or nearby");
+                console.log("Trying to add a player to Global or Nearby Chat.");
                 return;
             } else {
                 const chat: Chat = this.byChatId(chatMessage.chatId);
                 otherPlayers.forEach(otherPlayer => {
                     if (!(chat.users.includes(otherPlayer.id) || chat.users.includes(otherPlayer.data.userId))) {
-                        if (otherPlayer.data.userId) {
+                        if (otherPlayer.data.userId && otherPlayer.data.userId !== "undefined") {
                             chat.users.push(otherPlayer.data.userId);
+                            console.log(`Adding userid "${otherPlayer.data.userId}" to chat ${chat.id}.`)
                         }
                         else {
                             chat.users.push(otherPlayer.id);
+                            console.log(`Adding sessionid "${otherPlayer.id}" to chat ${chat.id}.`)
                         }
 
-                        //make a message
-                        const message = "Add new User to this Chat: " + otherPlayer.data.displayName;
-                        const chatId = chatMessage.chatId;
-                        const serverMessage = makeMessage(this.room, client, { message, chatId })
-                        chat.messages.push(serverMessage);
 
                         //change the name of the chat
                         updateChatName(chat, this.room);
@@ -288,10 +291,36 @@ export class ChatHandler implements Handler {
                                 this.onChatUpdate(client);
                                 this.onLog(client, chat.id);
                             });
+                        
+                        
                     } else {
                         console.log(`User ${otherPlayer.id} already in chat ${chat.id}`);
                     }
                 });
+                //make a message
+                let message = `User "${ourPlayer.data.displayName}" added `;
+                for (let i = 0; i < otherPlayers.length; i++) {
+                    message += `"${otherPlayers[i].data.displayName}"`;
+                    if (i === otherPlayers.length - 2) {
+                        message += ` and `;
+                    } else if (i === otherPlayers.length - 1) {} 
+                    else {
+                        message += `, `
+                    }
+                }
+                message += ` to Chat.`;
+                
+                const serverMessage: ChatMessage = {
+                    timestamp: getFormattedTime(),
+                    name: "Server",
+                    chatId: chat.id,
+                    message,
+                    userId: "",
+                };
+                chat.messages.push(serverMessage);
+                this.room.clients
+                    .filter(client => chat.users.includes(getUserId(client, this.room)))
+                    .forEach(client => client.send(MessageType.CHAT_SEND, serverMessage));
             }
         }
     }

@@ -28,6 +28,8 @@ var _inFocus = false;
 
 const chats: Chat[] = [];
 
+var unread: boolean = false;
+
 function getChatById(chatId: string): Chat {
     const chat = chats.find(chat => chat.id === chatId);
     if (!chat) {
@@ -63,8 +65,12 @@ export function getInFocus() {
 
 //toggles chat visibility
 function toggleTextchatBar() {
-    if (getShowTextchatBar()) setShowTextchatBar(false);
-    else setShowTextchatBar(true);
+    if (getShowTextchatBar()) {
+        setShowTextchatBar(false);
+    }
+    else {
+        setShowTextchatBar(true);
+    }
     checkInputMode();
     setShowParticipantsTab(false);
 }
@@ -92,6 +98,8 @@ export function initChatListener() {
     //changing of inputmode if text area is in use or not
     textchatArea.onfocus = function() {
         setInFocus(true);
+        textchatChatsButton.classList.remove("unread");
+        removeUnreadFromChatButton();
     };
     textchatArea.onblur = function() {
         setInFocus(false);
@@ -111,6 +119,11 @@ export function initChatListener() {
     });
 
     updateUserList();
+
+    textchatChatsButton.addEventListener("click", () => {
+        textchatChatsButton.classList.remove("unread");
+        removeUnreadFromChatButton();
+    });
 
     textchatAddUsers.addEventListener("click", () => {
         const ids: string[] = [];
@@ -388,7 +401,8 @@ function addChatListOption(chat: Chat) {
             console.log("Chat already selected");
             return;
         }
-
+        li.classList.remove("unread");
+        removeUnreadFromChatButton();
         updateChatListButton(chat.id);
 
         clearTextchatBar();
@@ -431,6 +445,8 @@ function updateChatListButton(id: string) {
     });
     textchatChatsButton.innerText = a;
     textchatChatsButton.setAttribute("data-id", id);
+    textchatChatsButton.classList.remove("unread");
+    removeUnreadFromChatButton();
 
 }
 
@@ -480,13 +496,30 @@ function updateChatName(chat: Chat) {
 }
 
 function sendChatNotification(message: ChatMessage) {
-    if (!checkIfOwnMessage(message)) {
-        let chatSuffix: string = "";
-        if (chats[0].id === message.chatId) {
-            chatSuffix = " in Global";
-        } else if (chats[1].id === message.chatId) {
-            chatSuffix = " in Nearby";
+    if (checkIfOwnMessage(message)) {
+        return;
+    }
+    if (!unread && !_showTextchat) {
+        sendNotification(`Recieved new messages.`);
+    }
+    if (!unread) {
+        textchatButton.classList.add("unread");
+        unread = true;
+    }
+    for (let i = 0; textchatDropdownChats.children.length > i; i++) {
+        if (textchatChatsButton.getAttribute("data-id") === message.chatId) {
+            textchatChatsButton.classList.add("unread");
         }
-        sendNotification(`${message.name}${chatSuffix} says: ${message.message}`);
+        else if (textchatDropdownChats.children[i].id === message.chatId) {
+            
+            textchatDropdownChats.children[i].classList.add("unread");
+        }
+    } 
+}
+
+function removeUnreadFromChatButton() {
+    if ($(".unread").length === 1) {
+        textchatButton.classList.remove("unread");
+        unread = false;
     }
 }

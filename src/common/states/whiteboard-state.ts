@@ -6,5 +6,5 @@ import { WhiteboardPlayerState } from "./whiteboard-player-state";
  */
 export class WhiteboardState extends Schema {
     @type({ map: WhiteboardPlayerState })
-    whiteboardPlayer: MapSchema<WhiteboardPlayerState> = new MapSchema<WhiteboardPlayerState>();
+    whiteboardPlayers: MapSchema<WhiteboardPlayerState> = new MapSchema<WhiteboardPlayerState>();
 }

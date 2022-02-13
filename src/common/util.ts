@@ -49,8 +49,6 @@ export enum MessageType {
     WHITEBOARD_CLEAR = "whiteboardClear",
     WHITEBOARD_SAVE = "whiteboardSave",
     WHITEBOARD_PATH = "whiteboardPath",
-    WHITEBOARD_DRAW = "whiteboardDraw",
-    WHITEBOARD_ERASE = "whiteboardErase",
     WHITEBOARD_REDRAW = "whiteboardRedraw",
     WHITEBOARD_CREATE = "whiteboardCreate",
     //TodoListHandler

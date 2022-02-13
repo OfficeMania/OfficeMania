@@ -1,15 +1,13 @@
 import { ArraySchema, Schema, type } from "@colyseus/schema";
+import { WhiteboardPlayerPathState } from "./whiteboard-player-path-state";
 
 /*
  * state of whiteboard players (new)
  */
 export class WhiteboardPlayerState extends Schema {
-    @type({ array: "number" })
-    paths: ArraySchema<number> = new ArraySchema<number>();
+    @type({ array: WhiteboardPlayerPathState })
+    paths: ArraySchema<WhiteboardPlayerPathState> = new ArraySchema<WhiteboardPlayerPathState>();
 
-    @type({ array: "string" })
-    color: ArraySchema<string> = new ArraySchema<string>();
-
-    @type({ array: "number" })
-    sizes: ArraySchema<number> = new ArraySchema<number>();
+    @type(WhiteboardPlayerPathState)
+    currentPath?: WhiteboardPlayerPathState;
 }

@@ -111,7 +111,7 @@ button:active{
 
     /* Position the tooltip text */
     text-align: center;
-    top: 90%;
+    top: 120%;
     left: 50%;
     /* Variable transformation depending on span width, only fiddeling */
     transform: translateX(-40%);
@@ -243,6 +243,10 @@ button:active{
     margin-left: 50px;
     flex-shrink: 1;
     overflow: hidden;
+}
+
+#video-bar video {
+    max-height: 300px;
 }
 
 .video-container video {
@@ -437,7 +441,7 @@ button:active{
     justify-content: flex-end;
 }
 
-.player-state-name {
+.video-container .player-state-name {
     opacity: 0.7;
     background-color: var(--bg-secondary);
     padding-left: 10px;
@@ -550,23 +554,11 @@ button:active{
 /* Small screens */
 @media only screen and (max-width: 600px) {
     #player-online-container {
-        bottom: 0;
-        width: 100vw;
-        height: 5rem;
-    }
-
-    #player-online-list {
-        flex-direction: row;
+        visibility: hidden;
     }
 
     #textchat-container {
-        bottom: 0;
-        width: 100vm;
-        height: 5rem;
-    }
-
-    #textchat-container {
-        flex-direction: row;
+        visibility: hidden;
     }
 }
 
@@ -769,6 +761,10 @@ button:active{
     width: 1em;
     margin-right: 10px;
     float: left;
+}
+
+.unread {
+    background-color: #ff5d5d !important;
 }
 
 .sent-message,
