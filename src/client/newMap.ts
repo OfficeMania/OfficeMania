@@ -577,7 +577,7 @@ export function drawChairsAbovePlayers(players: PlayerRecord, foreground: HTMLCa
                 let posX = (x - coordinateX) * 48 + Math.round(canvas.width / 2);
                 let posY = (y - coordinateY) * 48 + Math.round(canvas.height / 2) + 48;
 
-                ctx.drawImage(foreground, (x - getNewMap()._lowestPosx) * 48, (y - getNewMap()._lowestPosy + 1) * 48, 48, 96, posX, posY, 48, 96);
+                ctx.drawImage(foreground, (x - getNewMap()._lowestPosx) * 48 - 24, (y - getNewMap()._lowestPosy + 1) * 48, 48, 96, posX - 24, posY, 48, 96);
 
             }
         });
