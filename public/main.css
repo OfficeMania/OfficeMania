@@ -111,7 +111,7 @@ button:active{
 
     /* Position the tooltip text */
     text-align: center;
-    top: 90%;
+    top: 120%;
     left: 50%;
     /* Variable transformation depending on span width, only fiddeling */
     transform: translateX(-40%);
