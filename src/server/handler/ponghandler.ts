@@ -304,6 +304,10 @@ function startNewRound(game: PongState) {
     if (game.velBallX < 0.2) {
         game.velBallX = 0.2;
     }
+    const dir = Math.random();
+    if (dir < 0.5) {
+        game.velBallX *= -1;
+    }
     game.velBallY = 1 - Math.abs(game.velBallX);
     hasScored = false;
 }
