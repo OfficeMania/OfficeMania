@@ -14,6 +14,7 @@ export * from "./states/player-state";
 export * from "./states/pong-state";
 export * from "./states/state";
 export * from "./states/todo-state";
+export * from "./states/whiteboard-player-path-state";
 export * from "./states/whiteboard-player-state";
 export * from "./states/whiteboard-state";
 
