@@ -441,7 +441,7 @@ button:active{
     justify-content: flex-end;
 }
 
-.player-state-name {
+.video-container .player-state-name {
     opacity: 0.7;
     background-color: var(--bg-secondary);
     padding-left: 10px;
