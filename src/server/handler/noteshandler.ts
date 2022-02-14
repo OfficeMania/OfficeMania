@@ -183,6 +183,7 @@ export class NotesHandler implements Handler{
                     break;
                 case Direction.DOWN:
                     this.room.state.notesState.markersX.set(clientid, 0);
+                    // fall through
                 case Direction.UP:
                     if (direction === Direction.UP) {
                         markerPos = this.oldContents[line - 1].length;
