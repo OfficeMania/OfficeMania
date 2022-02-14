@@ -57,5 +57,6 @@ export const colorSelector = $<HTMLSelectElement>("whiteboard-color-selector");
 export const sizeSelector = $<HTMLSelectElement>("whiteboard-size-selector");
 export const whiteboardPanel = $<HTMLDivElement>("interactive-bar-whiteboard");
 export const whiteboardSizeIcon = $<HTMLElement>("whiteboard-size-icon");
+export const helpVersionInfo = $<HTMLDivElement>("help-version-info");
 // @ts-ignore
 export const bsWelcomeModal = new bootstrap.Modal(document.getElementById('welcome-modal'));

@@ -69,6 +69,7 @@ import {
     displayNameInput,
     doors,
     foreground,
+    helpVersionInfo,
     interactiveCanvas,
     loginButton,
     logoutButton,
@@ -371,9 +372,29 @@ function setupRoomListener(room: Room<State>) {
     room.onMessage(MessageType.DOOR_KNOCK_SUCCESS, (message: string) => sendNotification(message));
 }
 
+function loadVersion() {
+    fetch("/version")
+        .then(response => response.json())
+        .then(response => {
+            if (!response?.commit) {
+                return;
+            }
+            const commit: string = response.commit;
+            const commitUrl: string | undefined = response.commitUrl;
+            const paragraph: HTMLParagraphElement = document.createElement("p");
+            if (commitUrl) {
+                paragraph.innerHTML = `Current Commit: <a href="${commitUrl}" target="_blank">${commit.slice(0, 8)}</a>`;
+            } else {
+                paragraph.innerText = `Current Commit: ${commit}`;
+            }
+            helpVersionInfo.appendChild(paragraph);
+        })
+}
+
 // async is necessary here, because we use 'await' to resolve the promises
 async function main() {
     initLoadingScreenLoading();
+    loadVersion();
     /*
      * We communicate to our server via WebSockets (ws-protocol instead of http)
      */
