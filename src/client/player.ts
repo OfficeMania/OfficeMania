@@ -271,7 +271,7 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
         } else if (player.moveDirection === Direction.RIGHT && !player.changeDirection) {
             player.positionX += PLAYER_MOVEMENT_PER_TICK;
         }
-        if (player.moveTime === FRAMES_PER_MOVE && !player.changeDirection) {
+        if (player.moveTime >= FRAMES_PER_MOVE && !player.changeDirection) {
             //centers the player every whole step
             player.positionX = player.scaledX * STEP_SIZE;
             player.positionY = player.scaledY * STEP_SIZE;
