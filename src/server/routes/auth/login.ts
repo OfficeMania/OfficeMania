@@ -94,6 +94,12 @@ function setupRouter(): void {
                     errorMessage: authErrorToString(AuthError.INVALID_CREDENTIALS),
                 });
             }
+            if (!user.active) {
+                return res.status(500).send({
+                    error: AuthError.USER_DEACTIVATED,
+                    errorMessage: authErrorToString(AuthError.USER_DEACTIVATED),
+                });
+            }
             req.logIn(user, function(error) {
                 if (error) {
                     return res.status(500).send({

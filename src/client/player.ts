@@ -16,6 +16,10 @@ export var STEP_SIZE = TILE_SIZE / 2;
 export var FRAMES_PER_MOVE = Math.round(100 / MOVEMENT_SPEED);
 export var PLAYER_MOVEMENT_PER_TICK = STEP_SIZE * (1 / FRAMES_PER_MOVE);
 
+export const MOVEMENT_SPEED_STAIRS = 17;
+export const FRAMES_PER_MOVE_STAIRS = Math.round(100 / MOVEMENT_SPEED_STAIRS);
+export const PLAYER_MOVEMENT_PER_TICK_STAIRS = STEP_SIZE * (1 / FRAMES_PER_MOVE_STAIRS);
+
 export var PLAYER_COLORS = ["red", "blue", "green", "yellow", "black"];
 
 /*
@@ -57,35 +61,48 @@ export interface Player {
  * Syncing data from server and using it
  */
 export function updatePosition(player: Player, room: Room) {
-    //if server and client data differ to much tp player to server postion.
+    let playerMovementPerTick: number = PLAYER_MOVEMENT_PER_TICK;
+
+    const roomX = room.state.players[player.roomId].x * STEP_SIZE;
+    const roomY = room.state.players[player.roomId].y * STEP_SIZE;
+    const differenceX: number = Math.abs(player.positionX - roomX);
+    const differenceY: number = Math.abs(player.positionY - roomY);
+
     if (
-        Math.abs(player.positionX - room.state.players[player.roomId].x * STEP_SIZE) >= 100 ||
-        Math.abs(player.positionY - room.state.players[player.roomId].y * STEP_SIZE) >= 100
+        differenceX >= 120 ||
+        differenceY >= 120
     ) {
-        player.positionX = room.state.players[player.roomId].x * STEP_SIZE;
-        player.positionY = room.state.players[player.roomId].y * STEP_SIZE;
+        //if server and client data differ to much tp player to server postion.
+        player.positionX = roomX;
+        player.positionY = roomY;
+    } else
+    if (
+        differenceX >= 50 ||
+        differenceY >= 50
+    ) {
+        playerMovementPerTick *= 2;
     }
 
     //if close enough just set client pos = server pos
-    if (Math.abs(player.positionX - room.state.players[player.roomId].x * STEP_SIZE) <= PLAYER_MOVEMENT_PER_TICK) {
-        player.positionX = room.state.players[player.roomId].x * STEP_SIZE;
+    if (differenceX <= playerMovementPerTick) {
+        player.positionX = roomX;
     } else {
         //smooth animation to new x coord
-        if (player.positionX < room.state.players[player.roomId].x * STEP_SIZE) {
-            player.positionX += PLAYER_MOVEMENT_PER_TICK;
-        } else if (player.positionX > room.state.players[player.roomId].x * STEP_SIZE) {
-            player.positionX -= PLAYER_MOVEMENT_PER_TICK;
+        if (player.positionX < roomX) {
+            player.positionX += playerMovementPerTick;
+        } else if (player.positionX > roomX) {
+            player.positionX -= playerMovementPerTick;
         }
     }
     //if close enough just set client pos = server pos
-    if (Math.abs(player.positionY - room.state.players[player.roomId].y * STEP_SIZE) <= PLAYER_MOVEMENT_PER_TICK) {
-        player.positionY = room.state.players[player.roomId].y * STEP_SIZE;
+    if (differenceY <= playerMovementPerTick) {
+        player.positionY = roomY;
     } else {
         //smooth animation to new y coord
-        if (player.positionY < room.state.players[player.roomId].y * STEP_SIZE) {
-            player.positionY += PLAYER_MOVEMENT_PER_TICK;
-        } else if (player.positionY > room.state.players[player.roomId].y * STEP_SIZE) {
-            player.positionY -= PLAYER_MOVEMENT_PER_TICK;
+        if (player.positionY < roomY) {
+            player.positionY += playerMovementPerTick;
+        } else if (player.positionY > roomY) {
+            player.positionY -= playerMovementPerTick;
         }
     }
 }
@@ -96,15 +113,17 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
 
     const sittingDown = room.state.players.get(player.roomId).isSitting &&
                         (collisionInfo[x][y + 2] === undefined || !collisionInfo[x][y + 2].isSolid) &&
-                        (collisionInfo[x + 2][y + 2] === undefined || !collisionInfo[x + 2][y + 2].isSolid)
+                        (collisionInfo[x + 1][y + 2] === undefined || !collisionInfo[x + 1][y + 2].isSolid)
     const sittingUp = room.state.players.get(player.roomId).isSitting &&
                         (collisionInfo[x][y - 2] === undefined || !collisionInfo[x][y - 2].isSolid) &&
-                        (collisionInfo[x + 2][y - 2] === undefined || !collisionInfo[x + 2][y - 2].isSolid)
+                        (collisionInfo[x + 1][y - 2] === undefined || !collisionInfo[x + 1][y - 2].isSolid)
     const sittingLeft = room.state.players.get(player.roomId).isSitting &&
                         (collisionInfo[x - 2][y] === undefined || !collisionInfo[x - 2][y].isSolid)
     const sittingRight = room.state.players.get(player.roomId).isSitting &&
                         (collisionInfo[x + 2][y] === undefined || !collisionInfo[x + 2][y].isSolid)
 
+    const onStairs: boolean = isOnStairs(player);
+    const playerMovementPerTick: number = onStairs ? PLAYER_MOVEMENT_PER_TICK_STAIRS : PLAYER_MOVEMENT_PER_TICK;
 
     //initiates movement in one direction and blocks the other directions till the next tile
     if (player.priorDirections.length > 0) {
@@ -139,7 +158,7 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
                     } else {
                         player.previousDirection = Direction.DOWN;
                         player.changeDirection = true;
-                        player.waitBeforeMoving = 2 * Math.floor(PLAYER_MOVEMENT_PER_TICK);
+                        player.waitBeforeMoving = 2 * Math.floor(playerMovementPerTick);
                     }
                 } else {
                     player.facing = Direction.DOWN;
@@ -181,7 +200,7 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
                     } else {
                         player.previousDirection = Direction.UP;
                         player.changeDirection = true;
-                        player.waitBeforeMoving = 2 * Math.floor(PLAYER_MOVEMENT_PER_TICK);
+                        player.waitBeforeMoving = 2 * Math.floor(playerMovementPerTick);
                     }
                 } else {
                     player.facing = Direction.UP;
@@ -215,7 +234,7 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
                     } else {
                         player.previousDirection = Direction.LEFT;
                         player.changeDirection = true;
-                        player.waitBeforeMoving = 2 * Math.floor(PLAYER_MOVEMENT_PER_TICK);
+                        player.waitBeforeMoving = 2 * Math.floor(playerMovementPerTick);
                     }
                 } else {
                     player.facing = Direction.LEFT;
@@ -233,7 +252,7 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
                 if (
                     (content && content.name === "Door" && !content.proofIfClosed()) ||
                     !content ||
-                    content.name !== "Door" 
+                    content.name !== "Door"
                 ) {
                     player.moveDirection = Direction.RIGHT;
                     player.facing = Direction.RIGHT;
@@ -249,7 +268,7 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
                     } else {
                         player.previousDirection = Direction.RIGHT;
                         player.changeDirection = true;
-                        player.waitBeforeMoving = 2 * Math.floor(PLAYER_MOVEMENT_PER_TICK);
+                        player.waitBeforeMoving = 2 * Math.floor(playerMovementPerTick);
                     }
                 } else {
                     player.facing = Direction.RIGHT;
@@ -263,15 +282,15 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
     if (player.moveDirection) {
         player.moveTime++;
         if (player.moveDirection === Direction.DOWN && !player.changeDirection) {
-            player.positionY += PLAYER_MOVEMENT_PER_TICK;
+            player.positionY += playerMovementPerTick;
         } else if (player.moveDirection === Direction.UP && !player.changeDirection) {
-            player.positionY -= PLAYER_MOVEMENT_PER_TICK;
+            player.positionY -= playerMovementPerTick;
         } else if (player.moveDirection === Direction.LEFT && !player.changeDirection) {
-            player.positionX -= PLAYER_MOVEMENT_PER_TICK;
+            player.positionX -= playerMovementPerTick;
         } else if (player.moveDirection === Direction.RIGHT && !player.changeDirection) {
-            player.positionX += PLAYER_MOVEMENT_PER_TICK;
+            player.positionX += playerMovementPerTick;
         }
-        if (player.moveTime === FRAMES_PER_MOVE && !player.changeDirection) {
+        if (player.moveTime >= (onStairs ? FRAMES_PER_MOVE_STAIRS : FRAMES_PER_MOVE) && !player.changeDirection) {
             //centers the player every whole step
             player.positionX = player.scaledX * STEP_SIZE;
             player.positionY = player.scaledY * STEP_SIZE;
@@ -296,6 +315,15 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
             room.send(MessageType.SYNC, [player.scaledX, player.scaledY]);
         }
     }
+}
+
+function isOnStairs(player: Player): boolean {
+    //936 -1500, 1032 -1500
+    //936 -1296, 1032 -1296
+    return player.positionX >= 936
+        && player.positionX <= 1032
+        && player.positionY >= -1500
+        && player.positionY <= -1296;
 }
 
 //syncs the own position from the server

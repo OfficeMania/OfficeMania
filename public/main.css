@@ -829,3 +829,8 @@ button:active{
 .modal-content {
     background-color: rgba(0, 0, 0, 0);
 }
+
+#help-version-info {
+    left: 0;
+    margin-right: auto;
+}

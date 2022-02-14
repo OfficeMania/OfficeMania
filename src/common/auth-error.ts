@@ -13,6 +13,7 @@ export enum AuthError {
     LOGIN_VIA_INVITE_CODE_IS_DISABLED,
     UNKNOWN_LOGIN_METHOD,
     USERNAME_INVALID,
+    USER_DEACTIVATED,
 }
 
 export function authErrorToString(error: AuthError): string {
@@ -46,5 +47,7 @@ export function authErrorToString(error: AuthError): string {
             return "Unknown Login Method";
         case AuthError.USERNAME_INVALID:
             return "Username invalid";
+        case AuthError.USER_DEACTIVATED:
+            return "User deactivated";
     }
 }

@@ -6,7 +6,7 @@ const batSections: number[] = [-0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0
 
 const taskExecutor: TaskExecutor<void> = new TaskExecutor<void>();
 
-const ballSpeed: number = 5;
+const ballSpeed: number = 8;
 const ballSize: number = 30;
 const playerSpeed: number = 10;
 const batSize: number = 150;
