@@ -76,11 +76,11 @@ function setupVersion(app: Express): void {
         console.warn(`File "${headPath}" does not exist`);
     }
     const repoTemplate: string | undefined = process.env.VERSION_REPO_TEMPLATE;
-    const url: string | undefined = commit && repoTemplate ? repoTemplate.replace("${commit}", commit) : undefined;
+    const commitUrl: string | undefined = commit && repoTemplate ? repoTemplate.replace("${commit}", commit) : undefined;
     app.use("/version", (req, res) => {
         if (!commit) {
             return res.status(404).send({});
         }
-        res.send({ commit, url });
+        res.send({ commit, commitUrl });
     });
 }
