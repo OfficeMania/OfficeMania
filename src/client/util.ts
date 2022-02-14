@@ -15,7 +15,7 @@ import {
 } from "../common/util";
 import { characters, START_POSITION_X, START_POSITION_Y } from "./main";
 import { panelButtonsInteraction } from "./static";
-import { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
+import AnimatedSpriteSheet, { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
 import AnimationData, { createAnimationData } from "./graphic/animation-data";
 import { PlayerState } from "../common/states/player-state";
 import { textchatPlayerOnChange } from "./textchat";
@@ -439,16 +439,16 @@ export async function loadCharacter(): Promise<void> {
     ).then(response => response.json());
     const characterAnimations: { [key: string]: AnimationData } = createAnimationData(characterAnimationsJson);
 
+    const promises: Promise<AnimatedSpriteSheet>[] = [];
     //loads character sprite paths from the server (from movement)
     for (const path of getRoom().state.playerSpritePaths) {
         //characters[path] = await loadImage("/img/characters/" + path);
-        characters[path] = await createAnimatedSpriteSheet(
-            await loadImage("/img/characters/" + path),
-            characterAnimations,
-            playerWidth,
-            playerHeight
-        );
+        const promise: Promise<AnimatedSpriteSheet> = loadImage(`/img/characters/${path}`)
+            .then(image => createAnimatedSpriteSheet(image, characterAnimations, playerWidth, playerHeight))
+            .then(animatedSpriteSheet => characters[path] = animatedSpriteSheet);
+        promises.push(promise);
     }
+    await Promise.all(promises);
     if (!areWeLoggedIn()) {
         //load character
         const character: string = getLocalCharacter();
