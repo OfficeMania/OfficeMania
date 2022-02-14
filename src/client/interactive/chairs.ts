@@ -33,8 +33,10 @@ export class Chair extends Interactive {
 
     onInteraction() {
         this.sync();
-        if(!this.isUsed){
-            let player = getOurPlayer();
+        let posX = this.posX + xCorrection;
+        let posY = this.posY + yCorrection;
+        let player = getOurPlayer();
+        if(!this.isUsed || getRoom().state.chairStates[posX + "" + posY]?.playerId === player.roomId){
             let x = this.posX *STEP_SIZE + xCorrection * STEP_SIZE;
             let y = this.posY *STEP_SIZE + yCorrection * STEP_SIZE;
 
