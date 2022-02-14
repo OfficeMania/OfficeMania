@@ -95,7 +95,7 @@ export class Animation {
     }
 
     public async drawAnimation(ctx: CanvasRenderingContext2D, dx: number, dy: number, posx: number, posy: number) {
-        
+
         ctx.drawImage(this._image, posx * 48 + this._animationState * this._width * 48 , posy * 48, 48, 48, dx, dy, 48, 48);
     }
 }
@@ -237,7 +237,7 @@ export class TexturePaths {
                 return path;
             }
         }
-    }    
+    }
 }
 
 //Contains information about all used textures. Also includes all paths from the png files
@@ -301,7 +301,7 @@ class dataFromPos {
     /* TODO einheitliches Koordinaten-System
     nur isSolid wird im datapackage gespeichert, Rest in dataFromPos
     Koordiante wird auf und abgerundet um alle betroffenen Felder von einem Spieler zu erkennen.
-    Pfade der sheets für Animationen werden auf dem jeweiligen Feld gespeichert. 
+    Pfade der sheets für Animationen werden auf dem jeweiligen Feld gespeichert.
     DONE    Vordergrund und Hintergund in einem Chunk speichern.
     */
 
@@ -382,7 +382,7 @@ export class MapData {
         this._map.set(chunk.posX + "." + chunk.posY, mergedChunk);
     }
 
-    public getChunk(id: string = "-1") { 
+    public getChunk(id: string = "-1") {
         if (id == "-1") {
             return this._map
         } else {
@@ -466,7 +466,7 @@ export class MapData {
             else if (copyY == -16 % 16) {
                 correctY = 0;
             }
-            
+
             return [
                 correctX,
                 correctY,
@@ -494,7 +494,7 @@ export class MapData {
         for (const ANIMATION of animationMap.values()) {
             mergedList.push(ANIMATION);
         }
-    
+
         this._animationList = mergedList;
     }
 }
@@ -507,11 +507,14 @@ export function createTexturePaths(room: Room) {
 }
 
 
-export async function createMapJson(room: Room, canvas: HTMLCanvasElement) {
-
-    let map = createMapFromJson(await fetch("/map/Map.json").then((response) => response.json()), room);
-    await createSpriteSheet(map, canvas);
-    return map;
+export function createMapJson(room: Room, canvas: HTMLCanvasElement): Promise<any> {
+    return fetch("/map/Map.json")
+        .then((response) => response.json())
+        .then(async response => {
+            const map = createMapFromJson(response, room);
+            await createSpriteSheet(map, canvas);
+            return map;
+        });
 }
 
 async function createSpriteSheet(map: MapData, canvas: HTMLCanvasElement) {
@@ -543,7 +546,7 @@ export function drawChairsAbovePlayers(players: PlayerRecord, foreground: HTMLCa
     Object.values(players)
         .forEach((player: Player) => {
             if(getRoom().state.players.get(player.roomId).isSitting) {
-                
+
                 let ctx = canvas.getContext("2d");
                 const [x, y] = getNewCorrectedPlayerCoordinate(player);
                 let correctX = x % 16;
@@ -596,7 +599,7 @@ export function drawMap(map: MapData, spriteSheet: HTMLCanvasElement, canvas: HT
     let animationToDraw: Animation;
     let animationX: number;
     let animationY: number;
-    
+
     mapChunks = <Map<string, Chunk>> map.getChunk();
 
     for (let y = starty; y <= endy; y++) {
@@ -657,7 +660,7 @@ export function drawMap(map: MapData, spriteSheet: HTMLCanvasElement, canvas: HT
                     continue;
                 }
                 ctx.drawImage(spriteSheet, (chunk.data[correctX][correctY]._textureIdF % size) * 48 , Math.floor(chunk.data[correctX][correctY]._textureIdF / size) * 48, 48, 48, dx, dy, 48, 48);
-            }   
+            }
         }
     }
 }
@@ -809,7 +812,7 @@ function createMapFromJson(mapJson: {[key: string]: any}, room: Room) {
                         path = path.replace("Map/", "")
 
                         if (mapJsonLayer.name == "Content" || mapJsonLayer.name == "Solid" || mapJsonLayer.name == "Rooms" || mapJsonLayer.name == "Conference rooms") {
-            
+
                             const value: number = data - id + 1;
                             if (mapJsonLayer.name == "Solid" && value !== 0 && value < 16) {
                                 let numbBin: string = value.toString(2);
