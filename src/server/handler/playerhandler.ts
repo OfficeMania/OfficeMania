@@ -198,7 +198,7 @@ export class PlayerHandler implements Handler {
     private updateParticipantId(client: Client, value: string): void {
         const playerState: PlayerState = this.getPlayerData(client);
         playerState.participantId = value;
-        client.send(MessageType.UPDATE_PARTICIPANT_ID, value);
+        //client.send(MessageType.UPDATE_PARTICIPANT_ID, value);
     }
 
     private updateUsername(client: Client, value: string): void {
@@ -218,7 +218,7 @@ export class PlayerHandler implements Handler {
         playerState.character = value;
         client.send(MessageType.UPDATE_CHARACTER, value);
     }
-    
+
     private onSit(room: Room<State>, client:Client, message): void {
         const playerState: PlayerState = this.getPlayerData(client);
         playerState.isSitting = true;
