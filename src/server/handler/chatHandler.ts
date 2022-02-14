@@ -1,4 +1,4 @@
-import { Client, Room } from "colyseus";
+import { Client, Room, Server } from "colyseus";
 import { Chat, ChatDTO, ChatMessage, MessageType, PlayerState, State } from "../../common";
 import { Handler } from "./handler";
 
@@ -336,9 +336,10 @@ export class ChatHandler implements Handler {
                     this.room.state.players.forEach((p, k) => {if(k === client.sessionId) {displayName = p.displayName;}});
                     const serverMessage: ChatMessage =  {
                         timestamp: getFormattedTime(),
-                        name,
+                        name: "Server",
                         chatId: chat.id,
                         message: `User "${name}" changed names to "${displayName}"`,
+                        userId: "",
                     }
                     chat.messages.push(serverMessage);
                     this.room.clients
