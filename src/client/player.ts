@@ -69,12 +69,18 @@ export function updatePosition(player: Player, room: Room) {
     const differenceY: number = Math.abs(player.positionY - roomY);
 
     if (
-        differenceX >= 100 ||
-        differenceY >= 100
+        differenceX >= 120 ||
+        differenceY >= 120
     ) {
         //if server and client data differ to much tp player to server postion.
         player.positionX = roomX;
         player.positionY = roomY;
+    } else
+    if (
+        differenceX >= 50 ||
+        differenceY >= 50
+    ) {
+        playerMovementPerTick *= 2;
     }
 
     //if close enough just set client pos = server pos
