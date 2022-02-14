@@ -125,15 +125,14 @@ export function checkDisplayName(value?: string): boolean {
     if (!value || value.length < 1 || value.length > 20) {
         return false;
     }
-    const lowerCase: string = value.toLowerCase();
-    return lowerCase === sanitizeDisplayName(lowerCase);
+    return value === sanitizeDisplayName(value);
 }
 
 export function sanitizeDisplayName(value?: string): string | undefined {
     if (!value) {
         return;
     }
-    return stringSanitizer.sanitize.keepUnicode(value).slice(0, 20).trim();
+    return value.slice(0, 20).trim();
 }
 
 export function ensureUserId(value?: string): string {
