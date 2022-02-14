@@ -61,35 +61,42 @@ export interface Player {
  * Syncing data from server and using it
  */
 export function updatePosition(player: Player, room: Room) {
-    //if server and client data differ to much tp player to server postion.
+    let playerMovementPerTick: number = PLAYER_MOVEMENT_PER_TICK;
+
+    const roomX = room.state.players[player.roomId].x * STEP_SIZE;
+    const roomY = room.state.players[player.roomId].y * STEP_SIZE;
+    const differenceX: number = Math.abs(player.positionX - roomX);
+    const differenceY: number = Math.abs(player.positionY - roomY);
+
     if (
-        Math.abs(player.positionX - room.state.players[player.roomId].x * STEP_SIZE) >= 100 ||
-        Math.abs(player.positionY - room.state.players[player.roomId].y * STEP_SIZE) >= 100
+        differenceX >= 100 ||
+        differenceY >= 100
     ) {
-        player.positionX = room.state.players[player.roomId].x * STEP_SIZE;
-        player.positionY = room.state.players[player.roomId].y * STEP_SIZE;
+        //if server and client data differ to much tp player to server postion.
+        player.positionX = roomX;
+        player.positionY = roomY;
     }
 
     //if close enough just set client pos = server pos
-    if (Math.abs(player.positionX - room.state.players[player.roomId].x * STEP_SIZE) <= PLAYER_MOVEMENT_PER_TICK) {
-        player.positionX = room.state.players[player.roomId].x * STEP_SIZE;
+    if (differenceX <= playerMovementPerTick) {
+        player.positionX = roomX;
     } else {
         //smooth animation to new x coord
-        if (player.positionX < room.state.players[player.roomId].x * STEP_SIZE) {
-            player.positionX += PLAYER_MOVEMENT_PER_TICK;
-        } else if (player.positionX > room.state.players[player.roomId].x * STEP_SIZE) {
-            player.positionX -= PLAYER_MOVEMENT_PER_TICK;
+        if (player.positionX < roomX) {
+            player.positionX += playerMovementPerTick;
+        } else if (player.positionX > roomX) {
+            player.positionX -= playerMovementPerTick;
         }
     }
     //if close enough just set client pos = server pos
-    if (Math.abs(player.positionY - room.state.players[player.roomId].y * STEP_SIZE) <= PLAYER_MOVEMENT_PER_TICK) {
-        player.positionY = room.state.players[player.roomId].y * STEP_SIZE;
+    if (differenceY <= playerMovementPerTick) {
+        player.positionY = roomY;
     } else {
         //smooth animation to new y coord
-        if (player.positionY < room.state.players[player.roomId].y * STEP_SIZE) {
-            player.positionY += PLAYER_MOVEMENT_PER_TICK;
-        } else if (player.positionY > room.state.players[player.roomId].y * STEP_SIZE) {
-            player.positionY -= PLAYER_MOVEMENT_PER_TICK;
+        if (player.positionY < roomY) {
+            player.positionY += playerMovementPerTick;
+        } else if (player.positionY > roomY) {
+            player.positionY -= playerMovementPerTick;
         }
     }
 }
