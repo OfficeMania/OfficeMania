@@ -4391,6 +4391,17 @@
                  "width":48,
                  "x":768.151515151515,
                  "y":-191.878787878788
+                }, 
+                {
+                 "height":48,
+                 "id":193,
+                 "name":"pong gamecube",
+                 "rotation":0,
+                 "type":"6",
+                 "visible":true,
+                 "width":96,
+                 "x":1008,
+                 "y":-2186.90909090909
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -4399,7 +4410,7 @@
          "y":0
         }],
  "nextlayerid":71,
- "nextobjectid":193,
+ "nextobjectid":194,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.6.0",
