@@ -96,7 +96,7 @@ export function updateOwnPosition(player: Player, room: Room<State>, collisionIn
 
     const sittingDown = room.state.players.get(player.roomId).isSitting &&
                         (collisionInfo[x][y + 2] === undefined || !collisionInfo[x][y + 2].isSolid) &&
-                        (collisionInfo[x + 2][y + 2] === undefined || !collisionInfo[x + 2][y + 2].isSolid)
+                        (collisionInfo[x + 1][y + 2] === undefined || !collisionInfo[x + 1][y + 2].isSolid)
     const sittingUp = room.state.players.get(player.roomId).isSitting &&
                         (collisionInfo[x][y - 2] === undefined || !collisionInfo[x][y - 2].isSolid) &&
                         (collisionInfo[x + 1][y - 2] === undefined || !collisionInfo[x + 1][y - 2].isSolid)
