@@ -328,25 +328,27 @@ export class ChatHandler implements Handler {
 
     onUpdateUsername(client: Client, name: string) {
         //console.log("updatreusernamecall", client.sessionId, name);
-        this.chats.forEach(chat => {
-            if (chat.users.includes(getUserId(client, this.room)) && chat.id !== this.globalChat.id && chat.id !== this.nearbyChat.id) {
-                updateChatName(chat, this.room);
-                let displayName: string;
-                this.room.state.players.forEach((p, k) => {if(k === client.sessionId) {displayName = p.displayName;}});
-                const serverMessage: ChatMessage =  {
-                    timestamp: getFormattedTime(),
-                    name,
-                    chatId: chat.id,
-                    message: `User "${name}" changed names to "${displayName}"`,
+        if (name !== this.room.state.players.get(getUserId(client, this.room)).displayName) {
+            this.chats.forEach(chat => {
+                if (chat.users.includes(getUserId(client, this.room)) && chat.id !== this.globalChat.id && chat.id !== this.nearbyChat.id) {
+                    updateChatName(chat, this.room);
+                    let displayName: string;
+                    this.room.state.players.forEach((p, k) => {if(k === client.sessionId) {displayName = p.displayName;}});
+                    const serverMessage: ChatMessage =  {
+                        timestamp: getFormattedTime(),
+                        name,
+                        chatId: chat.id,
+                        message: `User "${name}" changed names to "${displayName}"`,
+                    }
+                    chat.messages.push(serverMessage);
+                    this.room.clients
+                        .filter(client => chat.users.includes(getUserId(client, this.room)))
+                        .forEach(client => {
+                            client.send(MessageType.CHAT_SEND, serverMessage);
+                        });
                 }
-                chat.messages.push(serverMessage);
-                this.room.clients
-                    .filter(client => chat.users.includes(getUserId(client, this.room)))
-                    .forEach(client => {
-                        client.send(MessageType.CHAT_SEND, serverMessage);
-                    });
-            }
-        });
+            });
+        }
     }
 }
 
