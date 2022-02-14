@@ -328,7 +328,7 @@ export class ChatHandler implements Handler {
 
     onUpdateUsername(client: Client, name: string) {
         //console.log("updatreusernamecall", client.sessionId, name);
-        if (name !== this.room.state.players.get(getUserId(client, this.room)).displayName) {
+        if (name !== this.room.state.players.get(getColyseusId(getUserId(client, this.room),this.room)).displayName) {
             this.chats.forEach(chat => {
                 if (chat.users.includes(getUserId(client, this.room)) && chat.id !== this.globalChat.id && chat.id !== this.nearbyChat.id) {
                     updateChatName(chat, this.room);
