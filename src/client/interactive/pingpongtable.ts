@@ -129,7 +129,7 @@ export class PingPongTable extends Interactive {
             ourGame.paint();
             this.updateInput();
             if(ourGame.gameOver !== 0) {
-                if (ourGame.gameOver === 1 && ourGame.playerA.id === getOurPlayer().roomId) {
+                if ((ourGame.gameOver === 1 && ourGame.playerA.id === getOurPlayer().roomId) || (ourGame.gameOver === 2 && ourGame.playerB.id === getOurPlayer().roomId)) {
                     this.leave(true);
                 } else {
                     this.leave(false);
