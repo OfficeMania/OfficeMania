@@ -65,9 +65,9 @@ export class ChatHandler implements Handler {
         if (message === "chats") {
             this.chats.forEach(chat => console.log(chat.id, chat.name, chat.users))
         }
-        console.debug("Message received:", message);
+        //console.debug("Message received:", message);
         const messageIdArray: string[] = JSON.parse(chatMessage.chatId);
-        console.debug("chatId:", messageIdArray);
+        //console.debug("chatId:", messageIdArray);
         const chatIds: string[] = this.chats.map(chat => chat.id);
         if (chatIds.includes(messageIdArray[0])) {
             const chatId = messageIdArray[0];
@@ -152,11 +152,11 @@ export class ChatHandler implements Handler {
             // Chat no longer exists
             return;
         }
-        console.debug(`User ${userId} left Chat ${chatId}.`);
+        //console.debug(`User ${userId} left Chat ${chatId}.`);
         const userIndex: number = chat.users.indexOf(userId);
         if (userIndex < 0) {
             // Client is not part of Chat
-            console.debug(`User ${userId} already left Chat ${chatId}.`);
+            //console.debug(`User ${userId} already left Chat ${chatId}.`);
             return;
         }
         chat.users.splice(userIndex, 1);
@@ -185,7 +185,7 @@ export class ChatHandler implements Handler {
                 return;
             }
             this.chats.splice(chatIndex, 1);
-            console.debug(`Removed empty chat ${chatId}`);
+            //console.debug(`Removed empty chat ${chatId}`);
         }
     }
 

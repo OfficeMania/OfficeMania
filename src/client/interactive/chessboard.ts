@@ -334,7 +334,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         if (!ourGame) {
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.room.send(MessageType.CHESS_INTERACTION);
-            console.debug("Requesting ChessState...");
+            //console.debug("Requesting ChessState...");
             this.show();
             checkInputMode();
             this.initListeners();
@@ -444,7 +444,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         }
         // console.debug("field:", field);
         if (currentField && currentMoves && currentMoves.includes(field)) {
-            console.debug(`move from ${currentField} to ${field}`);
+            //console.debug(`move from ${currentField} to ${field}`);
             // ourGame.move(currentField, field);
             this.room.send(MessageType.CHESS_MOVE, { from: currentField, to: field });
             setCurrentMoves(null);
@@ -457,10 +457,10 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         }
         const moves: string[] = ourGame.moves(field);
         if (!moves || moves.length === 0) {
-            console.debug("no moves available for this field");
+            //console.debug("no moves available for this field");
             setCurrentMoves(null);
         } else {
-            console.debug("field:", field, "moves:", moves);
+            //console.debug("field:", field, "moves:", moves);
             setCurrentMoves(field, moves);
         }
         // redraw(canvasChess, contextChess, ourGame.board.configuration, moves);

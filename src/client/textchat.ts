@@ -203,7 +203,7 @@ function onChatUpdate(chatDTOs: ChatDTO[]): void {
 
 //update/refill all messages in chat object and update displayed messages
 function onMessageLogs(chatMessages: ChatMessage[]): void {
-    console.debug("onmessagelogs call");
+    //console.debug("onmessagelogs call");
     let chatIds: string[] = [];
     chatMessages.forEach(message => {
         if (!chatIds.includes(message.chatId)) {

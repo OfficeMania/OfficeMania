@@ -81,7 +81,7 @@ function leaveChessGame(room: Room<State>, client: Client) {
         room.state.chessStates.delete(gameId);
         delete games[gameId];
         games[gameId] = null;
-        console.debug("delete chess game:", gameId);
+        //console.debug("delete chess game:", gameId);
         return;
     }
     //TODO Notify remaining Player?
@@ -116,10 +116,10 @@ function joinOrCreateChessGame(room: Room<State>, client: Client) {
     let gameId: string = openGameId;
     if (!gameId) {
         const [newGameId] = createChessState(room, client);
-        console.debug("create chess game:", newGameId);
+        //console.debug("create chess game:", newGameId);
         gameId = newGameId;
     }
-    console.debug("join chess game:", gameId);
+    //console.debug("join chess game:", gameId);
     setTimeout(() => client.send(MessageType.CHESS_INIT, gameId), 200);
 }
 

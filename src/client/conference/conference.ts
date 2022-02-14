@@ -222,15 +222,15 @@ function onTrack(track, onLocal, onRemote) {
 
 function onLocalTrackCreated(track) {
     // console.debug(`Local Track added: ${track}`); //DEBUG
-    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel =>
-        console.debug(`Audio Level Local: ${audioLevel}`)
-    ); //DEBUG
-    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_MUTE_CHANGED, () =>
-        console.debug("Local Track Mute changed")
-    ); //DEBUG
-    track.addEventListener(JitsiMeetJSIntern.events.track.LOCAL_TRACK_STOPPED, () =>
-        console.debug("Local Track stopped")
-    ); //DEBUG
+    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel => {
+        //console.debug(`Audio Level Local: ${audioLevel}`)
+    }); //DEBUG
+    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_MUTE_CHANGED, () => {
+        //console.debug("Local Track Mute changed")
+    }); //DEBUG
+    track.addEventListener(JitsiMeetJSIntern.events.track.LOCAL_TRACK_STOPPED, () => {
+        //console.debug("Local Track stopped")
+    }); //DEBUG
     track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId =>
         console.debug(`Local Track Audio Output Device was changed to ${deviceId}`)
     ); //DEBUG

@@ -462,7 +462,7 @@ async function main() {
         map.objects
     );
     Space.OLD_MAP_SOLID_INFO.map = currentMap;
-    console.debug("OLD currentMap:", currentMap);
+    //console.debug("OLD currentMap:", currentMap);
 
     initDoorState(newMap, ctxB);
 

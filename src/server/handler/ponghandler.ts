@@ -90,7 +90,7 @@ function onPongUpdate(client: Client, room: Room<State>) {
 function joinPong(room: Room<State>, client) {
     const emptyGame = getEmptyPongGame(room);
     if (getPongGame(room, client) === -1) {
-        console.debug("empty game: " + emptyGame);
+        //console.debug("empty game: " + emptyGame);
         if (emptyGame !== -1) {
             const emptyState: PongState = room.state.pongStates[emptyGame.toString()];
             if (emptyState) {
@@ -236,8 +236,8 @@ function getEmptyPongGame(room: Room<State>): number {
         if (room.state.pongStates[i.toString()]) {
             const playerA = room.state.pongStates[i.toString()]?.playerA;
             const playerB = room.state.pongStates[i.toString()]?.playerB;
-            console.debug("playerA=", playerA);
-            console.debug("playerB=", playerB);
+            //console.debug("playerA=", playerA);
+            //console.debug("playerB=", playerB);
             if (!playerA || !playerB) {
                 return i;
             }

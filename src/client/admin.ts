@@ -143,12 +143,12 @@ class Setting {
                 this.value = this.input.value;
                 break;
         }
-        console.debug("this.value:", this.value);
+        //console.debug("this.value:", this.value);
         const url = `${configEndpoint}?key=${this.key}&value=${this.value}`;
-        console.debug("url:", url);
+        //console.debug("url:", url);
         fetch(url, { method: "PATCH" })
             .then(response => {
-                console.debug("response:", response);
+                //console.debug("response:", response);
                 if (response.ok) {
                     this.oldValue = this.value;
                 } else {
@@ -232,12 +232,12 @@ function processConfigEntriesResponse(configEntries: any[]): ConfigEntry<any>[] 
 }
 
 function test(): void {
-    console.debug("Hello World Admin");
+    //console.debug("Hello World Admin");
     fetch(configEndpoint)
         .then(response => response.json())
         .then(configEntries => processConfigEntriesResponse(configEntries))
         .then((configEntries: ConfigEntry<any>[]) => {
-            console.debug(configEntries);
+            //console.debug(configEntries);
             configEntries.forEach(configEntry =>
                 settings.push(createSetting(configEntry.key, configEntry.key, "checkbox", configEntry.value, configEntry.description)),
             );
