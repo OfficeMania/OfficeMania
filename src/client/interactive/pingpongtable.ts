@@ -22,6 +22,8 @@ export class PingPongTable extends Interactive {
     players: PlayerRecord;
     previousInput: Direction[];
 
+    listener;
+
     constructor() {
         super("Pong table", false, 2);
         this.room = getRoom();
@@ -49,11 +51,10 @@ export class PingPongTable extends Interactive {
     }
 
     initListener() {
-        this.room.onMessage(MessageType.PONG_INTERACTION, message => {
+        this.listener = this.room.onMessage(MessageType.PONG_INTERACTION, message => {
             //console.log("interatction message recieved in client " + message)
             switch (message) {
                 case PongMessage.INIT: {
-                    //console.log("initializing game")
                     this.getPong();
                     this.updateState();
                     break;
@@ -67,12 +68,10 @@ export class PingPongTable extends Interactive {
                     break;
                 }
                 case PongMessage.LEAVE_VICTORY: {
-                    console.log("victory")
                     this.onLeave(true);
                     break;
                 }
                 case PongMessage.LEAVE_DEFEAT: {
-                    console.log("defeat")
                     this.onLeave(false);
                     break;
                 }
@@ -120,7 +119,6 @@ export class PingPongTable extends Interactive {
                 return i;
             }
         }
-        //console.log("nothing found, exiting");
         return -1;
     }
 
@@ -150,23 +148,23 @@ export class PingPongTable extends Interactive {
     onLeave(victory?: boolean) {
         
         if (ourGame) { 
+            this.listener();
             let ctx = this.canvas.getContext("2d");
             ourGame.updatePong();
             ourGame.paint();
             ourGame = null;
             //for another life  
             if (victory === true || victory === false) {
-                console.log("showing victory screen")
                 ctx.fillStyle = "white";
                 ctx.textAlign = "center";
-                ctx.font = "30px Arial";
+                ctx.font = "50px Arial";
                 if (victory) {
                     //console.log("Pong: Victory!");
-                    ctx.fillText("viktori", this.canvas.width / 2, this.canvas.height/2);
+                    ctx.fillText("Victory!", this.canvas.width / 2, this.canvas.height/2);
                 }
                 else {
                     //console.log("Pong: Defeat!");
-                    ctx.fillText("dafeet", this.canvas.width / 2, this.canvas.height/2);
+                    ctx.fillText("Defeat!", this.canvas.width / 2, this.canvas.height/2);
                 }
                 setTimeout(() => {
                     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -183,8 +181,6 @@ export class PingPongTable extends Interactive {
                 removeCloseInteractionButton();
                 checkInputMode();
             }
-                
-            
         }
     }
 
