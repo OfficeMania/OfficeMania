@@ -100,7 +100,7 @@ export class NotesHandler implements Handler{
             default:
                 //maybe for clipboard?
                 if(key.length > 1) {
-                    console.log("Not implemented")
+                    console.warn("Not implemented")
                     break;
                 }
                 console.log("modifying: " + markerX + line);

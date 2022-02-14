@@ -129,7 +129,7 @@ function onPongInteraction(room: Room<State>, client, message: PongMessage) {
         case PongMessage.UPDATE:
             break;
         default: {
-            console.log("type of interaction not defined in the turoom onMessage(MessageType.INTERACTION): " + message);
+            console.warn("type of interaction not defined in the turoom onMessage(MessageType.INTERACTION): " + message);
         }
     }
 }

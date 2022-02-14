@@ -24,7 +24,7 @@ export class Notes extends Interactive {
             this.room.send(MessageType.NOTES_ENTER, e.key);
         }
         else {
-            console.log("Cannot type " + e.key);
+            console.warn("Cannot type " + e.key);
         }
 
         //console.log("sent request to add key");
