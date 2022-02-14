@@ -80,7 +80,7 @@ export class Pong {
         this.ctx.fillStyle = "white";
         this.ctx.fillRect(this.posBallX - (this.sizeBall / 2), this.posBallY - (this.sizeBall / 2), this.sizeBall, this.sizeBall);
         if (this.playerA && this.playerB) {
-            let scoreTab: string = getPlayerByRoomId(this.playerA.id).displayName + ": " + this.playerA.score.toString() + " : " + this.playerB?.score.toString() + " :" + getPlayerByRoomId(this.playerB?.id).displayName;
+            let scoreTab: string = getPlayerByRoomId(this.playerA.id)?.displayName + ": " + this.playerA.score.toString() + " : " + this.playerB?.score.toString() + " :" + getPlayerByRoomId(this.playerB?.id)?.displayName;
             this.ctx.fillStyle = "white";
             this.ctx.textAlign = "center";
             this.ctx.font = "30px Arial";
