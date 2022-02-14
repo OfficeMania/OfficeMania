@@ -168,7 +168,7 @@ function onPongMovePlayer(message: string, gameState: PongState, pos: number, ca
 }
 
 function initNewState(room: Room<State>, client: Client) {
-    console.log("creating new pongstate");
+    //console.log("creating new pongstate");
     //console.log(getNextPongSlot(room));
     let ar = getNextPongSlot(room);
     let newState = new PongState();
@@ -191,7 +191,7 @@ function leavePongGame(room: Room<State>, client: Client, hostWon?: boolean) {
     if (n === -1) {
         return;
     }
-    console.log("deleting " + n);
+    //console.log("deleting " + n);
     let otherClient: Client;
     room.clients.forEach((nclient) => {
         if (nclient.sessionId !== client.sessionId && getPongGame(room, nclient) === n) {
@@ -201,24 +201,24 @@ function leavePongGame(room: Room<State>, client: Client, hostWon?: boolean) {
     room.state.pongStates.delete(n.toString());
     setTimeout(() => {
         if (hostWon && hostWon === true) {
-            console.log("a won")
+            //console.log("a won")
             client.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE_VICTORY);
             otherClient?.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE_DEFEAT);
 
         }
         else if (hostWon) {
-            console.log("b won")
+            //console.log("b won")
             client.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE_DEFEAT);
             otherClient?.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE_VICTORY);
-            
+
         }
         else {
-            console.log("left")
+            //console.log("left")
             client.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
             otherClient?.send(MessageType.PONG_INTERACTION, PongMessage.LEAVE);
         }
     }, 100);
-    
+
 }
 
 

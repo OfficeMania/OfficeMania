@@ -199,7 +199,7 @@ export function loadInputFunctions() {
 
 export function checkInteraction(executeInteraction: boolean = false): solidInfo {
     if (executeInteraction) {
-        console.log("Interaction called.");
+        //console.log("Interaction called.");
     }
     const ourPlayer = getOurPlayer();
     const [facingX, facingY] = getCorrectedPlayerFacingCoordinates(ourPlayer);
@@ -216,7 +216,7 @@ export function checkInteraction(executeInteraction: boolean = false): solidInfo
 
 export function checkNewInteraction(executeInteraction: boolean = false): Interactive {
     if (executeInteraction) {
-        console.log("Interaction called.");
+        //console.log("Interaction called.");
     }
     const ourPlayer = getOurPlayer();
     const [newFacingX, newFacingY] = getNewPlayerFacingCoordinates(ourPlayer);

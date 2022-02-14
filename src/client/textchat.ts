@@ -226,7 +226,7 @@ function onMessageLogs(chatMessages: ChatMessage[]): void {
 
 //write message into chat object, update messagebar if it is selected
 function onMessage(chatMessage: ChatMessage) {
-    console.log(`New message: `, chatMessage)
+    //console.log(`New message: `, chatMessage)
     const chat: Chat = getChatById(chatMessage.chatId);
     chat.messages.push(chatMessage);
     if (textchatChatsButton.getAttribute("data-id") === chatMessage.chatId) {
@@ -398,7 +398,7 @@ function addChatListOption(chat: Chat) {
     //change displayed chats to selected one
     li.addEventListener("click", () => {
         if (textchatChatsButton.getAttribute("data-id") === chat.id) {
-            console.log("Chat already selected");
+            //console.log("Chat already selected");
             return;
         }
         li.classList.remove("unread");
@@ -451,7 +451,7 @@ function updateChatListButton(id: string) {
 }
 
 function clearTextchatBar() {
-    console.log("clearing bar");
+    //console.log("clearing bar");
     while (textchatBar.firstChild) {
         textchatBar.firstChild.remove();
     }
@@ -465,7 +465,7 @@ function unCheck() {
 }
 
 function updatePlayerName(userId: string) {
-    console.log("Updating player: ", userId);
+    //console.log("Updating player: ", userId);
     const chatList: Chat[] = chats.filter(chat => chat.users.includes(userId));
     chatList.forEach(chat => updateChatName(chat));
 }

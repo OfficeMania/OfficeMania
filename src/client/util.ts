@@ -206,7 +206,7 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
              * See: https://docs.colyseus.io/state/schema/#onremove-instance-key
              */
             room.state.players.onRemove = (playerData, sessionId) => {
-                console.log("Remove", sessionId);
+                //console.log("Remove", sessionId);
                 delete players[sessionId];
                 //trigger onchange when removing player
                 playerData.triggerAll();
@@ -410,7 +410,7 @@ export function getLocalCharacter(): string {
 }
 
 export function payRespect() {
-    console.log("F's in chat");
+    //console.log("F's in chat");
 }
 
 //sprite dimensions (from movement)
@@ -513,12 +513,12 @@ export function createPlayerAvatar(character: string): HTMLDivElement {
 
 export function getPlayerByParticipantId(participantId: string): Player {
     if (!participantId) {
-        console.log("no pid");
+        //console.log("no pid");
         return null;
     }
     const players = getPlayers();
     if (!players) {
-        console.log("no players");
+        //console.log("no players");
         return null;
     }
     for (const player of Object.values(players)) {
@@ -526,18 +526,18 @@ export function getPlayerByParticipantId(participantId: string): Player {
             return player;
         }
     }
-    console.log("not in players");
+    //console.log("not in players");
     return null;
 }
 
 export function getPlayerByRoomId(playerId: string): Player {
     if (!playerId) {
-        console.log("no pid");
+        //console.log("no pid");
         return null;
     }
     const players = getPlayers();
     if (!players) {
-        console.log("no players");
+        //console.log("no players");
         return null;
     }
     for (const player of Object.values(players)) {
@@ -545,7 +545,7 @@ export function getPlayerByRoomId(playerId: string): Player {
             return player;
         }
     }
-    console.log("not in players");
+    //console.log("not in players");
     return null;
 }
 

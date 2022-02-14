@@ -99,12 +99,12 @@ export class ChatHandler implements Handler {
     onLog(client: Client, chatId?: string) {
         //console.log("chatlog call ", client.id)
         if (chatId) {
-            console.log("Request log for Chat:", chatId);
+            //console.log("Request log for Chat:", chatId);
             const chat: Chat = this.byChatId(chatId);
             client.send(MessageType.CHAT_LOG, JSON.stringify(chat.messages));
         } else {
             const userId: string = getUserId(client, this.room);
-            console.log("Request log for User:", userId);
+            //console.log("Request log for User:", userId);
             const chats: Chat[] = this.byUserId(userId);
             if (!chats.includes(this.globalChat)) {
                 chats.unshift(this.nearbyChat);
@@ -116,7 +116,7 @@ export class ChatHandler implements Handler {
 
     onChatUpdate(client: Client) {
         const userId: string = getUserId(client, this.room);
-        console.log("Request chat update for User:", userId);
+        //console.log("Request chat update for User:", userId);
         const userChats: Chat[] = this.byUserId(userId);
         //userChats.forEach(chat => console.log("chat: ", chat.id));
         const chatDTOs: ChatDTO[] = userChats.map(chat => ({
@@ -126,7 +126,7 @@ export class ChatHandler implements Handler {
         }));
         chatDTOs.unshift({ id: this.nearbyChat.id, name: this.nearbyChat.name });
         chatDTOs.unshift({ id: this.globalChat.id, name: this.globalChat.name });
-        console.log("ChatDTOs: ", chatDTOs);
+        //console.log("ChatDTOs: ", chatDTOs);
         client.send(MessageType.CHAT_UPDATE, JSON.stringify(chatDTOs));
     }
 
@@ -210,7 +210,7 @@ export class ChatHandler implements Handler {
 
         if (chatMessage.chatId === "new") {
             //add new chat
-            console.log("Create new chat:", ourPlayer.id);
+            //console.log("Create new chat:", ourPlayer.id);
 
             // create new chat between client and playerid
             const newChat: Chat = new Chat("");
@@ -266,7 +266,7 @@ export class ChatHandler implements Handler {
         } else {
             //add to existing
             if (chatMessage.chatId === this.globalChat.id || chatMessage.chatId === this.nearbyChat.id) {
-                console.log("Trying to add a player to Global or Nearby Chat.");
+                //console.log("Trying to add a player to Global or Nearby Chat.");
                 return;
             } else {
                 const chat: Chat = this.byChatId(chatMessage.chatId);
@@ -274,11 +274,11 @@ export class ChatHandler implements Handler {
                     if (!(chat.users.includes(otherPlayer.id) || chat.users.includes(otherPlayer.data.userId))) {
                         if (otherPlayer.data.userId && otherPlayer.data.userId !== "undefined") {
                             chat.users.push(otherPlayer.data.userId);
-                            console.log(`Adding userid "${otherPlayer.data.userId}" to chat ${chat.id}.`)
+                            //console.log(`Adding userid "${otherPlayer.data.userId}" to chat ${chat.id}.`)
                         }
                         else {
                             chat.users.push(otherPlayer.id);
-                            console.log(`Adding sessionid "${otherPlayer.id}" to chat ${chat.id}.`)
+                            //console.log(`Adding sessionid "${otherPlayer.id}" to chat ${chat.id}.`)
                         }
 
 
@@ -295,7 +295,7 @@ export class ChatHandler implements Handler {
                         
                         
                     } else {
-                        console.log(`User ${otherPlayer.id} already in chat ${chat.id}`);
+                        //console.log(`User ${otherPlayer.id} already in chat ${chat.id}`);
                     }
                 });
                 //make a message

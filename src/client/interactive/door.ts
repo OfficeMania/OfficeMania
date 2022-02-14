@@ -164,7 +164,7 @@ export class Door extends Interactive {
             //console.log(callPlayers);
             this.room.send(MessageType.DOOR_KNOCK, callPlayers);
             lastKnocked = temp;
-            console.log("Knocked (Local)");
+            //console.log("Knocked (Local)");
         }
         else {
             //console.warn("Faggot dont spam");

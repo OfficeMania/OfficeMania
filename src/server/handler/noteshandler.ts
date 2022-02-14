@@ -18,7 +18,7 @@ export class NotesHandler implements Handler{
         this.room.onMessage(MessageType.NOTES_ENTER, (client, message) => {this.enterNotes(client, message)})
         this.room.onMessage(MessageType.NOTES_MARKER, (client, message) => {this.modifyMarkers(this.room.state.notesState.markersX.get(client.sessionId), this.room.state.notesState.markersY.get(client.sessionId), client.sessionId, message)})
         this.room.state.notesState.contents.push("");
-        this.room.state.notesState.contents.forEach(content => console.log("Notes: " + content + " "));
+        //this.room.state.notesState.contents.forEach(content => console.log("Notes: " + content + " "));
     }
     onJoin() {
 
@@ -36,10 +36,10 @@ export class NotesHandler implements Handler{
     }
 
     private enterNotes(client: Client, key: string) {
-        console.log("inserting: " + key);
+        //console.log("inserting: " + key);
         let markerX = this.room.state.notesState.markersX.get(client.sessionId)
         let line = this.room.state.notesState.markersY.get(client.sessionId);
-        console.log("at: ", markerX, line)
+        //console.log("at: ", markerX, line)
         this.oldContents = [];
         this.room.state.notesState.contents.forEach(content => this.oldContents.push(content));
         switch (key) {
@@ -103,12 +103,12 @@ export class NotesHandler implements Handler{
                     console.warn("Not implemented")
                     break;
                 }
-                console.log("modifying: " + markerX + line);
+                //console.log("modifying: " + markerX + line);
                 let contents: string[] = []
                 this.room.state.notesState.contents.forEach(content => contents.push(content));
                 this.room.state.notesState.contents.forEach(content => this.room.state.notesState.contents.pop());
                 if (contents[line] === "") {
-                    console.log("empty", line)
+                    //console.log("empty", line)
                     contents[line] = key;
                 }
                 else {
@@ -134,7 +134,7 @@ export class NotesHandler implements Handler{
             case Direction.UP:
                 this.room.state.notesState.contents.forEach(content => old.push(content));
                 this.room.state.notesState.contents.forEach(content => this.room.state.notesState.contents.pop());
-                console.log(old);
+                //console.log(old);
                 old.forEach(content => {
                     if (counter === line) {
                         this.room.state.notesState.contents.pop();
@@ -159,7 +159,7 @@ export class NotesHandler implements Handler{
                     }
                     counter++;
                 });
-                this.room.state.notesState.contents.forEach(content => console.log(`[${content}]`));
+                //this.room.state.notesState.contents.forEach(content => console.log(`[${content}]`));
                 break;
             case Direction.LEFT:
                 let temp: string[] = [];
@@ -187,7 +187,7 @@ export class NotesHandler implements Handler{
                     if (direction === Direction.UP) {
                         markerPos = this.oldContents[line - 1].length;
                         this.room.state.notesState.markersX.set(clientid, markerPos);
-                        console.log("markerPos is now", markerPos)
+                        //console.log("markerPos is now", markerPos)
                     }
                     if(this.room.state.notesState.markersY.get(clientid) === line && markerPos >= fromPosX) {
                         this.modifyMarkers(markerPos, line, clientid, direction);
@@ -251,7 +251,7 @@ export class NotesHandler implements Handler{
         //move marker right or down if possible, adjust y position if necessary
         else if (direction === Direction.RIGHT) {
             let rand: string = this.room.state.notesState.contents.at(line);
-            console.log(rand, line);
+            //console.log(rand, line);
             if (rand.length === markerX) {
                 if (line === this.room.state.notesState.contents.length - 1) {
                     return;

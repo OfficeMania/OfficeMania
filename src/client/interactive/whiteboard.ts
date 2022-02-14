@@ -70,7 +70,7 @@ export class Whiteboard extends Interactive {
     };
 
     changeColor = (number) => {
-        console.log(number);
+        //console.log(number);
         this.draw(Number(number));
         colorSelector.style.backgroundColor = this.colors[this.currentColor];
         colorSelector.style.color = this.colors[this.currentColor];

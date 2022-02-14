@@ -81,7 +81,7 @@ export class Interactive {
     }
 
     updateInput(): void {
-        console.log("No input method speccified");
+        //console.log("No input method speccified");
     }
 
     hide(): void{
@@ -98,7 +98,7 @@ export class Interactive {
 
     //need this for doors and Zitdruck
     proofIfClosed(): any{
-        console.log("No proofIfClosed method speccified");
+        //console.log("No proofIfClosed method speccified");
     }
 }
 

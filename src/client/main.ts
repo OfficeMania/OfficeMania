@@ -526,7 +526,7 @@ async function main() {
     // message recieve test
 
     room.onMessage("skill", message => {
-        console.log("lol");
+        //console.log("lol");
     });
 
     initConference(room);

@@ -55,21 +55,21 @@ function onUpdate(room: Room<State>, client: Client, message: string[]) { //mess
 function onUse(room: Room<State>, client: Client, ID: string) {
 
     room.state.todoState[ID].isUsed = client.sessionId;
-    console.log(ID);
+    //console.log(ID);
 
 }
 
 function onStopUse(room: Room<State>, client: Client, ID: string){
 
     room.state.todoState[ID].isUsed = null;
-    console.log("onstopuse");
+    //console.log("onstopuse");
 
 }
 function getStateID(room: Room <State>, client: Client): number {
     const states = room.state.todoState;
     for (let i = 0; i < states.size; i++) {
         if(states[i].isUsed === client.sessionId) {
-            console.log(i);
+            //console.log(i);
             return i;
         }
     }
