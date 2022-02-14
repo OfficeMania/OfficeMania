@@ -1,6 +1,7 @@
 import { getInputMode, setInputMode } from "../input";
 import { checkInputMode } from "../main";
-import { createCloseInteractionButton, InputMode, removeCloseInteractionButton } from "../util";
+import { playerLoop } from "../movement";
+import { createCloseInteractionButton, InputMode, loadCharacter, removeCloseInteractionButton } from "../util";
 import { Interactive } from "./interactive";
 
 
@@ -13,9 +14,9 @@ export class Computer extends Interactive {
         super("Computer", false, 1);
         this.ctx = this.canvas.getContext("2d");
         this.iframe.id = "computer-iframe";
-        this.iframe.src = "https://www.tu-braunschweig.de/";
+        this.iframe.src = "https://dustinbrett.com/";
+        this.iframe.style.boxShadow = "0 0 0 10px hsl(0, 0%, 0%), 0 0 50px hsl(0, 0%, 75.3%), 0 0 0 50px hsl(0, 0%, 20.4%)"
     }
-
 
     /*<iframe src="https://www.tu-braunschweig.de/" style="height:500px;width:500px" title="Iframe Example">*/
 
@@ -34,6 +35,9 @@ export class Computer extends Interactive {
             createCloseInteractionButton(() => this.leave());
             checkInputMode();
             document.getElementById("interactive-bar").prepend(this.iframe);
+            document.getElementById("computer-iframe").addEventListener("load", () => {
+                this.canvas.style.visibility = "hidden";
+            });
         }
         else this.leave();
     }
@@ -43,6 +47,7 @@ export class Computer extends Interactive {
     leave() {
         removeCloseInteractionButton();
         this.canvas.style.visibility = "hidden";
+        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
         document.getElementById("computer-iframe").remove();
         setInputMode(InputMode.NORMAL);
     }

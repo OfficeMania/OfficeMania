@@ -15,5 +15,5 @@
     },
     "include": ["**/*.ts"],
     "exclude": ["**/*.test.ts"],
-    "references": [{ "path": "../common" }]
+    "references": [{ "path": "../common" }] //@Paul ?
 }

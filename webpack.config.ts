@@ -1,7 +1,8 @@
 import * as path from 'path';
 import {CleanWebpackPlugin} from 'clean-webpack-plugin';
 import {Configuration} from 'webpack';
-import {IS_DEV, SERVER_PORT, WEBPACK_PORT} from './src/server/config';
+
+const IS_DEV = process.env.NODE_ENV !== "production";
 
 const webpack = require('webpack');
 
@@ -11,7 +12,11 @@ const targets = IS_DEV ? {chrome: '79', firefox: '72'} : '> 0.25%, not dead';
 const config: Configuration = {
     mode: IS_DEV ? 'development' : 'production',
     devtool: IS_DEV ? 'inline-source-map' : false,
-    entry: ['./src/client/main'],
+    entry: {
+        main: './src/client/main',
+        admin: './src/client/admin',
+        "admin-config": './src/client/admin/config',
+    },
     plugins: [
         new webpack.ProgressPlugin(),
         new CleanWebpackPlugin(),
@@ -59,12 +64,6 @@ const config: Configuration = {
             },
         ],
     },
-    devServer: {
-        port: WEBPACK_PORT,
-        overlay: IS_DEV,
-        open: IS_DEV,
-        openPage: `http://localhost:${SERVER_PORT}`,
-    }
 };
 
 export default config;

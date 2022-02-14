@@ -1,9 +1,8 @@
-import {Room} from "colyseus.js";
-import {State} from "../../common";
-import {MessageType} from "../../common/util";
-import {Interactive} from "./interactive";
-import {setInputMode} from "../input";
-import {createCloseInteractionButton, getOurPlayer, getRoom, InputMode, removeCloseInteractionButton} from "../util";
+import { Room } from "colyseus.js";
+import { MessageType, State } from "../../common";
+import { Interactive } from "./interactive";
+import { setInputMode } from "../input";
+import { createCloseInteractionButton, getOurPlayer, getRoom, InputMode, removeCloseInteractionButton } from "../util";
 import { checkInputMode } from "../main";
 
 export class Todo extends Interactive {
@@ -61,7 +60,7 @@ export class Todo extends Interactive {
             this.paint();
             this.drawText();
             checkInputMode();
-    
+
             document.addEventListener("keydown", this.inputLam);
         }
     }
@@ -71,12 +70,12 @@ export class Todo extends Interactive {
         document.removeEventListener("keydown", this.inputLam);
 
         if (this.content !== this.contentBeforeEdit && this.content !== "") {
-            this.content = this.content + "\n    '@" + getOurPlayer().name + "'";
+            this.content = this.content + "\n    '@" + getOurPlayer().displayName + "'";
         }
-        
+
         this.syncServer();
         this.room.send(MessageType.LIST_STOPUSE, this.id.toString());
-
+        this.canvas.getContext("2d").clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.canvas.style.visibility = "hidden";
         setInputMode(InputMode.NORMAL);
     }

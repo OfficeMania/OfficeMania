@@ -3,46 +3,55 @@
     <head>
         <meta charset="UTF-8">
         <meta name="description" content="This is a proximity based video chat application.">
-        <meta name="viewport" content="width=device-width"/>
+        <meta name="viewport" content="width=device-width" />
         <title>OfficeMania</title>
         <link rel="shortcut icon" href="../assets/img/favicon.ico" />
 
-        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link href="/cache/cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"  integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" crossorigin="anonymous">
         <link rel="stylesheet" href="main.css">
 
+        <script src="/cache/cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
-<!--        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>-->
+        <!--        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>-->
         <script src="https://meet.jit.si/libs/lib-jitsi-meet.min.js"></script>
-<!--        <script src="/lib/lib-jitsi-meet.min.js"></script>-->
+        <!--        <script src="/lib/lib-jitsi-meet.min.js"></script>-->
 
         <script src="/js/vendors-bundle.js" defer></script>
     </head>
     <body>
-        <canvas id = "loading-screen" width="1000" height="1000"></canvas>
-        <img src="../assets/templates/Modern_Interiors/3_Animated_objects/48x48/gif/animated_cat_48x48.gif" id="loading-cat">
+        <canvas id="loading-screen" width="1000" height="1000"></canvas>
+        <img src="../assets/templates/Modern_Interiors/3_Animated_objects/48x48/gif/animated_cat_48x48.gif"
+             id="loading-cat">
         <div id="panel-buttons">
             <div id="group-left">
-                <button id="button-mute-audio" aria-label="Mute Audio" disabled><em class="fa fa-microphone"></em><span></span></button>
-                <button id="button-mute-video" aria-label="Mute Video" disabled><em class="fa fa-video"></em><span></span></button>
-                <button id="button-share-video" aria-label="Share Desktop" disabled><em class="fa fa-desktop"></em><span></span></button>
+                <button id="button-mute-audio" aria-label="Mute Audio" disabled><em
+                    class="fa fa-microphone"></em><span class="tooltip-text">Microphone</span></button>
+                <button id="button-mute-video" aria-label="Mute Video" disabled><em
+                    class="fa fa-video"></em><span class="tooltip-text">Webcam</span></button>
+                <button id="button-share-video" aria-label="Share Desktop" disabled><em
+                    class="fa fa-desktop"></em><span class="tooltip-text">Screenshare</span></button>
             </div>
             <div id="panel-buttons-interaction"></div>
             <div id="group-right">
-                <button id="button-settings" aria-label="Open Settings" data-toggle="modal" data-target="#settings-modal"><em class="fa fa-cog"></em><span></span></button>
-                <button id="button-users" aria-label="Show Users"><em class="fa fa-users"></em><span></span></button>
-                <button id="button-help"data-toggle="modal" data-target="#help-modal"><em class="fa fa-question-circle"></em><span></span></button>
+                <button id="button-admin-config" aria-label="Open Admin Configuration" hidden><em class="fa fa-tools"></em><span class="tooltip-text">Open Admin Configuration</span></button>
+                <button id="button-settings" aria-label="Open Settings" data-bs-toggle="modal" data-bs-target="#settings-modal"><em class="fa fa-cog"></em><span class="tooltip-text">Settings</span></button>
+                <button id="button-users" aria-label="Show Users"><em class="fa fa-users"></em><span class="tooltip-text">Users</span></button>
+                <button id="button-textchat" aria-label="Toggle Textchat"><em class="fas fa-comments"></em><span class="tooltip-text">Chat</span></button>
+                <button id="button-help"data-bs-toggle="modal" data-bs-target="#help-modal"><em class="fa fa-question-circle"></em><span class="tooltip-text">Help</span></button>
+                <button id="button-login" aria-label="Logout"><em class="fas fa-sign-in-alt"></em><span class="tooltip-text">Login</span></button>
+                <button id="button-logout" aria-label="Logout" hidden><em class="fas fa-sign-out-alt"></em><span class="tooltip-text">Logout</span></button>
+
             </div>
         </div>
-
+        
         <div id="settings-modal" class="modal fade" role="dialog">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Exit Settings">&times;</button>
-                        <h4 class="modal-title">Settings</h4>
+                        <h4 class="modal-bs-title">Settings</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Exit Settings"></button>
                     </div>
                     <div class="modal-body">
                         <div id="settings-body">
@@ -50,15 +59,21 @@
                                 <label for="input-settings-username">Username</label>
                                 <input type="text" id="input-settings-username" name="username" autocomplete="off">
                                 <br><br>
+                                <label for="input-settings-display-name">Display Name</label>
+                                <input type="text" id="input-settings-display-name" name="display-name"
+                                       autocomplete="off">
+                                <br><br>
                                 <label for="character-select">Character</label>
                                 <select id="character-select"></select>
-                                <br><hr>
+                                <br>
+                                <hr>
                                 <label for="audio-input-select">Audio Input Device</label>
                                 <select id="audio-input-select"></select>
                                 <br><br>
                                 <label for="audio-output-select">Audio Output Device</label>
                                 <select id="audio-output-select"></select>
-                                <br><hr>
+                                <br>
+                                <hr>
                                 <label for="video-input-select">Video Input Device</label>
                                 <select id="video-input-select"></select>
                                 <input type="submit" value="Submit" disabled hidden>
@@ -67,8 +82,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button id="button-settings-ok" aria-label="Apply and Exit Settings" type="button" class="btn btn-default" data-dismiss="modal">OK</button>
-                        <button id="button-settings-cancel" aria-label="Exit Settings" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button id="button-settings-ok" aria-label="Apply and Exit Settings" type="button" class="btn btn-default" data-bs-dismiss="modal">OK</button>
+                        <button id="button-settings-cancel" aria-label="Exit Settings" type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
                         <button id="button-settings-apply" aria-label="Apply Settings" type="button" class="btn btn-default">Apply</button>
                     </div>
                 </div>
@@ -79,37 +94,58 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Help</h4>
+                        <h4 class="modal-bs-title">Help</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div id="help-body">
-                            <img src="../assets/img/transparent_32x32.png" alt="ESC-Key" class="key key-small" style="background-position: -32px calc(5 * -32px);"><p>  Escape from Interaction or Modal</p>
-                            <br><hr>
-                            <img src="../assets/img/transparent_32x32.png" alt="M-Key" class="key key-small" style="background-position: 0 calc(3 * -32px);"><p>  Mute Audio</p>
+                            <img src="../assets/img/transparent_32x32.png" alt="ESC-Key" class="key key-small"
+                                 style="background-position: -32px calc(5 * -33px);">
+                            <p> Escape from Interaction or Modal</p>
+                            <br>
+                            <hr>
+                            <img src="../assets/img/transparent_32x32.png" alt="M-Key" class="key key-small"
+                                 style="background-position: 0 calc(3 * -33px);">
+                            <p> Mute Audio</p>
                             <br><br>
-                            <img src="../assets/img/transparent_32x32.png" alt="N-Key" class="key key-small" style="background-position: -32px calc(3 * -32px);"><p>  Mute Video</p>
+                            <img src="../assets/img/transparent_32x32.png" alt="N-Key" class="key key-small"
+                                 style="background-position: -32px calc(3 * -33px);">
+                            <p> Mute Video</p>
                             <br><br>
-                            <img src="../assets/img/transparent_32x32.png" alt="Comma-Key" class="key key-small" style="background-position: calc(4 * -32px) calc(6 * -32px);"><p>  Share Screen</p>
-                            <br><hr>
-                            <img src="../assets/img/transparent_32x32.png" alt="Q-Key" class="key key-small" style="background-position: calc(4 * -32px) calc(3 * -32px);"><p>  Open Settings</p>
+                            <img src="../assets/img/transparent_32x32.png" alt="Comma-Key" class="key key-small"
+                                 style="background-position: calc(4 * -32px) calc(6 * -32.5px);">
+                            <p> Share Screen</p>
+                            <br>
+                            <hr>
+                            <img src="../assets/img/transparent_32x32.png" alt="Q-Key" class="key key-small"
+                                 style="background-position: calc(4 * -32px) calc(3 * -33px);">
+                            <p> Open Settings</p>
                             <br><br>
-                            <img src="../assets/img/transparent_32x32.png" alt="H-Key" class="key key-small" style="background-position: calc(2 * -32px) calc(2 * -32px);"><p>  Open Help</p>
-                            <br><hr>
-                            <img src="../assets/img/transparent_32x32.png" alt="C-Key" class="key key-small" style="background-position: calc(4 * -32px) calc(-32px);"><p>  Cycle Character Skin</p>
+                            <img src="../assets/img/transparent_32x32.png" alt="H-Key" class="key key-small"
+                                 style="background-position: calc(2 * -32px) calc(2 * -33px);">
+                            <p> Open Help</p>
+                            <br>
+                            <hr>
+                            <img src="../assets/img/transparent_32x32.png" alt="C-Key" class="key key-small"
+                                 style="background-position: calc(4 * -32px) calc(-33px);">
+                            <p> Cycle Character Skin</p>
                             <br><br>
-                            <img src="../assets/img/transparent_32x32.png" alt="R-Key" class="key key-small" style="background-position: calc(5 * -32px) calc(3 * -32px);"><p>  Change Username</p>
+                            <img src="../assets/img/transparent_32x32.png" alt="U-Key" class="key key-small"
+                                 style="background-position: calc(-32px) calc(4 * -33px);">
+                            <p> Show User List</p>
                             <br><br>
-                            <img src="../assets/img/transparent_32x32.png" alt="U-Key" class="key key-small" style="background-position: calc(-32px) calc(4 * -32px);"><p>  Show User List</p>
-                            <br><br>
-                            <img src="../assets/img/transparent_32x32.png" alt="E-Key" class="key key-small" style="background-position: calc(6 * -32px) calc(-32px);"><p>  Interact with Object</p>
-                            <br><hr>
-                            <p>Press <strong>E</strong> to interact with Objects like: Doors, Computers, Vending Machines, Whiteboards and more...</p>
+                            <img src="../assets/img/transparent_32x32.png" alt="E-Key" class="key key-small"
+                                 style="background-position: calc(6 * -32px) calc(-33px);">
+                            <p> Interact with Object</p>
+                            <br>
+                            <hr>
+                            <p>Press <strong>E</strong> to interact with Objects like: Doors, Computers, Vending
+                                Machines, Whiteboards and more...</p>
                             <br>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button id="button-help-ok" type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                        <button id="button-help-ok" type="button" class="btn btn-default" data-bs-dismiss="modal">OK</button>
                     </div>
                 </div>
             </div>
@@ -119,41 +155,40 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Exit Welcome Screen">&times;</button>
-                        <h2 class="modal-title">Welcome to OfficeMania</h2>
+                        <h2 class="modal-bs-title">Welcome to OfficeMania</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Exit Welcome Screen"></button>
                     </div>
                     <div class="modal-body">
                         <div id="welcome-body">
                             <form id="name-form">
                                 <label for="input-welcome-username">Please enter your Username:</label>
                                 <input type="text" id="input-welcome-username" name="username" autocomplete="off">
-                                
                             </form>
                             <hr>
-                            <span>Move around with the Arrow Keys or </span>
-                            <img src="../assets/img/transparent_32x32.png" alt="W-Key" class="key key-small" style="background-position: calc(3 * -32px) calc(4 * -32px);">
-                            <img src="../assets/img/transparent_32x32.png" alt="A-Key" class="key key-small" style="background-position: calc(2 * -32px) -32px;">
-                            <img src="../assets/img/transparent_32x32.png" alt="S-Key" class="key key-small" style="background-position: calc(6 * -32px) calc(3 * -32px);">
-                            <img src="../assets/img/transparent_32x32.png" alt="D-Key" class="key key-small" style="background-position: calc(5 * -32px) calc(1 * -32px);">
+                            <span>Move around with the arrow keys or </span>
+                            <img src="../assets/img/transparent_32x32.png" alt="W-Key" class="key key-small"
+                                 style="background-position: calc(3 * -32px) calc(4 * -33px);">
+                            <img src="../assets/img/transparent_32x32.png" alt="A-Key" class="key key-small"
+                                 style="background-position: calc(2 * -32px) -36px;">
+                            <img src="../assets/img/transparent_32x32.png" alt="S-Key" class="key key-small"
+                                 style="background-position: calc(6 * -32px) calc(3 * -33.3px);">
+                            <img src="../assets/img/transparent_32x32.png" alt="D-Key" class="key key-small"
+                                 style="background-position: calc(5 * -32px) calc(1 * -36px);">
                             <br><br>
                             <span>Press</span>
-                            <img src="../assets/img/transparent_32x32.png" alt="E-Key" class="key key-small" style="background-position: calc(6 * -32px) calc(-32px);">
-                            <span>to interact with Objects like: Doors, Computers, Sticky Notes, Whiteboards and more...</span>
+                            <img src="../assets/img/transparent_32x32.png" alt="E-Key" class="key key-small"
+                                 style="background-position: calc(6 * -32px) calc(-37px);">
+                            <span>to interact with objects like: doors, sticky notes, whiteboards and more. While looking 
+                                at interactive objects, there will be a hint in the bottom left corner of your screen.</span>
                             <br><br>
-                            <span>Please remember to give OfficeMania permisson to access the camera and the microphone.</span>
+                            <span>Please remember to give OfficeMania permisson to access the camera and the microphone and send you notifications.</span>
                             <hr>
-                            <span>For Help click on</span>
+                            <span>For more Help click on</span>
                             <em class="fa fa-question-circle"></em>
-                            <br>
-                            <span>To show all online Users</span>
-                            <em class="fa fa-users"></em>
-                            <br>
-                            <span>To change Settings click on</span>
-                            <em class="fa fa-cog"></em>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <input type="button" value="OK" id="button-welcome-ok" aria-label="Apply and Exit" class="btn btn-default" data-dismiss="modal">
+                        <input type="button" value="OK" id="button-welcome-ok" aria-label="Apply and Exit" class="btn btn-default" data-bs-dismiss="modal">
                     </div>
                 </div>
             </div>
@@ -169,26 +204,94 @@
             <ul id="player-online-list"></ul>
         </div>
 
-        <div id="chat-container">
-            <ul id="chat-list"></ul>
+        <div id="textchat-container" class="horizontal-animation">
+            <div id="menu-bar">
+                <div class="btn-group" id="chat-list">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="button-chat-list" data-bs-toggle="dropdown" aria-expanded="false">Active Chat here</button>
+                    <ul class="dropdown-menu" id="dropdown-chat-list" aria-labelledby="button-chat-list"></ul>
+                </div>
+                <div class="btn-group" id="user-list" >
+                    <button class="btn btn-secondary" type="button" id="button-user-list" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">+</button>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="button-user-list" style="width: 50%;">
+                        <ul id="dropdown-user-list" style="height: 10em;"></ul>
+                        <ul id="dropdown-user-divider">
+                            <li><hr class="dropdown-divider" href="#"></li>
+                            <li><a class="dropdown-item" href="#" id="textchat-create-new">create new chat</a></li>
+                            <li><a class="dropdown-item" href="#" id="textchat-add-to-chat">add to chat</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div id="messages-bar">
+
+            </div>
+            <div id="textchat-bar">
+                <textarea id="typing-field" name="Text" rows="1" placeholder="Send message..."></textarea>
+                <button id="button-send" aria-label="Send Message"><em class="fas fa-paper-plane"></em><span></span>
+                </button>
+            </div>
         </div>
 
         <div id="interactive-bar">
-            <canvas id="interactive" tabindex='0' width="1280" height="720"></canvas>
-            <button id="button-interactive"></button>
-            <div id="interactive-bar-chess">
-                <button id="button-chess-export"><em class="fa fa-copy"></em><span></span></button>
-                <button id="button-chess-import"><em class="fa fa-paste"></em><span></span></button>
+            <div id="interactive-whiteboard-wrapper">
+                <div id="interactive-bar-whiteboard-wrapper">
+                    <div id="interactive-bar-whiteboard">
+                        <button id="button-whiteboard-save"><em class="fas fa-save"></em><span></span></button>
+                        <button id="button-whiteboard-clear"><em class="fa fa-trash"></em><span></span></button>
+                        <button id="button-whiteboard-pen"><em class="fas fa-pen"></em><span></span></button>
+                        <button id="button-whiteboard-eraser"><em class="fa fa-eraser"></em><span></span></button>
+                        <div>    
+                            <select id="whiteboard-size-selector">
+                                <option class="size" value="5">small</option>
+                                <option class="size" value="10">medium</option>
+                                <option class="size" value="15">large</option>
+                            </select>
+                            <style type="text/css">
+                                option.size {background-color: white; color: black;}
+                            </style>
+                            <div><em class="fa fa-circle" id="whiteboard-size-icon"></em><span></span></div>
+                        </div>
+                        <select id="whiteboard-color-selector">
+                            <option class="black" value="0">black</option> 
+                            <option class="red" value="2">red</option>
+                            <option class="pink" value="3">pink</option>
+                            <option class="orange" value="4">orange</option>
+                            <option class="yellow" value="5">yellow</option>
+                            <option class="green" value="6">green</option>
+                            <option class="blue" value="7">blue</option>
+                        </select>
+                        <style type="text/css">
+                            option.black {background-color: black; color: white;}
+                            option.red {background-color: red; color: black;}
+                            option.pink {background-color: magenta; color: black;}
+                            option.orange {background-color: orange; color: black;}
+                            option.yellow {background-color: yellow; color: black;}
+                            option.green {background-color: green; color: black;}
+                            option.blue {background-color: blue; color: black;}
+                        </style>
+
+                    </div>
+                </div>
+                <canvas id="interactive" tabindex="0" width="1280" height="720"></canvas>
+                <canvas id="backpack" tabindex="0" width="1280" height="720"></canvas>
+                <button id="button-interactive"></button>
+                <div id="interactive-bar-chess">
+                    <button id="button-chess-export"><em class="fa fa-copy"></em><span></span></button>
+                    <button id="button-chess-import"><em class="fa fa-paste"></em><span></span></button>
+                </div>
             </div>
         </div>
 
         <!-- 'canvas' is the main canvas for the map-->
         <canvas id="canvas" width="600" height="600" class="background">
             <canvas id="background"></canvas>
+            <canvas id="foreground"></canvas>
+            <canvas id="spriteSheet"></canvas>
             <canvas id="doors"></canvas>
         </canvas>
 
-        <div id="help-footer" class="footer"></div>
+        <!--Load MobileFont beforehand, this is important for the machine.ts ineractives-->
+        <div style="font-family: MobileFont;">.</div>
 
         <script src="/js/main-bundle.js" defer></script>
     </body>

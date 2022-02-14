@@ -5,7 +5,6 @@ import {
     canSeeEachOther,
     createPlayerAvatar,
     getCameraDeviceId,
-    getChatEnabled,
     getCollisionInfo,
     getCorrectedPlayerCoordinates,
     getMicDeviceId,
@@ -18,21 +17,17 @@ import {
     removeChildren,
     setCameraDeviceId,
     setMicDeviceId,
-    setSpeakerDeviceId
+    setSpeakerDeviceId,
 } from "../util";
-import {SelfUser, User} from "./entities";
-import {Room} from "colyseus.js";
-import {solidInfo} from "../map";
-import {Player} from "../player";
-import {MessageType} from "../../common/util";
-import {camButton, muteButton, shareButton} from "../static";
+import { SelfUser, User } from "./entities";
+import { Room } from "colyseus.js";
+import { solidInfo } from "../map";
+import { Player } from "../player";
+import { MessageType } from "../../common";
+import { camButton, muteButton, shareButton } from "../static";
+import { setShowTextchatBar } from "../textchat";
 
-export {
-    init as initConference,
-    trackTypeAudio,
-    trackTypeVideo,
-    trackTypeDesktop
-};
+export { init as initConference, trackTypeAudio, trackTypeVideo, trackTypeDesktop };
 
 // @ts-ignore
 const JitsiMeetJSIntern = JitsiMeetJS;
@@ -68,9 +63,6 @@ const videoInputSelect = $<HTMLSelectElement>("video-input-select");
 const playerOnlineContainer = $<HTMLUListElement>("player-online-container");
 const playerOnlineList = $<HTMLUListElement>("player-online-list");
 
-const chatContainer = $<HTMLDivElement>("chat-container");
-const chatList = $<HTMLDivElement>("chat-list");
-
 const selfUser = new SelfUser(audioBar, videoBar, focusBar);
 const users: User[] = [];
 
@@ -78,31 +70,31 @@ let showParticipantsTab = false;
 
 // Options
 
-function conferenceData() {
+function conferenceState() {
     return getRoom().state.conference;
 }
 
 function optionsHosts() {
     return {
         domain: "8x8.vc",
-        muc: `conference.${conferenceData().id}.8x8.vc`,
-        focus: "focus.8x8.vc"
+        muc: `conference.${conferenceState().id}.8x8.vc`,
+        focus: "focus.8x8.vc",
     };
 }
 
 function optionsConnection() {
     return {
         hosts: optionsHosts(),
-        serviceUrl: "wss://8x8.vc/xmpp-websocket?room=" + conferenceData().id,
-        clientNode: "https://jitsi.org/jitsimeet"
+        serviceUrl: "wss://8x8.vc/xmpp-websocket?room=" + conferenceState().id,
+        clientNode: "https://jitsi.org/jitsimeet",
     };
 }
 
 const optionsConference = {
     enableLayerSuspension: true,
     p2p: {
-        enabled: false
-    }
+        enabled: false,
+    },
 };
 
 const optionsInit = {
@@ -110,8 +102,8 @@ const optionsInit = {
 };
 
 const optionsAudioTrack = {
-    devices: [trackTypeAudio]
-}
+    devices: [trackTypeAudio],
+};
 
 const optionsCamTrack = {
     devices: [trackTypeVideo],
@@ -120,17 +112,17 @@ const optionsCamTrack = {
         video: {
             aspectRatio: 16 / 9,
             width: { min: 640, ideal: 1280, max: 1920 },
-            height: { min: 360, ideal: 720, max: 1080 }
-        }
-    }
-}
+            height: { min: 360, ideal: 720, max: 1080 },
+        },
+    },
+};
 
 const optionsDesktopTrack = {
     devices: [trackTypeDesktop],
     desktopSharingFrameRate: {
-        max: 30
-    }
-}
+        max: 30,
+    },
+};
 
 // Variables
 
@@ -153,14 +145,14 @@ function onDeviceListChanged(devices) {
  * This is called after a connection failed to establish
  */
 function onConnectionFailed() {
-    console.error('Connection to Jitsi Server Failed!');
+    console.error("Connection to Jitsi Server Failed!");
 }
 
 /**
  * This is called after successfully establishing a connection
  */
 function onConnectionSuccess() {
-    conference = connection.initJitsiConference(conferenceData().id, optionsConference);
+    conference = connection.initJitsiConference(conferenceState().id, optionsConference);
     //conference.setStartMutedPolicy({audio: true});
     conference.on(JitsiMeetJSIntern.events.conference.TRACK_ADDED, onTrackAdded);
     conference.on(JitsiMeetJSIntern.events.conference.TRACK_REMOVED, onTrackRemoved);
@@ -172,13 +164,12 @@ function onConnectionSuccess() {
     // conference.on(JitsiMeetJSIntern.events.conference.TRACK_AUDIO_LEVEL_CHANGED, (userID, audioLevel) => console.debug(`${userID} - ${audioLevel}`)); //DEBUG
     // conference.on(JitsiMeetJSIntern.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.debug(`${userID} - ${displayName}`)); //DEBUG
     // conference.on(JitsiMeetJSIntern.events.conference.PHONE_NUMBER_CHANGED, () => console.debug(`${conference.getPhoneNumber()} - ${conference.getPhonePin()}`)); //DEBUG //REMOVE
-    conference.on(JitsiMeetJSIntern.events.conference.MESSAGE_RECEIVED, onMessageReceived);
-    if (conferenceData().password) {
-        conference.join(conferenceData().password);
+    if (conferenceState().password) {
+        conference.join(conferenceState().password);
     } else {
         conference.join();
     }
-    users.forEach(user => user.conference = conference);
+    users.forEach(user => (user.conference = conference));
     selfUser.conference = conference;
     selfUser.participantId = conference.myUserId();
     // console.debug("participantId:", selfUser.participantId)
@@ -228,24 +219,21 @@ function onTrack(track, onLocal, onRemote) {
     }
 }
 
-function onMessageReceived(participantId: string, message: string, ts: number) {
-    // console.debug(`participantId: ${participantId}, ts: ${ts}, message: ${message}`); //DEBUG
-    if (!getChatEnabled()) {
-        return;
-    }
-    const chatItem = createChatItem(getUser(participantId), message);
-    if (chatItem) {
-        ensureChatAppend();
-        chatList.append(chatItem);
-    }
-}
 
 function onLocalTrackCreated(track) {
     // console.debug(`Local Track added: ${track}`); //DEBUG
-    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel => console.debug(`Audio Level Local: ${audioLevel}`)); //DEBUG
-    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_MUTE_CHANGED, () => console.debug('Local Track Mute changed')); //DEBUG
-    track.addEventListener(JitsiMeetJSIntern.events.track.LOCAL_TRACK_STOPPED, () => console.debug('Local Track stopped')); //DEBUG
-    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId => console.debug(`Local Track Audio Output Device was changed to ${deviceId}`)); //DEBUG
+    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_AUDIO_LEVEL_CHANGED, audioLevel => {
+        //console.debug(`Audio Level Local: ${audioLevel}`)
+    }); //DEBUG
+    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_MUTE_CHANGED, () => {
+        //console.debug("Local Track Mute changed")
+    }); //DEBUG
+    track.addEventListener(JitsiMeetJSIntern.events.track.LOCAL_TRACK_STOPPED, () => {
+        //console.debug("Local Track stopped")
+    }); //DEBUG
+    track.addEventListener(JitsiMeetJSIntern.events.track.TRACK_AUDIO_OUTPUT_CHANGED, deviceId =>
+        console.debug(`Local Track Audio Output Device was changed to ${deviceId}`)
+    ); //DEBUG
 }
 
 function onTrackAdded(track) {
@@ -320,7 +308,7 @@ function onUserLeft(participantId) {
 
 // Functions
 
-function getUser(participantId: string): User {
+export function getUser(participantId: string): User {
     let user = users.find(value => value.participantId === participantId);
     if (!user) {
         user = new User(conference, audioBar, videoBar, focusBar, participantId);
@@ -329,7 +317,13 @@ function getUser(participantId: string): User {
     return user;
 }
 
-function useTrackType(trackType: string, onTrackTypeAudio: () => void, onTrackTypeVideo: () => void, onTrackTypeDesktop?: () => void, onTrackTypeElse?: () => void) {
+function useTrackType(
+    trackType: string,
+    onTrackTypeAudio: () => void,
+    onTrackTypeVideo: () => void,
+    onTrackTypeDesktop?: () => void,
+    onTrackTypeElse?: () => void
+) {
     switch (trackType) {
         case trackTypeAudio:
             onTrackTypeAudio();
@@ -345,7 +339,13 @@ function useTrackType(trackType: string, onTrackTypeAudio: () => void, onTrackTy
     }
 }
 
-function processTrackType<R>(trackType: string, onTrackTypeAudio: () => R, onTrackTypeVideo: () => R, onTrackTypeDesktop?: () => R, onTrackTypeElse?: () => R): R {
+function processTrackType<R>(
+    trackType: string,
+    onTrackTypeAudio: () => R,
+    onTrackTypeVideo: () => R,
+    onTrackTypeDesktop?: () => R,
+    onTrackTypeElse?: () => R
+): R {
     switch (trackType) {
         case trackTypeAudio:
             return onTrackTypeAudio();
@@ -355,7 +355,7 @@ function processTrackType<R>(trackType: string, onTrackTypeAudio: () => R, onTra
             return onTrackTypeDesktop();
         default:
             if (!onTrackTypeElse) {
-                console.warn(`Unknown TrackType: ${trackType}`)
+                console.warn(`Unknown TrackType: ${trackType}`);
             }
             return onTrackTypeElse();
     }
@@ -368,46 +368,62 @@ async function unload() {
 }
 
 function createCamTrack(cameraDeviceId: string = getCameraDeviceId()) {
-    createVideoTrack(!cameraDeviceId ? optionsCamTrack : {...optionsCamTrack, cameraDeviceId});
+    createVideoTrack(!cameraDeviceId ? optionsCamTrack : { ...optionsCamTrack, cameraDeviceId });
 }
 
 function createDesktopTrack() {
     //createVideoTrack(optionsDesktopTrack, true);
-    createLocalTracks(optionsDesktopTrack, (tracks) => {
-        // tracks.forEach(onLocalTrackCreated);
-        const track = tracks[0];
-        track.track.addEventListener("ended", () => disableSharing());
-        selfUser.setNewVideoTrack(track, true).then(() => updateButtons());
-    }, error => {
-        if (error.name !== "gum.screensharing_user_canceled") {
-            console.error(error);
+    createLocalTracks(
+        optionsDesktopTrack,
+        tracks => {
+            // tracks.forEach(onLocalTrackCreated);
+            const track = tracks[0];
+            track.track.addEventListener("ended", () => disableSharing());
+            selfUser.setNewVideoTrack(track, true).then(() => updateButtons());
+        },
+        error => {
+            if (error.name !== "gum.screensharing_user_canceled") {
+                console.error(error);
+            }
+            disableSharing();
         }
-        disableSharing();
-    });
+    );
 }
 
 function createVideoTrack(options: {}) {
-    createLocalTracks(options, (tracks) => {
-        // tracks.forEach(onLocalTrackCreated);
-        selfUser.setNewVideoTrack(tracks[0]).then(() => updateButtons());
-    }, error => {
-        console.error(error);
-        setCameraDeviceId(null);
-    });
+    createLocalTracks(
+        options,
+        tracks => {
+            // tracks.forEach(onLocalTrackCreated);
+            selfUser.setNewVideoTrack(tracks[0]).then(() => updateButtons());
+        },
+        error => {
+            console.error(error);
+            setCameraDeviceId(null);
+        }
+    );
 }
 
 function createAudioTrack(micDeviceId: string = getMicDeviceId()) {
-    const options = !micDeviceId ? optionsAudioTrack : {...optionsAudioTrack, micDeviceId};
-    createLocalTracks(options, (tracks) => {
-        // tracks.forEach(onLocalTrackCreated);
-        selfUser.setNewAudioTrack(tracks[0]).then(() => updateButtons());
-    }, error => {
-        console.error(error);
-        setMicDeviceId(null);
-    });
+    const options = !micDeviceId ? optionsAudioTrack : { ...optionsAudioTrack, micDeviceId };
+    createLocalTracks(
+        options,
+        tracks => {
+            // tracks.forEach(onLocalTrackCreated);
+            selfUser.setNewAudioTrack(tracks[0]).then(() => updateButtons());
+        },
+        error => {
+            console.error(error);
+            setMicDeviceId(null);
+        }
+    );
 }
 
-function createLocalTracks(options: {}, onSuccess: (tracks: any[]) => void, onFailure: (error) => void = console.error) {
+function createLocalTracks(
+    options: {},
+    onSuccess: (tracks: any[]) => void,
+    onFailure: (error) => void = console.error
+) {
     JitsiMeetJSIntern.createLocalTracks(options).then(onSuccess).catch(onFailure);
 }
 
@@ -423,15 +439,18 @@ function enableSharing() {
 
 export function setAudioButtonMute(muted: boolean, supported: boolean, sharing: boolean) {
     muteButton.disabled = !supported;
-    muteButton.innerHTML = muted || !supported ? "<em class = \"fa fa-microphone-slash\"></em><span></span>" : "<em class = \"fa fa-microphone\"></em><span></span>";
+    muteButton.innerHTML =
+        muted || !supported
+            ? '<em class = "fa fa-microphone-slash"></em><span class="tooltip-text">Unmute</span>'
+            : '<em class = "fa fa-microphone"></em><span class="tooltip-text">Mute</span>';
 }
 
 export function setVideoButtonMute(muted: boolean, supported: boolean, sharing: boolean) {
     camButton.disabled = !supported;
-    const camNormal = "<em class = \"fa fa-video\"></em><span></span>";
-    const camMuted = "<em class = \"fa fa-video-slash\"></em><span></span>";
-    const sharingNormal = "<em class = \"fa fa-pause\"></em><span></span>";
-    const sharingMuted = "<em class = \"fa fa-play\"></em><span></span>";
+    const camNormal = '<em class = "fa fa-video"></em><span class="tooltip-text">Pause Webcam</span>';
+    const camMuted = '<em class = "fa fa-video-slash"></em><span class="tooltip-text">Resume Webcam</span>';
+    const sharingNormal = '<em class = "fa fa-pause"></em><span class="tooltip-text">Pause Screenshare</span>';
+    const sharingMuted = '<em class = "fa fa-play"></em><span class="tooltip-text">Resume Screenshare</span>';
     const textNormal = sharing ? sharingNormal : camNormal;
     const textMuted = sharing ? sharingMuted : camMuted;
     camButton.innerHTML = muted || !supported ? textMuted : textNormal;
@@ -439,7 +458,12 @@ export function setVideoButtonMute(muted: boolean, supported: boolean, sharing: 
 
 export function setSwitchToDesktop(enabled: boolean, supported: boolean = false) {
     shareButton.disabled = !supported;
-    shareButton.innerHTML = enabled ? "<em class = \"fa fa-user\"></em><span></span>" : "<em class = \"fa fa-desktop\"></em><span></span>";
+    if (enabled) {
+        shareButton.innerHTML = '<em class = "fa fa-user"></em><span class="tooltip-text">End Screenshare</span>';
+    }
+    else {
+        shareButton.innerHTML = '<em class = "fa fa-desktop"></em><span class="tooltip-text">Screenshare</span>';
+    }
 }
 
 export function updateButtons() {
@@ -453,7 +477,7 @@ function getMediaDeviceInfos(deviceType: string, deviceDirection: string): Promi
         return undefined;
     }
     const kind = deviceType + deviceDirection;
-    return navigator.mediaDevices.enumerateDevices().then((devices) => devices.filter(device => device.kind === kind));
+    return navigator.mediaDevices.enumerateDevices().then(devices => devices.filter(device => device.kind === kind));
 }
 
 function setMediaDevices(select: HTMLSelectElement, devices: MediaDeviceInfo[], selectedDevice: MediaDeviceInfo) {
@@ -473,29 +497,6 @@ function setMediaDevices(select: HTMLSelectElement, devices: MediaDeviceInfo[], 
     select.selectedIndex = selectedIndex;
 }
 
-function createChatItem(user: User, message: string): HTMLLIElement {
-    if (!user || !message) {
-        return null;
-    }
-    const chatItem = document.createElement("li");
-    chatItem.classList.add("chat-list-item");
-    chatItem.setAttribute("data-created", "" + new Date().getTime());
-    const messageItem = document.createElement("span");
-    messageItem.classList.add("chat-list-item-message");
-    messageItem.innerText = message;
-    const playerState = document.createElement("div");
-    const player = getPlayerByParticipantId(user.participantId);
-    chatItem.append(createPlayerState(player, playerState, false, false));
-    chatItem.append(messageItem);
-    return chatItem;
-}
-
-function ensureChatAppend() {
-    while (chatList.childElementCount > 10) {
-        chatList.firstChild.remove();
-    }
-}
-
 // Exported Functions
 
 export function isDesktopSharingSupported() {
@@ -503,7 +504,11 @@ export function isDesktopSharingSupported() {
 }
 
 export function toggleMuteByType(type: string): boolean {
-    return processTrackType(type, () => selfUser.toggleAudio(), () => selfUser.toggleVideo());
+    return processTrackType(
+        type,
+        () => selfUser.toggleAudio(),
+        () => selfUser.toggleVideo()
+    );
 }
 
 export function toggleSharing() {
@@ -530,10 +535,11 @@ export function nearbyPlayerCheck() {
     const ourRoomId: number = solidInfo?.roomId;
     const isOurRoomConferenceRoom: boolean = solidInfo?.isConferenceRoom;
     for (const player of Object.values(players)) {
-        if (player.id === ourPlayer.id) {
+        if (player.roomId === ourPlayer.roomId) {
             continue;
         }
-        if (!ourRoomId && ourRoomId !== 0) { //TODO ist this too many or too much? - jedenfalls ist es quatsch.
+        if (!ourRoomId && ourRoomId !== 0) {
+            //TODO ist this too many or too much? - jedenfalls ist es quatsch.
             playersAway.push(player.participantId);
             continue;
         }
@@ -548,23 +554,29 @@ export function nearbyPlayerCheck() {
             playersAway.push(player.participantId);
             continue;
         }
-        const distanceSquared = Math.pow(player.positionX - ourPlayer.positionX, 2) + Math.pow(player.positionY - ourPlayer.positionY, 2);
+        const distanceSquared =
+            Math.pow(player.positionX - ourPlayer.positionX, 2) + Math.pow(player.positionY - ourPlayer.positionY, 2);
         if (distanceSquared <= minDistanceSquared || (isOurRoomConferenceRoom && sameRoom)) {
             playersNearby.push(player.participantId);
             continue;
         }
         playersAway.push(player.participantId);
     }
-    playersAway.forEach((participantId) => getUser(participantId).setDisabled(true));
-    playersNearby.forEach((participantId) => getUser(participantId).setDisabled(false));
+    playersAway.forEach(participantId => getUser(participantId).setDisabled(true));
+    playersNearby.forEach(participantId => getUser(participantId).setDisabled(false));
 }
 
-export function createPlayerState<Type extends HTMLElement>(player: Player, element: Type, showCharacter: boolean = false, showMuteState: boolean = true): Type {
+export function createPlayerState<Type extends HTMLElement>(
+    player: Player,
+    element: Type,
+    showCharacter: boolean = false,
+    showMuteState: boolean = true
+): Type {
     element.classList.add("unselectable");
     element.classList.add("player-state");
     const playerName = document.createElement("span");
     playerName.classList.add("player-state-name");
-    playerName.innerText = player ? player.name : "You";
+    playerName.innerText = player ? player.displayName : "You";
     if (showMuteState && player && selfUser.participantId !== player.participantId) {
         const user = getUser(player.participantId);
         if (user.isAudioTrackMuted()) {
@@ -589,28 +601,16 @@ export function createPlayerState<Type extends HTMLElement>(player: Player, elem
 
 export function updateUsers() {
     const players: PlayerRecord = getPlayers();
-    Object.values(players).forEach((player) => getUser(player.participantId)?.updatePlayer(player));
+    Object.values(players).forEach(player => getUser(player.participantId)?.updatePlayer(player));
     removeChildren(playerOnlineList);
-    Object.values(players).forEach((player) => playerOnlineList.append(createPlayerState(player, document.createElement("li"), true)));
-}
-
-export function updateChat() {
-    if (!getChatEnabled()) {
-        return;
-    }
-    const now: number = new Date().getTime();
-    const children = chatList.children;
-    for (let i = 0; i < children.length; i++) {
-        const child = children[i];
-        const created: number = Number(child.getAttribute("data-created"));
-        if (now - created > 10000) {
-            child.remove();
-        }
-    }
+    Object.values(players).forEach(player =>
+        playerOnlineList.append(createPlayerState(player, document.createElement("li"), true))
+    );
 }
 
 export function toggleShowParticipantsTab(): boolean {
     setShowParticipantsTab(!getShowParticipantsTab());
+    setShowTextchatBar(false);
     return getShowParticipantsTab();
 }
 
@@ -641,7 +641,10 @@ export async function loadConferenceSettings() {
     if (audioInputDevices && audioInputDevices.length > 0) {
         if (!audioInputDevice) {
             const micDeviceId = getMicDeviceId();
-            audioInputDevice = (micDeviceId ? audioInputDevices.find(audioInputDevice => audioInputDevice.deviceId === micDeviceId) : audioInputDevices[0]) ?? audioInputDevices[0];
+            audioInputDevice =
+                (micDeviceId
+                    ? audioInputDevices.find(audioInputDevice => audioInputDevice.deviceId === micDeviceId)
+                    : audioInputDevices[0]) ?? audioInputDevices[0];
         }
         setMediaDevices(audioInputSelect, audioInputDevices, audioInputDevice);
         audioInputSelect.disabled = false;
@@ -653,10 +656,19 @@ export async function loadConferenceSettings() {
     if (audioOutputDevices && audioOutputDevices.length > 0) {
         if (!audioOutputDevice) {
             const speakerDeviceId = getSpeakerDeviceId();
-            audioOutputDevice = (speakerDeviceId ? audioOutputDevices.find(audioOutputDevice => audioOutputDevice.deviceId === speakerDeviceId) : audioOutputDevices[0]) ?? audioOutputDevices[0];
+            audioOutputDevice =
+                (speakerDeviceId
+                    ? audioOutputDevices.find(audioOutputDevice => audioOutputDevice.deviceId === speakerDeviceId)
+                    : audioOutputDevices[0]) ?? audioOutputDevices[0];
         }
         const currentAudioOutputDevice = JitsiMeetJSIntern.mediaDevices.getAudioOutputDevice();
-        setMediaDevices(audioOutputSelect, audioOutputDevices, !currentAudioOutputDevice || currentAudioOutputDevice == '' ? undefined : audioOutputDevices.find(device => device.deviceId == currentAudioOutputDevice));
+        setMediaDevices(
+            audioOutputSelect,
+            audioOutputDevices,
+            !currentAudioOutputDevice || currentAudioOutputDevice == ""
+                ? undefined
+                : audioOutputDevices.find(device => device.deviceId == currentAudioOutputDevice)
+        );
         audioOutputSelect.disabled = false;
     } else {
         audioOutputSelect.disabled = true;
@@ -666,7 +678,10 @@ export async function loadConferenceSettings() {
     if (videoInputDevices && videoInputDevices.length > 0) {
         if (!videoInputDevice) {
             const cameraDeviceId = getCameraDeviceId();
-            videoInputDevice = (cameraDeviceId ? videoInputDevices.find(videoInputDevice => videoInputDevice.deviceId === cameraDeviceId) : videoInputDevices[0]) ?? videoInputDevices[0];
+            videoInputDevice =
+                (cameraDeviceId
+                    ? videoInputDevices.find(videoInputDevice => videoInputDevice.deviceId === cameraDeviceId)
+                    : videoInputDevices[0]) ?? videoInputDevices[0];
         }
         setMediaDevices(videoInputSelect, videoInputDevices, videoInputDevice);
         videoInputSelect.disabled = false;
@@ -715,7 +730,8 @@ function setAudioOutputDevice(deviceId: string) {
     try {
         JitsiMeetJSIntern.mediaDevices.setAudioOutputDevice(deviceId);
         setSpeakerDeviceId(deviceId);
-    } catch (error) { //TODO Does this trigger if we try to set a non existing audio device as an output
+    } catch (error) {
+        //TODO Does this trigger if we try to set a non existing audio device as an output
         setSpeakerDeviceId(null);
     }
 }
@@ -728,7 +744,10 @@ function init(room: Room) {
     updateButtons();
     connection = new JitsiMeetJSIntern.JitsiConnection(null, null, optionsConnection());
     // console.debug("conference.id:", conferenceData().id); //DEBUG
-    JitsiMeetJSIntern.mediaDevices.addEventListener(JitsiMeetJSIntern.events.mediaDevices.DEVICE_LIST_CHANGED, onDeviceListChanged);
+    JitsiMeetJSIntern.mediaDevices.addEventListener(
+        JitsiMeetJSIntern.events.mediaDevices.DEVICE_LIST_CHANGED,
+        onDeviceListChanged
+    );
     connection.addEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
     connection.addEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_FAILED, onConnectionFailed);
     connection.addEventListener(JitsiMeetJSIntern.events.connection.CONNECTION_DISCONNECTED, onDisconnected);

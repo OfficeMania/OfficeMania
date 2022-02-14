@@ -1,4 +1,4 @@
-import {Direction} from "../../common/util";
+import {Direction} from "../../common";
 import { interactiveCanvas } from "../static";
 import { DoorDirection } from "./door";
 
@@ -15,12 +15,15 @@ export class Interactive {
     canvas: HTMLCanvasElement;
     input: Direction[] = [null];
     direction: DoorDirection;
+    //helps to know in wich direction the player looks while sitting (I#m open for advise how to avoid this)
+    chairDirection: Direction;
 
-    constructor(name: string, singleton: boolean = true, maxPlayer: number = 1) {
+    constructor(name: string, singleton: boolean = true, maxPlayer: number = 1, canvasElement: HTMLCanvasElement = interactiveCanvas) {
         this._name = name;
         this._singleton = singleton;
         this._maxPlayer = maxPlayer;
-        this.canvas = interactiveCanvas;
+        this.canvas = canvasElement;
+
     }
 
     /**
@@ -78,7 +81,7 @@ export class Interactive {
     }
 
     updateInput(): void {
-        console.log("No input method speccified");
+        //console.log("No input method speccified");
     }
 
     hide(): void{
@@ -95,7 +98,7 @@ export class Interactive {
 
     //need this for doors and Zitdruck
     proofIfClosed(): any{
-        console.log("No proofIfClosed method speccified");
+        //console.log("No proofIfClosed method speccified");
     }
 }
 

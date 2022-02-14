@@ -1,3 +1,5 @@
+/*.sqlite
+
 dist-server/
 /js/
 
@@ -160,3 +162,4 @@ dist/**/*
 
 # ignore yarn.lock
 yarn.lock
+/cache/

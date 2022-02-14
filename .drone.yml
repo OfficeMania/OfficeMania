@@ -5,7 +5,7 @@ name: default
 
 steps:
   - name: test
-    image: node:14.13
+    image: node:16.13
     commands:
       - npm install
       - npm test
@@ -20,6 +20,22 @@ steps:
     when:
       branch:
         - master
+
+  - name: publish-version
+    image: plugins/docker
+    settings:
+      repo:
+        from_secret: docker_repo
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      target: PRODUCTION
+      tags:
+        - ${DRONE_TAG##v}
+    when:
+      ref:
+        - refs/tags/v*.*.*
 
   - name: publish-master
     image: plugins/docker
@@ -38,7 +54,7 @@ steps:
       branch:
         - master
 
-  - name: publish-design
+  - name: publish-development
     image: plugins/docker
     settings:
       repo:
@@ -49,42 +65,8 @@ steps:
         from_secret: docker_password
       target: DEV
       tags:
-        - dev-design
+        - development
         - commit-${DRONE_COMMIT_SHA:0:8}
     when:
       branch:
-        - design
-
-  - name: publish-movement
-    image: plugins/docker
-    settings:
-      repo:
-        from_secret: docker_repo
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
-      target: DEV
-      tags:
-        - dev-movement
-        - commit-${DRONE_COMMIT_SHA:0:8}
-    when:
-      branch:
-        - movement
-
-  - name: publish-video
-    image: plugins/docker
-    settings:
-      repo:
-        from_secret: docker_repo
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
-      target: DEV
-      tags:
-       - dev-video
-       - commit-${DRONE_COMMIT_SHA:0:8}
-    when:
-      branch:
-        - video
+        - development

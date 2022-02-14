@@ -1,37 +1,53 @@
-import {Client, Room} from "colyseus.js";
-import {State} from "../common";
-import {Player, STEP_SIZE} from "./player";
-import {MapInfo, solidInfo} from "./map";
+import { Client, Room } from "colyseus.js";
+import { State } from "../common";
+import { Player, STEP_SIZE } from "./player";
+import { MapInfo, solidInfo } from "./map";
 import {
     Direction,
     KEY_CAMERA_DEVICE_ID,
     KEY_CHARACTER,
     KEY_CURRENT_VERSION,
+    KEY_DISPLAY_NAME,
     KEY_MIC_DEVICE_ID,
     KEY_SPEAKER_DEVICE_ID,
-    KEY_USERNAME,
-    MessageType
+    literallyUndefined,
+    MessageType,
 } from "../common/util";
-import {characters} from "./main";
-import {panelButtonsInteraction} from "./static";
-import {createAnimatedSpriteSheet} from "./graphic/animated-sprite-sheet";
-import AnimationData, {createAnimationData} from "./graphic/animation-data";
+import { characters, START_POSITION_X, START_POSITION_Y } from "./main";
+import { panelButtonsInteraction } from "./static";
+import AnimatedSpriteSheet, { createAnimatedSpriteSheet } from "./graphic/animated-sprite-sheet";
+import AnimationData, { createAnimationData } from "./graphic/animation-data";
+import { PlayerState } from "../common/states/player-state";
+import { textchatPlayerOnChange } from "./textchat";
+import { updateUsers } from "./conference/conference";
+import { MapData } from "./newMap";
 
 export enum InputMode {
     NORMAL = "normal",
     IGNORE = "ignore",
     INTERACTION = "interaction",
+    BACKPACK = "backpack",
 }
 
 export type InitState = [Room<State>, Player];
-export type PlayerRecord = { [key: string]: Player }
+export type PlayerRecord = { [key: string]: Player };
 
+let _client: Client = undefined;
 let _room: Room<State> = undefined;
 let _collisionInfo: solidInfo[][] = undefined;
 let _mapInfo: MapInfo = undefined;
 let _ourPlayer: Player = undefined;
 let _players: PlayerRecord = undefined;
 let _chatEnabled: boolean = false;
+let _newMap: MapData = undefined;
+
+export function setClient(client: Client) {
+    _client = client;
+}
+
+export function getClient(): Client {
+    return _client;
+}
 
 export function setRoom(room: Room<State>) {
     _room = room;
@@ -81,12 +97,33 @@ export function getChatEnabled(): boolean {
     return _chatEnabled;
 }
 
+export function areWeLoggedIn(): boolean {
+    const ourPlayer: Player = getOurPlayer();
+    return ourPlayer.loggedIn;
+}
+
+export function areWeAdmin(): boolean {
+    const ourPlayer: Player = getOurPlayer();
+    return ourPlayer.userRole === 1;
+}
+
+export function setNewMap(newMap: MapData) {
+    _newMap = newMap;
+}
+
+export function getNewMap(): MapData {
+    return _newMap;
+}
+
 /*
  * This function returns a promise that is resolve when the image is loaded
  * from the url. Note that this function currently does no error handling.
  */
 export function loadImage(url: string): Promise<HTMLImageElement> {
-    return new Promise((resolve) => {
+    if (!url) {
+        return;
+    }
+    return new Promise(resolve => {
         const image = new Image();
         image.addEventListener("load", () => resolve(image));
         image.src = url;
@@ -107,22 +144,26 @@ export function loadImage(url: string): Promise<HTMLImageElement> {
  * See: https://docs.colyseus.io/client/client/#joinorcreate-roomname-string-options-any
  */
 export async function joinAndSync(client: Client, players: PlayerRecord): Promise<InitState> {
-    return client.joinOrCreate<State>("turoom").then((room) => {
-        return new Promise((resolve) => {
+    return client.joinOrCreate<State>("turoom").then(room => {
+        return new Promise(resolve => {
             /*
-            * This method is called when the server adds new players to its state.
-            * To keep synced to the server state, we save the newly added player...
-            *
-            * See: https://docs.colyseus.io/state/schema/#onadd-instance-key
-            */
-            room.state.players.onAdd = (playerData, sessionId) => {
-                // console.log("Add", sessionId, playerData);
+             * This method is called when the server adds new players to its state.
+             * To keep synced to the server state, we save the newly added player...
+             *
+             * See: https://docs.colyseus.io/state/schema/#onadd-instance-key
+             */
+            room.state.players.onAdd = async (playerState: PlayerState, sessionId: string) => {
+                // console.log("Add", sessionId, playerState);
 
                 let player: Player = {
-                    id: sessionId,
-                    name: "",
+                    loggedIn: playerState.loggedIn,
+                    userId: playerState.userId,
+                    userRole: playerState.userRole,
+                    roomId: sessionId,
+                    username: playerState.username,
+                    displayName: playerState.displayName,
                     participantId: null,
-                    character: "Adam_48x48.png",
+                    character: playerState.character,
                     positionX: 0,
                     positionY: 0,
                     scaledX: 0,
@@ -137,7 +178,11 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                     moving: 0,
                     animationName: undefined,
                     animationStep: 0,
-                    whiteboard: 0
+                    whiteboard: 0,
+                    previousDirection: Direction.DOWN,
+                    changeDirection: false,
+                    waitBeforeMoving: 0,
+                    backpack: null,
                 };
                 players[sessionId] = player;
 
@@ -149,23 +194,30 @@ export async function joinAndSync(client: Client, players: PlayerRecord): Promis
                 if (sessionId === room.sessionId) {
                     resolve([room, player]);
                 }
-                //onUserUpdate(players);
+
+                //logic for updating playerinfo for textchat
+                playerOnChangeFunctions(playerState);
             };
 
             /*
-            * ... but once a player becomes inactive (according to the server) we
-            * also delete it from our record
-            *
-            * See: https://docs.colyseus.io/state/schema/#onremove-instance-key
-            */
-            room.state.players.onRemove = (_, sessionId) => {
-                console.log("Remove", sessionId);
+             * ... but once a player becomes inactive (according to the server) we
+             * also delete it from our record
+             *
+             * See: https://docs.colyseus.io/state/schema/#onremove-instance-key
+             */
+            room.state.players.onRemove = (playerData, sessionId) => {
+                //console.log("Remove", sessionId);
                 delete players[sessionId];
-                //onUserUpdate(players);
+                //trigger onchange when removing player
+                playerData.triggerAll();
             };
-            /**room.state.players.onChange = (_, sessionId) => {
-                onUserUpdate(players);
-            }*/
+            //room.state.players.onChange = (_, sessionId) => {}
+
+            //any time a player changes anything this happens:
+            //logic for updating playerinfo for textchat
+            room.state.players.forEach((player, sessionId) => {
+                playerOnChangeFunctions(player);
+            })
 
             /*
              * If the room has any other state that needs to be observed, the
@@ -183,18 +235,18 @@ export function setOneTimeCookie(key: string, value: string, path: string = "/")
 
 export function setCookie(key: string, value: string, expirationDays: number = 1, path: string = "/") {
     const date = new Date();
-    date.setTime(date.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
+    date.setTime(date.getTime() + expirationDays * 24 * 60 * 60 * 1000);
     document.cookie = `${key}=${value};expires=${date.toUTCString()};path=${path}`;
 }
 
 export function getCookie(key: string) {
-    return document.cookie.match('(^|;)\\s*' + key + '\\s*=\\s*([^;]+)')?.pop() || '';
+    return document.cookie.match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")?.pop() || "";
 }
 
 //const xCorrection = Math.abs(_mapInfo.lowestX - _mapInfo.highestX) - START_POSITION_X;
 //const yCorrection = Math.abs(_mapInfo.lowestX - _mapInfo.highestX) - START_POSITION_X;
-const xCorrection = -74;
-const yCorrection = -79;
+export const xCorrection = -74;
+export const yCorrection = -79;
 
 export function getCorrectedPlayerFacingCoordinates(player: Player): [number, number] {
     let deltaX = 0;
@@ -213,11 +265,51 @@ export function getCorrectedPlayerFacingCoordinates(player: Player): [number, nu
             deltaY += 2;
             break;
     }
-    return [Math.round(player.positionX / STEP_SIZE - xCorrection + deltaX), Math.round(player.positionY / STEP_SIZE - yCorrection + deltaY)];
+    return [
+        Math.round(player.positionX / STEP_SIZE - xCorrection + deltaX),
+        Math.round(player.positionY / STEP_SIZE - yCorrection + deltaY),
+    ];
+}
+
+export function getNewPlayerFacingCoordinates(player: Player): [number, number] {
+    let facingX: number;
+    let facingY: number;
+    switch (player.facing) {
+        case Direction.LEFT:
+            facingX = Math.ceil(player.positionX / STEP_SIZE / 2 - 1 + START_POSITION_X);
+            facingY = Math.floor(player.positionY / STEP_SIZE / 2 + START_POSITION_Y);
+            break;
+        case Direction.RIGHT:
+            facingX = Math.floor(player.positionX / STEP_SIZE / 2 + 1 + START_POSITION_X);
+            facingY = Math.floor(player.positionY / STEP_SIZE / 2 + START_POSITION_Y);
+            break;
+        case Direction.UP:
+            facingX = Math.floor(player.positionX / STEP_SIZE / 2 + START_POSITION_X);
+            facingY = Math.ceil(player.positionY / STEP_SIZE / 2 - 1 + START_POSITION_Y);
+            break;
+        case Direction.DOWN:
+            facingX = Math.floor(player.positionX / STEP_SIZE / 2 + START_POSITION_X);
+            facingY = Math.floor(player.positionY / STEP_SIZE / 2 + 1 + START_POSITION_Y);
+            break;
+    }
+    return [
+        facingX,
+        facingY,
+    ];
+}
+
+export function getNewCorrectedPlayerCoordinate(player: Player): [number, number] {
+    return [
+        Math.round(player.positionX / STEP_SIZE / 2 + START_POSITION_X),
+        Math.round(player.positionY / STEP_SIZE / 2 + START_POSITION_Y),
+    ]
 }
 
 export function getCorrectedPlayerCoordinates(player: Player): [number, number] {
-    return [Math.round(player.positionX / STEP_SIZE - xCorrection), Math.round(player.positionY / STEP_SIZE - yCorrection)];
+    return [
+        Math.round(player.positionX / STEP_SIZE - xCorrection),
+        Math.round(player.positionY / STEP_SIZE - yCorrection),
+    ];
 }
 
 export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionInfo: solidInfo[][]): boolean {
@@ -229,79 +321,141 @@ export function canSeeEachOther(playerOne: Player, playerTwo: Player, collisionI
     const diffX = Math.abs(oneX - twoX);
     const diffY = Math.abs(oneY - twoY);
     const length = Math.ceil(Math.sqrt(diffX * diffX + diffY * diffY));
-    const currentX = (progress) => Math.floor(oneX + (twoX - oneX) * progress);
-    const currentY = (progress) => Math.floor(oneY + (twoY - oneY) * progress);
+    const currentX = progress => Math.floor(oneX + (twoX - oneX) * progress);
+    const currentY = progress => Math.floor(oneY + (twoY - oneY) * progress);
     for (let i = 0; i <= length; i++) {
         const progress = i / length;
         const x = currentX(progress);
         const y = currentY(progress);
-        if (collisionInfo[x][y]?.isSolid || collisionInfo[x][y]?.content?.proofIfClosed()) {
+        if (collisionInfo[x][y]?.isSolid || (collisionInfo[x][y]?.content?.name === "Door" && collisionInfo[x][y]?.content?.proofIfClosed())) {
             return false;
         }
     }
     return true;
 }
 
-export function setUsername(value: string) {
-    value = value?.slice(0, 20) || "Jimmy";
-    getOurPlayer().name = value;
-    localStorage.setItem(KEY_USERNAME, value);
+// // Username
+
+// Get/Set
+
+export function getUsername(): string {
+    return getOurPlayer().username;
+}
+
+export function setUsername(value: string): void {
+    getOurPlayer().username = value;
+}
+
+// Update
+
+export function updateUsername(value: string): void {
     getRoom().send(MessageType.UPDATE_USERNAME, value);
 }
 
-export function getUsername(): string {
-    return localStorage.getItem(KEY_USERNAME);
+// // Display Name
+
+// Get/Set
+
+export function getDisplayName(): string {
+    return getOurPlayer().displayName;
+}
+
+export function setDisplayName(value: string): void {
+    getOurPlayer().displayName = value;
+}
+
+// Update
+
+export function updateDisplayName(old:string, value?: string): void {
+    getRoom().send(MessageType.UPDATE_DISPLAY_NAME, value);
+    getRoom().send(MessageType.CHAT_UPDATE_DISPLAY_NAME, old);
+}
+
+// Local Get/Set
+
+export function setLocalDisplayName(value?: string): void {
+    localStorage.setItem(KEY_DISPLAY_NAME, value);
+}
+
+export function getLocalDisplayName(): string {
+    return localStorage.getItem(KEY_DISPLAY_NAME);
+}
+
+// // Character
+
+// Get/Set
+
+export function getCharacter(): string {
+    return getOurPlayer().character;
+}
+
+export function setCharacter(value: string): void {
+    getOurPlayer().character = value;
+}
+
+// Update
+
+export function updateCharacter(value?: string): void {
+    getRoom().send(MessageType.UPDATE_CHARACTER, value);
+}
+
+// Local Get/Set
+
+export function setLocalCharacter(value: string) {
+    localStorage.setItem(KEY_CHARACTER, value);
+}
+
+export function getLocalCharacter(): string {
+    return localStorage.getItem(KEY_CHARACTER);
 }
 
 export function payRespect() {
-    console.log("F's in chat")
+    //console.log("F's in chat");
 }
 
 //sprite dimensions (from movement)
 const playerWidth: number = 48;
 const playerHeight: number = 2 * playerWidth;
 
-export async function loadCharacter() {
+export function loadUser(): void {
     //load or ask for name
     const username = getUsername();
     if (username && username !== "") {
         setUsername(username);
-    } else {
-        /*let playerNameInput = document.getElementById("name-form").submit();
-        console.log(playerNameInput.elements[0].value);
-        setUsername(playerNameInput.elements[0].value);*/
-        //setUsername(window.prompt("Gib dir einen Namen (max. 20 Chars)", "Jimmy")?.slice(0, 20) || "Jimmy");
     }
+    if (!areWeLoggedIn()) {
+        //load displayName
+        const displayName: string = getLocalDisplayName();
+        if (displayName && displayName !== "") {
+            updateDisplayName(getOurPlayer().displayName, displayName);
+        }
+    }
+}
 
+export async function loadCharacter(): Promise<void> {
     //loads character animations
-    const characterAnimationsJson: { [key: string]: any } = await fetch("/assets/animation/character-animations.json").then((response) => response.json());
+    const characterAnimationsJson: { [key: string]: any } = await fetch(
+        "/assets/animation/character-animations.json"
+    ).then(response => response.json());
     const characterAnimations: { [key: string]: AnimationData } = createAnimationData(characterAnimationsJson);
 
+    const promises: Promise<AnimatedSpriteSheet>[] = [];
     //loads character sprite paths from the server (from movement)
     for (const path of getRoom().state.playerSpritePaths) {
         //characters[path] = await loadImage("/img/characters/" + path);
-        characters[path] = await createAnimatedSpriteSheet(await loadImage("/img/characters/" + path), characterAnimations, playerWidth, playerHeight);
+        const promise: Promise<AnimatedSpriteSheet> = loadImage(`/img/characters/${path}`)
+            .then(image => createAnimatedSpriteSheet(image, characterAnimations, playerWidth, playerHeight))
+            .then(animatedSpriteSheet => characters[path] = animatedSpriteSheet);
+        promises.push(promise);
     }
-
-    //load character
-    const character = getCharacter();
-    if (character && character !== "") {
-        setCharacter(character);
+    await Promise.all(promises);
+    if (!areWeLoggedIn()) {
+        //load character
+        const character: string = getLocalCharacter();
+        if (character && character !== "") {
+            updateCharacter(character);
+        }
     }
-}
-
-export function setCharacter(value: string) {
-    const filenames = Object.keys(characters);
-    if (filenames.indexOf(value) === -1) {
-        value = filenames[0];
-    }
-    getOurPlayer().character = value;
-    localStorage.setItem(KEY_CHARACTER, value);
-    getRoom().send(MessageType.UPDATE_CHARACTER, value);
-}
-
-export function getCharacter(): string {
-    return localStorage.getItem(KEY_CHARACTER);
 }
 
 export function setMicDeviceId(value: string) {
@@ -359,12 +513,12 @@ export function createPlayerAvatar(character: string): HTMLDivElement {
 
 export function getPlayerByParticipantId(participantId: string): Player {
     if (!participantId) {
-        console.log("no pid");
+        //console.log("no pid");
         return null;
     }
     const players = getPlayers();
     if (!players) {
-        console.log("no players")
+        //console.log("no players");
         return null;
     }
     for (const player of Object.values(players)) {
@@ -372,26 +526,26 @@ export function getPlayerByParticipantId(participantId: string): Player {
             return player;
         }
     }
-    console.log("not in players")
+    //console.log("not in players");
     return null;
 }
 
 export function getPlayerByRoomId(playerId: string): Player {
     if (!playerId) {
-        console.log("no pid");
+        //console.log("no pid");
         return null;
     }
     const players = getPlayers();
     if (!players) {
-        console.log("no players")
+        //console.log("no players");
         return null;
     }
     for (const player of Object.values(players)) {
-        if (player?.id === playerId) {
+        if (player?.roomId === playerId) {
             return player;
         }
     }
-    console.log("not in players")
+    //console.log("not in players");
     return null;
 }
 
@@ -406,10 +560,18 @@ let interactionClosed: boolean = false;
 export function createCloseInteractionButton(listener: () => void) {
     const button: HTMLButtonElement = createInteractionButton(listener, "button-close-interaction");
     appendFAIcon(button, "times");
-    button.addEventListener("click", () => interactionClosed = true);
+    const span = document.createElement("span");
+    span.classList.add("tooltip-text");
+    span.innerText = "Exit";
+    button.append(span);
+    button.addEventListener("click", () => (interactionClosed = true));
 }
 
-export function createInteractionButton(listener: () => void, id: string = null, preAppend: (button: HTMLButtonElement) => void = null): HTMLButtonElement {
+export function createInteractionButton(
+    listener: () => void,
+    id: string = null,
+    preAppend: (button: HTMLButtonElement) => void = null
+): HTMLButtonElement {
     const button: HTMLButtonElement = document.createElement("button");
     if (id) {
         button.id = id;
@@ -428,4 +590,49 @@ export function consumeInteractionClosed() {
     const temp: boolean = interactionClosed;
     interactionClosed = false;
     return temp;
+}
+
+export function ensureCharacter(value?: string): string {
+    const filenames: string[] = Object.keys(characters);
+    if (filenames.indexOf(value) === -1) {
+        value = filenames[0];
+    }
+    return value;
+}
+
+
+
+//onchange listeners to be added to the players
+function playerOnChangeFunctions(playerState: PlayerState) {
+    //for updating textchat stuff
+    textchatPlayerOnChange(playerState);
+    //for user online list
+    updateUsers();
+}
+
+
+export function sendNotification(message: string) {
+    if (!("Notification" in window)) {
+        console.warn("This browser does not support desktop notifications.");
+    } else if (window.Notification.permission === "granted") {
+        makeNotification(message);
+    } else if (window.Notification.permission !== "denied") {
+        //we send even though the person doesnt want to get notifications
+        window.Notification.requestPermission(function (permission) {
+            if (permission === "granted") {
+                makeNotification(message);
+            }
+        });
+    }
+}
+
+function makeNotification(message: string) {
+    let notification = new window.Notification("OfficeMania", {
+        body: message,
+        icon: "../../assets/img/favicon.ico"
+    });
+    notification.onclick = function () {
+        window.focus();
+    }
+    return notification;
 }

@@ -1,15 +1,11 @@
-import {Interactive} from "./interactive";
-import {Room} from "colyseus.js";
-import {State} from "../../common";
-import {createCloseInteractionButton, getRoom, removeCloseInteractionButton} from "../util";
-import {ChessState} from "../../common/rooms/schema/state";
-import {MessageType} from "../../common/util";
-import {checkInputMode} from "../main";
-import {ChessColor, getOppositeChessColor} from "../../common/handler/chesshandler";
-import {chessExportButton, chessImportButton, interactiveBarChess} from "../static";
-import { createTextChangeRange } from "typescript";
+import { Interactive } from "./interactive";
+import { Room } from "colyseus.js";
+import { ChessColor, ChessState, getOppositeChessColor, MessageType, State } from "../../common";
+import { createCloseInteractionButton, getRoom, removeCloseInteractionButton } from "../util";
+import { checkInputMode } from "../main";
+import { chessExportButton, chessImportButton, interactiveBarChess } from "../static";
 
-const jsChessEngine = require('js-chess-engine');
+const jsChessEngine = require("js-chess-engine");
 
 enum ChessSquareColor {
     NORMAL_WHITE = "white",
@@ -255,19 +251,19 @@ function getCoordinates(field: string, turned: boolean): [number, number] {
 }
 
 const imageSources: { [key: string]: string } = {
-    'K': "https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg",
-    'Q': "https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg",
-    'R': "https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg",
-    'B': "https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg",
-    'N': "https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg",
-    'P': "https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg",
-    'k': "https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg",
-    'q': "https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg",
-    'r': "https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg",
-    'b': "https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg",
-    'n': "https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg",
-    'p': "https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg"
-}
+    "K": "https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg",
+    "Q": "https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg",
+    "R": "https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg",
+    "B": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg",
+    "N": "https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg",
+    "P": "https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg",
+    "k": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg",
+    "q": "https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg",
+    "r": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg",
+    "b": "https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg",
+    "n": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg",
+    "p": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg",
+};
 
 const images: { [key: string]: HTMLImageElement } = {};
 
@@ -338,7 +334,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         if (!ourGame) {
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.room.send(MessageType.CHESS_INTERACTION);
-            console.debug("Requesting ChessState...");
+            //console.debug("Requesting ChessState...");
             this.show();
             checkInputMode();
             this.initListeners();
@@ -348,11 +344,14 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         }
     }
 
+    mouseDownListener = (event) => this.onClick(event);
+    importButtonListener = () => this.loadGameFromClipboard();
+
     private initListeners() { //TODO Implement option to offer a draw if half moves is greater than 100 (50 move rule) and implement the 75 move rule
-        this.canvas.addEventListener('mousedown', (event) => this.onClick(event));
+        this.canvas.addEventListener("mousedown", this.mouseDownListener);
         this.room.onMessage(MessageType.CHESS_INIT, gameId => {
             if (!gameId) {
-                console.warn("Got CHESS_INIT message without a gameId")
+                console.warn("Got CHESS_INIT message without a gameId");
                 this.leave();
                 return;
             }
@@ -372,7 +371,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
             ourGame.move(message.from, message.to);
             updateGame();
         });
-        chessImportButton.addEventListener("click", () => this.loadGameFromClipboard());
+        chessImportButton.addEventListener("click", this.importButtonListener);
     }
 
     isFinished(): boolean {
@@ -404,8 +403,9 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         this.hideButtons();
         this.hide();
         this.canvas.onmousedown = null;
-        chessImportButton.click = null;
-        this.room.removeAllListeners();
+        this.canvas.removeEventListener("mousedown", this.mouseDownListener);
+        chessImportButton.removeEventListener("click", this.importButtonListener);
+        //this.room.removeAllListeners(); //Dangerous move
         this.room.send(MessageType.CHESS_LEAVE);
         resetVariables();
         checkInputMode();
@@ -425,7 +425,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         chessExportButton.style.visibility = "hidden";
     }
 
-    private onClick(event: MouseEvent) { //FIXME Closing and opening a game again removes the drawing of possible moves
+    private onClick(event: MouseEvent) {
         if (!ourGame || ourGame.board?.configuration?.isFinished) {
             return;
         }
@@ -444,9 +444,9 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         }
         // console.debug("field:", field);
         if (currentField && currentMoves && currentMoves.includes(field)) {
-            console.debug(`move from ${currentField} to ${field}`);
+            //console.debug(`move from ${currentField} to ${field}`);
             // ourGame.move(currentField, field);
-            this.room.send(MessageType.CHESS_MOVE, {from: currentField, to: field});
+            this.room.send(MessageType.CHESS_MOVE, { from: currentField, to: field });
             setCurrentMoves(null);
             // redraw(canvasChess, contextChess, ourGame.board.configuration);
             return;
@@ -457,10 +457,10 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         }
         const moves: string[] = ourGame.moves(field);
         if (!moves || moves.length === 0) {
-            console.debug("no moves available for this field");
+            //console.debug("no moves available for this field");
             setCurrentMoves(null);
         } else {
-            console.debug("moves:", moves);
+            //console.debug("field:", field, "moves:", moves);
             setCurrentMoves(field, moves);
         }
         // redraw(canvasChess, contextChess, ourGame.board.configuration, moves);
