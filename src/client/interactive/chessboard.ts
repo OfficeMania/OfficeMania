@@ -344,8 +344,11 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         }
     }
 
+    mouseDownListener = (event) => this.onClick(event);
+    importButtonListener = () => this.loadGameFromClipboard();
+
     private initListeners() { //TODO Implement option to offer a draw if half moves is greater than 100 (50 move rule) and implement the 75 move rule
-        this.canvas.addEventListener('mousedown', (event) => this.onClick(event));
+        this.canvas.addEventListener('mousedown', this.mouseDownListener);
         this.room.onMessage(MessageType.CHESS_INIT, gameId => {
             if (!gameId) {
                 console.warn("Got CHESS_INIT message without a gameId")
@@ -368,7 +371,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
             ourGame.move(message.from, message.to);
             updateGame();
         });
-        chessImportButton.addEventListener("click", () => this.loadGameFromClipboard());
+        chessImportButton.addEventListener("click", this.importButtonListener);
     }
 
     isFinished(): boolean {
@@ -400,7 +403,8 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
         this.hideButtons();
         this.hide();
         this.canvas.onmousedown = null;
-        chessImportButton.click = null;
+        this.canvas.removeEventListener("mousedown", this.mouseDownListener);
+        chessImportButton.removeEventListener("click", this.importButtonListener);
         //this.room.removeAllListeners(); //Dangerous move
         this.room.send(MessageType.CHESS_LEAVE);
         resetVariables();
@@ -456,7 +460,7 @@ export class ChessBoard extends Interactive { //TODO Use the rest of the space o
             console.debug("no moves available for this field");
             setCurrentMoves(null);
         } else {
-            console.debug("moves:", moves);
+            console.debug("field:", field, "moves:", moves);
             setCurrentMoves(field, moves);
         }
         // redraw(canvasChess, contextChess, ourGame.board.configuration, moves);
