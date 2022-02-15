@@ -45,7 +45,7 @@
 
             </div>
         </div>
-        
+
         <div id="settings-modal" class="modal fade" role="dialog">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -179,7 +179,7 @@
                             <span>Press</span>
                             <img src="../assets/img/transparent_32x32.png" alt="E-Key" class="key key-small"
                                  style="background-position: calc(6 * -32px) calc(-37px);">
-                            <span>to interact with objects like: doors, sticky notes, whiteboards and more. While looking 
+                            <span>to interact with objects like: doors, sticky notes, whiteboards and more. While looking
                                 at interactive objects, there will be a hint in the bottom left corner of your screen.</span>
                             <br><br>
                             <span>Please remember to give OfficeMania permisson to access the camera and the microphone and send you notifications.</span>
@@ -241,7 +241,7 @@
                         <button id="button-whiteboard-clear"><em class="fa fa-trash"></em><span></span></button>
                         <button id="button-whiteboard-pen"><em class="fas fa-pen"></em><span></span></button>
                         <button id="button-whiteboard-eraser"><em class="fa fa-eraser"></em><span></span></button>
-                        <div>    
+                        <div>
                             <select id="whiteboard-size-selector">
                                 <option class="size" value="5">small</option>
                                 <option class="size" value="10">medium</option>
@@ -252,15 +252,17 @@
                             </style>
                             <div><em class="fa fa-circle" id="whiteboard-size-icon"></em><span></span></div>
                         </div>
-                        <select id="whiteboard-color-selector">
-                            <option class="black" value="0">black</option> 
-                            <option class="red" value="2">red</option>
-                            <option class="pink" value="3">pink</option>
-                            <option class="orange" value="4">orange</option>
-                            <option class="yellow" value="5">yellow</option>
-                            <option class="green" value="6">green</option>
-                            <option class="blue" value="7">blue</option>
-                        </select>
+                        <input type="color" id="whiteboard-input-color" name="color" value="#000000FF" list="whiteboard-input-color-presets">
+                        <datalist id="whiteboard-input-color-presets">
+                            <option>#000000FF</option> <!-- Black -->
+                            <option>#FFFFFFFF</option> <!-- White -->
+                            <option>#FF0000FF</option> <!-- Red -->
+                            <option>#FF00FFFF</option> <!-- Magenta -->
+                            <option>#FF8800FF</option> <!-- Orange -->
+                            <option>#FFFF00FF</option> <!-- Yellow -->
+                            <option>#00FF00FF</option> <!-- Green -->
+                            <option>#0000FFFF</option> <!-- Blue -->
+                        </datalist>
                         <style type="text/css">
                             option.black {background-color: black; color: white;}
                             option.red {background-color: red; color: black;}

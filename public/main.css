@@ -61,7 +61,7 @@ body {
 }
 
 #button-close-interaction {
-    background-color: #ff5d5d !important; 
+    background-color: #ff5d5d !important;
 }
 
 #panel-buttons #group-right {
@@ -95,13 +95,13 @@ button:active{
     transform: translateY(2px);
 }
 
-  
+
 /* Tooltip text */
 
 #panel-buttons .tooltip-text {
     position: absolute;
     visibility: hidden;
-    
+
     background-color: #ffffffaa;
     font-size: 10px;
     color: #000;
@@ -362,7 +362,7 @@ button:active{
     align-items: center;
 }
 
-#whiteboard-color-selector {
+#whiteboard-input-color {
     visibility: hidden;
     width: 40px;
     height: 40px;

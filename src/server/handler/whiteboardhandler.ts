@@ -72,8 +72,7 @@ function onPath(room: Room<State>, client: Client, message: WhiteboardPathSegmen
     const whiteboardIndex: number = message.whiteboardId;
     const isEnd: boolean = message.isEnd;
     const points: number[] | undefined = message.points;
-    const colorId: number | undefined = message.colorId;
-    const color: string | undefined = colorId !== undefined ? colors?.[colorId] : undefined;
+    const color: string | undefined = message.color;
     const size: number | undefined = message.size;
     const whiteboard: WhiteboardState = room.state.whiteboards.at(whiteboardIndex);
     const whiteboardPlayer: WhiteboardPlayerState = whiteboard.whiteboardPlayers[client.sessionId];
@@ -81,10 +80,8 @@ function onPath(room: Room<State>, client: Client, message: WhiteboardPathSegmen
     if (points) {
         currentPath.points.push(...points);
     }
-    if (!!color) {
+    if (color) {
         currentPath.color = color;
-    } else if (colorId === -1) {
-        currentPath.color = "eraser";
     }
     if (!!size) {
         currentPath.size = size;
