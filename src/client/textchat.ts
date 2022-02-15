@@ -13,10 +13,17 @@ import {
     textchatUsersButton,
     textchatSendButton,
 } from "./static";
-import { getOurPlayer, getRoom, sendNotification } from "./util";
+import {
+    getOurPlayer,
+    getPlayersByUserId,
+    getRoom,
+    sendNotification,
+} from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chat-handler";
 import { PlayerState } from "../common/states/player-state";
 import { getUser, setShowParticipantsTab } from "./conference/conference";
+import { Player } from "./player";
+import { getRoleColor } from "../common";
 
 const patternUrl: RegExp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
 
@@ -217,7 +224,7 @@ function onMessageLogs(chatMessages: ChatMessage[]): void {
                 clearTextchatBar();
             }
         }
-        
+
     });
     chatMessages.forEach(message => {
         onMessage(message);
@@ -259,10 +266,13 @@ function addMessageToBar(chatMessage: ChatMessage) {
     const messageDiv = document.createElement("div");
     const messageLine = document.createElement("p");
     const messageTime = document.createElement("p");
+    const players: Player[] = getPlayersByUserId(chatMessage.userId);
+    const color: string = getRoleColor(players?.[0]?.userRole).nameColorChat;
     messageTime.id = "message-time";
     messageLine.id = "message-line";
     messageTime.innerText = `${chatMessage.timestamp}  `;
     messageLine.innerText = `${chatMessage.name}: ${chatMessage.message}`;
+    messageLine.innerHTML = `<span style="color: ${color}; -webkit-text-fill-color: ${color};">${chatMessage.name}</span>` + messageLine.innerHTML.substring(chatMessage.name.length);
     messageLine.innerHTML = messageLine.innerHTML.replace(patternUrl, '<a href="$&" target="_blank">$&</a>');
     messageDiv.append(messageTime);
     messageDiv.append(messageLine);
@@ -511,10 +521,10 @@ function sendChatNotification(message: ChatMessage) {
             textchatChatsButton.classList.add("unread");
         }
         else if (textchatDropdownChats.children[i].id === message.chatId) {
-            
+
             textchatDropdownChats.children[i].classList.add("unread");
         }
-    } 
+    }
 }
 
 function removeUnreadFromChatButton() {
