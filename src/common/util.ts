@@ -185,22 +185,3 @@ export interface InviteCodeToken {
     created: Date;
     lastUsed?: Date;
 }
-
-export const ROLE_COLORS = {
-    // User
-    0: "#FFFFFFFF",
-    USER: "#FFFFFFFF",
-    // Admin
-    1: "#E00000FF",
-    ADMIN: "#E00000FF",
-    // Mod
-    2: "#00E000FF",
-    MOD: "#00E000FF",
-    // VIP
-    3: "#55FFFFFF",
-    VIP: "#55FFFFFF",
-};
-
-export function getColorForRole(roleId?: number): string {
-    return ROLE_COLORS?.[roleId] ?? ROLE_COLORS.USER;
-}

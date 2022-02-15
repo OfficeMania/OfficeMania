@@ -23,7 +23,7 @@ import { SelfUser, User } from "./entities";
 import { Room } from "colyseus.js";
 import { solidInfo } from "../map";
 import { Player } from "../player";
-import { getColorForRole, MessageType } from "../../common";
+import { getRoleColor, MessageType } from "../../common";
 import { camButton, muteButton, shareButton } from "../static";
 import { setShowTextchatBar } from "../textchat";
 
@@ -577,7 +577,7 @@ export function createPlayerState<Type extends HTMLElement>(
     const playerName = document.createElement("span");
     if (player?.userRole || !player) {
         const role: number | undefined = player ? player?.userRole : getOurPlayer()?.userRole;
-        const color: string = getColorForRole(role);
+        const color: string = getRoleColor(role).nameColor;
         playerName.style.color = color;
         /**
          * -webkit-text-fill-color
