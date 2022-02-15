@@ -23,7 +23,7 @@ import { SelfUser, User } from "./entities";
 import { Room } from "colyseus.js";
 import { solidInfo } from "../map";
 import { Player } from "../player";
-import { MessageType } from "../../common";
+import { getColorForRole, MessageType } from "../../common";
 import { camButton, muteButton, shareButton } from "../static";
 import { setShowTextchatBar } from "../textchat";
 
@@ -575,6 +575,21 @@ export function createPlayerState<Type extends HTMLElement>(
     element.classList.add("unselectable");
     element.classList.add("player-state");
     const playerName = document.createElement("span");
+    if (player?.userRole || !player) {
+        const role: number | undefined = player ? player?.userRole : getOurPlayer()?.userRole;
+        const color: string = getColorForRole(role);
+        playerName.style.color = color;
+        /**
+         * -webkit-text-fill-color
+         *
+         * Non-standard: This feature is non-standard and is not on a standards track.
+         * Do not use it on production sites facing the Web: it will not work for every user.
+         * There may also be large incompatibilities between implementations and the behavior may change in the future.
+         *
+         * Source: https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-fill-color
+         */
+        playerName.style.webkitTextFillColor = color;
+    }
     playerName.classList.add("player-state-name");
     playerName.innerText = player ? player.displayName : "You";
     if (showMuteState && player && selfUser.participantId !== player.participantId) {
