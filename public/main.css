@@ -465,6 +465,7 @@ button:active{
 }
 
 #player-online-container {
+    z-index: 2;
     position: fixed;
     background-color: var(--bg-primary-op);
 
@@ -512,6 +513,7 @@ button:active{
 }
 
 #textchat-container {
+    z-index: 2;
     right: 0;
     position: fixed;
     background-color: var(--bg-primary-op);
