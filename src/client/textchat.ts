@@ -1,5 +1,5 @@
 import { MessageType } from "../common/util";
-import { checkInputMode } from "./main";
+import { checkInputMode, setShowPlayersRoomTab } from "./main";
 import {
     textchatArea,
     textchatBar,
@@ -80,6 +80,7 @@ function toggleTextchatBar() {
     }
     checkInputMode();
     setShowParticipantsTab(false);
+    setShowPlayersRoomTab(false);
 }
 
 //getter of _showTextchat

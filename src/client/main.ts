@@ -1,13 +1,16 @@
 import { Client, Room } from "colyseus.js";
-import { TILE_SIZE } from "./player";
+import { Player, TILE_SIZE } from "./player";
 import {
     areWeAdmin,
     areWeLoggedIn,
     createPlayerAvatar,
     getCharacter,
+    getCollisionInfo,
+    getCorrectedPlayerCoordinates,
     getCurrentVersion,
     getDisplayName,
     getOurPlayer,
+    getPlayers,
     getUsername,
     InitState,
     InputMode,
@@ -38,9 +41,11 @@ import {
 import { convertMapData, fillSolidInfos, MapInfo, solidInfo } from "./map";
 import {
     applyConferenceSettings,
+    createPlayerState,
     initConference,
     loadConferenceSettings,
     nearbyPlayerCheck,
+    setShowParticipantsTab,
     toggleMuteByType,
     toggleSharing,
     toggleShowParticipantsTab,
@@ -74,6 +79,8 @@ import {
     loginButton,
     logoutButton,
     muteButton,
+    playersRoomContainer,
+    playersRoomList,
     settingsApplyButton,
     settingsButton,
     settingsModal,
@@ -82,7 +89,8 @@ import {
     spriteSheet,
     usernameInput,
     usernameInputWelcome,
-    usersButton,
+    usersButtonOnline,
+    usersButtonRoom,
     version,
     welcomeModal,
     welcomeOkButton,
@@ -90,7 +98,7 @@ import {
 import { initDoorState, setDoorTextures, updateDoors } from "./interactive/door";
 import { initLoadingScreenLoading, setShowLoadingscreen } from "./loadingscreen";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
-import { getInFocus, initChatListener } from "./textchat";
+import { getInFocus, initChatListener, setShowTextchatBar } from "./textchat";
 import { Backpack } from "./backpack";
 import { literallyUndefined, MessageType } from "../common/util";
 import { State } from "../common";
@@ -136,7 +144,8 @@ loginButton.addEventListener("click", () => login());
 logoutButton.addEventListener("click", () => logout());
 
 settingsButton.addEventListener("click", () => onSettingsOpen());
-usersButton.addEventListener("click", () => toggleShowParticipantsTab());
+usersButtonOnline.addEventListener("click", () => toggleShowParticipantsTab());
+usersButtonRoom.addEventListener("click", () => toggleShowPlayersRoomTab());
 
 settingsOkButton.addEventListener("click", () => applySettings());
 settingsApplyButton.addEventListener("click", () => applySettings());
@@ -643,8 +652,10 @@ async function main() {
         // Draw each player
         drawPlayers(ourPlayer, players, characters, ctx, width, height);
 
+        showPlayersRoomTab && updatePlayersRoomList(ourPlayer);
+
         //draw press e thing
-        //we still want the e even though we are sitting on a chair because 
+        //we still want the e even though we are sitting on a chair because
         const content: Interactive = checkInteraction()?.content;
         if ((content && content.name !== "Door")|| checkNewInteraction()) {
             ctx.globalAlpha = 0.75;
@@ -676,3 +687,40 @@ async function main() {
 }
 
 main();
+
+function getRoomIdByPlayer(player: Player): string {
+    const collisionInfo: solidInfo[][] = getCollisionInfo();
+    const [posX, posY] = getCorrectedPlayerCoordinates(player);
+    return String(collisionInfo[posX][posY]?.roomId);
+}
+
+function updatePlayersRoomList(ourPlayer: Player): void {
+    const roomId: string = getRoomIdByPlayer(ourPlayer);
+    const players: Player[] = Object.values(getPlayers()).filter(player => getRoomIdByPlayer(player) === roomId);
+    removeChildren(playersRoomList);
+    Object.values(players).forEach(player =>
+        playersRoomList.append(createPlayerState(player, document.createElement("li"), true))
+    );
+}
+
+let showPlayersRoomTab: boolean;
+
+export function toggleShowPlayersRoomTab(): boolean {
+    setShowPlayersRoomTab(!getShowPlayersRoomTab());
+    setShowTextchatBar(false);
+    setShowParticipantsTab(false);
+    return getShowPlayersRoomTab();
+}
+
+export function getShowPlayersRoomTab(): boolean {
+    return showPlayersRoomTab;
+}
+
+export function setShowPlayersRoomTab(show: boolean) {
+    if (show) {
+        playersRoomContainer.classList.add("hover");
+    } else {
+        playersRoomContainer.classList.remove("hover");
+    }
+    showPlayersRoomTab = show;
+}

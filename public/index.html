@@ -37,7 +37,8 @@
             <div id="group-right">
                 <button id="button-admin-config" aria-label="Open Admin Configuration" hidden><em class="fa fa-tools"></em><span class="tooltip-text">Open Admin Configuration</span></button>
                 <button id="button-settings" aria-label="Open Settings" data-bs-toggle="modal" data-bs-target="#settings-modal"><em class="fa fa-cog"></em><span class="tooltip-text">Settings</span></button>
-                <button id="button-users" aria-label="Show Users"><em class="fa fa-users"></em><span class="tooltip-text">Users</span></button>
+                <button id="button-users-room" aria-label="Show Room Users"><em class="fa fa-user-friends"></em><span class="tooltip-text">Room Users</span></button>
+                <button id="button-users-online" aria-label="Show Online Users"><em class="fa fa-users"></em><span class="tooltip-text">Online Users</span></button>
                 <button id="button-textchat" aria-label="Toggle Textchat"><em class="fas fa-comments"></em><span class="tooltip-text">Chat</span></button>
                 <button id="button-help"data-bs-toggle="modal" data-bs-target="#help-modal"><em class="fa fa-question-circle"></em><span class="tooltip-text">Help</span></button>
                 <button id="button-login" aria-label="Logout"><em class="fas fa-sign-in-alt"></em><span class="tooltip-text">Login</span></button>
@@ -201,8 +202,14 @@
             <div id="focus-bar"></div>
         </div>
 
-        <div id="player-online-container" class="horizontal-animation">
-            <ul id="player-online-list"></ul>
+        <div id="players-online-container" class="players-container horizontal-animation">
+            <h1 class="unselectable player-state">Online Users</h1>
+            <ul id="players-online-list" class="players-list"></ul>
+        </div>
+
+        <div id="players-room-container" class="players-container horizontal-animation">
+            <h1 class="unselectable player-state">Room Users</h1>
+            <ul id="players-room-list" class="players-list"></ul>
         </div>
 
         <div id="textchat-container" class="horizontal-animation">

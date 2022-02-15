@@ -26,6 +26,7 @@ import { Player } from "../player";
 import { getRoleColor, MessageType } from "../../common";
 import { camButton, muteButton, shareButton } from "../static";
 import { setShowTextchatBar } from "../textchat";
+import { setShowPlayersRoomTab } from "../main";
 
 export { init as initConference, trackTypeAudio, trackTypeVideo, trackTypeDesktop };
 
@@ -60,8 +61,8 @@ const audioInputSelect = $<HTMLSelectElement>("audio-input-select");
 const audioOutputSelect = $<HTMLSelectElement>("audio-output-select");
 const videoInputSelect = $<HTMLSelectElement>("video-input-select");
 
-const playerOnlineContainer = $<HTMLUListElement>("player-online-container");
-const playerOnlineList = $<HTMLUListElement>("player-online-list");
+const playersOnlineContainer = $<HTMLUListElement>("players-online-container");
+const playersOnlineList = $<HTMLUListElement>("players-online-list");
 
 const selfUser = new SelfUser(audioBar, videoBar, focusBar);
 const users: User[] = [];
@@ -617,15 +618,16 @@ export function createPlayerState<Type extends HTMLElement>(
 export function updateUsers() {
     const players: PlayerRecord = getPlayers();
     Object.values(players).forEach(player => getUser(player.participantId)?.updatePlayer(player));
-    removeChildren(playerOnlineList);
+    removeChildren(playersOnlineList);
     Object.values(players).forEach(player =>
-        playerOnlineList.append(createPlayerState(player, document.createElement("li"), true))
+        playersOnlineList.append(createPlayerState(player, document.createElement("li"), true))
     );
 }
 
 export function toggleShowParticipantsTab(): boolean {
     setShowParticipantsTab(!getShowParticipantsTab());
     setShowTextchatBar(false);
+    setShowPlayersRoomTab(false);
     return getShowParticipantsTab();
 }
 
@@ -635,9 +637,9 @@ export function getShowParticipantsTab(): boolean {
 
 export function setShowParticipantsTab(setTo: boolean) {
     if (setTo) {
-        playerOnlineContainer.classList.add("hover");
+        playersOnlineContainer.classList.add("hover");
     } else {
-        playerOnlineContainer.classList.remove("hover");
+        playersOnlineContainer.classList.remove("hover");
     }
     showParticipantsTab = setTo;
 }

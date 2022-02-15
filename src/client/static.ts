@@ -15,7 +15,8 @@ export const settingsButton = $<HTMLButtonElement>("button-settings");
 export const adminConfigButton = $<HTMLButtonElement>("button-admin-config");
 export const welcomeModal = $<HTMLDivElement>("welcome-modal");
 export const helpButton = $<HTMLButtonElement>("button-help");
-export const usersButton = $<HTMLButtonElement>("button-users");
+export const usersButtonOnline = $<HTMLButtonElement>("button-users-online");
+export const usersButtonRoom = $<HTMLButtonElement>("button-users-room");
 export const textchatButton = $<HTMLButtonElement>("button-textchat");
 export const loginButton = $<HTMLButtonElement>("button-login");
 export const logoutButton = $<HTMLButtonElement>("button-logout");
@@ -58,5 +59,9 @@ export const sizeSelector = $<HTMLSelectElement>("whiteboard-size-selector");
 export const whiteboardPanel = $<HTMLDivElement>("interactive-bar-whiteboard");
 export const whiteboardSizeIcon = $<HTMLElement>("whiteboard-size-icon");
 export const helpVersionInfo = $<HTMLDivElement>("help-version-info");
+
+export const playersRoomContainer = $<HTMLUListElement>("players-room-container");
+export const playersRoomList = $<HTMLUListElement>("players-room-list");
+
 // @ts-ignore
 export const bsWelcomeModal = new bootstrap.Modal(document.getElementById('welcome-modal'));
