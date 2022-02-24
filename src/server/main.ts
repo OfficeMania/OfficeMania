@@ -1,11 +1,12 @@
 import "reflect-metadata";
 
-import http from "http";
+import http, { IncomingMessage } from "http";
 import express, { Express } from "express";
 import cors from "cors";
 import compression from "compression";
 import path from "path";
 import { Server } from "colyseus";
+import { WebSocketTransport } from "@colyseus/ws-transport";
 
 import { TURoom } from "./rooms/turoom";
 import { DEBUG, IS_DEV, SERVER_PORT } from "./config";
@@ -111,16 +112,17 @@ async function setupApp(): Promise<Express> {
 function setupGameServer(app: Express): Server {
     // Create game server
     const gameServer: Server = new Server({
-        server: http.createServer(app),
-        express: app,
-        verifyClient: (info, next) => {
-            // Make "session" available for the WebSocket connection (during onAuth())
-            getSessionHandler()(info.req as any, {} as any, () => next(true));
-        },
-        //pingInterval: 0, // Number of milliseconds for the server to "ping" the clients. Default: 3000
-        // The clients are going to be forcibly disconnected if they can't respond after pingMaxRetries retries.
-        // Maybe this solves the problem that you can't move after some time doing nothing on the website.
-        //pingMaxRetries: 2, // Maximum allowed number of pings without a response. Default: 2.
+        transport: new WebSocketTransport({
+            server: http.createServer(app),
+            verifyClient: (info: { origin: string; secure: boolean; req: IncomingMessage }, next) => {
+                // Make "session" available for the WebSocket connection (during onAuth())
+                getSessionHandler()(info.req as any, {} as any, () => next(true));
+            },
+            //pingInterval: 0, // Number of milliseconds for the server to "ping" the clients. Default: 3000
+            // The clients are going to be forcibly disconnected if they can't respond after pingMaxRetries retries.
+            // Maybe this solves the problem that you can't move after some time doing nothing on the website.
+            //pingMaxRetries: 2, // Maximum allowed number of pings without a response. Default: 2.
+        }),
     });
 
     // Register the TURoom (defined in src/common/rooms/turoom.ts)
