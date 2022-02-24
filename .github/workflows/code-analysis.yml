@@ -14,6 +14,15 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.13'
+          cache: 'npm'
+
+      - run: npm install
+
       - name: SonarQube Scan
         uses: kitabisa/sonarqube-action@v1.1.0
         with:
