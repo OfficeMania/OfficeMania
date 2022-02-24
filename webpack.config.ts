@@ -3,6 +3,8 @@ import {CleanWebpackPlugin} from 'clean-webpack-plugin';
 import {Configuration} from 'webpack';
 
 const IS_DEV = process.env.NODE_ENV !== "production";
+const WEBPACK_PORT = 8085;
+const SERVER_PORT = Number(process.env.PORT) || 3000;
 
 const webpack = require('webpack');
 
