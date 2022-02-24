@@ -1,0 +1,4 @@
+scopes:
+  - deps
+  - ci
+  - ci/cd
