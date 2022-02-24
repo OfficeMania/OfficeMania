@@ -1,7 +1,7 @@
 import { Room } from "colyseus.js";
 import { Player, STEP_SIZE } from "./player";
 import { getCollisionInfo, getCorrectedPlayerCoordinates, getRoom, PlayerRecord } from "./util";
-import { PlayerState, State } from "../common";
+import { getRoleColor, State } from "../common";
 import { Direction } from "../common/util";
 import AnimatedSpriteSheet from "./graphic/animated-sprite-sheet";
 import { Chair } from "./interactive/chairs";
@@ -32,7 +32,7 @@ function calculateAnimation(player: Player) {
         } else {
             direction = player.facing;
         }
-        
+
         player.moving = 0;
         player.standing++;
         const number = player.standing % 300;
@@ -166,6 +166,6 @@ function drawPlayer(
     context.fillStyle = "rgba(100, 100, 100, 0.5)";
     context.fillRect(playerX - textMetrics.width / 2 + 20, playerY - 4, textMetrics.width + 8, 24);
     // Draw Player Name
-    context.fillStyle = "rgba(255, 255, 255, 1)";
+    context.fillStyle = getRoleColor(player.userRole).nameColor;
     context.fillText(player.displayName, playerX + 24, playerY + 12);
 }

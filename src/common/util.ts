@@ -176,6 +176,7 @@ export interface LoginInfo {
 }
 
 export interface SignupInfo {
+    isLoginDisabled?: boolean,
     isInviteCodeRequiredForSignup?: boolean,
 }
 

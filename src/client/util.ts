@@ -511,6 +511,17 @@ export function createPlayerAvatar(character: string): HTMLDivElement {
     return playerAvatar;
 }
 
+export function getPlayersByUserId(userId?: string): Player[] {
+    if (!userId) {
+        return [];
+    }
+    const players: PlayerRecord = getPlayers();
+    if (!players) {
+        return [];
+    }
+    return Object.values(players).filter(player => player?.userId === userId);
+}
+
 export function getPlayerByParticipantId(participantId: string): Player {
     if (!participantId) {
         //console.log("no pid");

@@ -1,0 +1,16 @@
+name: Create GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  Release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          bodyFile: "CHANGELOG.md"
+          token: ${{ secrets.GITHUB_TOKEN }}

@@ -177,5 +177,8 @@ export async function getLoginInfo(): Promise<LoginInfo> {
 }
 
 export async function getSignupInfo(): Promise<SignupInfo> {
-    return { isInviteCodeRequiredForSignup: await isInviteCodeRequiredForSignup() };
+    return {
+        isLoginDisabled: !(await isLoginEnabled()),
+        isInviteCodeRequiredForSignup: await isInviteCodeRequiredForSignup(),
+    };
 }

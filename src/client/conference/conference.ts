@@ -23,9 +23,10 @@ import { SelfUser, User } from "./entities";
 import { Room } from "colyseus.js";
 import { solidInfo } from "../map";
 import { Player } from "../player";
-import { MessageType } from "../../common";
+import { getRoleColor, MessageType } from "../../common";
 import { camButton, muteButton, shareButton } from "../static";
 import { setShowTextchatBar } from "../textchat";
+import { setShowPlayersRoomTab } from "../main";
 
 export { init as initConference, trackTypeAudio, trackTypeVideo, trackTypeDesktop };
 
@@ -60,8 +61,8 @@ const audioInputSelect = $<HTMLSelectElement>("audio-input-select");
 const audioOutputSelect = $<HTMLSelectElement>("audio-output-select");
 const videoInputSelect = $<HTMLSelectElement>("video-input-select");
 
-const playerOnlineContainer = $<HTMLUListElement>("player-online-container");
-const playerOnlineList = $<HTMLUListElement>("player-online-list");
+const playersOnlineContainer = $<HTMLUListElement>("players-online-container");
+const playersOnlineList = $<HTMLUListElement>("players-online-list");
 
 const selfUser = new SelfUser(audioBar, videoBar, focusBar);
 const users: User[] = [];
@@ -575,6 +576,21 @@ export function createPlayerState<Type extends HTMLElement>(
     element.classList.add("unselectable");
     element.classList.add("player-state");
     const playerName = document.createElement("span");
+    if (player?.userRole || !player) {
+        const role: number | undefined = player ? player?.userRole : getOurPlayer()?.userRole;
+        const color: string = getRoleColor(role).nameColor;
+        playerName.style.color = color;
+        /**
+         * -webkit-text-fill-color
+         *
+         * Non-standard: This feature is non-standard and is not on a standards track.
+         * Do not use it on production sites facing the Web: it will not work for every user.
+         * There may also be large incompatibilities between implementations and the behavior may change in the future.
+         *
+         * Source: https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-fill-color
+         */
+        playerName.style.webkitTextFillColor = color;
+    }
     playerName.classList.add("player-state-name");
     playerName.innerText = player ? player.displayName : "You";
     if (showMuteState && player && selfUser.participantId !== player.participantId) {
@@ -602,15 +618,16 @@ export function createPlayerState<Type extends HTMLElement>(
 export function updateUsers() {
     const players: PlayerRecord = getPlayers();
     Object.values(players).forEach(player => getUser(player.participantId)?.updatePlayer(player));
-    removeChildren(playerOnlineList);
+    removeChildren(playersOnlineList);
     Object.values(players).forEach(player =>
-        playerOnlineList.append(createPlayerState(player, document.createElement("li"), true))
+        playersOnlineList.append(createPlayerState(player, document.createElement("li"), true))
     );
 }
 
 export function toggleShowParticipantsTab(): boolean {
     setShowParticipantsTab(!getShowParticipantsTab());
     setShowTextchatBar(false);
+    setShowPlayersRoomTab(false);
     return getShowParticipantsTab();
 }
 
@@ -620,9 +637,9 @@ export function getShowParticipantsTab(): boolean {
 
 export function setShowParticipantsTab(setTo: boolean) {
     if (setTo) {
-        playerOnlineContainer.classList.add("hover");
+        playersOnlineContainer.classList.add("hover");
     } else {
-        playerOnlineContainer.classList.remove("hover");
+        playersOnlineContainer.classList.remove("hover");
     }
     showParticipantsTab = setTo;
 }

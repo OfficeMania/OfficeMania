@@ -69,8 +69,8 @@ export function updatePosition(player: Player, room: Room) {
     const differenceY: number = Math.abs(player.positionY - roomY);
 
     if (
-        differenceX >= 120 ||
-        differenceY >= 120
+        differenceX >= 200 ||
+        differenceY >= 200
     ) {
         //if server and client data differ to much tp player to server postion.
         player.positionX = roomX;

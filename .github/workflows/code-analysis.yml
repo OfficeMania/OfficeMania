@@ -1,0 +1,21 @@
+name: Code Analysis
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'master'
+
+jobs:
+  Code-Analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the Repository completely
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: kitabisa/sonarqube-action@v1.1.0
+        with:
+          host: ${{ secrets.SONARQUBE_HOST }}
+          login: ${{ secrets.SONARQUBE_TOKEN }}

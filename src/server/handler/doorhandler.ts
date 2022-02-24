@@ -1,6 +1,6 @@
 import { Handler } from "./handler";
 import { Client, Room } from "colyseus";
-import { DoorState, MessageType, State } from "../../common";
+import { DoorState, MessageType, PlayerState, State } from "../../common";
 
 export class DoorHandler implements Handler {
 
@@ -35,9 +35,11 @@ export class DoorHandler implements Handler {
     }
 
     onKnock(room: Room<State>, client: Client, message) {
+        const player: PlayerState = room.state.players[client.sessionId];
+        const notification = `${player?.displayName ?? player?.username ?? "Someone"} knocked on your door.`;
         this.room.clients.forEach(client => {
             if(message.includes(client.sessionId)) {
-                client.send(MessageType.DOOR_NOTIFICATION, "Someone knocked on your door.");
+                client.send(MessageType.DOOR_NOTIFICATION, notification);
             }
         });
         client.send(MessageType.DOOR_KNOCK_SUCCESS, "You successfully knocked.")

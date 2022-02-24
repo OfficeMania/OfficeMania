@@ -47,11 +47,10 @@ export class Whiteboard extends Interactive {
     whiteboardId: number = 0;
     static whiteboardCount: number = 0;
     static currentWhiteboard: number = 0;
-    currentColor: number = 0; //black
+    currentColor: string = "#000000FF"; // Black
     private size: number = 5;
     private numberOfDrawnPixel: number = 0;
     private currentlyDrawing: boolean = false;
-    private colors: string[] = ["black", "white", "red", "magenta", "orange", "yellow", "green", "blue"];
 
     changeSize = (size) => {
         this.size = Number(size);
@@ -69,11 +68,11 @@ export class Whiteboard extends Interactive {
         this.save(this, this.whiteboardId);
     };
 
-    changeColor = (number) => {
-        //console.log(number);
-        this.draw(Number(number));
-        colorSelector.style.backgroundColor = this.colors[this.currentColor];
-        colorSelector.style.color = this.colors[this.currentColor];
+    changeColor = (color: string) => {
+        //console.debug("color:", color);
+        this.draw(color);
+        colorSelector.style.backgroundColor = this.currentColor;
+        colorSelector.style.color = this.currentColor;
     };
 
 
@@ -179,7 +178,7 @@ export class Whiteboard extends Interactive {
         colorSelector.addEventListener("change", (e) => {
             this.changeColor(colorSelector.value);
         });
-        this.changeColor(colorSelector.options[0].value);
+        this.changeColor(colorSelector.value);
 
 
         //size changed
@@ -363,7 +362,7 @@ export class Whiteboard extends Interactive {
 
         if (this.numberOfDrawnPixel % 4 === 0) { //only send each eth pixel to server => draw short lines rather than each pixel
         }
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, createMessage(whiteboard.whiteboardId, false, [whiteboard.x, whiteboard.y], this.isPen ? this.currentColor : -1, this.size));
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, createMessage(whiteboard.whiteboardId, false, [whiteboard.x, whiteboard.y], this.isPen ? this.currentColor : "eraser", this.size));
         this.numberOfDrawnPixel++;
         this.currentlyDrawing = true;
     }
@@ -380,7 +379,7 @@ export class Whiteboard extends Interactive {
         context.lineWidth = this.size;
         context.lineCap = "round";
         if (this.isPen) {
-            context.strokeStyle = this.colors[this.currentColor];
+            context.strokeStyle = this.currentColor;
         } else {
             context.strokeStyle = "white";
         }
@@ -394,13 +393,13 @@ export class Whiteboard extends Interactive {
 
     mouseUp(e, whiteboard: Whiteboard) {
         this.currentlyDrawing = false;
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, createMessage(whiteboard.whiteboardId, true, this.currentlyDrawing ? [this.x, this.y] : undefined, this.isPen ? this.currentColor : -1, this.size));
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, createMessage(whiteboard.whiteboardId, true, this.currentlyDrawing ? [this.x, this.y] : undefined, this.isPen ? this.currentColor : "eraser", this.size));
     }
 
     mouseDown(e, whiteboard: Whiteboard) {
         this.currentlyDrawing = true;
         this.setPosition(e, whiteboard);
-        whiteboard.room.send(MessageType.WHITEBOARD_PATH, createMessage(whiteboard.whiteboardId, false, [whiteboard.x, whiteboard.y], this.isPen ? this.currentColor : -1, this.size));
+        whiteboard.room.send(MessageType.WHITEBOARD_PATH, createMessage(whiteboard.whiteboardId, false, [whiteboard.x, whiteboard.y], this.isPen ? this.currentColor : "eraser", this.size));
     }
 
     mouseEnter(e, whiteboard: Whiteboard) {
@@ -417,7 +416,7 @@ export class Whiteboard extends Interactive {
         */
     }
 
-    private draw(color: number) {
+    private draw(color: string) {
         this.isPen = true;
         this.currentColor = color; //0=black, 1=white, 2=red, 3=pink, 4=orange, 5=yellow, 6=green, 7=blue
     }
@@ -445,12 +444,12 @@ export function drawWhiteboard(canvas: HTMLCanvasElement, whiteboard: HTMLCanvas
 
 }
 
-function createMessage(whiteboardId: number, isEnd: boolean, points?: number[], colorId?: number, size?: number): WhiteboardPathSegmentMessage {
+function createMessage(whiteboardId: number, isEnd: boolean, points?: number[], color?: string, size?: number): WhiteboardPathSegmentMessage {
     return {
         whiteboardId,
         isEnd,
         points,
-        colorId,
+        color,
         size,
     };
 }

@@ -18,6 +18,9 @@ export * from "./states/whiteboard-player-path-state";
 export * from "./states/whiteboard-player-state";
 export * from "./states/whiteboard-state";
 
+// Export util
+export * from "./util/role-color";
+
 // Export Misc
 export * from "./auth-error";
 export * from "./util";

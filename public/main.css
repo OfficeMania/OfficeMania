@@ -61,7 +61,7 @@ body {
 }
 
 #button-close-interaction {
-    background-color: #ff5d5d !important; 
+    background-color: #ff5d5d !important;
 }
 
 #panel-buttons #group-right {
@@ -95,13 +95,13 @@ button:active{
     transform: translateY(2px);
 }
 
-  
+
 /* Tooltip text */
 
 #panel-buttons .tooltip-text {
     position: absolute;
     visibility: hidden;
-    
+
     background-color: #ffffffaa;
     font-size: 10px;
     color: #000;
@@ -362,7 +362,7 @@ button:active{
     align-items: center;
 }
 
-#whiteboard-color-selector {
+#whiteboard-input-color {
     visibility: hidden;
     width: 40px;
     height: 40px;
@@ -464,7 +464,13 @@ button:active{
     background-position: calc(-3 * 48px) 0;
 }
 
-#player-online-container {
+.players-container h1 {
+    color: white;
+    margin: auto;
+}
+
+.players-container {
+    z-index: 2;
     position: fixed;
     background-color: var(--bg-primary-op);
 
@@ -472,7 +478,7 @@ button:active{
     overflow: hidden;
 }
 
-#player-online-list {
+.players-list {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -485,16 +491,16 @@ button:active{
     scrollbar-width: none;  /* Firefox */
 }
 
-#player-online-list::-webkit-scrollbar {
+.players-list::-webkit-scrollbar {
     display: none;  /* Chrome*/
 }
 
-#player-online-list .player-state {
+.players-list .player-state {
     width: 100%;
 }
 
-#player-online-list .player-state-name,
-#player-online-list .player-state-mute {
+.players-list .player-state-name,
+.players-list .player-state-mute {
     padding-top: 25px;
     color: white;
     font-size: 200%;
@@ -512,6 +518,7 @@ button:active{
 }
 
 #textchat-container {
+    z-index: 2;
     right: 0;
     position: fixed;
     background-color: var(--bg-primary-op);
@@ -554,7 +561,7 @@ button:active{
 
 /* Small screens */
 @media only screen and (max-width: 600px) {
-    #player-online-container {
+    .players-container {
         visibility: hidden;
     }
 
@@ -565,27 +572,27 @@ button:active{
 
 /* Large screens */
 @media only screen and (min-width: 600px) {
-    #player-online-container {
+    .players-container {
         right: 0;
     }
 
-    #player-online-container.horizontal-animation {
+    .players-container.horizontal-animation {
         bottom: 0;
         width: 0;
         height: calc(100vh - 64px);
     }
 
-    #player-online-container.vertical-animation {
+    .players-container.vertical-animation {
         top: 64px;
         width: 36rem;
         height: 0;
     }
 
-    #player-online-container.hover.horizontal-animation {
+    .players-container.hover.horizontal-animation {
         width: 36rem;
     }
 
-    #player-online-container.hover.vertical-animation {
+    .players-container.hover.vertical-animation {
         height: calc(100vh - 64px);
     }
 
