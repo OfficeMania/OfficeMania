@@ -54,3 +54,9 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Invoke Redeployment Webhook
+        uses: distributhor/workflow-webhook@v2
+        env:
+          webhook_url: ${{ secrets.WEBHOOK_REDEPLOY_URL }}
+          webhook_secret: ${{ secrets.WEBHOOK_REDEPLOY_SECRET }}
