@@ -6,9 +6,11 @@ on:
       - 'v*.*.*'
 
 jobs:
-  Release:
+  release:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout the Repository
+        uses: actions/checkout@v2
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
