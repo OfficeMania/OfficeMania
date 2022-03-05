@@ -19,6 +19,7 @@ import { PlayerState } from "../common/states/player-state";
 import { getUser, setShowParticipantsTab } from "./conference/conference";
 import { Player } from "./player";
 import { getRoleColor } from "../common";
+import { Autolinker } from "autolinker";
 
 const patternUrl: RegExp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
 
@@ -255,6 +256,18 @@ function sendMessage(message: string, chatId: string) {
 
 }
 
+const autolinker: Autolinker = new Autolinker({
+    newWindow: true,
+    sanitizeHtml: true,
+    stripPrefix: { www: true, scheme: false },
+});
+
+const autolinkerSanitizeOnly: Autolinker = new Autolinker({
+    sanitizeHtml: true,
+    urls: false,
+    email: false,
+    phone: false,
+});
 
 //add message as "p" into textchatbar
 function addMessageToBar(chatMessage: ChatMessage) {
@@ -265,10 +278,7 @@ function addMessageToBar(chatMessage: ChatMessage) {
     const color: string = getRoleColor(players?.[0]?.userRole).nameColorChat;
     messageTime.id = "message-time";
     messageLine.id = "message-line";
-    messageTime.innerText = `${chatMessage.timestamp}  `;
-    messageLine.innerText = `${chatMessage.name}: ${chatMessage.message}`;
-    messageLine.innerHTML = `<span style="color: ${color}; -webkit-text-fill-color: ${color};">${chatMessage.name}</span>` + messageLine.innerHTML.substring(chatMessage.name.length);
-    messageLine.innerHTML = messageLine.innerHTML.replace(patternUrl, '<a href="$&" target="_blank">$&</a>');
+    messageLine.innerHTML = `<span style="color: ${color}; -webkit-text-fill-color: ${color};">${autolinkerSanitizeOnly.link(chatMessage.name)}</span>: ${autolinker.link(chatMessage.message)}`;
     messageDiv.append(messageTime);
     messageDiv.append(messageLine);
     if (checkIfOwnMessage(chatMessage)) {
