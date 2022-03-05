@@ -1,24 +1,19 @@
 import { MessageType } from "../common/util";
 import { checkInputMode, setShowPlayersRoomTab } from "./main";
 import {
+    textchatAddUsers,
     textchatArea,
     textchatBar,
     textchatButton,
-    textchatContainer,
-    textchatAddUsers,
-    textchatDropdownChats,
     textchatChatsButton,
-    textchatNewChat,
+    textchatContainer,
+    textchatDropdownChats,
     textchatDropdownUsers,
-    textchatUsersButton,
+    textchatNewChat,
     textchatSendButton,
+    textchatUsersButton,
 } from "./static";
-import {
-    getOurPlayer,
-    getPlayersByUserId,
-    getRoom,
-    sendNotification,
-} from "./util";
+import { getOurPlayer, getPlayersByUserId, getRoom, sendNotification } from "./util";
 import { Chat, ChatDTO, ChatMessage } from "../common/handler/chat-handler";
 import { PlayerState } from "../common/states/player-state";
 import { getUser, setShowParticipantsTab } from "./conference/conference";
@@ -74,8 +69,7 @@ export function getInFocus() {
 function toggleTextchatBar() {
     if (getShowTextchatBar()) {
         setShowTextchatBar(false);
-    }
-    else {
+    } else {
         setShowTextchatBar(true);
     }
     checkInputMode();
@@ -200,7 +194,7 @@ function onChatUpdate(chatDTOs: ChatDTO[]): void {
         updateChat(chat);
         ids.push(chat.id);
     });
-    for(let i = 0; i < chats.length; i++) {
+    for (let i = 0; i < chats.length; i++) {
         if (!ids.includes(chats[i].id)) {
             chats.splice(i, 1);
         }
@@ -485,8 +479,8 @@ function updateChatName(chat: Chat) {
     chat.name = "";
     chat.users.forEach((user) => {
         if (user.length !== 9) {
-            getRoom().state.players.forEach((p,k,) => {
-                if(p.userId && p.userId === user) {
+            getRoom().state.players.forEach((p, k) => {
+                if (p.userId && p.userId === user) {
                     user = k;
                 }
             });
@@ -520,8 +514,7 @@ function sendChatNotification(message: ChatMessage) {
     for (let i = 0; textchatDropdownChats.children.length > i; i++) {
         if (textchatChatsButton.getAttribute("data-id") === message.chatId) {
             textchatChatsButton.classList.add("unread");
-        }
-        else if (textchatDropdownChats.children[i].id === message.chatId) {
+        } else if (textchatDropdownChats.children[i].id === message.chatId) {
 
             textchatDropdownChats.children[i].classList.add("unread");
         }
